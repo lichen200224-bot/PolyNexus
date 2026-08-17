@@ -1,11 +1,13 @@
 $ErrorActionPreference = "Stop"
 
+$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
+$venvPython = Join-Path $repoRoot ".venv\Scripts\python.exe"
 $python = "python"
-if (Test-Path ".venv\Scripts\python.exe") {
-  $python = ".venv\Scripts\python.exe"
+if (Test-Path $venvPython) {
+  $python = $venvPython
 }
 
-Push-Location ".\services\core"
+Push-Location (Join-Path $repoRoot "services\core")
 try {
   & $python -m pytest
   if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

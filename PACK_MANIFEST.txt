@@ -14,6 +14,7 @@ PolyNexus_V1_Project_Tracker_v1.0.xlsx
 README.md
 apps/web/index.html
 apps/web/package.json
+apps/web/src/App.test.tsx
 apps/web/src/App.tsx
 apps/web/src/main.tsx
 apps/web/src/styles.css
@@ -44,6 +45,8 @@ docs/19_DEVELOPMENT_BASELINE.md
 docs/20_FIRST_VERTICAL_SLICE_PLAN.md
 docs/21_DEPENDENCY_BASELINE.md
 docs/22_BASELINE_VALIDATION_REPORT.md
+docs/23_DEV_PREPARATION_CHECKLIST.md
+docs/24_DEV_PREPARATION_PATCH_v1.0.1.md
 extensions/browser-companion/README.md
 extensions/browser-companion/manifest.json
 extensions/browser-companion/src/driver-contract.js
@@ -53,12 +56,14 @@ extensions/browser-companion/src/drivers/gemini.js
 extensions/browser-companion/src/service-worker.js
 schemas/workflow.schema.json
 scripts/bootstrap_git.ps1
+scripts/check_environment.ps1
 scripts/preflight.ps1
 scripts/setup_dev.ps1
 scripts/start_core.ps1
 scripts/start_web.ps1
 scripts/test_core.ps1
 scripts/validate_baseline.py
+scripts/verify_dev_ready.ps1
 services/core/pyproject.toml
 services/core/src/polynexus_core/__init__.py
 services/core/src/polynexus_core/api/health.py
