@@ -1,0 +1,16 @@
+id: review-minimal
+version: 1
+assurance: STANDARD
+parameters:
+  reviewers: 1
+steps:
+  - id: prepare-context
+    type: CONTEXT
+  - id: review
+    type: AI_TASK
+    depends_on:
+      - prepare-context
+  - id: synthesize
+    type: SYNTHESIS
+    depends_on:
+      - review

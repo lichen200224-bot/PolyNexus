@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://polynexus.local/schemas/workflow.schema.json",
+  "title": "PolyNexus Workflow Definition",
+  "type": "object",
+  "required": ["id", "version", "steps"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {"type": "string", "minLength": 1},
+    "version": {"type": "integer", "minimum": 1},
+    "assurance": {"enum": ["FLEXIBLE", "STANDARD", "VERIFIED"]},
+    "parameters": {"type": "object"},
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "type"],
+        "additionalProperties": true,
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "type": {
+            "enum": [
+              "CONTEXT",
+              "AI_TASK",
+              "PARALLEL_AI",
+              "CROSS_REVIEW",
+              "TOOL",
+              "EVIDENCE_CHECK",
+              "HUMAN_GATE",
+              "SYNTHESIS",
+              "CONDITION"
+            ]
+          },
+          "depends_on": {
+            "type": "array",
+            "items": {"type": "string"},
+            "uniqueItems": true
+          }
+        }
+      }
+    }
+  }
+}

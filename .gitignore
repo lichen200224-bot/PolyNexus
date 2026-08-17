@@ -1,0 +1,63 @@
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.example.json
+.idea/
+
+# Secrets / local config
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+.local/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node
+node_modules/
+dist/
+build/
+coverage/
+.npm/
+
+# Local databases / runtime state
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+runtime-data/
+artifacts/
+logs/
+
+# Browser / test profiles
+.browser-profile/
+playwright-report/
+test-results/
+
+# Generated competition/export artifacts
+competition/output/
+exports/
+
+# Temporary
+*.tmp
+*.bak
+*.swp
+~$*
+
+# Additional development caches
+*.egg-info/
+.mypy_cache/
+.ruff_cache/
+apps/web/.vite/

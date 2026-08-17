@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "PolyNexus Browser Companion",
+  "version": "0.1.0",
+  "description": "Thin browser companion for assisted Web AI workflows.",
+  "permissions": ["storage", "tabs", "scripting"],
+  "host_permissions": [
+    "http://127.0.0.1/*",
+    "https://chatgpt.com/*",
+    "https://claude.ai/*",
+    "https://gemini.google.com/*"
+  ],
+  "background": {
+    "service_worker": "src/service-worker.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "PolyNexus"
+  }
+}
