@@ -1,8 +1,10 @@
 # Development Preparation Checklist
 
-Baseline: Development Baseline v1.0 + preparation patch v1.0.1
+Baseline: Development Baseline v1.0 + preparation profile v1.0.2
 
 ## A. Files / Repository
+- [ ] Primary workspace is exactly `D:\AI學習教材\PolyNexus`.
+- [ ] Run `powershell -ExecutionPolicy Bypass -File .\scripts\check_workspace_path.ps1`.
 - [ ] Clone from Git bundle into the final PolyNexus folder.
 - [ ] Confirm baseline commit/tag.
 - [ ] Keep only one physical working tree for sequential Codex/OpenCode/Antigravity use.

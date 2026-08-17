@@ -3,6 +3,7 @@
 TASK: Development Baseline v1.0 → First Vertical Slice
 OWNER: Next Active Writer (recommended Codex for architecture/core bootstrap)
 BRANCH: feature/first-vertical-slice
+PRIMARY_WORKSPACE: D:\AI學習教材\PolyNexus
 
 ## Goal
 Validate the frozen repository scaffold, then implement the minimum real path:

@@ -1,7 +1,7 @@
 # Project State
 
 Date: 2026-08-17
-Version: Development Baseline v1.0
+Version: Development Baseline v1.0 + Dev Preparation Profile v1.0.2
 Milestone: Architecture Freeze / Repository Scaffold
 
 ## Confirmed
@@ -16,6 +16,10 @@ Milestone: Architecture Freeze / Repository Scaffold
 - Development target: Feature Freeze 2026-10-18; V1 acceptance 2026-10-31.
 - Competition latest notice: initial-review deadline 2026-09-07.
 - Development tools: Codex + OpenCode Go + Antigravity, same Git project directory, Single Active Writer.
+
+## Local Workspace
+- Primary Windows path: `D:\AI學習教材\PolyNexus`
+- Absolute path is a local profile only; product code remains repo-relative.
 
 ## Current Priority
 1. Establish Development Baseline v1.0 repository and initial Git checkpoint.

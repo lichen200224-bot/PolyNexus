@@ -47,6 +47,8 @@ docs/21_DEPENDENCY_BASELINE.md
 docs/22_BASELINE_VALIDATION_REPORT.md
 docs/23_DEV_PREPARATION_CHECKLIST.md
 docs/24_DEV_PREPARATION_PATCH_v1.0.1.md
+docs/25_LOCAL_WORKSPACE_PROFILE.md
+docs/26_DEV_PREPARATION_PATCH_v1.0.2.md
 extensions/browser-companion/README.md
 extensions/browser-companion/manifest.json
 extensions/browser-companion/src/driver-contract.js
@@ -57,6 +59,7 @@ extensions/browser-companion/src/service-worker.js
 schemas/workflow.schema.json
 scripts/bootstrap_git.ps1
 scripts/check_environment.ps1
+scripts/check_workspace_path.ps1
 scripts/preflight.ps1
 scripts/setup_dev.ps1
 scripts/start_core.ps1

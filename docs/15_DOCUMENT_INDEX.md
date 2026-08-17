@@ -28,3 +28,7 @@
 ## Token 原則
 
 新 session 只先讀 `AGENTS.md + PROJECT_STATE + HANDOFF_CURRENT`。再依任務載入 1–3 份必要文件。聊天歷史不是 Source of Truth。
+
+## Development preparation profile additions
+- `25_LOCAL_WORKSPACE_PROFILE.md` — current Windows canonical workspace `D:\AI學習教材\PolyNexus` and portability rule.
+- `26_DEV_PREPARATION_PATCH_v1.0.2.md` — Drive-D development-preparation patch summary.

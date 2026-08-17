@@ -2,10 +2,20 @@
 
 > Local-first Multi-AI Collaboration & Validation Workspace
 
-版本：Development Baseline v1.0
+版本：Development Baseline v1.0（Dev Preparation Profile v1.0.2）
 日期：2026-08-17
 
 PolyNexus Phase 1 的目標是交付可長期自行使用的 `LOCAL_PERSONAL` 多 AI 工作平台，不是只有 Framework。Workspace / Task / Discuss / Review / Validate / Council / Evidence / Workflow / Runtime / Web AI / Local AI 都必須有真實可操作垂直切片；後續再沿同一 Domain / Contract 演進 Personal Hub、部門／Team 與 Enterprise 能力。
+
+## 主要開發工作目錄
+
+目前主要 Windows 開發機的固定工作目錄：
+
+```text
+D:\AI學習教材\PolyNexus
+```
+
+此路徑是本機 Workspace Profile，不是 Core/Domain 的硬編碼假設；應用程式與測試仍必須使用 repository-relative path。第一次實機準備請先執行 `scripts/check_workspace_path.ps1`。
 
 ## 已凍結技術基線
 

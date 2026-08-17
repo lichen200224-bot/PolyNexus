@@ -1,7 +1,10 @@
-$ErrorActionPreference = "Stop"
+﻿$ErrorActionPreference = "Stop"
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 
 Write-Host "== PolyNexus Development Readiness Gate =="
+
+& (Join-Path $PSScriptRoot "check_workspace_path.ps1")
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 & (Join-Path $PSScriptRoot "check_environment.ps1")
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

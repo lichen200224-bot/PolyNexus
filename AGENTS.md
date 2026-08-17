@@ -2,6 +2,11 @@
 
 本檔是 Codex / OpenCode 的短版永久規則。完整規格採 Need-to-know 載入，避免 Token 浪費。
 
+
+## 0. Workspace Profile
+
+主要 Windows 開發工作目錄為 `D:\AI學習教材\PolyNexus`。這只是本機開發位置；禁止把絕對路徑寫入 Domain、Runtime Contract 或可攜式設定。除非任務明確是安裝／本機環境設定，程式碼應使用 repo-relative path。
+
 ## 1. Source of Truth
 
 優先順序：
