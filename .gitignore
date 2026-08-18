@@ -61,3 +61,5 @@ exports/
 .mypy_cache/
 .ruff_cache/
 apps/web/.vite/
+
+*.tsbuildinfo
