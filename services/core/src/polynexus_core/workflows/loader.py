@@ -7,6 +7,8 @@ from typing import Any
 import yaml
 from jsonschema import Draft202012Validator
 
+from polynexus_core.workflows.models import WorkflowDefinition
+
 
 class WorkflowValidationError(ValueError):
     pass
@@ -33,3 +35,10 @@ def load_workflow(path: str | Path, schema_path: str | Path | None = None) -> di
         raise WorkflowValidationError(details)
 
     return data
+
+
+def load_workflow_definition(
+    path: str | Path,
+    schema_path: str | Path | None = None,
+) -> WorkflowDefinition:
+    return WorkflowDefinition.from_mapping(load_workflow(path, schema_path))
