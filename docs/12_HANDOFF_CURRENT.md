@@ -1,40 +1,62 @@
 # Current Handoff
 
-TASK: Development Baseline v1.0 → First Vertical Slice
-OWNER: Next Active Writer (recommended Codex for architecture/core bootstrap)
-BRANCH: feature/first-vertical-slice
-PRIMARY_WORKSPACE: D:\AI學習教材\PolyNexus
+## Task
+First Vertical Slice
+
+## Status
+READY TO START
+
+## Active Writer
+Codex — initial architecture/core bootstrap
+
+## Starting Branch
+feature/first-vertical-slice
 
 ## Goal
-Validate the frozen repository scaffold, then implement the minimum real path:
-`Project → Review Task → Reference/Mock Runtime → Finding/Evidence → Result → durable history`.
+Deliver the first real PolyNexus end-to-end product path:
 
-## Completed
-- Scope D01–D10 confirmed.
-- ADR-001～010 confirmed.
-- PRD/SA/SD promoted to Development Baseline v1.0.
-- Shared `.agents/skills` / Antigravity rules / token-aware handoff rules prepared.
-- Initial React/FastAPI/MV3/workflow schema scaffold prepared.
-- Git safety model = same repo, sequential tools, Single Active Writer.
+Project
+→ Review Task
+→ ContextPackage
+→ WorkflowDefinition
+→ Reference/Mock Runtime
+→ Run Supervisor
+→ Finding + Evidence
+→ Persist
+→ Result
+→ Reload History
 
-## Required First Actions
-1. `git status --short --branch`
-2. Run `scripts/preflight.ps1`.
-3. Run `scripts/test_core.ps1`.
-4. Read only PRD/SA/SD sections directly relevant to First Vertical Slice.
-5. Do not implement Web AI / Local AI / all workflow templates before the slice works.
+## Confirmed Baseline
+- ADR-001 through ADR-010 frozen.
+- Windows development environment accepted.
+- OpenCode onboarding PASS.
+- Codex onboarding PASS.
+- Antigravity onboarding PASS.
+- Git backup available at D:\GitBackup\PolyNexus_Backup.git.
 
-## Acceptance for Next Handoff
-- Core health test PASS with actual exit code 0.
-- Workflow schema baseline test PASS.
-- First Project/Review domain path persisted through Repository boundary.
-- Evidence object cannot be confused with AI opinion.
-- Updated `HANDOFF_CURRENT.md` lists changed files, tests, actual exit codes, known issues.
+## Tool Assignment
 
-## Do Not Change Without ADR/Decision
-- D01–D10.
-- ADR-001～010.
-- Discuss/Review/Validate top-level modes.
-- Evidence truth/provenance rules.
-- Plugin-ready/declarative workflow foundations.
-- V1 LOCAL_PERSONAL focus and 2026-10-31 acceptance target.
+### Codex
+First writer:
+- domain boundaries
+- run supervisor
+- workflow execution contracts
+- evidence/context/artifact integration boundaries
+
+### OpenCode
+Second writer:
+- persistence implementation
+- API wiring
+- tests
+- routine integration work
+
+### Antigravity
+Milestone verifier:
+- UI/E2E only after vertical slice becomes runnable
+
+## Restrictions
+- Do not change ADR-001–010 without a new ADR and explicit human approval.
+- Do not add Plugin/MCP infrastructure.
+- Do not add unrelated V1 features.
+- Do not allow multiple active writers.
+- Do not claim PASS without current deterministic evidence.

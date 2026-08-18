@@ -40,3 +40,48 @@ First Vertical Slice target by 2026-09-06:
 
 ## Next Gate
 2026-08-25: competition content v1 + Development Baseline operating on local machine.
+
+## Current Development State
+
+Phase: Development Preparation Complete
+Next Phase: First Vertical Slice
+
+Current Branch: develop
+Current Baseline Commit: 2c8fcc0
+
+Architecture:
+- ADR-001 through ADR-010 are CONFIRMED / FROZEN FOR V1 IMPLEMENTATION.
+
+Development Environment:
+- Windows development readiness: PASS
+- Core pytest: 7 passed
+- Frontend build: PASS
+- Frontend Vitest: 1 passed
+- Local Git backup: PASS
+
+Tool Onboarding:
+- OpenCode Desktop: PASS
+- ChatGPT / Codex Desktop: PASS
+- Antigravity Desktop: PASS
+
+Primary Workspace:
+D:\AI學習教材\PolyNexus
+
+Tool Roles:
+- Codex: Architecture / Core / Contract / Hard Bug / Critical Review
+- OpenCode: Primary Builder / Tests / Templates / Routine Implementation
+- Antigravity: Browser / UI / E2E / Integration / Milestone Red Team
+
+Development Rule:
+- Single Active Writer.
+- AI opinion does not override deterministic evidence.
+- Existing deterministic evidence is not rerun solely because the active AI tool changes.
+
+OpenCode Model Routing:
+1. Default: DeepSeek V4 Flash
+2. If unavailable / policy-blocked: MiMo V2.5
+3. If MiMo V2.5 repeatedly fails deterministic validation: MiMo V2.5 Pro
+4. Architecture / security / lifecycle / hard root cause: escalate to Codex
+
+Next Gate:
+First Vertical Slice
