@@ -232,6 +232,65 @@ None. All work within FVS-03 scope.
 - **Codex**: Independently accept FVS-03 after the Writer reports `READY_FOR_CODEX_ACCEPTANCE`.
 - **OpenCode**: After acceptance, proceed with FVS-04 or WP-06 (UI scaffold).
 
+## WP-06 Update
+
+### Goal
+Minimal React UI for Project and Task flows on top of the existing FVS-03 API, without changing backend contracts or adding authentication architecture.
+
+### Changed files
+- `apps/web/src/api.ts` (new)
+- `apps/web/src/App.tsx` (rewritten)
+- `apps/web/src/App.test.tsx` (rewritten)
+- `apps/web/src/styles.css` (extended)
+- `apps/web/src/components/ProjectList.tsx` (new)
+- `apps/web/src/components/CreateProjectForm.tsx` (new)
+- `apps/web/src/components/TaskList.tsx` (new)
+- `apps/web/src/components/CreateTaskForm.tsx` (new)
+- `apps/web/src/components/RunPreparation.tsx` (new)
+- `apps/web/vite.config.ts` (modified — added `/api` proxy to `127.0.0.1:8765`)
+- `apps/web/vitest.config.ts` (new)
+- `apps/web/tsconfig.json` (modified — exclude test files from tsc)
+
+### Implemented
+- `api.ts`: typed API client with correct response wrappers (`{ projects }`, `{ tasks }`, `{ runs }`), injectable `getAuthHeaders`, configurable `baseUrl` (includes `/api/v1`), no hard-coded token/port/secret.
+- `ProjectList`: loading, empty, 403 auth error states; project selection navigation.
+- `CreateProjectForm`: name + description form, 422 error display, loading/disabled states.
+- `TaskList`: Discuss/Review/Validate mode labels, task selection, empty state.
+- `CreateTaskForm`: title, workflow, version, mode form; 404/422/403 error handling.
+- `RunPreparation`: ContextPackage ID input (non-empty validation only, real validity from API 422), run creation, Run CREATED/LOCAL/NONE state display, run history list.
+- `App.tsx`: `useState`-based view state navigation (`projects` → `tasks` → `run-prep`), no router, props-based.
+- Accessibility: `role="status"` for loading, `role="alert"` for errors, `aria-label` on all forms, `aria-required`, `disabled`/`loading` button states.
+- Default API base URL: `/api/v1` (same-origin). Vite dev proxy forwards `/api` → `127.0.0.1:8765`. Overridable via `VITE_POLYNEXUS_API_BASE_URL` env var (not a secret). No CORS issue in dev mode.
+- `LOOPBACK_TOKEN` is NOT stored, transmitted, or referenced as a value in frontend code. The 403 error hint mentions the environment variable name only — this is an operational hint, not a secret leak.
+
+### Tests and validation
+- `apps/web/src/App.test.tsx`: 41 tests — PASS, exit code 0.
+- `npm run build` (tsc -b && vite build) — PASS, exit code 0.
+- `git diff --check` — PASS, exit code 0.
+- Test coverage: api error classes, loading state, empty state, 403 auth error, project list, create form 422 validation, create success (POST 201 + refresh GET), navigation flow (project→task→run-prep, back navigation), task list with Validate/Review/Discuss labels, task list 403/404/422 error branches, CreateTaskForm 403/404/422 error branches, Run CREATED/LOCAL/NONE state display, run list 403/404 error branches, run create 403/404/422 error branches, accessibility (role=status, role=alert, aria-label on forms).
+
+### Test count
+- Frontend tests: 41
+- Total project tests: 83 (core) + 41 (frontend) = 124
+
+### ADR impact
+None. ADR-003 (React/TS/Vite), ADR-004 (UI/Core boundary via REST), ADR-010 (no secret in UI) all respected.
+
+### Scope deviation
+- WP-06 scope strictly followed. No backend changes, no new endpoints, no new runtime dependencies.
+- Pre-existing untracked files in working tree (`docs/governance/`, `docs/tasks/`, `tools/`) are from prior治理/任務文件 work, unrelated to WP-06. They do not affect WP-06 verification.
+
+### Known limitations
+- No `@testing-library/react` installed; tests use direct DOM manipulation with jsdom.
+- `jsdom` added as devDependency (not a runtime dependency).
+- `vitest.config.ts` added to set `environment: 'jsdom'`.
+- Vite proxy (`/api` → `127.0.0.1:8765`) only applies in dev mode (`npm run dev`). Production build (`npm run build`) outputs static files; production deployment needs its own reverse proxy or CORSMiddleware.
+- Frontend has no real auth source; when `LOOPBACK_TOKEN` is not set on the backend, all API calls return 403. The UI surfaces "Authentication required" with a hint about `LOOPBACK_TOKEN`.
+
+### Next
+- **Codex**: Independently review WP-06 after `READY_FOR_CODEX_REVIEW`.
+- **OpenCode**: After Codex review passes, proceed with WP-07 Integration Acceptance or next FVS task.
+
 ## Restrictions
 - Do not change ADR-001–010 without a new ADR and explicit human approval.
 - Do not add Plugin/MCP infrastructure.
