@@ -1,8 +1,8 @@
 # Project State
 
-Date: 2026-08-17
+Date: 2026-08-19
 Version: Development Baseline v1.0 + Dev Preparation Profile v1.0.2
-Milestone: Architecture Freeze / Repository Scaffold
+Milestone: First Vertical Slice — WP-06 accepted / WP-07 pending
 
 ## Confirmed
 - Product Scope Decisions D01–D10 confirmed.
@@ -22,10 +22,8 @@ Milestone: Architecture Freeze / Repository Scaffold
 - Absolute path is a local profile only; product code remains repo-relative.
 
 ## Current Priority
-1. Establish Development Baseline v1.0 repository and initial Git checkpoint.
-2. Verify scaffold/preflight/tests on target Windows environment.
-3. Prepare competition proposal/deck content confidence gate by 2026-08-25.
-4. Begin First Vertical Slice immediately after baseline verification.
+1. Execute WP-07 Integration Acceptance from the accepted FVS-03 and WP-06 checkpoints.
+2. Prepare competition proposal/deck content confidence gate by 2026-08-25.
 
 ## Current Product Slice
 First Vertical Slice target by 2026-09-06:
@@ -43,20 +41,25 @@ First Vertical Slice target by 2026-09-06:
 
 ## Current Development State
 
-Phase: Development Preparation Complete
-Next Phase: First Vertical Slice
+Phase: First Vertical Slice In Progress
+Next Phase: WP-07 Integration Acceptance
 
-Current Branch: develop
+Current Branch: feature/first-vertical-slice
 Current Baseline Commit: 2c8fcc0
+Latest FVS Checkpoint: ed856a5 (`feat(web): add WP-06 project task run UI`)
+Current Planned Task: WP-07 — Integration Acceptance
+Active Writer: None (WP-06 accepted; WP-07 Codex acceptance pending)
+Reviewer: Codex
+Antigravity: NOT_REQUIRED
 
 Architecture:
 - ADR-001 through ADR-010 are CONFIRMED / FROZEN FOR V1 IMPLEMENTATION.
 
 Development Environment:
 - Windows development readiness: PASS
-- Core pytest: 7 passed
+- Core pytest: 83 passed
 - Frontend build: PASS
-- Frontend Vitest: 1 passed
+- Frontend Vitest: 41 passed
 - Local Git backup: PASS
 
 Tool Onboarding:
@@ -84,4 +87,4 @@ OpenCode Model Routing:
 4. Architecture / security / lifecycle / hard root cause: escalate to Codex
 
 Next Gate:
-First Vertical Slice
+WP-07 Integration Acceptance, followed by the next Human approval gate.

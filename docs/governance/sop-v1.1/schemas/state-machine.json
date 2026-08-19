@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PolyNexus SOP v1.1 State Machine",
+  "type": "object",
+  "required": ["version", "states", "transitions", "terminal_states"],
+  "properties": {
+    "version": { "const": "1.1.0" },
+    "states": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "transitions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["from", "to", "guard"],
+        "properties": {
+          "from": { "type": "string" },
+          "to": { "type": "string" },
+          "guard": { "type": "string" },
+          "required_fields": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "terminal_states": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "additionalProperties": false
+}

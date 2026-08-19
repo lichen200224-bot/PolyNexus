@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PolyNexus SOP v1.1 Governance Event",
+  "type": "object",
+  "required": ["task_id", "state", "result", "actor", "next_action", "next_prompt"],
+  "properties": {
+    "task_id": { "type": "string", "minLength": 1 },
+    "state": {
+      "type": "string",
+      "enum": [
+        "TASK_CREATED",
+        "WRITER_IN_PROGRESS",
+        "READY_FOR_CODEX_ACCEPTANCE",
+        "CODEX_ACCEPTANCE_IN_PROGRESS",
+        "CODEX_REJECTED",
+        "FIX_REQUIRED",
+        "READY_FOR_REVERIFICATION",
+        "CODEX_REVERIFICATION_IN_PROGRESS",
+        "CODEX_ACCEPTED",
+        "ANTIGRAVITY_VERIFICATION_REQUIRED",
+        "ANTIGRAVITY_VERIFICATION_IN_PROGRESS",
+        "ANTIGRAVITY_REJECTED",
+        "ANTIGRAVITY_ACCEPTED",
+        "FINAL_ACCEPTANCE_IN_PROGRESS",
+        "HUMAN_APPROVAL_REQUIRED",
+        "COMMIT_APPROVED",
+        "COMMITTED",
+        "TASK_CLOSED",
+        "NEED_ACTION",
+        "BLOCKED"
+      ]
+    },
+    "result": { "type": "string", "minLength": 1 },
+    "actor": { "type": "string", "enum": ["Human", "OpenCode", "Codex", "Antigravity", "coordinator"] },
+    "writer": { "type": "string" },
+    "reviewer": { "type": "string" },
+    "attempt": { "type": "integer", "minimum": 0 },
+    "modified_files": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "summary"],
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "type": "string" },
+          "path": { "type": "string" },
+          "summary": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["issue_id", "severity", "summary"],
+        "properties": {
+          "issue_id": { "type": "string" },
+          "severity": { "type": "string", "enum": ["BLOCKER", "HIGH", "MEDIUM", "LOW"] },
+          "summary": { "type": "string" },
+          "target_tool": { "type": "string" },
+          "fix_prompt": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "protected_areas_check": {
+      "type": "object",
+      "required": ["fvs_01", "fvs_02", "adr_001_to_010"],
+      "properties": {
+        "fvs_01": { "type": "string" },
+        "fvs_02": { "type": "string" },
+        "adr_001_to_010": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "next_action": { "type": "string", "minLength": 1 },
+    "next_prompt": { "type": "string", "minLength": 1 }
+  },
+  "additionalProperties": false
+}

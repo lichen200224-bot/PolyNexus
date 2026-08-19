@@ -4,21 +4,23 @@
 First Vertical Slice
 
 ## Status
-Previous: FVS-02 PERSISTENCE / REPOSITORY / MIGRATION — CHECKPOINTED at `1c872de`.
-Current: FVS-03 CORE API FOUNDATION: PROJECT / TASK / RUN — READY_FOR_CODEX_ACCEPTANCE.
+Previous: FVS-03 CORE API FOUNDATION: PROJECT / TASK / RUN — ACCEPTED and checkpointed at `7f3e4df`.
+Current: WP-06 UI — ACCEPTED and checkpointed at `ed856a5`.
+Next: WP-07 Integration Acceptance — pending.
 
 Acceptance repair log: `docs/27_ACCEPTANCE_REPAIR_LOG.md`
 
-Task document: `docs/tasks/FVS-03.md`
+Task document: `docs/20_FIRST_VERTICAL_SLICE_PLAN.md` (WP-07 next).
+Historical task document: `docs/tasks/FVS-03.md`
 
 ## Active Writer
-OpenCode — FVS-03 API implementation
+None — WP-06 implementation completed by OpenCode.
 
 ## Reviewer
-Codex — independent acceptance after `READY_FOR_CODEX_ACCEPTANCE`
+Codex — WP-06 acceptance completed; WP-07 acceptance pending.
 
 ## Antigravity
-NOT_REQUIRED for FVS-03; reserve browser/E2E verification for UI or milestone integration.
+NOT_REQUIRED for WP-06; reserve browser/E2E verification for UI or milestone integration.
 
 ## Starting Branch
 feature/first-vertical-slice
