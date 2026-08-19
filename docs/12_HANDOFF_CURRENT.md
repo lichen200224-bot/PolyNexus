@@ -4,23 +4,23 @@
 First Vertical Slice
 
 ## Status
-Previous: FVS-03 CORE API FOUNDATION: PROJECT / TASK / RUN — ACCEPTED and checkpointed at `7f3e4df`.
-Current: WP-06 UI — ACCEPTED and checkpointed at `ed856a5`.
-Next: WP-07 Integration Acceptance — pending.
+Previous: WP-07 Integration Acceptance — ACCEPTED and checkpointed at `d7060c4`.
+Current: First Vertical Slice post-WP-07 handoff — HUMAN_DECISION for the next milestone/UI E2E task.
+Next: Human selects and authorizes the next FVS milestone task; use Antigravity when browser/E2E verification is valuable.
 
 Acceptance repair log: `docs/27_ACCEPTANCE_REPAIR_LOG.md`
 
-Task document: `docs/20_FIRST_VERTICAL_SLICE_PLAN.md` (WP-07 next).
+Task document: `docs/20_FIRST_VERTICAL_SLICE_PLAN.md` (WP-07 accepted; next milestone task pending Human selection).
 Historical task document: `docs/tasks/FVS-03.md`
 
 ## Active Writer
-None — WP-06 implementation completed by OpenCode.
+NONE — WP-07 implementation and acceptance completed.
 
 ## Reviewer
-Codex — WP-06 acceptance completed; WP-07 acceptance pending.
+Codex — WP-07 independently accepted after current manual evidence and Human waiver.
 
 ## Antigravity
-NOT_REQUIRED for WP-06; reserve browser/E2E verification for UI or milestone integration.
+NOT_REQUIRED for WP-07 Core integration; recommended for the next UI/browser milestone verification if selected by Human.
 
 ## Starting Branch
 feature/first-vertical-slice
@@ -292,6 +292,84 @@ None. ADR-003 (React/TS/Vite), ADR-004 (UI/Core boundary via REST), ADR-010 (no 
 ### Next
 - **Codex**: Independently review WP-06 after `READY_FOR_CODEX_REVIEW`.
 - **OpenCode**: After Codex review passes, proceed with WP-07 Integration Acceptance or next FVS task.
+
+## WP-07 Update
+
+### Goal
+Integration Acceptance — execution persistence and reload. Establish the minimal Core-owned integration that executes a Task through RunSupervisor + ReferenceRuntimeAdapter, persists all results through repositories, and verifies full session-close-reopen reload.
+
+### Changed files
+- `services/core/src/polynexus_core/execution_service.py` (new)
+- `services/core/tests/test_wp07_integration.py` (new)
+
+### Implemented
+- `ExecutionService`: thin orchestration layer connecting Repository layer, Workflow loader, and RunSupervisor.
+  - Loads Task and ContextPackage from repositories; validates same-project ownership.
+  - Loads WorkflowDefinition from builtin YAML; validates task workflow reference.
+  - **Workflow path security**: workflow_id validated against allowlist pattern (`^[a-zA-Z0-9_-]+$`); resolved path containment verified via `Path.is_relative_to()` (not string prefix); rejects sibling-prefix paths and symlink/junction escapes. Containment logic factored into `_check_workflow_path_containment` static helper (called by `_load_workflow`).
+  - Executes via `RunSupervisor` + `ReferenceRuntimeAdapter`.
+  - Persists Run, RunEvents, RunResult, Finding, Evidence, Artifact through repository ABCs. No direct ORM operations in service layer.
+  - Single explicit transaction boundary with commit.
+- `test_wp07_integration.py`: 13 integration acceptance tests covering:
+  - Full lifecycle: execute → persist → close session → reopen → reload → verify.
+  - Cross-project validation (Task/ContextPackage must share project).
+  - Workflow reference validation (task workflow must match loaded YAML).
+  - Strict run event lifecycle ordering: CREATED→STARTING→RUNNING→COMPLETED with chain integrity and monotonic timestamps.
+  - Cancel cleanup persistence verification.
+  - Reference runtime network egress guarantee (purely in-memory).
+  - **Workflow path traversal prevention**: rejects `../`, `..\\`, URL-encoded, and non-alphanumeric workflow IDs via regex; validates sibling-prefix false positive rejection (regex layer only — not production symlink containment); symlink escape detection test requires symlink-capable environment (currently UNVERIFIED/SKIPPED).
+
+### Architecture / boundary summary
+- `ExecutionService` does NOT own Domain logic, persistence schema, or runtime adapter internals.
+- All persistence goes through Repository ABC interfaces (no direct ORM operations, no raw SQL).
+- Workflow loaded from `workflows/builtin/review-minimal.yaml` via existing `load_workflow_definition`.
+- `ReferenceRuntimeAdapter` is purely in-memory; no network/vendor egress.
+- Alembic `upgrade head` used for migration lifecycle (not `Base.metadata.create_all()`).
+
+### Tests and validation (WP-07 ATTEMPT 5 — 2026-08-19)
+- `services/core/tests/test_wp07_integration.py`: 12 passed, 1 skipped — exit code 0.
+  - SKIPPED / UNVERIFIED: `test_symlink_escape_rejected` — Windows symlink permission denied; uses `pytest.skip(reason=...)`. Symlink-based containment verification could not be executed on current environment. Sibling-prefix fallback test verifies regex rejection only; it does NOT exercise production symlink containment.
+- `services/core/tests/test_runtime_skeleton.py`: 2 tests — PASS, exit code 0 (regression).
+- `services/core/tests/test_persistence.py`: 38 tests — PASS, exit code 0 (regression).
+- Full `services/core` pytest: 95 passed, 1 skipped — exit code 0.
+- `scripts/validate_baseline.py`: PASS, exit code 0.
+- `git diff --check`: PASS, exit code 0.
+- Execution environment: temp venv `C:\temp_pn_venv2\Scripts\python.exe` (Python 3.13.14).
+
+### Acceptance result
+- Codex independent review: **PASS** on 2026-08-19.
+- Human explicitly accepted the Windows symlink containment `UNVERIFIED/SKIPPED` limitation.
+- WP-07 implementation checkpoint: `d7060c4` (`feat(core): add WP-07 execution integration`).
+
+### Test count
+- New integration tests: 12 passed + 1 skipped (UNVERIFIED) = 13 total
+- Total project tests: 95 (core, 1 skipped) + 41 (frontend) = 136
+
+### Acceptance governance files
+This acceptance sync includes the following governance/state files; WP-07 source/test are checkpointed at `d7060c4`:
+- `AGENTS.md`
+- `docs/05_GIT_WORKFLOW.md`
+- `docs/06_AI_TOOL_COLLABORATION.md`
+- `docs/08_ACCEPTANCE_STRATEGY.md`
+- `docs/11_PROJECT_STATE.md`
+- `docs/12_HANDOFF_CURRENT.md`
+
+### ADR impact
+None. ADR-007 (RunSupervisor lifecycle), ADR-008 (SQLite metadata), ADR-010 (no secret in execution) all respected.
+
+### Scope deviation
+None. All work within WP-07 scope.
+
+### Known limitations
+- `ExecutionService` uses `ReferenceRuntimeAdapter` only; production adapters will need their own integration tests.
+- The service does not handle concurrent execution or retry semantics (future work).
+- FVS02-AC-001 BLOCKER (Unicode workspace path) remains — environment issue, not product issue.
+- `test_symlink_escape_rejected` SKIPPED / UNVERIFIED on current Windows environment (symlink permission denied). Human accepted this limitation for WP-07; full symlink containment verification remains future environment-specific evidence.
+
+### Next
+- **Human**: Select and authorize the next FVS milestone/UI E2E verification task.
+- **Antigravity**: Perform browser/E2E verification only if the selected task requires it.
+- **OpenCode/Codex**: Wait for the next owner/scope assignment; do not start a new writer concurrently.
 
 ## Restrictions
 - Do not change ADR-001–010 without a new ADR and explicit human approval.

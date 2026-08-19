@@ -2,7 +2,7 @@
 
 Date: 2026-08-19
 Version: Development Baseline v1.0 + Dev Preparation Profile v1.0.2
-Milestone: First Vertical Slice — WP-06 accepted / WP-07 pending
+Milestone: First Vertical Slice — WP-07 ACCEPTED / checkpoint `d7060c4`
 
 ## Confirmed
 - Product Scope Decisions D01–D10 confirmed.
@@ -22,7 +22,7 @@ Milestone: First Vertical Slice — WP-06 accepted / WP-07 pending
 - Absolute path is a local profile only; product code remains repo-relative.
 
 ## Current Priority
-1. Execute WP-07 Integration Acceptance from the accepted FVS-03 and WP-06 checkpoints.
+1. Select and authorize the next First Vertical Slice milestone/UI E2E verification task from the accepted WP-07 checkpoint.
 2. Prepare competition proposal/deck content confidence gate by 2026-08-25.
 
 ## Current Product Slice
@@ -41,15 +41,15 @@ First Vertical Slice target by 2026-09-06:
 
 ## Current Development State
 
-Phase: First Vertical Slice In Progress
-Next Phase: WP-07 Integration Acceptance
+Phase: First Vertical Slice Integration Accepted
+Next Phase: Milestone UI/E2E Verification Planning
 
 Current Branch: feature/first-vertical-slice
 Current Baseline Commit: 2c8fcc0
-Latest FVS Checkpoint: ed856a5 (`feat(web): add WP-06 project task run UI`)
-Current Planned Task: WP-07 — Integration Acceptance
-Active Writer: None (WP-06 accepted; WP-07 Codex acceptance pending)
-Reviewer: Codex
+Latest FVS Checkpoint: d7060c4 (`feat(core): add WP-07 execution integration`)
+Current Planned Task: Next FVS milestone/UI E2E task — HUMAN_DECISION
+Active Writer: NONE (WP-07 accepted)
+Reviewer: Codex (WP-07 accepted)
 Antigravity: NOT_REQUIRED
 
 Architecture:
@@ -57,7 +57,7 @@ Architecture:
 
 Development Environment:
 - Windows development readiness: PASS
-- Core pytest: 83 passed
+- Core pytest: 95 passed, 1 skipped (symlink containment UNVERIFIED; Human waiver accepted)
 - Frontend build: PASS
 - Frontend Vitest: 41 passed
 - Local Git backup: PASS
@@ -87,4 +87,4 @@ OpenCode Model Routing:
 4. Architecture / security / lifecycle / hard root cause: escalate to Codex
 
 Next Gate:
-WP-07 Integration Acceptance, followed by the next Human approval gate.
+Human selection and authorization of the next FVS milestone/UI E2E verification task.

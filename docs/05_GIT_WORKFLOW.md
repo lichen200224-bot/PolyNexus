@@ -43,8 +43,21 @@ git log -5 --oneline
 1. run targeted tests。
 2. update `HANDOFF_CURRENT.md`。
 3. `git diff --stat` / `git status`。
-4. 可安全 checkpoint 時 commit。
+4. 檢查 changed files，包含 untracked、protected areas、ADR impact、scope deviation、known limitations 與 unverified items。
 5. 下一工具先 Review handoff + diff，不重讀完整 repo。
+
+### 5.1 Role handoff actions
+
+- **OpenCode → Antigravity**：僅於 UI/browser/E2E/milestone task 使用；OpenCode 必須提供 start command、route、fixture/test data、expected result、failure-path checklist、目前測試 evidence 與 `Do Not Change`。不涉及 browser 時，handoff 必須記錄 `ANTIGRAVITY_STATUS: NOT_REQUIRED` 及理由。
+- **Antigravity → Codex**：提供實際 browser/environment、route、journey 結果、failure-path 結果、screenshot/video/artifact ref、blocker 與未驗證項目；不得宣稱未執行的 E2E 為 PASS。
+- **OpenCode → Codex**：提供 implementation summary、完整 changed-files（含 untracked）、current tests + exit codes、scope/ADR/protected-area check 與下一步；Codex 接手後只讀 review。
+- **Codex → Human**：只有 `PASS` 才能提出 Human approval；`FAIL` 必須附 issue evidence 與可貼回 OpenCode 的 `FIX_PROMPT`；`NEED_ACTION` 必須列出缺少的授權或外部條件。
+
+### 5.2 Git authorization
+
+OpenCode、Antigravity、Codex 預設不得自行 `git add`、commit、push、rebase、reset 或 force push。Human 必須在當前 task 明確授權後，才能依 verified staged-file allowlist 執行 Git 操作；歷史授權不自動延伸到新 task。
+
+交接輸出至少要有：`RESULT`、`TASK_ID`、`ATTEMPT`、`BRANCH`、`WRITER`、`REVIEWER`、`ANTIGRAVITY_STATUS`、`NEXT_OWNER`、`CHANGED_FILES`、`TESTS`、`ADR_IMPACT`、`SCOPE_DEVIATION`、`KNOWN_LIMITATIONS`、`UNVERIFIED`、`NEXT_ACTION`、`NEXT_PROMPT_FOR_HUMAN` 與 `FIX_PROMPT`。
 
 ## 6. Rollback
 

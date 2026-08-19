@@ -70,6 +70,15 @@ git status --short --branch
 
 重要任務結束前更新 `docs/12_HANDOFF_CURRENT.md`：Goal / Branch / Changed files / Tests+exit codes / Known issues / Next / Do Not Change。
 
+每次工具或人員交接都必須另外提供：`TASK_ID`、`ATTEMPT`、`TASK_DOC`、`HANDOFF_DOC`、`BRANCH`、`WRITER`、`REVIEWER`、`ANTIGRAVITY_STATUS`、`NEXT_OWNER`、完整 changed-files（含 untracked）、protected areas、ADR impact、scope deviation、known limitations、unverified items、current test commands/results/exit codes 與下一步。
+
+- OpenCode：負責實作與測試；完成後更新 handoff，回報 `READY_FOR_CODEX_REVIEW`；不得自行把歷史測試或工具失敗宣告為 PASS。
+- Antigravity：涉及 UI、browser、E2E 或 milestone 時執行獨立 journey/failure-path verification；回報 route、fixture、實際結果、artifact/screenshot ref 與 blocker。若不適用，必須明確寫 `NOT_REQUIRED` 及理由；不得修改 Core contract 或與 Writer 同時寫入。
+- Codex：以只讀方式獨立 review、重跑必要 evidence，輸出 `PASS`、`FAIL` 或 `NEED_ACTION`；FAIL 必須附 severity、檔案/行號、證據與可直接貼給 OpenCode 的 `FIX_PROMPT`（含測試命令）。
+- Human：負責 scope/ADR/產品決策與 Git 授權；只有在 Codex PASS 後，才可明確授權 stage、commit 或 remote push。
+
+PASS 只接受本輪真實 command/tool evidence 與 actual exit code；`SKIPPED`、環境 blocker、未驗證項目與歷史結果必須明確標示，不得轉寫成 PASS。詳細欄位與角色交接規則見 `docs/05_GIT_WORKFLOW.md`、`docs/06_AI_TOOL_COLLABORATION.md`、`docs/08_ACCEPTANCE_STRATEGY.md`。
+
 ## 9. Tool Routing
 
 - Codex：Architecture/Core/Hard bug/critical review。
