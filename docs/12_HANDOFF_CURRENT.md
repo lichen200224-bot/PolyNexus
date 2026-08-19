@@ -5,22 +5,22 @@ First Vertical Slice
 
 ## Status
 Previous: WP-07 Integration Acceptance — ACCEPTED and checkpointed at `d7060c4`.
-Current: First Vertical Slice post-WP-07 handoff — HUMAN_DECISION for the next milestone/UI E2E task.
-Next: Human selects and authorizes the next FVS milestone task; use Antigravity when browser/E2E verification is valuable.
+Current: FVS-MILESTONE-UI-E2E-01 attempt 1 — ACCEPTED WITH HUMAN WAIVER.
+Next: Continue development; Browser E2E remains UNVERIFIED/SKIPPED and must be rerun after development is complete.
 
 Acceptance repair log: `docs/27_ACCEPTANCE_REPAIR_LOG.md`
 
-Task document: `docs/20_FIRST_VERTICAL_SLICE_PLAN.md` (WP-07 accepted; next milestone task pending Human selection).
+Task document: `docs/20_FIRST_VERTICAL_SLICE_PLAN.md` (WP-07 accepted; UI/Core milestone acceptance recorded below; Browser E2E deferred).
 Historical task document: `docs/tasks/FVS-03.md`
 
 ## Active Writer
-NONE — WP-07 implementation and acceptance completed.
+NONE — WP-07 and FVS-MILESTONE-UI-E2E-01 acceptance completed; no active writer.
 
 ## Reviewer
-Codex — WP-07 independently accepted after current manual evidence and Human waiver.
+Codex — independently reviewed FVS-MILESTONE-UI-E2E-01; Human waiver accepted the documented Browser E2E limitation.
 
 ## Antigravity
-NOT_REQUIRED for WP-07 Core integration; recommended for the next UI/browser milestone verification if selected by Human.
+COMPLETED read-only verification for FVS-MILESTONE-UI-E2E-01; Browser DOM / Playwright E2E is UNVERIFIED/SKIPPED.
 
 ## Starting Branch
 feature/first-vertical-slice
@@ -367,9 +367,55 @@ None. All work within WP-07 scope.
 - `test_symlink_escape_rejected` SKIPPED / UNVERIFIED on current Windows environment (symlink permission denied). Human accepted this limitation for WP-07; full symlink containment verification remains future environment-specific evidence.
 
 ### Next
-- **Human**: Select and authorize the next FVS milestone/UI E2E verification task.
-- **Antigravity**: Perform browser/E2E verification only if the selected task requires it.
-- **OpenCode/Codex**: Wait for the next owner/scope assignment; do not start a new writer concurrently.
+- **Human**: Continue development; Browser E2E is deferred until development is complete.
+- **Antigravity**: Re-run Browser DOM / Playwright E2E after development completion and record route, fixture, failure-path, and screenshot/artifact evidence.
+- **OpenCode/Codex**: Do not start a new writer concurrently; preserve the waiver and deferred-test label.
+
+## FVS-MILESTONE-UI-E2E-01 Update
+
+- **TASK_ID**: `FVS-MILESTONE-UI-E2E-01`
+- **ATTEMPT**: 1
+- **BRANCH**: `feature/first-vertical-slice`
+- **WRITER**: OpenCode (WP-06 frontend already implemented)
+- **REVIEWER**: Codex
+- **ANTIGRAVITY_STATUS**: Completed read-only verification; Browser E2E `UNVERIFIED/SKIPPED`
+- **RESULT**: Accepted with explicit Human waiver; this is not full Browser E2E certification.
+
+### Goal and evidence
+
+Verify the existing UI/Core integration through Project → Task → Run Preparation, including `/api/v1`, Vite proxy, fail-closed auth, mode labels, ContextPackage validation, run-state display, navigation, errors, and accessibility.
+
+- Codex rerun: `cd apps/web && npm test` — 41 passed, exit code 0.
+- Codex rerun: `cd apps/web && npm run build` — success, exit code 0.
+- Codex rerun: `git diff --check` — clean, exit code 0.
+- Codex check: `git status --short --branch` — clean, no untracked files, exit code 0.
+- Antigravity reported live Core health and Vite `/api` proxy checks — PASS, exit code 0.
+- Browser DOM / Playwright screenshot or video artifact — `UNVERIFIED/SKIPPED`; browser binary unavailable in the verification environment.
+
+### Changed files and protected areas
+
+- Product source changed for this verification: **NONE**.
+- Governance sync files: `docs/11_PROJECT_STATE.md`, `docs/12_HANDOFF_CURRENT.md`.
+- Untracked files: **NONE** at review baseline.
+- Protected: `services/core/`, existing `apps/web/src/` implementation, API contracts, workflow YAML, and ADR-001–010 were not changed.
+
+### ADR impact
+
+None. ADR-003, ADR-004, and ADR-010 remain respected.
+
+### Scope deviation
+
+None for product source. Browser E2E maturity is explicitly deferred, not certified.
+
+### Human waiver and limitation
+
+Human explicitly accepted 41 Vitest tests, live HTTP/proxy checks, and static inspection as the temporary acceptance basis, with Browser E2E marked `UNVERIFIED/SKIPPED`. Browser E2E must be rerun after development is complete.
+
+### Do Not Change
+
+- Do not relabel Browser E2E as PASS before a browser-capable rerun.
+- Do not modify ADR-001–010, Core source, API contracts, or frontend source as part of this governance sync.
+- Do not start multiple writers on `feature/first-vertical-slice`.
 
 ## Restrictions
 - Do not change ADR-001–010 without a new ADR and explicit human approval.

@@ -2,7 +2,7 @@
 
 Date: 2026-08-19
 Version: Development Baseline v1.0 + Dev Preparation Profile v1.0.2
-Milestone: First Vertical Slice — WP-07 ACCEPTED / checkpoint `d7060c4`
+Milestone: First Vertical Slice — WP-07 ACCEPTED; FVS-MILESTONE-UI-E2E-01 ACCEPTED WITH HUMAN WAIVER
 
 ## Confirmed
 - Product Scope Decisions D01–D10 confirmed.
@@ -22,7 +22,7 @@ Milestone: First Vertical Slice — WP-07 ACCEPTED / checkpoint `d7060c4`
 - Absolute path is a local profile only; product code remains repo-relative.
 
 ## Current Priority
-1. Select and authorize the next First Vertical Slice milestone/UI E2E verification task from the accepted WP-07 checkpoint.
+1. Continue approved development; defer Browser E2E re-test until development is complete.
 2. Prepare competition proposal/deck content confidence gate by 2026-08-25.
 
 ## Current Product Slice
@@ -41,16 +41,16 @@ First Vertical Slice target by 2026-09-06:
 
 ## Current Development State
 
-Phase: First Vertical Slice Integration Accepted
-Next Phase: Milestone UI/E2E Verification Planning
+Phase: First Vertical Slice UI/Core Verification Accepted (Browser E2E Deferred)
+Next Phase: Continued Development; Browser E2E Re-test Pending
 
 Current Branch: feature/first-vertical-slice
-Current Baseline Commit: 2c8fcc0
+Current Baseline Commit: 337bc47
 Latest FVS Checkpoint: d7060c4 (`feat(core): add WP-07 execution integration`)
-Current Planned Task: Next FVS milestone/UI E2E task — HUMAN_DECISION
-Active Writer: NONE (WP-07 accepted)
-Reviewer: Codex (WP-07 accepted)
-Antigravity: NOT_REQUIRED
+Current Planned Task: Continued development — next implementation task requires Human selection
+Active Writer: NONE
+Reviewer: Codex (FVS-MILESTONE-UI-E2E-01 accepted with Human waiver)
+Antigravity: COMPLETED read-only verification; Browser E2E UNVERIFIED/SKIPPED
 
 Architecture:
 - ADR-001 through ADR-010 are CONFIRMED / FROZEN FOR V1 IMPLEMENTATION.
@@ -86,5 +86,17 @@ OpenCode Model Routing:
 3. If MiMo V2.5 repeatedly fails deterministic validation: MiMo V2.5 Pro
 4. Architecture / security / lifecycle / hard root cause: escalate to Codex
 
-Next Gate:
-Human selection and authorization of the next FVS milestone/UI E2E verification task.
+## Latest Verification
+
+FVS-MILESTONE-UI-E2E-01 (attempt 1) was accepted with an explicit Human waiver. Current acceptance evidence is 41 frontend Vitest tests, live Core/HTTP and Vite proxy checks reported by Antigravity, and static inspection. Browser DOM / Playwright E2E remains UNVERIFIED/SKIPPED and is deferred until development is complete.
+
+- Frontend tests: 41 passed, exit code 0.
+- Frontend build: PASS, exit code 0.
+- Git diff check: PASS, exit code 0.
+- Working tree: clean at review baseline `337bc47`.
+- ADR impact: NONE.
+- Scope deviation: NONE for product source; Browser E2E maturity remains deferred.
+
+## Next Gate
+
+Continue development. After development is complete, rerun Browser E2E and update this state with actual route, fixture, failure-path, and screenshot/artifact evidence.
