@@ -1528,3 +1528,427 @@ describe('WP-08B: ContextPackage authoring', () => {
     el.remove()
   })
 })
+
+// ---------------------------------------------------------------------------
+// WP-09D: Run detail
+// ---------------------------------------------------------------------------
+
+describe('WP-09D run detail', () => {
+  afterEach(() => { globalThis.fetch = originalFetch })
+  const p1 = { id: 'p_1', name: 'P', description: null, created_at: '2026-01-01T00:00:00' }
+  const t1 = { id: 't_1', project_id: 'p_1', title: 'T', workflow_id: 'review-minimal', workflow_version: 1, mode: 'REVIEW', context_package_id: null, created_at: '2026-01-01T00:00:00' }
+  const runA = { id: 'run_1', task_id: 't_1', workflow_id: 'review-minimal', workflow_version: 1, context_package_id: 'ctx_1', execution_target: 'LOCAL', resume_mode: 'NONE', state: 'COMPLETED', runtime_ref: null, created_at: '2026-01-01T00:00:00', updated_at: '2026-01-01T00:00:00', events: [], result: null }
+  const ev1 = { id: 'ev_1', task_id: 't_1', run_id: 'run_1', actor_id: 'a', source: 's', type: 'RUNTIME_EVIDENCE', status: 'PASS', artifact_refs: [], metadata: {}, observed_at: '2026-01-01T01:00:00' }
+  const f1 = { id: 'f_1', task_id: 't_1', run_id: 'run_1', title: 'Find', description: 'desc', severity: 'LOW', evidence_refs: [], status: 'OPEN', created_at: '2026-01-01T01:00:00' }
+  const art1 = { id: 'art_1', project_id: 'p_1', task_id: 't_1', run_id: 'run_1', artifact_type: 'TEXT', mime_type: 'text/plain', source_type: 'test', storage_ref: 'ref1', sha256: 'a'.repeat(64), size: 10 }
+  const hist1 = { id: 'h1', run_id: 'run_1', from_state: 'CREATED', to_state: 'STARTING', occurred_at: '2026-01-01T00:00:00', reason: null }
+  const hist2 = { id: 'h2', run_id: 'run_1', from_state: 'STARTING', to_state: 'RUNNING', occurred_at: '2026-01-01T00:01:00', reason: null }
+  const resultObj = { run_id: 'run_1', status: 'COMPLETED', summary: 'done', finding_ids: ['f_1'], evidence_ids: ['ev_1'], artifact_ids: ['art_1'] }
+
+  async function openDetailWithMocks(fetchFn: typeof fetch) {
+    globalThis.fetch = fetchFn as typeof fetch
+    const el = await mount()
+    click(el.querySelector('.project-item-btn'))
+    await flush()
+    click(el.querySelector('.task-item-btn'))
+    await flush()
+    // runs list is already mocked to contain runA; now click View result / history
+    const btn = Array.from(el.querySelectorAll('button')).find(b => b.textContent?.includes('View result'))!
+    btn.click()
+    await flush()
+    await flush()
+    return el
+  }
+
+  it('opens detail from run list', async () => {
+    globalThis.fetch = vi.fn(async (input: string | URL | Request) => {
+      const url = typeof input === 'string' ? input : input.toString()
+      if (url.includes('/runs/run_1/result')) return new Response(JSON.stringify({ result: resultObj }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs/run_1/findings')) return new Response(JSON.stringify({ findings: [f1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs/run_1/evidence')) return new Response(JSON.stringify({ evidence: [ev1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs/run_1/artifacts')) return new Response(JSON.stringify({ artifacts: [art1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs/run_1/history')) return new Response(JSON.stringify({ events: [hist1, hist2] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs/run_1') && !url.includes('/result')) return new Response(JSON.stringify(runA), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs')) return new Response(JSON.stringify({ runs: [runA] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/tasks')) return new Response(JSON.stringify({ tasks: [t1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      return new Response(JSON.stringify({ projects: [p1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }) as typeof fetch
+    const el = await openDetailWithMocks(globalThis.fetch)
+    expect(el.textContent).toContain('Run Detail')
+    expect(el.textContent).toContain('run_1')
+    el.remove()
+  })
+
+  it('calls five query URLs with encoded runId and wrappers', async () => {
+    const specialId = 'run 1/2'
+    const runSpecial = { ...runA, id: specialId }
+    const calls: string[] = []
+    globalThis.fetch = vi.fn(async (input: string | URL | Request) => {
+      const url = typeof input === 'string' ? input : input.toString()
+      calls.push(url)
+      if (url.includes('/result')) return new Response(JSON.stringify({ result: null }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/findings')) return new Response(JSON.stringify({ findings: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/evidence')) return new Response(JSON.stringify({ evidence: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/artifacts')) return new Response(JSON.stringify({ artifacts: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/history')) return new Response(JSON.stringify({ events: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs/') && !url.includes('/runs/run%20')) return new Response(JSON.stringify(runSpecial), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs')) return new Response(JSON.stringify({ runs: [runSpecial] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/tasks')) return new Response(JSON.stringify({ tasks: [t1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      return new Response(JSON.stringify({ projects: [p1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }) as typeof fetch
+    const el = await mount()
+    click(el.querySelector('.project-item-btn'))
+    await flush()
+    click(el.querySelector('.task-item-btn'))
+    await flush()
+    const btn = Array.from(el.querySelectorAll('button')).find(b => b.textContent?.includes('View result'))!
+    btn.click()
+    await flush(); await flush()
+    const enc = encodeURIComponent(specialId)
+    expect(calls.some(c => c.includes(`/runs/${enc}/result`))).toBe(true)
+    expect(calls.some(c => c.includes(`/runs/${enc}/findings`))).toBe(true)
+    expect(calls.some(c => c.includes(`/runs/${enc}/evidence`))).toBe(true)
+    expect(calls.some(c => c.includes(`/runs/${enc}/artifacts`))).toBe(true)
+    expect(calls.some(c => c.includes(`/runs/${enc}/history`))).toBe(true)
+    el.remove()
+  })
+
+  it('renders result success', async () => {
+    globalThis.fetch = vi.fn(async (input: string | URL | Request) => {
+      const url = typeof input === 'string' ? input : input.toString()
+      if (url.includes('/result')) return new Response(JSON.stringify({ result: resultObj }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/findings')) return new Response(JSON.stringify({ findings: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/evidence')) return new Response(JSON.stringify({ evidence: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/artifacts')) return new Response(JSON.stringify({ artifacts: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/history')) return new Response(JSON.stringify({ events: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs/run_1') && !url.includes('/runs')) return new Response(JSON.stringify(runA), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs')) return new Response(JSON.stringify({ runs: [runA] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/tasks')) return new Response(JSON.stringify({ tasks: [t1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      return new Response(JSON.stringify({ projects: [p1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }) as typeof fetch
+    const el = await openDetailWithMocks(globalThis.fetch)
+    expect(el.textContent).toContain('done')
+    expect(el.textContent).toContain('COMPLETED')
+    el.remove()
+  })
+
+  it('renders result null empty state without fabrication', async () => {
+    globalThis.fetch = vi.fn(async (input: string | URL | Request) => {
+      const url = typeof input === 'string' ? input : input.toString()
+      if (url.includes('/result')) return new Response(JSON.stringify({ result: null }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/findings')) return new Response(JSON.stringify({ findings: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/evidence')) return new Response(JSON.stringify({ evidence: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/artifacts')) return new Response(JSON.stringify({ artifacts: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/history')) return new Response(JSON.stringify({ events: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs/run_1') && url.includes('/runs/run_1')) return new Response(JSON.stringify(runA), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs')) return new Response(JSON.stringify({ runs: [runA] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/tasks')) return new Response(JSON.stringify({ tasks: [t1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      return new Response(JSON.stringify({ projects: [p1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }) as typeof fetch
+    const el = await openDetailWithMocks(globalThis.fetch)
+    expect(el.textContent).toContain('No result yet')
+    expect(el.textContent).not.toContain('fabricated')
+    el.remove()
+  })
+
+  it('renders findings/evidence/artifacts/history success', async () => {
+    globalThis.fetch = vi.fn(async (input: string | URL | Request) => {
+      const url = typeof input === 'string' ? input : input.toString()
+      if (url.includes('/result')) return new Response(JSON.stringify({ result: resultObj }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/findings')) return new Response(JSON.stringify({ findings: [f1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/evidence')) return new Response(JSON.stringify({ evidence: [ev1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/artifacts')) return new Response(JSON.stringify({ artifacts: [art1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/history')) return new Response(JSON.stringify({ events: [hist1, hist2] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs/run_1') && !url.includes('/result')) return new Response(JSON.stringify(runA), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs')) return new Response(JSON.stringify({ runs: [runA] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/tasks')) return new Response(JSON.stringify({ tasks: [t1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      return new Response(JSON.stringify({ projects: [p1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }) as typeof fetch
+    const el = await openDetailWithMocks(globalThis.fetch)
+    expect(el.textContent).toContain('Find')
+    expect(el.textContent).toContain('RUNTIME_EVIDENCE')
+    expect(el.textContent).toContain('ref1')
+    expect(el.textContent).toContain('CREATED')
+    el.remove()
+  })
+
+  it('shows empty states for empty lists', async () => {
+    globalThis.fetch = vi.fn(async (input: string | URL | Request) => {
+      const url = typeof input === 'string' ? input : input.toString()
+      if (url.includes('/result')) return new Response(JSON.stringify({ result: null }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/findings')) return new Response(JSON.stringify({ findings: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/evidence')) return new Response(JSON.stringify({ evidence: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/artifacts')) return new Response(JSON.stringify({ artifacts: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/history')) return new Response(JSON.stringify({ events: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs/run_1') && !url.includes('/result')) return new Response(JSON.stringify(runA), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs')) return new Response(JSON.stringify({ runs: [runA] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/tasks')) return new Response(JSON.stringify({ tasks: [t1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      return new Response(JSON.stringify({ projects: [p1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }) as typeof fetch
+    const el = await openDetailWithMocks(globalThis.fetch)
+    expect(el.textContent).toContain('No findings')
+    expect(el.textContent).toContain('No evidence')
+    expect(el.textContent).toContain('No artifacts')
+    expect(el.textContent).toContain('No history')
+    el.remove()
+  })
+
+  it('preserves history order from API', async () => {
+    const evA = { id: 'a', run_id: 'run_1', from_state: 'CREATED', to_state: 'STARTING', occurred_at: '2026-01-02T00:00:00', reason: null }
+    const evB = { id: 'b', run_id: 'run_1', from_state: 'STARTING', to_state: 'FAILED', occurred_at: '2026-01-03T00:00:00', reason: 'err' }
+    globalThis.fetch = vi.fn(async (input: string | URL | Request) => {
+      const url = typeof input === 'string' ? input : input.toString()
+      if (url.includes('/result')) return new Response(JSON.stringify({ result: null }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/findings')) return new Response(JSON.stringify({ findings: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/evidence')) return new Response(JSON.stringify({ evidence: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/artifacts')) return new Response(JSON.stringify({ artifacts: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/history')) return new Response(JSON.stringify({ events: [evB, evA] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs/run_1') && !url.includes('/result')) return new Response(JSON.stringify(runA), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs')) return new Response(JSON.stringify({ runs: [runA] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/tasks')) return new Response(JSON.stringify({ tasks: [t1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      return new Response(JSON.stringify({ projects: [p1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }) as typeof fetch
+    const el = await openDetailWithMocks(globalThis.fetch)
+    const idxB = el.textContent!.indexOf('STARTING → FAILED')
+    const idxA = el.textContent!.indexOf('CREATED → STARTING')
+    expect(idxB < idxA).toBe(true)
+    el.remove()
+  })
+
+  it('shows 403 with LOOPBACK_TOKEN hint', async () => {
+    globalThis.fetch = vi.fn(async (input: string | URL | Request) => {
+      const url = typeof input === 'string' ? input : input.toString()
+      if (url.includes('/runs/run_1')) return new Response(JSON.stringify({ detail: 'forbidden' }), { status: 403, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs')) return new Response(JSON.stringify({ runs: [runA] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/tasks')) return new Response(JSON.stringify({ tasks: [t1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      return new Response(JSON.stringify({ projects: [p1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }) as typeof fetch
+    const el = await openDetailWithMocks(globalThis.fetch)
+    expect(el.textContent).toContain('Authentication required')
+    expect(el.querySelectorAll('[role="alert"]').length).toBeGreaterThan(0)
+    el.remove()
+  })
+
+  it('shows 404 Run not found', async () => {
+    globalThis.fetch = vi.fn(async (input: string | URL | Request) => {
+      const url = typeof input === 'string' ? input : input.toString()
+      if (url.includes('/runs/run_1')) return new Response(JSON.stringify({ detail: 'not found' }), { status: 404, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs')) return new Response(JSON.stringify({ runs: [runA] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/tasks')) return new Response(JSON.stringify({ tasks: [t1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      return new Response(JSON.stringify({ projects: [p1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }) as typeof fetch
+    const el = await openDetailWithMocks(globalThis.fetch)
+    expect(el.textContent).toContain('Run not found')
+    el.remove()
+  })
+
+  it('shows 422 validation error', async () => {
+    globalThis.fetch = vi.fn(async (input: string | URL | Request) => {
+      const url = typeof input === 'string' ? input : input.toString()
+      if (url.includes('/runs/run_1')) return new Response(JSON.stringify({ detail: 'mismatch' }), { status: 422, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs')) return new Response(JSON.stringify({ runs: [runA] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/tasks')) return new Response(JSON.stringify({ tasks: [t1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      return new Response(JSON.stringify({ projects: [p1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }) as typeof fetch
+    const el = await openDetailWithMocks(globalThis.fetch)
+    expect(el.textContent).toContain('Validation error')
+    el.remove()
+  })
+
+  it('shows generic error and retry', async () => {
+    let first = true
+    globalThis.fetch = vi.fn(async (input: string | URL | Request) => {
+      const url = typeof input === 'string' ? input : input.toString()
+      if (url.includes('/runs/run_1/result') && first) { first = false; return new Response(JSON.stringify({ detail: 'oops' }), { status: 500, headers: { 'Content-Type': 'application/json' } }) }
+      if (url.includes('/result')) return new Response(JSON.stringify({ result: resultObj }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/findings')) return new Response(JSON.stringify({ findings: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/evidence')) return new Response(JSON.stringify({ evidence: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/artifacts')) return new Response(JSON.stringify({ artifacts: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/history')) return new Response(JSON.stringify({ events: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs/run_1') && !url.includes('/result')) return new Response(JSON.stringify(runA), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs')) return new Response(JSON.stringify({ runs: [runA] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/tasks')) return new Response(JSON.stringify({ tasks: [t1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      return new Response(JSON.stringify({ projects: [p1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }) as typeof fetch
+    const el = await openDetailWithMocks(globalThis.fetch)
+    expect(el.querySelectorAll('[role="alert"]').length).toBeGreaterThan(0)
+    const retry = Array.from(el.querySelectorAll('button')).find(b => b.textContent === 'Retry')!
+    retry.click()
+    await flush(); await flush()
+    expect(el.textContent).toContain('done')
+    el.remove()
+  })
+
+  it('loading shows role status', async () => {
+    globalThis.fetch = vi.fn(async (input: string | URL | Request) => {
+      const url = typeof input === 'string' ? input : input.toString()
+      if (url.includes('/runs/run_1/result') || url.includes('/findings') || url.includes('/evidence') || url.includes('/artifacts') || url.includes('/history')) {
+        return new Promise(() => {}) as Promise<Response>
+      }
+      if (url.includes('/runs/run_1') && !url.includes('/result')) return new Response(JSON.stringify(runA), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs')) return new Response(JSON.stringify({ runs: [runA] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/tasks')) return new Response(JSON.stringify({ tasks: [t1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      return new Response(JSON.stringify({ projects: [p1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }) as typeof fetch
+    const el = await mount()
+    click(el.querySelector('.project-item-btn'))
+    await flush()
+    click(el.querySelector('.task-item-btn'))
+    await flush()
+    const btn = Array.from(el.querySelectorAll('button')).find(b => b.textContent?.includes('View result'))!
+    btn.click()
+    await flush()
+    expect(el.querySelectorAll('[role="status"]').length).toBeGreaterThan(0)
+    el.remove()
+  })
+
+  it('retry does not retain stale data', async () => {
+    let call = 0
+    globalThis.fetch = vi.fn(async (input: string | URL | Request) => {
+      const url = typeof input === 'string' ? input : input.toString()
+      if (url.includes('/runs/run_1/result') && call === 0) { call++; return new Response(JSON.stringify({ detail: 'err' }), { status: 500, headers: { 'Content-Type': 'application/json' } }) }
+      if (url.includes('/result')) return new Response(JSON.stringify({ result: null }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/findings')) return new Response(JSON.stringify({ findings: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/evidence')) return new Response(JSON.stringify({ evidence: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/artifacts')) return new Response(JSON.stringify({ artifacts: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/history')) return new Response(JSON.stringify({ events: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs/run_1') && !url.includes('/result')) return new Response(JSON.stringify(runA), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs')) return new Response(JSON.stringify({ runs: [runA] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/tasks')) return new Response(JSON.stringify({ tasks: [t1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      return new Response(JSON.stringify({ projects: [p1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }) as typeof fetch
+    const el = await openDetailWithMocks(globalThis.fetch)
+    expect(el.querySelectorAll('[role="alert"]').length).toBeGreaterThan(0)
+    const retry = Array.from(el.querySelectorAll('button')).find(b => b.textContent === 'Retry')!
+    retry.click()
+    await flush(); await flush()
+    expect(el.querySelectorAll('[role="alert"]').length).toBe(0)
+    expect(el.textContent).toContain('No result yet')
+    el.remove()
+  })
+
+  it('back navigation returns to preparation', async () => {
+    globalThis.fetch = vi.fn(async (input: string | URL | Request) => {
+      const url = typeof input === 'string' ? input : input.toString()
+      if (url.includes('/result')) return new Response(JSON.stringify({ result: null }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/findings')) return new Response(JSON.stringify({ findings: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/evidence')) return new Response(JSON.stringify({ evidence: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/artifacts')) return new Response(JSON.stringify({ artifacts: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/history')) return new Response(JSON.stringify({ events: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs/run_1') && !url.includes('/result')) return new Response(JSON.stringify(runA), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs')) return new Response(JSON.stringify({ runs: [runA] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/tasks')) return new Response(JSON.stringify({ tasks: [t1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      return new Response(JSON.stringify({ projects: [p1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }) as typeof fetch
+    const el = await openDetailWithMocks(globalThis.fetch)
+    const back = Array.from(el.querySelectorAll('button')).find(b => b.textContent?.includes('Back to preparation'))!
+    back.click()
+    await flush()
+    expect(el.textContent).toContain('Review Preparation')
+    el.remove()
+  })
+
+  it('has accessible labels and headings', async () => {
+    globalThis.fetch = vi.fn(async (input: string | URL | Request) => {
+      const url = typeof input === 'string' ? input : input.toString()
+      if (url.includes('/result')) return new Response(JSON.stringify({ result: null }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/findings')) return new Response(JSON.stringify({ findings: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/evidence')) return new Response(JSON.stringify({ evidence: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/artifacts')) return new Response(JSON.stringify({ artifacts: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/history')) return new Response(JSON.stringify({ events: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs/run_1') && !url.includes('/result')) return new Response(JSON.stringify(runA), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs')) return new Response(JSON.stringify({ runs: [runA] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/tasks')) return new Response(JSON.stringify({ tasks: [t1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      return new Response(JSON.stringify({ projects: [p1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }) as typeof fetch
+    const el = await openDetailWithMocks(globalThis.fetch)
+    expect(el.querySelector('#run-detail-heading')).not.toBeNull()
+    expect(el.querySelectorAll('h3').length).toBeGreaterThanOrEqual(5)
+    expect(el.querySelector('button[aria-label="Back to run preparation"]')).not.toBeNull()
+    el.remove()
+  })
+
+  it('artifact shows metadata only, no content', async () => {
+    globalThis.fetch = vi.fn(async (input: string | URL | Request) => {
+      const url = typeof input === 'string' ? input : input.toString()
+      if (url.includes('/result')) return new Response(JSON.stringify({ result: null }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/findings')) return new Response(JSON.stringify({ findings: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/evidence')) return new Response(JSON.stringify({ evidence: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/artifacts')) return new Response(JSON.stringify({ artifacts: [art1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/history')) return new Response(JSON.stringify({ events: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs/run_1') && !url.includes('/result')) return new Response(JSON.stringify(runA), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs')) return new Response(JSON.stringify({ runs: [runA] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/tasks')) return new Response(JSON.stringify({ tasks: [t1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      return new Response(JSON.stringify({ projects: [p1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }) as typeof fetch
+    const el = await openDetailWithMocks(globalThis.fetch)
+    expect(el.textContent).toContain('ref1')
+    expect(el.textContent).toContain(art1.sha256)
+    expect(el.textContent).not.toContain('content')
+    el.remove()
+  })
+
+  it('shows full metadata/reference fields for all sections', async () => {
+    const fFull = { id: 'f_1', task_id: 't_1', run_id: 'run_1', title: 'FindTitle', description: 'FindDesc', severity: 'LOW', evidence_refs: ['ev_1'], status: 'OPEN', created_at: '2026-01-01T01:00:00' }
+    const eFull = { id: 'ev_1', task_id: 't_1', run_id: 'run_1', actor_id: 'actor_1', source: 'src1', type: 'TOOL_EVIDENCE', status: 'PASS', artifact_refs: ['art_1'], metadata: { k: 'v' }, observed_at: '2026-01-01T02:00:00' }
+    const aFull = { id: 'art_1', project_id: 'p_1', task_id: 't_1', run_id: 'run_1', artifact_type: 'TEXT', mime_type: 'text/plain', source_type: 'test', storage_ref: 'ref1', sha256: 'a'.repeat(64), size: 10 }
+    const hFull = { id: 'h1', run_id: 'run_1', from_state: 'CREATED', to_state: 'STARTING', occurred_at: '2026-01-01T00:00:00', reason: 'r' }
+    globalThis.fetch = vi.fn(async (input: string | URL | Request) => {
+      const url = typeof input === 'string' ? input : input.toString()
+      if (url.includes('/result')) return new Response(JSON.stringify({ result: resultObj }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/findings')) return new Response(JSON.stringify({ findings: [fFull] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/evidence')) return new Response(JSON.stringify({ evidence: [eFull] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/artifacts')) return new Response(JSON.stringify({ artifacts: [aFull] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/history')) return new Response(JSON.stringify({ events: [hFull] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs/run_1') && !url.includes('/result')) return new Response(JSON.stringify(runA), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs')) return new Response(JSON.stringify({ runs: [runA] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/tasks')) return new Response(JSON.stringify({ tasks: [t1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      return new Response(JSON.stringify({ projects: [p1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }) as typeof fetch
+    const el = await openDetailWithMocks(globalThis.fetch)
+    // Finding fields
+    expect(el.textContent).toContain('f_1')
+    expect(el.textContent).toContain('FindTitle')
+    expect(el.textContent).toContain('FindDesc')
+    expect(el.textContent).toContain('LOW')
+    expect(el.textContent).toContain('OPEN')
+    expect(el.textContent).toContain('ev_1')
+    expect(el.textContent).toContain('2026-01-01T01:00:00')
+    // Finding task_id/run_id (WP-09D Attempt 3 fix)
+    expect(el.textContent).toContain('task:t_1')
+    expect(el.textContent).toContain('run:run_1')
+    expect(el.textContent).toContain('f_1 — task:t_1 — run:run_1 — FindTitle')
+    // Evidence fields
+    expect(el.textContent).toContain('ev_1')
+    expect(el.textContent).toContain('actor_1')
+    expect(el.textContent).toContain('src1')
+    expect(el.textContent).toContain('TOOL_EVIDENCE')
+    expect(el.textContent).toContain('PASS')
+    expect(el.textContent).toContain('art_1')
+    expect(el.textContent).toContain('"k":"v"')
+    expect(el.textContent).toContain('2026-01-01T02:00:00')
+    // Evidence task_id/run_id (WP-09D Attempt 3 fix)
+    expect(el.textContent).toContain('ev_1 — task:t_1 — run:run_1 — actor_1')
+    // Artifact fields
+    expect(el.textContent).toContain('art_1')
+    expect(el.textContent).toContain('project:p_1')
+    expect(el.textContent).toContain('task:t_1')
+    expect(el.textContent).toContain('run:run_1')
+    expect(el.textContent).toContain('TEXT')
+    expect(el.textContent).toContain('text/plain')
+    expect(el.textContent).toContain('test')
+    expect(el.textContent).toContain('ref1')
+    expect(el.textContent).toContain('a'.repeat(64))
+    expect(el.textContent).toContain('10 bytes')
+    // History fields
+    expect(el.textContent).toContain('h1')
+    expect(el.textContent).toContain('run:run_1')
+    expect(el.textContent).toContain('CREATED → STARTING')
+    expect(el.textContent).toContain('2026-01-01T00:00:00')
+    expect(el.textContent).toContain('r')
+    // Ensure no artifact content read or secret leak
+    expect(el.textContent).not.toContain('content')
+    expect(el.textContent).not.toContain('LOOPBACK_TOKEN')
+    el.remove()
+  })
+})

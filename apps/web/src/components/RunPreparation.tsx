@@ -6,6 +6,7 @@ interface RunPreparationProps {
   config: ApiClientConfig
   task: Task
   onBack: () => void
+  onOpenDetail: (runId: string) => void
 }
 
 function parseMultiline(raw: string): string[] {
@@ -34,7 +35,7 @@ function parseProjectFacts(raw: string): Record<string, string> | string {
   return facts
 }
 
-export function RunPreparation({ config, task, onBack }: RunPreparationProps) {
+export function RunPreparation({ config, task, onBack, onOpenDetail }: RunPreparationProps) {
   const [runs, setRuns] = useState<Run[]>([])
   const [loading, setLoading] = useState(true)
   const [contextPackageId, setContextPackageId] = useState('')
@@ -371,6 +372,7 @@ export function RunPreparation({ config, task, onBack }: RunPreparationProps) {
                     <span>{r.result.summary}</span>
                   </div>
                 )}
+                <button type="button" onClick={() => onOpenDetail(r.id)} aria-label={`View result and history for run ${r.id}`}>View result / history</button>
               </li>
             ))}
           </ul>

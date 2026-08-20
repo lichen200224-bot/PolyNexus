@@ -316,6 +316,19 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   gap: 12px;
 }
 
+/* --- Run detail --- */
+
+.detail-section {
+  background: #fff;
+  border: 1px solid #dbe1ea;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.detail-section h3 { margin: 0 0 8px; font-size: 1.05rem; }
+.detail-section ul { margin: 8px 0 0; padding-left: 18px; }
+.result-card p { margin: 4px 0; font-size: 0.92rem; }
+
 /* --- Responsive --- */
 
 @media (max-width: 760px) {

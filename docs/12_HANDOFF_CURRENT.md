@@ -4,23 +4,23 @@
 First Vertical Slice
 
 ## Status
-Previous: WP-09B — ACCEPTED (Attempt 5); Codex review PASS and Human acceptance recorded on 2026-08-20.
-Current: WP-09C — ACCEPTED (Attempt 4; IMPLEMENTATION_ATTEMPT: 3 / REVIEW_ATTEMPT: 4); Codex PASS and Human acceptance recorded on 2026-08-20.
-Next: Codex prepares WP-09D task scope and Writer handoff.
+Previous: WP-09C — ACCEPTED (Attempt 4; IMPLEMENTATION_ATTEMPT: 3 / REVIEW_ATTEMPT: 4); Codex PASS and Human acceptance recorded on 2026-08-20.
+Current: WP-09D — ACCEPTED (Attempt 3); Codex PASS and Human acceptance recorded on 2026-08-20.
+Next: Prepare WP-10 FVS final deterministic acceptance.
 
 Acceptance repair log: `docs/27_ACCEPTANCE_REPAIR_LOG.md`
 
-Task document: `docs/tasks/WP-09C.md`; roadmap: `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`; accepted dependencies: `docs/tasks/WP-09A.md` and `docs/tasks/WP-09B.md`.
+Task document: `docs/tasks/WP-09D.md`; roadmap: `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`; accepted dependencies: `docs/tasks/WP-09A.md`, `docs/tasks/WP-09B.md`, and `docs/tasks/WP-09C.md`.
 Historical task document: `docs/tasks/FVS-03.md`
 
 ## Active Writer
-NONE — WP-09C accepted; WP-09D task handoff is pending.
+NONE — WP-09D accepted; WP-10 planning pending.
 
 ## Reviewer
-Codex — WP-09C PASS recorded; prepares WP-09D scope.
+Codex / Human — WP-09D PASS and acceptance recorded; prepare WP-10 final acceptance.
 
 ## Antigravity
-`NOT_REQUIRED` for WP-09C because it is Core-only. Browser DOM / Playwright E2E remains `UNVERIFIED/SKIPPED`.
+`NOT_REQUIRED_FOR_IMPLEMENTATION` for WP-09D; this task does not include real-browser E2E. Browser DOM / Playwright E2E remains `UNVERIFIED/SKIPPED`.
 
 ## Starting Branch
 feature/first-vertical-slice
@@ -837,8 +837,131 @@ Symlink containment `UNVERIFIED/SKIPPED`, Browser E2E `UNVERIFIED/SKIPPED`, conc
 
 ### Next
 
-Codex prepares WP-09D task scope and Writer handoff. Do not modify WP-09D product source before its task gate is recorded.
+WP-09D task scope and Writer handoff are recorded in `docs/tasks/WP-09D.md`. OpenCode may now implement the scoped frontend task; do not modify protected Core contracts.
 
 ### Do not change
 
 - ADR-001–010, Domain/ORM/Alembic, WP-08A/B, WP-09A/B, frontend, dependencies, artifact file content, or secret handling.
+
+## WP-09D Implementation Handoff (Attempt 3)
+
+- `TASK_ID`: `WP-09D`
+- `STATUS`: `READY_FOR_CODEX_REVIEW`
+- `ATTEMPT`: `3`
+- `BRANCH`: `feature/first-vertical-slice`
+- `WRITER`: `OpenCode`
+- `REVIEWER`: `Codex`
+- `ANTIGRAVITY_STATUS`: `NOT_REQUIRED_FOR_IMPLEMENTATION` — no real-browser E2E; waiver remains `UNVERIFIED/SKIPPED`
+- `NEXT_OWNER`: `Codex`
+- `HANDOFF_DOC`: `docs/12_HANDOFF_CURRENT.md`
+- `TASK_DOC`: `docs/tasks/WP-09D.md`
+
+### Changed files
+
+Modified:
+- `apps/web/src/App.test.tsx` — add WP-09D assertions for full metadata/reference fields including Finding task_id/run_id and Evidence task_id/run_id (78 tests = 61 baseline + 17 WP-09D, preserve existing; Attempt 3 adds task_id/run_id asserts inside existing full-metadata test)
+- `apps/web/src/App.tsx` — add run-detail view state, props-based no-router navigation
+- `apps/web/src/api.ts` — add WP-09C 5 query wrappers/types/functions, preserve /api/v1, auth injection, error classes, URL encoding
+- `apps/web/src/components/RunPreparation.tsx` — add Result/History detail action per Run, preserve CREATED/LOCAL/NONE and ContextPackage authoring
+- `apps/web/src/styles.css` — minimal detail-section styles (detail-section) + RunDetail metadata display
+- `docs/11_PROJECT_STATE.md` — WP-09D Attempt 3 READY_FOR_CODEX_REVIEW — implementation complete / awaiting Codex review; 78 frontend tests; Current Next Gate = Codex review / Human acceptance
+- `docs/12_HANDOFF_CURRENT.md` — this handoff (Attempt 3) with correct modified/untracked ledger
+- `docs/15_DOCUMENT_INDEX.md` — PRE_EXISTING dirty state (not WP-09D scope; see SCOPE_DEVIATION)
+- `docs/28_MASTER_DEVELOPMENT_ROADMAP.md` — WP-09D Attempt 3 READY_FOR_CODEX_REVIEW; 78 Vitest tests PASS + build PASS
+
+Untracked:
+- `apps/web/src/components/RunDetail.tsx` — read-only detail fetching 6 endpoints with full metadata fields (Finding: id/task_id/run_id/title/description/severity/status/evidence_refs/created_at; Evidence: id/task_id/run_id/actor_id/source/type/status/artifact_refs/metadata/observed_at; Artifact: id/project/task/run IDs/artifact_type/mime_type/source_type/storage_ref/sha256/size; History: id/run_id/from_state/to_state/occurred_at/reason), no artifact content read, no download, no fabricated evidence, no secret exposure
+- `docs/tasks/WP-09D.md` — status READY_FOR_CODEX_REVIEW Attempt 3 (still untracked until commit) — Progress checkpoint synced to READY_FOR_CODEX_REVIEW, implementation complete / awaiting Codex review, ITEM_PROGRESS 0%, PROJECT_PROGRESS 27/100, FVS_PROGRESS 19/22
+
+### Protected areas
+
+- ADR-001–010 (frozen, no change)
+- WP-08A/WP-08B contracts and frontend baseline (preserved, 61 tests retained + 17 new = 78)
+- WP-09B execution/lifecycle/CAS/failure isolation (no Core change)
+- WP-09C REST query contract (no endpoint/schema/migration change)
+- No Core source, REST endpoint, schema, migration, runtime, dependency changes
+
+### Tests
+
+- `cd apps/web && npm test` — 78 passed, exit code 0 (61 baseline preserved + 17 WP-09D, including Attempt 3 finding/evid task_id/run_id asserts: `f_1 — task:t_1 — run:run_1 — FindTitle` and `ev_1 — task:t_1 — run:run_1 — actor_1`)
+- `cd apps/web && npm run build` — PASS, exit code 0 (tsc -b && vite build)
+- `git diff --check` — PASS, exit code 0 (no whitespace errors)
+- `git status --short --branch` — Modified: 9 (apps/web 5 + docs 4) + Untracked: 2 (RunDetail.tsx + WP-09D.md), branch feature/first-vertical-slice, exit code 0
+  - `## feature/first-vertical-slice...backup/feature/first-vertical-slice [ahead 1]`
+  - ` M apps/web/src/App.test.tsx`
+  - ` M apps/web/src/App.tsx`
+  - ` M apps/web/src/api.ts`
+  - ` M apps/web/src/components/RunPreparation.tsx`
+  - ` M apps/web/src/styles.css`
+  - ` M docs/11_PROJECT_STATE.md`
+  - ` M docs/12_HANDOFF_CURRENT.md`
+  - ` M docs/15_DOCUMENT_INDEX.md`
+  - ` M docs/28_MASTER_DEVELOPMENT_ROADMAP.md`
+  - `?? apps/web/src/components/RunDetail.tsx`
+  - `?? docs/tasks/WP-09D.md`
+
+### ADR impact
+
+NONE — extends UI consumption of accepted WP-09C contract; preserves ADR-004/008/010; no services/core, REST contract, ADR, or dependency change
+
+### Scope deviation
+
+NONE
+
+### Known limitations
+
+- None new beyond inherited symlink UNVERIFIED/SKIPPED
+- Frontend has no real auth source; 403 hint is operational LOOPBACK_TOKEN name only, not secret value
+
+### Unverified
+
+- Browser DOM / Playwright E2E: `UNVERIFIED/SKIPPED` (accepted waiver, deferred to browser verification work)
+- True concurrent HTTP duplicate-command: `UNVERIFIED` (repository-level CAS test covers claim)
+- Symlink containment: `UNVERIFIED/SKIPPED` (Windows permission, Human waiver accepted)
+
+### Next
+
+WP-09D Codex PASS and Human acceptance are recorded below. Prepare WP-10 final deterministic acceptance.
+
+### Do not change
+
+- Do not modify `services/core/` WP-09B/C execution, WP-09C REST routes/schemas, WP-08A/B frontend, ADR-001–010, migrations, dependencies, storage, or secret handling.
+- Do not count WP-09D toward accepted progress (27/100, 19/22) before Codex PASS and Human acceptance.
+
+## WP-09D Acceptance Update (Attempt 3)
+
+- `TASK_ID`: `WP-09D`
+- `STATUS`: `ACCEPTED`
+- `ATTEMPT`: `3`
+- `CODEX_REVIEW`: `PASS`
+- `HUMAN_ACCEPTANCE`: Confirmed on `2026-08-20`
+- `ITEM_PROGRESS`: `100%` — 1/1 point accepted
+- `PROJECT_PROGRESS`: `28/100 = 28%`
+- `FVS_PROGRESS`: `20/22 = 90.9%`
+- `APPROVED_FOR_COMMIT`: `YES` — explicit Human authorization recorded in the current session
+
+### Acceptance evidence
+
+- `cd apps/web && npm test` — 78 passed, exit code 0
+- `cd apps/web && npm run build` — PASS, exit code 0
+- `git diff --check` — PASS, exit code 0
+- Browser DOM / Playwright E2E remains `UNVERIFIED/SKIPPED` under the accepted waiver.
+
+### Accepted stage allowlist
+
+- `apps/web/src/App.test.tsx`
+- `apps/web/src/App.tsx`
+- `apps/web/src/api.ts`
+- `apps/web/src/components/RunPreparation.tsx`
+- `apps/web/src/components/RunDetail.tsx`
+- `apps/web/src/styles.css`
+- `docs/11_PROJECT_STATE.md`
+- `docs/12_HANDOFF_CURRENT.md`
+- `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`
+- `docs/tasks/WP-09D.md`
+
+Excluded and preserved: `docs/15_DOCUMENT_INDEX.md` remains pre-existing dirty state and is not part of the WP-09D commit.
+
+### Next
+
+Prepare WP-10 FVS final deterministic acceptance. Do not relabel Browser E2E, symlink containment, or concurrent HTTP limitations as verified.

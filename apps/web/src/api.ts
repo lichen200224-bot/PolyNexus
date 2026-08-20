@@ -125,6 +125,68 @@ export interface ContextPackageCreateRequest {
 }
 
 // ---------------------------------------------------------------------------
+// WP-09C read-only query types
+// ---------------------------------------------------------------------------
+
+export interface Finding {
+  id: string
+  task_id: string
+  run_id: string
+  title: string
+  description: string
+  severity: string
+  evidence_refs: string[]
+  status: string
+  created_at: string
+}
+
+export interface Evidence {
+  id: string
+  task_id: string
+  run_id: string
+  actor_id: string
+  source: string
+  type: string
+  status: string
+  artifact_refs: string[]
+  metadata: Record<string, string>
+  observed_at: string
+}
+
+export interface Artifact {
+  id: string
+  project_id: string
+  task_id: string | null
+  run_id: string | null
+  artifact_type: string
+  mime_type: string
+  source_type: string
+  storage_ref: string
+  sha256: string
+  size: number
+}
+
+export interface RunResultWrapper {
+  result: RunResult | null
+}
+
+export interface FindingsWrapper {
+  findings: Finding[]
+}
+
+export interface EvidenceWrapper {
+  evidence: Evidence[]
+}
+
+export interface ArtifactsWrapper {
+  artifacts: Artifact[]
+}
+
+export interface HistoryWrapper {
+  events: RunEvent[]
+}
+
+// ---------------------------------------------------------------------------
 // Error types
 // ---------------------------------------------------------------------------
 
@@ -299,5 +361,64 @@ export function createContextPackage(
     'POST',
     `/projects/${encodeURIComponent(projectId)}/context-packages`,
     body,
+  )
+}
+
+// ---------------------------------------------------------------------------
+// WP-09C read-only query endpoints
+// ---------------------------------------------------------------------------
+
+export function getRunResult(
+  config: ApiClientConfig,
+  runId: string,
+): Promise<RunResultWrapper> {
+  return request<RunResultWrapper>(
+    config,
+    'GET',
+    `/runs/${encodeURIComponent(runId)}/result`,
+  )
+}
+
+export function getRunFindings(
+  config: ApiClientConfig,
+  runId: string,
+): Promise<FindingsWrapper> {
+  return request<FindingsWrapper>(
+    config,
+    'GET',
+    `/runs/${encodeURIComponent(runId)}/findings`,
+  )
+}
+
+export function getRunEvidence(
+  config: ApiClientConfig,
+  runId: string,
+): Promise<EvidenceWrapper> {
+  return request<EvidenceWrapper>(
+    config,
+    'GET',
+    `/runs/${encodeURIComponent(runId)}/evidence`,
+  )
+}
+
+export function getRunArtifacts(
+  config: ApiClientConfig,
+  runId: string,
+): Promise<ArtifactsWrapper> {
+  return request<ArtifactsWrapper>(
+    config,
+    'GET',
+    `/runs/${encodeURIComponent(runId)}/artifacts`,
+  )
+}
+
+export function getRunHistory(
+  config: ApiClientConfig,
+  runId: string,
+): Promise<HistoryWrapper> {
+  return request<HistoryWrapper>(
+    config,
+    'GET',
+    `/runs/${encodeURIComponent(runId)}/history`,
   )
 }

@@ -3,6 +3,7 @@ import type { ApiClientConfig, Project, Task } from './api'
 import { ProjectList } from './components/ProjectList'
 import { TaskList } from './components/TaskList'
 import { RunPreparation } from './components/RunPreparation'
+import { RunDetail } from './components/RunDetail'
 
 const workModes = [
   ['Discuss', 'Independent analysis, cross review, synthesis'],
@@ -14,6 +15,7 @@ type ViewState =
   | { view: 'projects' }
   | { view: 'tasks'; project: Project }
   | { view: 'run-prep'; project: Project; task: Task }
+  | { view: 'run-detail'; project: Project; task: Task; runId: string }
 
 function createDefaultConfig(): ApiClientConfig {
   const base = import.meta.env.VITE_POLYNEXUS_API_BASE_URL || '/api/v1'
@@ -81,6 +83,23 @@ export function App() {
             config={config}
             task={state.task}
             onBack={() => setState({ view: 'tasks', project: state.project })}
+            onOpenDetail={(runId) => setState({ view: 'run-detail', project: state.project, task: state.task, runId })}
+          />
+        </>
+      )}
+
+      {state.view === 'run-detail' && (
+        <>
+          <section className="panel" aria-labelledby="project-heading">
+            <div>
+              <p className="label">Current Project</p>
+              <h2 id="project-heading">{state.project.name}</h2>
+            </div>
+          </section>
+          <RunDetail
+            config={config}
+            runId={state.runId}
+            onBack={() => setState({ view: 'run-prep', project: state.project, task: state.task })}
           />
         </>
       )}

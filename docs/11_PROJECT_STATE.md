@@ -2,7 +2,7 @@
 
 Date: 2026-08-20
 Version: Development Baseline v1.0 + Dev Preparation Profile v1.0.2
-Milestone: First Vertical Slice — WP-08A/WP-08B/WP-09B/WP-09C ACCEPTED; UI/Core waiver accepted; ROADMAP-01 CONFIRMED
+Milestone: First Vertical Slice — WP-08A/WP-08B/WP-09B/WP-09C/WP-09D ACCEPTED; UI/Core waiver accepted; ROADMAP-01 CONFIRMED
 
 ## Confirmed
 - Product Scope Decisions D01–D10 confirmed.
@@ -22,7 +22,7 @@ Milestone: First Vertical Slice — WP-08A/WP-08B/WP-09B/WP-09C ACCEPTED; UI/Cor
 - Absolute path is a local profile only; product code remains repo-relative.
 
 ## Current Priority
-1. Prepare WP-09D Result/History UI task scope and Writer handoff; defer Browser E2E re-test until development is complete.
+1. Prepare WP-10 FVS final deterministic acceptance; defer Browser E2E re-test until development is complete.
 2. Prepare competition proposal/deck content confidence gate by 2026-08-25.
 
 ## Current Product Slice
@@ -37,28 +37,28 @@ First Vertical Slice target by 2026-09-06:
 - Actual competition upload-form fields/demo requirement still require recheck before submission.
 
 ## Next Gate
-Prepare WP-09D task scope and handoff; then OpenCode implementation and Codex review.
+Prepare WP-10 FVS final deterministic acceptance and Human/Codex checkpoint review.
 
 ## Current Development State
 
-Phase: First Vertical Slice — WP-09C REST queries (Attempt 4) ACCEPTED; Codex PASS and Human acceptance recorded on 2026-08-20
-Next Phase: WP-09D Result/History UI task preparation; Browser E2E Re-test deferred
+Phase: First Vertical Slice — WP-09D Result/History UI ACCEPTED (Attempt 3); Codex PASS and Human acceptance recorded on 2026-08-20
+Next Phase: WP-10 FVS final deterministic acceptance; Browser E2E Re-test deferred
 
 Current Branch: feature/first-vertical-slice
-Current Baseline Commit: 337bc47
-Latest FVS Checkpoint: d7060c4 (`feat(core): add WP-07 execution integration`)
-Current Planned Task: WP-09D — Result/History UI with durable reload and error states (task scope preparation pending)
-Active Writer: NONE — WP-09C accepted; WP-09D task handoff pending
-Reviewer: Codex — WP-09C PASS recorded; next prepares WP-09D scope
-Antigravity: NOT_REQUIRED for WP-09C (Core-only); Browser E2E UNVERIFIED/SKIPPED
+Current Baseline Commit: 3a0237d (`feat(core): add WP-09C run output queries`)
+Latest FVS Checkpoint: 3a0237d (`feat(core): add WP-09C run output queries`)
+Current Planned Task: WP-10 — FVS final deterministic acceptance
+Active Writer: NONE — WP-09D accepted; WP-10 planning pending
+Reviewer: Codex / Human — WP-09D PASS and acceptance recorded; WP-10 is next
+Antigravity: NOT_REQUIRED_FOR_IMPLEMENTATION; Browser E2E UNVERIFIED/SKIPPED
 
 Architecture:
 - ADR-001 through ADR-010 are CONFIRMED / FROZEN FOR V1 IMPLEMENTATION.
 
 Development Environment:
 - Windows development readiness: PASS
-- Core pytest: 169 passed, 1 skipped (170 collected, symlink containment UNVERIFIED; Human waiver accepted) — historical WP-09B evidence was 134 passed, 1 skipped
-- Frontend Vitest: 61 passed
+- Core pytest: 169 passed, 1 skipped (170 collected, symlink containment UNVERIFIED; Human waiver accepted)
+- Frontend Vitest: 78 passed (61 baseline + 17 WP-09D)
 - Frontend build: PASS
 - Local Git backup: PASS
 
@@ -144,7 +144,7 @@ WP-09C Attempt 4 was accepted after current Core evidence, Codex independent rev
 
 ## Current Next Gate
 
-WP-09B Attempt 5 and WP-09C Attempt 4 are accepted. Next gate is WP-09D task scope and Writer handoff preparation.
+WP-09B, WP-09C, and WP-09D are accepted. Next gate is WP-10 FVS final deterministic acceptance.
 
 ## WP-09B Development Gate
 
@@ -153,7 +153,7 @@ WP-09B Attempt 5 and WP-09C Attempt 4 are accepted. Next gate is WP-09D task sco
 - Scope: wire `POST /api/v1/runs/{run_id}/execute` to the existing persisted Run using the accepted Option A contract.
 - Protected behavior: existing Run-create remains `201 CREATED` and inert; Run identity, ContextPackage reference, lifecycle events, failure persistence, sanitized reason, and no-fabricated-output rules are mandatory.
 - Accepted project progress: **26/100 = 26%**; accepted FVS progress: **18/22 = 81.8%**; WP-09B earns **2/2 points**.
-- Completed transition: WP-09C was implemented, independently reviewed, and Human-accepted; WP-09D preparation is next.
+- Completed transition: WP-09C and WP-09D were implemented, independently reviewed, and Human-accepted; WP-10 is next.
 - Symlink containment remains `UNVERIFIED/SKIPPED`; Browser E2E remains `UNVERIFIED/SKIPPED`; true concurrent HTTP duplicate execution remains `UNVERIFIED`.
 
 ## WP-09C Development Gate
@@ -165,5 +165,17 @@ WP-09B Attempt 5 and WP-09C Attempt 4 are accepted. Next gate is WP-09D task sco
 - Required behavior: stable wrappers, deterministic ordering, `403/404/422`, durable reload, fail-closed ownership validation, and no fabricated output.
 - Protected behavior: WP-09B execution command, Run-create semantics, lifecycle/CAS/failure persistence, WP-08A/B, ADR-001–010, and all migration/frontend files.
 - Accepted project progress is **27/100 = 27%**; accepted FVS progress is **19/22 = 86.4%**; WP-09C earns **1/1 point**.
-- Next owner: Codex prepares WP-09D task scope and handoff.
+- Next owner: Codex/Human prepare and execute WP-10 final deterministic acceptance.
 - Antigravity: `NOT_REQUIRED` for this Core-only task; Browser E2E remains `UNVERIFIED/SKIPPED`.
+
+## WP-09D Development Gate
+
+- Task document: `docs/tasks/WP-09D.md`.
+- Status: `ACCEPTED` (Attempt 3); Codex review PASS and Human acceptance recorded on 2026-08-20; 78 frontend tests PASS, build PASS.
+- Goal: add a read-only Result/History detail view that reloads Run metadata and all five accepted WP-09C query wrappers from REST.
+- Scope: `apps/web` API client, props-based view/navigation, Run detail component, minimal styles, and Vitest integration coverage.
+- Protected behavior: WP-08A/WP-08B, WP-09B execution/lifecycle/CAS/failure, WP-09C endpoint wrappers/ordering/ownership, ADR-001–010, no storage/secret/direct Core access.
+- ADR impact: `NONE`. No endpoint, response, lifecycle, evidence, or dependency change.
+- Accepted project progress is **28/100 = 28%**; accepted FVS progress is **20/22 = 90.9%**; WP-09D earns **1/1 point**.
+- Browser E2E remains `UNVERIFIED/SKIPPED`; it is not a WP-09D implementation acceptance requirement.
+- Next owner: Codex/Human prepare WP-10 final deterministic acceptance.

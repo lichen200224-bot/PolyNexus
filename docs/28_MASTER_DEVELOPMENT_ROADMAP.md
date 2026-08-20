@@ -51,15 +51,15 @@ The project uses a 100-point checkpoint-weighted progress model. Only `ACCEPTED`
 ### Current baseline snapshot — 2026-08-20
 
 - `CP-00` Baseline/Governance: **8/8 points accepted**.
-- `CP-02` First Vertical Slice: **19/22 points accepted** for WP-01–WP-09C.
+- `CP-02` First Vertical Slice: **20/22 points accepted** for WP-01–WP-09D.
 - WP-08A is `ACCEPTED` after current deterministic evidence, Codex review PASS, and Human approval; it earns **2/2 points**.
 - WP-08B is `ACCEPTED` after current deterministic evidence, Codex review PASS, and Human approval on 2026-08-19; it earns **2/2 points**.
 - WP-09A is `ACCEPTED_ARCHITECTURE_GATE` after Human approval and Codex confirmation on 2026-08-19; it has no separate product point weight.
 - WP-09B is `ACCEPTED` after Attempt 5 deterministic evidence, Codex review PASS, and Human acceptance on 2026-08-20; it earns **2/2 points**.
 - WP-09C is `ACCEPTED` after Attempt 4 deterministic evidence, Codex review PASS, and Human acceptance on 2026-08-20; it earns **1/1 point**.
-- The remaining CP-02 allocation is explicit: WP-09D **1 point** and WP-10 **2 points**. This preserves the existing 22-point CP-02 total.
-- Current project progress: **27/100 = 27% accepted progress**.
-- Current FVS progress: **19/22 = 86.4% accepted progress**.
+- The remaining CP-02 allocation is explicit: WP-10 **2 points**. This preserves the existing 22-point CP-02 total.
+- Current project progress: **28/100 = 28% accepted progress**.
+- Current FVS progress: **20/22 = 90.9% accepted progress**.
 - Browser E2E waiver is a limitation record, not additional earned progress.
 
 ## 4. Checkpoint register
@@ -97,7 +97,7 @@ Competition work may proceed as a documentation track, but it must not change pr
 
 ### CP-02 — First Vertical Slice completion
 
-WP-01–WP-07, WP-08A, WP-08B, and WP-09B are accepted. The following sequence completes the remaining user path.
+WP-01–WP-07, WP-08A, WP-08B, WP-09B, WP-09C, and WP-09D are accepted. The following sequence completes the remaining user path.
 
 | Item | Scope | Owner / reviewer | Estimate | Target | Acceptance checkpoint |
 |---|---|---|---:|---|---|
@@ -107,7 +107,7 @@ WP-01–WP-07, WP-08A, WP-08B, and WP-09B are accepted. The following sequence c
 | WP-09A | Execution command API contract proposal and Human/Codex architecture gate | Codex / Human | 1 day | 2026-08-25 | `ACCEPTED_ARCHITECTURE_GATE`; Option A approved 2026-08-19; no separate product point weight |
 | WP-09B | Wire approved execution command to `ExecutionService` and RunSupervisor | OpenCode / Codex | 3 days | 2026-08-29 | `ACCEPTED`; Attempt 5 Codex PASS + Human accepted 2026-08-20; 2/2 points; existing Run identity, persisted lifecycle/result, failure isolation, no fabricated evidence |
 | WP-09C | Result, Finding, Evidence, Artifact, and History REST queries | OpenCode / Codex | 2 days | 2026-09-01 | `ACCEPTED` Attempt 4 (IMPLEMENTATION_ATTEMPT: 3 / REVIEW_ATTEMPT: 4); 1/1 point; 24 query tests PASS, governance sync recorded |
-| WP-09D | Result/History UI with durable reload and error states | OpenCode / Codex | 2 days | 2026-09-04 | 1 point; React/Vitest coverage; no direct Core internals |
+| WP-09D | Result/History UI with durable reload and error states | OpenCode / Codex | 2 days | 2026-09-04 | `ACCEPTED` Attempt 3; Codex PASS + Human acceptance 2026-08-20; 1/1 point; 78 Vitest tests PASS + build PASS, no Core change |
 | WP-10 | FVS final deterministic acceptance | Codex / Human | 2 days | 2026-09-06 | 2 points; fresh DB repeat, Core regression, UI regression, evidence/handoff complete |
 
 ### CP-03 — Core product baseline
