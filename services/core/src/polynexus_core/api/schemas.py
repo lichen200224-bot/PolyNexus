@@ -1,4 +1,4 @@
-"""Pydantic request/response schemas for Project, Task, Run API endpoints."""
+"""Pydantic request/response schemas for Project, Task, Run, ContextPackage API endpoints."""
 
 from __future__ import annotations
 
@@ -113,3 +113,32 @@ class RunResponse(BaseModel):
 
 class RunListResponse(BaseModel):
     runs: list[RunResponse]
+
+
+# ---------------------------------------------------------------------------
+# ContextPackage
+# ---------------------------------------------------------------------------
+
+class ContextPackageCreate(BaseModel):
+    version: int = Field(..., ge=1, description="Version number (>= 1)")
+    instructions: tuple[str, ...] = Field(default=(), description="Review instructions")
+    constraints: tuple[str, ...] = Field(default=(), description="Constraints")
+    project_facts: dict[str, str] = Field(default_factory=dict, description="Project facts")
+    artifact_refs: tuple[str, ...] = Field(default=(), description="Artifact references")
+    prior_decision_refs: tuple[str, ...] = Field(default=(), description="Prior decision references")
+    memory_refs: tuple[str, ...] = Field(default=(), description="Memory references")
+    source_refs: tuple[str, ...] = Field(default=(), description="Source references")
+
+
+class ContextPackageResponse(BaseModel):
+    id: str
+    project_id: str
+    version: int
+    instructions: tuple[str, ...]
+    constraints: tuple[str, ...]
+    project_facts: dict[str, str]
+    artifact_refs: tuple[str, ...]
+    prior_decision_refs: tuple[str, ...]
+    memory_refs: tuple[str, ...]
+    source_refs: tuple[str, ...]
+    created_at: datetime
