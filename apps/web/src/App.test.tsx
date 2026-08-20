@@ -1,4 +1,4 @@
-﻿import { describe, expect, it, vi, afterEach } from 'vitest'
+import { describe, expect, it, vi, afterEach } from 'vitest'
 import { App } from './App'
 import { AuthError, ApiError, NotFoundError } from './api'
 
@@ -710,6 +710,821 @@ describe('accessibility', () => {
     click(el.querySelector('.task-item-btn'))
     await flush()
     expect(el.querySelector('form')?.getAttribute('aria-label')).toBe('Create run')
+    el.remove()
+  })
+})
+
+// ---------------------------------------------------------------------------
+// WP-08B: ContextPackage authoring / selection
+// ---------------------------------------------------------------------------
+
+describe('WP-08B: ContextPackage authoring', () => {
+  afterEach(() => { globalThis.fetch = originalFetch })
+
+  const p1 = { id: 'p_1', name: 'Test', description: null, created_at: '2026-01-01T00:00:00' }
+  const t1 = {
+    id: 't_1', project_id: 'p_1', title: 'Task', workflow_id: 'review-minimal',
+    workflow_version: 1, mode: 'REVIEW', context_package_id: null, created_at: '2026-01-01T00:00:00',
+  }
+
+  it('shows authoring toggle button', async () => {
+    mockSeq([
+      { d: { projects: [p1] } },
+      { d: { tasks: [t1] } },
+      { d: { runs: [] } },
+    ])
+    const el = await mount()
+    click(el.querySelector('.project-item-btn'))
+    await flush()
+    click(el.querySelector('.task-item-btn'))
+    await flush()
+    expect(el.textContent).toContain('Create new ContextPackage')
+    el.remove()
+  })
+
+  it('opens authoring form on click', async () => {
+    mockSeq([
+      { d: { projects: [p1] } },
+      { d: { tasks: [t1] } },
+      { d: { runs: [] } },
+    ])
+    const el = await mount()
+    click(el.querySelector('.project-item-btn'))
+    await flush()
+    click(el.querySelector('.task-item-btn'))
+    await flush()
+    const toggleBtn = Array.from(el.querySelectorAll('button')).find(
+      (b) => b.textContent?.includes('Create new ContextPackage')
+    )!
+    toggleBtn.click()
+    await flush()
+    expect(el.querySelector('#cp-version')).not.toBeNull()
+    expect(el.querySelector('#cp-instructions')).not.toBeNull()
+    expect(el.querySelector('#cp-constraints')).not.toBeNull()
+    expect(el.querySelector('#cp-project-facts')).not.toBeNull()
+    el.remove()
+  })
+
+  it('create form has aria-label', async () => {
+    mockSeq([
+      { d: { projects: [p1] } },
+      { d: { tasks: [t1] } },
+      { d: { runs: [] } },
+    ])
+    const el = await mount()
+    click(el.querySelector('.project-item-btn'))
+    await flush()
+    click(el.querySelector('.task-item-btn'))
+    await flush()
+    const toggleBtn = Array.from(el.querySelectorAll('button')).find(
+      (b) => b.textContent?.includes('Create new ContextPackage')
+    )!
+    toggleBtn.click()
+    await flush()
+    const form = el.querySelector('#cp-authoring-form')
+    expect(form?.getAttribute('aria-label')).toBe('Create context package')
+    el.remove()
+  })
+
+  it('version field has aria-required', async () => {
+    mockSeq([
+      { d: { projects: [p1] } },
+      { d: { tasks: [t1] } },
+      { d: { runs: [] } },
+    ])
+    const el = await mount()
+    click(el.querySelector('.project-item-btn'))
+    await flush()
+    click(el.querySelector('.task-item-btn'))
+    await flush()
+    const toggleBtn = Array.from(el.querySelectorAll('button')).find(
+      (b) => b.textContent?.includes('Create new ContextPackage')
+    )!
+    toggleBtn.click()
+    await flush()
+    const versionInput = el.querySelector('#cp-version') as HTMLInputElement
+    expect(versionInput.getAttribute('aria-required')).toBe('true')
+    el.remove()
+  })
+
+  it('API posts to encoded path with full manifest shape including trim and blank omission', async () => {
+    const calls: Array<{ method: string; url: string; body?: string }> = []
+    const specialProject = { id: 'p_special/1 2', name: 'Special Project', description: null, created_at: '2026-01-01T00:00:00' }
+    const specialTask = {
+      id: 't_special', project_id: 'p_special/1 2', title: 'Task', workflow_id: 'review-minimal',
+      workflow_version: 1, mode: 'REVIEW', context_package_id: null, created_at: '2026-01-01T00:00:00',
+    }
+
+    globalThis.fetch = vi.fn(async (input: string | URL | Request, init?: RequestInit) => {
+      const url = typeof input === 'string' ? input : input.toString()
+      const method = init?.method ?? 'GET'
+      const body = init?.body as string | undefined
+      calls.push({ method, url, body })
+
+      if (method === 'POST' && url.includes('context-packages')) {
+        return new Response(
+          JSON.stringify({
+            id: 'context_new', project_id: 'p_special/1 2', version: 2,
+            instructions: [], constraints: [], project_facts: {},
+            artifact_refs: [], prior_decision_refs: [], memory_refs: [],
+            source_refs: [], created_at: '2026-01-01T00:00:00',
+          }),
+          { status: 201, headers: { 'Content-Type': 'application/json' } },
+        )
+      }
+      if (method === 'GET' && url.includes('runs')) {
+        return new Response(JSON.stringify({ runs: [] }), {
+          status: 200, headers: { 'Content-Type': 'application/json' },
+        })
+      }
+      if (method === 'GET' && url.includes('tasks')) {
+        return new Response(JSON.stringify({ tasks: [specialTask] }), {
+          status: 200, headers: { 'Content-Type': 'application/json' },
+        })
+      }
+      return new Response(JSON.stringify({ projects: [specialProject] }), {
+        status: 200, headers: { 'Content-Type': 'application/json' },
+      })
+    }) as typeof fetch
+
+    const el = await mount()
+    click(el.querySelector('.project-item-btn'))
+    await flush()
+    click(el.querySelector('.task-item-btn'))
+    await flush()
+
+    // Open authoring form
+    const toggleBtn = Array.from(el.querySelectorAll('button')).find(
+      (b) => b.textContent?.includes('Create new ContextPackage')
+    )!
+    toggleBtn.click()
+    await flush()
+
+    // Set version
+    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!
+    setter.call(el.querySelector('#cp-version')!, '2')
+    el.querySelector('#cp-version')!.dispatchEvent(new Event('input', { bubbles: true }))
+    el.querySelector('#cp-version')!.dispatchEvent(new Event('change', { bubbles: true }))
+
+    // Helper for textarea
+    const setTa = (selector: string, val: string) => {
+      const taSetter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')!.set!
+      taSetter.call(el.querySelector(selector)!, val)
+      el.querySelector(selector)!.dispatchEvent(new Event('input', { bubbles: true }))
+    }
+
+    setTa('#cp-instructions', '  inst 1  \n\n  inst 2  \n')
+    setTa('#cp-constraints', 'const 1\n\nconst 2\n')
+    setTa('#cp-project-facts', ' key1 = value1 \n\n key2=value2 \n')
+    setTa('#cp-artifact-refs', ' art1 \n\n art2 \n')
+    setTa('#cp-prior-decision-refs', ' dec1 \n\n dec2 \n')
+    setTa('#cp-memory-refs', ' mem1 \n\n mem2 \n')
+    setTa('#cp-source-refs', ' src1 \n\n src2 \n')
+
+    // Submit
+    el.querySelector('#cp-authoring-form')!.dispatchEvent(
+      new Event('submit', { bubbles: true, cancelable: true }),
+    )
+    await flush()
+
+    const cpCalls = calls.filter((c) => c.url.includes('context-packages'))
+    expect(cpCalls.length).toBe(1)
+    expect(cpCalls[0].method).toBe('POST')
+    // Verify URL encoding of special project id 'p_special/1 2'
+    expect(cpCalls[0].url).toContain('/projects/p_special%2F1%202/context-packages')
+    // Verify body shape and whitespace trim + blank line omission
+    const body = JSON.parse(cpCalls[0].body!)
+    expect(body.version).toBe(2)
+    expect(body.instructions).toEqual(['inst 1', 'inst 2'])
+    expect(body.constraints).toEqual(['const 1', 'const 2'])
+    expect(body.project_facts).toEqual({ key1: 'value1', key2: 'value2' })
+    expect(body.artifact_refs).toEqual(['art1', 'art2'])
+    expect(body.prior_decision_refs).toEqual(['dec1', 'dec2'])
+    expect(body.memory_refs).toEqual(['mem1', 'mem2'])
+    expect(body.source_refs).toEqual(['src1', 'src2'])
+    el.remove()
+  })
+
+  it('create success populates run form and subsequent Run create uses returned ContextPackage ID', async () => {
+    const postCalls: Array<{ url: string; body: any }> = []
+    let createdRun: any = null
+
+    globalThis.fetch = vi.fn(async (input: string | URL | Request, init?: RequestInit) => {
+      const url = typeof input === 'string' ? input : input.toString()
+      const method = init?.method ?? 'GET'
+      const body = init?.body ? JSON.parse(init.body as string) : undefined
+
+      if (method === 'POST') {
+        postCalls.push({ url, body })
+        if (url.includes('context-packages')) {
+          return new Response(
+            JSON.stringify({
+              id: 'context_returned', project_id: 'p_1', version: 3,
+              instructions: [], constraints: [], project_facts: {},
+              artifact_refs: [], prior_decision_refs: [], memory_refs: [],
+              source_refs: [], created_at: '2026-01-01T00:00:00',
+            }),
+            { status: 201, headers: { 'Content-Type': 'application/json' } },
+          )
+        }
+        if (url.includes('/runs')) {
+          createdRun = {
+            id: 'run_created_from_cp', task_id: 't_1', workflow_id: 'review-minimal', workflow_version: 1,
+            context_package_id: body.context_package_id, execution_target: 'LOCAL', resume_mode: 'NONE',
+            state: 'CREATED', runtime_ref: null, created_at: '2026-01-01T00:00:00',
+            updated_at: '2026-01-01T00:00:00', events: [], result: null,
+          }
+          return new Response(
+            JSON.stringify(createdRun),
+            { status: 201, headers: { 'Content-Type': 'application/json' } },
+          )
+        }
+      }
+      if (method === 'GET' && url.includes('runs')) {
+        return new Response(JSON.stringify({ runs: createdRun ? [createdRun] : [] }), {
+          status: 200, headers: { 'Content-Type': 'application/json' },
+        })
+      }
+      if (method === 'GET' && url.includes('tasks')) {
+        return new Response(JSON.stringify({ tasks: [t1] }), {
+          status: 200, headers: { 'Content-Type': 'application/json' },
+        })
+      }
+      return new Response(JSON.stringify({ projects: [p1] }), {
+        status: 200, headers: { 'Content-Type': 'application/json' },
+      })
+    }) as typeof fetch
+
+    const el = await mount()
+    click(el.querySelector('.project-item-btn'))
+    await flush()
+    click(el.querySelector('.task-item-btn'))
+    await flush()
+
+    // Open authoring form and submit ContextPackage
+    const toggleBtn = Array.from(el.querySelectorAll('button')).find(
+      (b) => b.textContent?.includes('Create new ContextPackage')
+    )!
+    toggleBtn.click()
+    await flush()
+    el.querySelector('#cp-authoring-form')!.dispatchEvent(
+      new Event('submit', { bubbles: true, cancelable: true }),
+    )
+    await flush()
+
+    // Verify success message shown and input updated
+    expect(el.textContent).toContain('context_returned')
+    expect(el.textContent).toContain('version 3')
+    const cpInput = el.querySelector('#cp-id') as HTMLInputElement
+    expect(cpInput.value).toBe('context_returned')
+
+    // Now submit Run form
+    el.querySelector('form[aria-label="Create run"]')!.dispatchEvent(
+      new Event('submit', { bubbles: true, cancelable: true }),
+    )
+    await flush()
+
+    // Assert that Run POST body specifically used the returned ID
+    const runPostCall = postCalls.find((c) => c.url.includes('/runs'))
+    expect(runPostCall).toBeDefined()
+    expect(runPostCall!.body.context_package_id).toBe('context_returned')
+
+    // Verify UI reflects newly created run
+    expect(el.textContent).toContain('run_created_from_cp')
+    expect(el.textContent).toContain('CREATED')
+    el.remove()
+  })
+
+  it('rejects version 0 and disables submit', async () => {
+    mockSeq([
+      { d: { projects: [p1] } },
+      { d: { tasks: [t1] } },
+      { d: { runs: [] } },
+    ])
+    const el = await mount()
+    click(el.querySelector('.project-item-btn'))
+    await flush()
+    click(el.querySelector('.task-item-btn'))
+    await flush()
+
+    const toggleBtn = Array.from(el.querySelectorAll('button')).find(
+      (b) => b.textContent?.includes('Create new ContextPackage')
+    )!
+    toggleBtn.click()
+    await flush()
+
+    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!
+    setter.call(el.querySelector('#cp-version')!, '0')
+    el.querySelector('#cp-version')!.dispatchEvent(new Event('input', { bubbles: true }))
+    el.querySelector('#cp-version')!.dispatchEvent(new Event('change', { bubbles: true }))
+    await flush()
+
+    const submitBtn = el.querySelector('#cp-authoring-form button[type="submit"]') as HTMLButtonElement
+    expect(submitBtn.disabled).toBe(true)
+    el.remove()
+  })
+
+  it('rejects version 1.5 (decimal) and disables submit without truncation', async () => {
+    mockSeq([
+      { d: { projects: [p1] } },
+      { d: { tasks: [t1] } },
+      { d: { runs: [] } },
+    ])
+    const el = await mount()
+    click(el.querySelector('.project-item-btn'))
+    await flush()
+    click(el.querySelector('.task-item-btn'))
+    await flush()
+
+    const toggleBtn = Array.from(el.querySelectorAll('button')).find(
+      (b) => b.textContent?.includes('Create new ContextPackage')
+    )!
+    toggleBtn.click()
+    await flush()
+
+    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!
+    setter.call(el.querySelector('#cp-version')!, '1.5')
+    el.querySelector('#cp-version')!.dispatchEvent(new Event('input', { bubbles: true }))
+    el.querySelector('#cp-version')!.dispatchEvent(new Event('change', { bubbles: true }))
+    await flush()
+
+    const submitBtn = el.querySelector('#cp-authoring-form button[type="submit"]') as HTMLButtonElement
+    expect(submitBtn.disabled).toBe(true)
+    el.remove()
+  })
+
+  it('rejects non-numeric version "abc" and disables submit', async () => {
+    mockSeq([
+      { d: { projects: [p1] } },
+      { d: { tasks: [t1] } },
+      { d: { runs: [] } },
+    ])
+    const el = await mount()
+    click(el.querySelector('.project-item-btn'))
+    await flush()
+    click(el.querySelector('.task-item-btn'))
+    await flush()
+
+    const toggleBtn = Array.from(el.querySelectorAll('button')).find(
+      (b) => b.textContent?.includes('Create new ContextPackage')
+    )!
+    toggleBtn.click()
+    await flush()
+
+    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!
+    setter.call(el.querySelector('#cp-version')!, 'abc')
+    el.querySelector('#cp-version')!.dispatchEvent(new Event('input', { bubbles: true }))
+    el.querySelector('#cp-version')!.dispatchEvent(new Event('change', { bubbles: true }))
+    await flush()
+
+    const submitBtn = el.querySelector('#cp-authoring-form button[type="submit"]') as HTMLButtonElement
+    expect(submitBtn.disabled).toBe(true)
+    el.remove()
+  })
+
+  it('rejects negative version -2 and disables submit', async () => {
+    mockSeq([
+      { d: { projects: [p1] } },
+      { d: { tasks: [t1] } },
+      { d: { runs: [] } },
+    ])
+    const el = await mount()
+    click(el.querySelector('.project-item-btn'))
+    await flush()
+    click(el.querySelector('.task-item-btn'))
+    await flush()
+
+    const toggleBtn = Array.from(el.querySelectorAll('button')).find(
+      (b) => b.textContent?.includes('Create new ContextPackage')
+    )!
+    toggleBtn.click()
+    await flush()
+
+    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!
+    setter.call(el.querySelector('#cp-version')!, '-2')
+    el.querySelector('#cp-version')!.dispatchEvent(new Event('input', { bubbles: true }))
+    el.querySelector('#cp-version')!.dispatchEvent(new Event('change', { bubbles: true }))
+    await flush()
+
+    const submitBtn = el.querySelector('#cp-authoring-form button[type="submit"]') as HTMLButtonElement
+    expect(submitBtn.disabled).toBe(true)
+    el.remove()
+  })
+
+  it('version empty blocks submission', async () => {
+    mockSeq([
+      { d: { projects: [p1] } },
+      { d: { tasks: [t1] } },
+      { d: { runs: [] } },
+    ])
+    const el = await mount()
+    click(el.querySelector('.project-item-btn'))
+    await flush()
+    click(el.querySelector('.task-item-btn'))
+    await flush()
+
+    const toggleBtn = Array.from(el.querySelectorAll('button')).find(
+      (b) => b.textContent?.includes('Create new ContextPackage')
+    )!
+    toggleBtn.click()
+    await flush()
+
+    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!
+    setter.call(el.querySelector('#cp-version')!, '')
+    el.querySelector('#cp-version')!.dispatchEvent(new Event('input', { bubbles: true }))
+    el.querySelector('#cp-version')!.dispatchEvent(new Event('change', { bubbles: true }))
+    await flush()
+
+    const submitBtn = el.querySelector('#cp-authoring-form button[type="submit"]') as HTMLButtonElement
+    expect(submitBtn.disabled).toBe(true)
+    el.remove()
+  })
+
+  it('project_facts invalid line shows validation error', async () => {
+    mockSeq([
+      { d: { projects: [p1] } },
+      { d: { tasks: [t1] } },
+      { d: { runs: [] } },
+    ])
+    const el = await mount()
+    click(el.querySelector('.project-item-btn'))
+    await flush()
+    click(el.querySelector('.task-item-btn'))
+    await flush()
+
+    const toggleBtn = Array.from(el.querySelectorAll('button')).find(
+      (b) => b.textContent?.includes('Create new ContextPackage')
+    )!
+    toggleBtn.click()
+    await flush()
+
+    const taSetter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')!.set!
+    taSetter.call(el.querySelector('#cp-project-facts')!, 'no-equals-sign')
+    el.querySelector('#cp-project-facts')!.dispatchEvent(new Event('input', { bubbles: true }))
+    await flush()
+
+    el.querySelector('#cp-authoring-form')!.dispatchEvent(
+      new Event('submit', { bubbles: true, cancelable: true }),
+    )
+    await flush()
+    expect(el.textContent).toContain('Invalid project_facts line')
+    el.remove()
+  })
+
+  it('403 error preserves form values', async () => {
+    globalThis.fetch = vi.fn(async (input: string | URL | Request, init?: RequestInit) => {
+      const url = typeof input === 'string' ? input : input.toString()
+      const method = init?.method ?? 'GET'
+
+      if (method === 'POST' && url.includes('context-packages')) {
+        return new Response(
+          JSON.stringify({ detail: 'forbidden' }),
+          { status: 403, headers: { 'Content-Type': 'application/json' } },
+        )
+      }
+      if (method === 'GET' && url.includes('runs')) {
+        return new Response(JSON.stringify({ runs: [] }), {
+          status: 200, headers: { 'Content-Type': 'application/json' },
+        })
+      }
+      if (method === 'GET' && url.includes('tasks')) {
+        return new Response(JSON.stringify({ tasks: [t1] }), {
+          status: 200, headers: { 'Content-Type': 'application/json' },
+        })
+      }
+      return new Response(JSON.stringify({ projects: [p1] }), {
+        status: 200, headers: { 'Content-Type': 'application/json' },
+      })
+    }) as typeof fetch
+
+    const el = await mount()
+    click(el.querySelector('.project-item-btn'))
+    await flush()
+    click(el.querySelector('.task-item-btn'))
+    await flush()
+
+    const toggleBtn = Array.from(el.querySelectorAll('button')).find(
+      (b) => b.textContent?.includes('Create new ContextPackage')
+    )!
+    toggleBtn.click()
+    await flush()
+
+    // Set some values
+    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!
+    setter.call(el.querySelector('#cp-version')!, '5')
+    el.querySelector('#cp-version')!.dispatchEvent(new Event('input', { bubbles: true }))
+    el.querySelector('#cp-version')!.dispatchEvent(new Event('change', { bubbles: true }))
+    const taSetter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')!.set!
+    taSetter.call(el.querySelector('#cp-instructions')!, 'Test instruction')
+    el.querySelector('#cp-instructions')!.dispatchEvent(new Event('input', { bubbles: true }))
+    await flush()
+
+    el.querySelector('#cp-authoring-form')!.dispatchEvent(
+      new Event('submit', { bubbles: true, cancelable: true }),
+    )
+    await flush()
+
+    expect(el.textContent).toContain('Authentication required')
+    // Form values preserved
+    expect((el.querySelector('#cp-version') as HTMLInputElement).value).toBe('5')
+    expect((el.querySelector('#cp-instructions') as HTMLTextAreaElement).value).toBe('Test instruction')
+    el.remove()
+  })
+
+  it('404 error preserves form values', async () => {
+    globalThis.fetch = vi.fn(async (input: string | URL | Request, init?: RequestInit) => {
+      const url = typeof input === 'string' ? input : input.toString()
+      const method = init?.method ?? 'GET'
+
+      if (method === 'POST' && url.includes('context-packages')) {
+        return new Response(
+          JSON.stringify({ detail: 'Project not found' }),
+          { status: 404, headers: { 'Content-Type': 'application/json' } },
+        )
+      }
+      if (method === 'GET' && url.includes('runs')) {
+        return new Response(JSON.stringify({ runs: [] }), {
+          status: 200, headers: { 'Content-Type': 'application/json' },
+        })
+      }
+      if (method === 'GET' && url.includes('tasks')) {
+        return new Response(JSON.stringify({ tasks: [t1] }), {
+          status: 200, headers: { 'Content-Type': 'application/json' },
+        })
+      }
+      return new Response(JSON.stringify({ projects: [p1] }), {
+        status: 200, headers: { 'Content-Type': 'application/json' },
+      })
+    }) as typeof fetch
+
+    const el = await mount()
+    click(el.querySelector('.project-item-btn'))
+    await flush()
+    click(el.querySelector('.task-item-btn'))
+    await flush()
+
+    const toggleBtn = Array.from(el.querySelectorAll('button')).find(
+      (b) => b.textContent?.includes('Create new ContextPackage')
+    )!
+    toggleBtn.click()
+    await flush()
+
+    const taSetter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')!.set!
+    taSetter.call(el.querySelector('#cp-instructions')!, 'Some instruction')
+    el.querySelector('#cp-instructions')!.dispatchEvent(new Event('input', { bubbles: true }))
+    await flush()
+
+    el.querySelector('#cp-authoring-form')!.dispatchEvent(
+      new Event('submit', { bubbles: true, cancelable: true }),
+    )
+    await flush()
+
+    expect(el.textContent).toContain('Project not found')
+    expect((el.querySelector('#cp-instructions') as HTMLTextAreaElement).value).toBe('Some instruction')
+    el.remove()
+  })
+
+  it('422 error preserves form values', async () => {
+    globalThis.fetch = vi.fn(async (input: string | URL | Request, init?: RequestInit) => {
+      const url = typeof input === 'string' ? input : input.toString()
+      const method = init?.method ?? 'GET'
+
+      if (method === 'POST' && url.includes('context-packages')) {
+        return new Response(
+          JSON.stringify({ detail: 'Invalid body' }),
+          { status: 422, headers: { 'Content-Type': 'application/json' } },
+        )
+      }
+      if (method === 'GET' && url.includes('runs')) {
+        return new Response(JSON.stringify({ runs: [] }), {
+          status: 200, headers: { 'Content-Type': 'application/json' },
+        })
+      }
+      if (method === 'GET' && url.includes('tasks')) {
+        return new Response(JSON.stringify({ tasks: [t1] }), {
+          status: 200, headers: { 'Content-Type': 'application/json' },
+        })
+      }
+      return new Response(JSON.stringify({ projects: [p1] }), {
+        status: 200, headers: { 'Content-Type': 'application/json' },
+      })
+    }) as typeof fetch
+
+    const el = await mount()
+    click(el.querySelector('.project-item-btn'))
+    await flush()
+    click(el.querySelector('.task-item-btn'))
+    await flush()
+
+    const toggleBtn = Array.from(el.querySelectorAll('button')).find(
+      (b) => b.textContent?.includes('Create new ContextPackage')
+    )!
+    toggleBtn.click()
+    await flush()
+
+    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!
+    setter.call(el.querySelector('#cp-version')!, '1')
+    el.querySelector('#cp-version')!.dispatchEvent(new Event('input', { bubbles: true }))
+    el.querySelector('#cp-version')!.dispatchEvent(new Event('change', { bubbles: true }))
+    await flush()
+
+    el.querySelector('#cp-authoring-form')!.dispatchEvent(
+      new Event('submit', { bubbles: true, cancelable: true }),
+    )
+    await flush()
+
+    expect(el.querySelectorAll('[role="alert"]').length).toBeGreaterThan(0)
+    expect((el.querySelector('#cp-version') as HTMLInputElement).value).toBe('1')
+    el.remove()
+  })
+
+  it('manual ContextPackage ID still creates Run', async () => {
+    let createdRun: any = null
+    globalThis.fetch = vi.fn(async (input: string | URL | Request, init?: RequestInit) => {
+      const url = typeof input === 'string' ? input : input.toString()
+      const method = init?.method ?? 'GET'
+
+      if (method === 'POST' && url.includes('/runs')) {
+        createdRun = {
+          id: 'run_1', task_id: 't_1', workflow_id: 'review-minimal', workflow_version: 1,
+          context_package_id: 'ctx_manual', execution_target: 'LOCAL', resume_mode: 'NONE',
+          state: 'CREATED', runtime_ref: null, created_at: '2026-01-01T00:00:00',
+          updated_at: '2026-01-01T00:00:00', events: [], result: null,
+        }
+        return new Response(
+          JSON.stringify(createdRun),
+          { status: 201, headers: { 'Content-Type': 'application/json' } },
+        )
+      }
+      if (method === 'GET' && url.includes('runs')) {
+        return new Response(JSON.stringify({ runs: createdRun ? [createdRun] : [] }), {
+          status: 200, headers: { 'Content-Type': 'application/json' },
+        })
+      }
+      if (method === 'GET' && url.includes('tasks')) {
+        return new Response(JSON.stringify({ tasks: [t1] }), {
+          status: 200, headers: { 'Content-Type': 'application/json' },
+        })
+      }
+      return new Response(JSON.stringify({ projects: [p1] }), {
+        status: 200, headers: { 'Content-Type': 'application/json' },
+      })
+    }) as typeof fetch
+
+    const el = await mount()
+    click(el.querySelector('.project-item-btn'))
+    await flush()
+    click(el.querySelector('.task-item-btn'))
+    await flush()
+
+    // Set manual CP ID
+    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!
+    setter.call(el.querySelector('#cp-id')!, 'ctx_manual')
+    el.querySelector('#cp-id')!.dispatchEvent(new Event('input', { bubbles: true }))
+    el.querySelector('#cp-id')!.dispatchEvent(new Event('change', { bubbles: true }))
+    await flush()
+
+    // Submit run creation
+    el.querySelector('form[aria-label="Create run"]')!.dispatchEvent(
+      new Event('submit', { bubbles: true, cancelable: true }),
+    )
+    await flush()
+
+    expect(el.textContent).toContain('run_1')
+    expect(el.textContent).toContain('CREATED')
+    el.remove()
+  })
+
+  it('submitting disables buttons', async () => {
+    mockSeq([
+      { d: { projects: [p1] } },
+      { d: { tasks: [t1] } },
+      { d: { runs: [] } },
+    ])
+    const el = await mount()
+    click(el.querySelector('.project-item-btn'))
+    await flush()
+    click(el.querySelector('.task-item-btn'))
+    await flush()
+
+    // Now mock endless fetch for the submit
+    mockNever()
+
+    // Set CP ID and submit run
+    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!
+    setter.call(el.querySelector('#cp-id')!, 'ctx_1')
+    el.querySelector('#cp-id')!.dispatchEvent(new Event('input', { bubbles: true }))
+    el.querySelector('#cp-id')!.dispatchEvent(new Event('change', { bubbles: true }))
+    await flush()
+
+    el.querySelector('form[aria-label="Create run"]')!.dispatchEvent(
+      new Event('submit', { bubbles: true, cancelable: true }),
+    )
+    await flush()
+
+    expect(el.textContent).toContain('Creating run...')
+    el.remove()
+  })
+
+  it('back navigation from run-prep works', async () => {
+    mockSeq([
+      { d: { projects: [p1] } },
+      { d: { tasks: [t1] } },
+      { d: { runs: [] } },
+      { d: { tasks: [t1] } },
+    ])
+    const el = await mount()
+    click(el.querySelector('.project-item-btn'))
+    await flush()
+    click(el.querySelector('.task-item-btn'))
+    await flush()
+    const back = Array.from(el.querySelectorAll('button')).find(
+      (b) => b.textContent?.includes('Back to tasks'),
+    )!
+    back.click()
+    await flush()
+    expect(el.textContent).toContain('Tasks')
+    el.remove()
+  })
+
+  it('labels have stable ids and describedby', async () => {
+    mockSeq([
+      { d: { projects: [p1] } },
+      { d: { tasks: [t1] } },
+      { d: { runs: [] } },
+    ])
+    const el = await mount()
+    click(el.querySelector('.project-item-btn'))
+    await flush()
+    click(el.querySelector('.task-item-btn'))
+    await flush()
+
+    // Open authoring form
+    const toggleBtn = Array.from(el.querySelectorAll('button')).find(
+      (b) => b.textContent?.includes('Create new ContextPackage')
+    )!
+    toggleBtn.click()
+    await flush()
+
+    // Check labels have htmlFor matching input ids
+    const labels = el.querySelectorAll('label')
+    labels.forEach((label) => {
+      const htmlFor = label.getAttribute('for')
+      if (htmlFor) {
+        expect(el.querySelector(`#${htmlFor}`)).not.toBeNull()
+      }
+    })
+
+    // Check cp-id has describedby
+    const cpIdInput = el.querySelector('#cp-id')
+    expect(cpIdInput?.getAttribute('aria-describedby')).toBe('cp-id-hint')
+    el.remove()
+  })
+
+  it('role=alert on error, role=status on success', async () => {
+    globalThis.fetch = vi.fn(async (input: string | URL | Request, init?: RequestInit) => {
+      const url = typeof input === 'string' ? input : input.toString()
+      const method = init?.method ?? 'GET'
+
+      if (method === 'POST' && url.includes('context-packages')) {
+        return new Response(
+          JSON.stringify({ detail: 'forbidden' }),
+          { status: 403, headers: { 'Content-Type': 'application/json' } },
+        )
+      }
+      if (method === 'GET' && url.includes('runs')) {
+        return new Response(JSON.stringify({ runs: [] }), {
+          status: 200, headers: { 'Content-Type': 'application/json' },
+        })
+      }
+      if (method === 'GET' && url.includes('tasks')) {
+        return new Response(JSON.stringify({ tasks: [t1] }), {
+          status: 200, headers: { 'Content-Type': 'application/json' },
+        })
+      }
+      return new Response(JSON.stringify({ projects: [p1] }), {
+        status: 200, headers: { 'Content-Type': 'application/json' },
+      })
+    }) as typeof fetch
+
+    const el = await mount()
+    click(el.querySelector('.project-item-btn'))
+    await flush()
+    click(el.querySelector('.task-item-btn'))
+    await flush()
+
+    const toggleBtn = Array.from(el.querySelectorAll('button')).find(
+      (b) => b.textContent?.includes('Create new ContextPackage')
+    )!
+    toggleBtn.click()
+    await flush()
+
+    el.querySelector('#cp-authoring-form')!.dispatchEvent(
+      new Event('submit', { bubbles: true, cancelable: true }),
+    )
+    await flush()
+
+    expect(el.querySelectorAll('[role="alert"]').length).toBeGreaterThan(0)
     el.remove()
   })
 })

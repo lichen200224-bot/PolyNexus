@@ -96,6 +96,35 @@ export interface RunCreateRequest {
 }
 
 // ---------------------------------------------------------------------------
+// ContextPackage
+// ---------------------------------------------------------------------------
+
+export interface ContextPackage {
+  id: string
+  project_id: string
+  version: number
+  instructions: string[]
+  constraints: string[]
+  project_facts: Record<string, string>
+  artifact_refs: string[]
+  prior_decision_refs: string[]
+  memory_refs: string[]
+  source_refs: string[]
+  created_at: string
+}
+
+export interface ContextPackageCreateRequest {
+  version: number
+  instructions?: string[]
+  constraints?: string[]
+  project_facts?: Record<string, string>
+  artifact_refs?: string[]
+  prior_decision_refs?: string[]
+  memory_refs?: string[]
+  source_refs?: string[]
+}
+
+// ---------------------------------------------------------------------------
 // Error types
 // ---------------------------------------------------------------------------
 
@@ -254,4 +283,21 @@ export function createRun(
 
 export function getRun(config: ApiClientConfig, runId: string): Promise<Run> {
   return request<Run>(config, 'GET', `/runs/${encodeURIComponent(runId)}`)
+}
+
+// ---------------------------------------------------------------------------
+// ContextPackage endpoints
+// ---------------------------------------------------------------------------
+
+export function createContextPackage(
+  config: ApiClientConfig,
+  projectId: string,
+  body: ContextPackageCreateRequest,
+): Promise<ContextPackage> {
+  return request<ContextPackage>(
+    config,
+    'POST',
+    `/projects/${encodeURIComponent(projectId)}/context-packages`,
+    body,
+  )
 }
