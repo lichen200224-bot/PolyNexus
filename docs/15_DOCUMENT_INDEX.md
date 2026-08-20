@@ -22,6 +22,11 @@
 | `18_ARCHITECTURE_DECISIONS.md` | ADR-001～010 frozen baseline | **架構／核心開發必讀** |
 | `19_DEVELOPMENT_BASELINE.md` | 第一條 Vertical Slice 執行契約 | **下一個開發任務必讀** |
 | `20_FIRST_VERTICAL_SLICE_PLAN.md` | 第一條產品垂直切片詳細工作包 | Slice 開發必讀 |
+| `28_MASTER_DEVELOPMENT_ROADMAP.md` | 全專案開發順序、範圍、時程、權重與 Checkpoint | **專案進度監控／每次交接必讀** |
+| `tasks/WP-08A.md` | ContextPackage REST Contract implementation task | WP-08A Writer / Review handoff |
+| `tasks/WP-08B.md` | ContextPackage UI authoring / selection implementation task | Antigravity Writer / Codex Review handoff |
+| `tasks/WP-09A.md` | Execution command API contract and architecture gate proposal | Human decision / Codex architecture review |
+| `tasks/WP-09B.md` | Approved existing-Run execution command implementation task | OpenCode Writer / Codex Review handoff |
 | `21_DEPENDENCY_BASELINE.md` | 初始依賴版本與 lock 規則 | 環境/依賴更新任務 |
 | `22_BASELINE_VALIDATION_REPORT.md` | Baseline scaffold 實際驗證與 SKIP | Baseline/交接/驗收 |
 

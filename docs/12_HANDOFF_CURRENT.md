@@ -4,23 +4,23 @@
 First Vertical Slice
 
 ## Status
-Previous: WP-07 Integration Acceptance — ACCEPTED and checkpointed at `d7060c4`.
-Current: FVS-MILESTONE-UI-E2E-01 attempt 1 — ACCEPTED WITH HUMAN WAIVER.
-Next: Continue development; Browser E2E remains UNVERIFIED/SKIPPED and must be rerun after development is complete.
+Previous: WP-09A — ACCEPTED_ARCHITECTURE_GATE; WP-08B and WP-08A previously accepted; ROADMAP-01 CONFIRMED.
+Current: WP-09B — ACCEPTED (Attempt 5); Codex review PASS and Human acceptance recorded on 2026-08-20.
+Next: Codex prepares the WP-09C task scope and single-Writer handoff.
 
 Acceptance repair log: `docs/27_ACCEPTANCE_REPAIR_LOG.md`
 
-Task document: `docs/20_FIRST_VERTICAL_SLICE_PLAN.md` (WP-07 accepted; UI/Core milestone acceptance recorded below; Browser E2E deferred).
+Task document: `docs/28_MASTER_DEVELOPMENT_ROADMAP.md` (project sequence/checkpoints), `docs/tasks/WP-08A.md` (accepted), `docs/tasks/WP-08B.md` (accepted), `docs/tasks/WP-09A.md` (accepted gate), and `docs/tasks/WP-09B.md` (accepted).
 Historical task document: `docs/tasks/FVS-03.md`
 
 ## Active Writer
-NONE — WP-07 and FVS-MILESTONE-UI-E2E-01 acceptance completed; no active writer.
+NONE — WP-09B accepted; WP-09C Writer handoff has not been issued.
 
 ## Reviewer
-Codex — independently reviewed FVS-MILESTONE-UI-E2E-01; Human waiver accepted the documented Browser E2E limitation.
+Codex — WP-09B independent Core/API review PASS; next prepares WP-09C scope.
 
 ## Antigravity
-COMPLETED read-only verification for FVS-MILESTONE-UI-E2E-01; Browser DOM / Playwright E2E is UNVERIFIED/SKIPPED.
+WP-08B implementation and review are complete; Browser DOM / Playwright E2E remains UNVERIFIED/SKIPPED.
 
 ## Starting Branch
 feature/first-vertical-slice
@@ -367,9 +367,148 @@ None. All work within WP-07 scope.
 - `test_symlink_escape_rejected` SKIPPED / UNVERIFIED on current Windows environment (symlink permission denied). Human accepted this limitation for WP-07; full symlink containment verification remains future environment-specific evidence.
 
 ### Next
-- **Human**: Continue development; Browser E2E is deferred until development is complete.
-- **Antigravity**: Re-run Browser DOM / Playwright E2E after development completion and record route, fixture, failure-path, and screenshot/artifact evidence.
-- **OpenCode/Codex**: Do not start a new writer concurrently; preserve the waiver and deferred-test label.
+- **Human**: Acceptance of WP-08A is recorded; approve future scope decisions as required.
+- **OpenCode**: Do not start WP-08B until its task document and contract/architecture gate are complete.
+- **Codex**: Prepare/review the WP-08B gate; WP-08A review and acceptance are complete.
+- **Antigravity**: Not required for ROADMAP-01/WP-08A review; rerun Browser E2E only after the development sequence is complete.
+
+## ROADMAP-01 Update
+
+- **TASK_ID**: `ROADMAP-01`
+- **STATUS**: `CONFIRMED — HUMAN_ACCEPTED 2026-08-19`
+- **OWNER**: Codex
+- **BRANCH**: `feature/first-vertical-slice`
+- **TASK_DOC**: `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`
+- **GOAL**: Record the complete V1 development order, scope, forecast dates, checkpoint weights, delivery sequence, and progress-reporting contract; gate WP-08A acceptance.
+
+### Current progress
+
+- Accepted project progress: **22/100 = 22%**.
+- Accepted FVS progress: **14/22 = 63.6%**.
+- WP-08A: `ACCEPTED`, **2/2 points earned** after current evidence, Codex review PASS, and Human approval.
+- Browser E2E: `UNVERIFIED/SKIPPED`, Human waiver retained and no certification claim made.
+
+### Changed files for ROADMAP-01
+
+- `docs/28_MASTER_DEVELOPMENT_ROADMAP.md` (new)
+- `docs/04_DEVELOPMENT_PLAN.md` (roadmap reference and current baseline)
+- `docs/11_PROJECT_STATE.md` (current checkpoint/progress state)
+- `docs/12_HANDOFF_CURRENT.md` (this handoff)
+- `docs/15_DOCUMENT_INDEX.md` (roadmap index entry)
+- `docs/tasks/WP-08A.md` (Codex review and Human acceptance recorded)
+- Product source changes from OpenCode WP-08A are preserved and accepted within WP-08A scope.
+
+### Tests and validation
+
+- Documentation/planning update: no additional product tests run by the status-sync portion of ROADMAP-01.
+- `git diff --check`: exit code 0 after the roadmap document update.
+- WP-08A current deterministic evidence and Codex review are recorded in the WP-08A section below.
+
+### ADR and scope
+
+- ADR impact: NONE. The roadmap records existing decisions and explicitly gates future execution API contract changes.
+- Scope deviation: NONE for roadmap documentation.
+
+### Next exact step
+
+WP-08A acceptance is complete. Next exact step is the WP-08B task document and contract/architecture gate before implementation.
+
+### Do Not Change
+
+- Do not start WP-08B or WP-09A without a task document and contract/architecture gate.
+- Do not modify product source as part of ROADMAP-01.
+- Do not stage, commit, or push without explicit Git authorization.
+
+## WP-08A Update
+
+- **TASK_ID**: `WP-08A`
+- **STATUS**: `ACCEPTED` — Codex review PASS; Human acceptance recorded on 2026-08-19
+- **ATTEMPT**: 1
+- **AUTHORIZATION**: Human authorized on 2026-08-19.
+- **HUMAN_ACCEPTANCE**: Confirmed on 2026-08-19 after Codex independent review PASS.
+- **BRANCH**: `feature/first-vertical-slice`
+- **WRITER**: OpenCode
+- **REVIEWER**: Codex
+- **ANTIGRAVITY_STATUS**: `NOT_REQUIRED` for implementation; Browser E2E remains `UNVERIFIED/SKIPPED`.
+- **TASK_DOC**: `docs/tasks/WP-08A.md`
+
+### Goal
+
+Add the minimal authenticated `POST /api/v1/projects/{project_id}/context-packages` command using the existing ContextPackage Domain model and Repository boundary, so a later UI slice can create a versioned reference manifest.
+
+### Changed files
+
+- `services/core/src/polynexus_core/api/context_packages.py` (new)
+- `services/core/src/polynexus_core/api/schemas.py` (modified — added ContextPackageCreate/ContextPackageResponse)
+- `services/core/src/polynexus_core/app.py` (modified — included context_packages router)
+- `services/core/tests/test_wp08_context_packages.py` (new)
+
+### Implemented
+
+- `POST /api/v1/projects/{project_id}/context-packages` endpoint with `AuthLoopback` and fail-closed auth.
+- Returns `201 Created` with persisted ContextPackage response.
+- Validates parent Project exists (404 if not found).
+- Validates `version >= 1` via Pydantic `Field(ge=1)` and Domain `__post_init__` (422 for invalid body/version).
+- Uses existing `ContextPackage` domain model and `SqlContextPackageRepository` boundary — no direct ORM operations in route.
+- Pydantic `ContextPackageCreate` request DTO with all optional manifest fields (instructions, constraints, project_facts, artifact_refs, prior_decision_refs, memory_refs, source_refs).
+- Pydantic `ContextPackageResponse` response DTO returning all persisted fields.
+- No changes to existing `POST /tasks/{task_id}/runs` behaviour.
+- No calls to `ExecutionService`.
+
+### Tests and validation (WP-08A ATTEMPT 1 — 2026-08-19)
+- `services/core/tests/test_wp08_context_packages.py`: 14 passed — exit code 0.
+  - 201 create with full fields, 201 create with minimal body, 403 auth, 404 project, 422 version zero, 422 version negative, 422 missing version, 422 empty body, persistence reload, no secret in response, no direct ORM operation, repository boundary, run API unchanged, placeholder regression.
+- `services/core/tests/test_api.py`: 32 tests — PASS, exit code 0 (regression).
+- `services/core/tests/test_persistence.py`: 38 tests — PASS, exit code 0 (regression).
+- `services/core/tests/test_wp07_integration.py`: 12 passed, 1 skipped — exit code 0 (regression).
+- API + persistence regression: 70 passed — exit code 0.
+- Full `services/core` pytest: 108 passed, 1 skipped — exit code 0.
+- `scripts/validate_baseline.py`: PASS, exit code 0.
+- `git diff --check`: PASS, exit code 0.
+- `create_app()` route inspection: ContextPackage endpoint registered — exit code 0.
+- Execution environment: temp venv `C:\temp_pn_venv2\Scripts\python.exe` (Python 3.13.14).
+
+### Test count
+- New WP-08A tests: 14
+- Total project tests: 108 (core, 1 skipped) + 41 (frontend) = 149
+
+### Protected areas
+- ADR-001–010: untouched.
+- Existing `POST /tasks/{task_id}/runs` behaviour: untouched.
+- `ExecutionService`: untouched.
+- Frontend source: untouched.
+- Workflow YAML: untouched.
+- Dependencies: untouched.
+- Database schema: untouched (existing ContextPackage table already supports all fields).
+
+### ADR impact
+
+NONE. ADR-002 (FastAPI/asyncio), ADR-004 (UI/Core boundary), ADR-008 (SQLite metadata / ContextPackage as reference manifest), ADR-010 (no secret in response) all respected.
+
+### Scope deviation
+
+NONE. All work within WP-08A scope.
+
+### Known limitations
+
+- Browser DOM / Playwright E2E remains `UNVERIFIED/SKIPPED` by Human waiver and is deferred until development is complete.
+- The existing Run API still creates `CREATED` only; WP-08A does not change that behaviour.
+- pytest emitted a Windows temp cleanup `PermissionError` at interpreter exit; all test commands returned exit code 0.
+- `test_full_core_regression` is a no-op placeholder; the independent full Core command is the actual regression evidence. Remove or rename it in a later test-quality cleanup.
+
+### Do Not Change
+
+- Do not modify `POST /api/v1/tasks/{task_id}/runs` execution semantics.
+- Do not call or modify `ExecutionService`.
+- Do not add frontend, WebSocket, vendor, plugin, or browser logic.
+- Do not change ADR-001–010 or add dependencies.
+- Do not stage, commit, or push during implementation.
+
+### Acceptance result and next
+
+- **Codex**: Independent review `PASS`; no BLOCKER or MAJOR findings.
+- **Human**: WP-08A acceptance confirmed on 2026-08-19.
+- **OpenCode**: Prepare the next FVS task only after the WP-08B task document and gate are ready.
 
 ## FVS-MILESTONE-UI-E2E-01 Update
 
@@ -412,10 +551,221 @@ None for product source. Browser E2E maturity is explicitly deferred, not certif
 Human explicitly accepted 41 Vitest tests, live HTTP/proxy checks, and static inspection as the temporary acceptance basis, with Browser E2E marked `UNVERIFIED/SKIPPED`. Browser E2E must be rerun after development is complete.
 
 ### Do Not Change
-
 - Do not relabel Browser E2E as PASS before a browser-capable rerun.
 - Do not modify ADR-001–010, Core source, API contracts, or frontend source as part of this governance sync.
 - Do not start multiple writers on `feature/first-vertical-slice`.
+
+## WP-08B Attempt 2 Update
+
+- **TASK_ID**: `WP-08B`
+- **ATTEMPT**: `2`
+- **BRANCH**: `feature/first-vertical-slice`
+- **WRITER**: Antigravity
+- **REVIEWER**: Codex
+- **ANTIGRAVITY_STATUS**: `IMPLEMENTATION_COMPLETE`
+- **RESULT**: `READY_FOR_CODEX_REVIEW`
+
+### Goal
+Implement ContextPackage authoring and selection in the React frontend, strictly validating version integer input, encoding path params, parsing all manifest fields (with whitespace trimming and blank omission), and populating the returned real ContextPackage ID into Run creation.
+
+### Changed files (THIS_ATTEMPT: WP-08B Frontend)
+- `apps/web/src/api.ts` (ContextPackage types and `createContextPackage`)
+- `apps/web/src/components/RunPreparation.tsx` (authoring form, strict integer validation, ID auto-population)
+- `apps/web/src/styles.css` (authoring UI and hints)
+- `apps/web/src/App.test.tsx` (61 tests, including strict version, URL encoding, full manifest shape, Run regression)
+- `docs/tasks/WP-08B.md` (task status sync)
+- `docs/11_PROJECT_STATE.md` (project state sync)
+- `docs/12_HANDOFF_CURRENT.md` (handoff sync)
+- `docs/28_MASTER_DEVELOPMENT_ROADMAP.md` (roadmap sync)
+
+### Protected areas check (PRE_EXISTING_ACCEPTED: WP-08A Core)
+- `services/core/src/polynexus_core/api/context_packages.py` (Unchanged by WP-08B)
+- `services/core/src/polynexus_core/api/schemas.py` (Unchanged by WP-08B)
+- `services/core/src/polynexus_core/app.py` (Unchanged by WP-08B)
+- `services/core/tests/test_wp08_context_packages.py` (Unchanged by WP-08B)
+- `docs/tasks/WP-08A.md` (Unchanged by WP-08B)
+- ADR-001–010 respected. No backend modifications.
+
+### Tests and deterministic evidence
+- `cd apps/web && npm test` (`vitest run`): 61 passed across 1 file, exit code 0.
+- `cd apps/web && npm run build` (`tsc -b && vite build`): PASS, exit code 0.
+- `git diff --check`: PASS, exit code 0.
+
+### Known limitations
+- Selection uses manual ID input or the newly created ID from the authoring form (no GET/list endpoint in Core per WP-08A contract).
+
+### Unverified
+- Real Headless Browser E2E (Playwright) remains `UNVERIFIED/SKIPPED` under existing Human waiver.
+
+### Next
+- Codex independent review of WP-08B Attempt 2.
+
+## WP-08B Acceptance Update
+
+- **TASK_ID**: `WP-08B`
+- **STATUS**: `ACCEPTED`
+- **CODEX_REVIEW**: PASS; no BLOCKER, MAJOR, or MINOR findings.
+- **HUMAN_ACCEPTANCE**: Confirmed on 2026-08-19.
+- **ITEM_PROGRESS**: 100% — 2/2 points accepted.
+- **PROJECT_PROGRESS**: 24/100 = 24%.
+- **FVS_PROGRESS**: 16/22 = 72.7%.
+- **TESTS**: 61 frontend tests passed, build passed, and `git diff --check` exited 0.
+- **UNVERIFIED**: Browser DOM / Playwright E2E remains `UNVERIFIED/SKIPPED` under the accepted Human waiver.
+- **NEXT**: Prepare WP-09A contract/architecture gate; do not implement execution API semantics before approval.
+
+Earlier WP-08B preparation and review text in this handoff is historical; this acceptance update and the top Status section are current.
+
+## WP-09B Acceptance Update
+
+- **TASK_ID**: `WP-09B`
+- **ATTEMPT**: 5
+- **STATUS**: `ACCEPTED`
+- **BRANCH**: `feature/first-vertical-slice`
+- **WRITER**: OpenCode
+- **REVIEWER**: Codex — PASS
+- **ANTIGRAVITY_STATUS**: `NOT_REQUIRED` (Core-only task; no browser/E2E involvement)
+- **NEXT_OWNER**: Codex — prepare WP-09C task scope and Writer handoff
+- **HANDOFF_DOC**: `docs/12_HANDOFF_CURRENT.md`
+- **TASK_DOC**: `docs/tasks/WP-09B.md`
+
+### Changed files
+
+Modified (WP-09B core):
+- `services/core/src/polynexus_core/api/runs.py`
+- `services/core/src/polynexus_core/execution_service.py`
+- `services/core/src/polynexus_core/runtime/supervisor.py` — now guards `version_info()` before COMPLETED, types `RunExecution.result` as `RunResult | None`
+- `services/core/src/polynexus_core/persistence/repository.py`
+- `docs/11_PROJECT_STATE.md`
+- `docs/12_HANDOFF_CURRENT.md`
+- `docs/tasks/WP-09B.md`
+- `services/core/tests/test_wp09_execution_api.py` — version_info added to failure matrix, Finding/Evidence/Artifact output test
+
+New (WP-09B):
+- `services/core/src/polynexus_core/errors.py`
+- `services/core/src/polynexus_core/api/errors.py`
+
+### Implementation summary (Attempt 5 — guards version_info, typed result, production output test)
+
+Durable claim (preserved):
+
+**Durable claim** (preserved from Attempt 3):
+- `RunRepository` ABC declares `claim_for_execution()` and `append_event()`.
+- ExecutionService uses `RunRepository` ABC — no SqlRunRepository cast.
+- Flow: validate all references → CAS claim → append claim event → commit → reload → execute.
+- CAS claim + event committed BEFORE adapter invocation.
+
+**Runtime failure isolation** (new in Attempt 4):
+- `execute_claimed_run()` wraps each adapter boundary call individually: `workflow_executor.execute()` (which calls `create_run`+`submit`), `adapter.status()`, `adapter.result()`, `adapter.artifacts()`.
+- Any runtime exception → `RunState.FAILED` transition with sanitized reason `"Runtime boundary error"`.
+- Returns `RunExecution(run=run, result=None, findings=(), evidence=(), artifacts=())` — no fabricated Result/Evidence/Finding/Artifact.
+- Programmer/domain validation errors (ValueError) are NOT caught — they propagate to caller.
+
+**Sanitized failure** (new in Attempt 4):
+- Fixed public-safe reason: `"Runtime boundary error"`.
+- Never contains raw str(exc), vendor payload, path, token, or credential fragment.
+- Test uses `_SECRET_MARKER` and asserts it does not appear in response, events, result, evidence, or DB reload.
+
+**No fabricated output** (new in Attempt 4):
+- ExecutionService only persists Finding/Evidence/Artifact when `execution.result is not None`.
+- On failure: only Run state + events persisted. result=None, no Finding/Evidence/Artifact in DB.
+- API returns 202 RunResponse with result=null per contract.
+
+**Layer boundary** (preserved from Attempt 3):
+- Exceptions in `polynexus_core.errors` (core layer).
+- `api/errors.py` re-exports for backward compatibility.
+- `ResourceNotFoundError` docstring says "API maps to HTTP 422".
+
+### Tests and validation (Attempt 5 — accepted evidence)
+
+- `C:\temp_pn_venv2\Scripts\python.exe -m pytest -q services\core\tests\test_wp09_execution_api.py`: 36 tests passed — exit code 0.
+- `C:\temp_pn_venv2\Scripts\python.exe -m pytest -q services\core`: 134 tests passed, 1 skipped — exit code 0.
+- `scripts/validate_baseline.py`: PASS, exit code 0.
+- `git diff --check`: PASS, exit code 0.
+
+### Acceptance and progress
+
+- Codex independent review: `PASS`; no BLOCKER, MAJOR, or MINOR findings.
+- Human acceptance: confirmed on 2026-08-20.
+- Item progress: `100%`, **2/2 points accepted**.
+- Accepted project progress: **26/100 = 26%**.
+- Accepted FVS progress: **18/22 = 81.8%**.
+- Progress allocation decision: WP-09B 2 points; remaining CP-02 work is WP-09C 1 point, WP-09D 1 point, and WP-10 2 points, preserving the 22-point checkpoint total.
+
+### Protected areas
+
+- WP-08A ContextPackage REST contract and Core tests.
+- WP-08B frontend authoring/selection and Run `CREATED / LOCAL / NONE` display.
+- ADR-001–010 remain frozen.
+- ReferenceRuntimeAdapter no-network behavior and workflow path containment.
+- Repository/ORM boundary: routes use dependencies and repositories; no direct ORM/raw SQL in API route logic.
+
+### ADR impact
+
+NONE. ADR-004, ADR-007, ADR-008, ADR-010 respected with no ADR file changes.
+
+### Scope deviation
+
+NONE.
+
+### Known limitations
+
+- True concurrent HTTP execution: UNVERIFIED (sequential regression tested; repository-level CAS one-winner test included).
+- Browser E2E: UNVERIFIED/SKIPPED.
+
+### UNVERIFIED
+
+- Browser DOM / Playwright E2E: `UNVERIFIED/SKIPPED`.
+- True concurrent HTTP duplicate-command execution: `UNVERIFIED`.
+
+### Do Not Change
+
+- WP-08A/WP-08B contract, ADR-001–010, migration, dependency, existing POST task/runs 201 CREATED semantics.
+
+### Next
+
+- Prepare WP-09C Result/Finding/Evidence/Artifact/History REST query task scope; do not change the accepted WP-09B execution command contract.
+
+## WP-09A Architecture Gate Acceptance
+
+- **TASK_ID**: `WP-09A`
+- **STATUS**: `ACCEPTED_ARCHITECTURE_GATE`
+- **BRANCH**: `feature/first-vertical-slice`
+- **WRITER**: Codex (proposal only)
+- **REVIEWER / DECISION OWNER**: Codex independent architecture review PASS / Human contract approval confirmed 2026-08-19
+- **ITEM_PROGRESS**: `100%` gate complete; no product points assigned or earned from this contract-only task
+- **PROJECT_PROGRESS**: `24/100 = 24%`
+- **FVS_PROGRESS**: `16/22 = 72.7%`
+
+### Changed files in this gate preparation
+
+- `docs/tasks/WP-09A.md` (new execution command contract proposal and decision gate)
+- `docs/11_PROJECT_STATE.md` (current gate/status synchronization)
+- `docs/12_HANDOFF_CURRENT.md` (current handoff synchronization)
+- `docs/15_DOCUMENT_INDEX.md` (task index entry)
+- `docs/04_DEVELOPMENT_PLAN.md` (progress/status note)
+- `docs/28_MASTER_DEVELOPMENT_ROADMAP.md` (WP-09A gate status; accepted progress unchanged)
+- `docs/tasks/WP-09B.md` (approved implementation Writer handoff)
+
+### Critical finding
+
+The accepted Run-create endpoint persists a `CREATED` Run and intentionally does not execute. The current `ExecutionService.execute_task()` and `RunSupervisor.start()` path creates another Run and reads the ContextPackage from `Task.context_package_id`. A direct API wiring would therefore risk duplicate Run records, wrong ContextPackage authority, and non-durable failure state. Human approved Option A and Codex confirmed the contract: execute the existing `run_id`, use the Run ContextPackage reference, return command `202`/durable GET semantics, and prevent duplicate runtime submission.
+
+### Protected areas
+
+- No product source changed under `services/core/` or `apps/web/`.
+- ADR-001–010 remain frozen; ADR-004/007/008/010 are marked potentially affected pending decision, not modified.
+- WP-08A Core contract, WP-08B UI behavior, and `CREATED / LOCAL / NONE` Run display remain protected.
+- Browser DOM / Playwright E2E remains `UNVERIFIED/SKIPPED` under the accepted waiver.
+
+### Required next action
+
+WP-09A gate is complete. OpenCode may implement WP-09B under `docs/tasks/WP-09B.md`; Codex must independently review the resulting source and deterministic evidence before Human acceptance.
+
+### Do not change
+
+- Do not implement an execution endpoint yet.
+- Do not change Core/frontend source, API schemas, migrations, runtime adapters, workflow YAML, or ADR-001–010.
+- Do not stage, commit, push, or rewrite unrelated working-tree changes without explicit authorization.
 
 ## Restrictions
 - Do not change ADR-001–010 without a new ADR and explicit human approval.

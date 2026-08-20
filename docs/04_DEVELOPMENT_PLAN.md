@@ -4,6 +4,12 @@ Date: 2026-08-17
 Target: V1 Feature Freeze 2026-10-18 / Acceptance Complete 2026-10-31
 Competition Initial Review: 2026-09-07
 
+## Master roadmap and monitoring
+
+The detailed project sequence, scope boundary, estimated dates, checkpoint register, weighted progress formula, delivery cycle, and change-control rules are maintained in `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`. This document remains the phase-level baseline; the master roadmap is the active progress-monitoring register.
+
+As of 2026-08-19, the accepted project progress is 24/100 points. WP-08A and WP-08B are accepted after current deterministic evidence, Codex independent review, and Human approval. WP-09A is an accepted contract/architecture gate with no product point weight; WP-09B is the next implementation handoff. Browser E2E remains `UNVERIFIED/SKIPPED` under the explicit Human waiver and is deferred until development completion.
+
 ## Phase 0 — Baseline / Competition (8/17–8/25)
 
 ### Completed / Frozen
