@@ -51,14 +51,15 @@ The project uses a 100-point checkpoint-weighted progress model. Only `ACCEPTED`
 ### Current baseline snapshot — 2026-08-20
 
 - `CP-00` Baseline/Governance: **8/8 points accepted**.
-- `CP-02` First Vertical Slice: **18/22 points accepted** for WP-01–WP-09B.
+- `CP-02` First Vertical Slice: **19/22 points accepted** for WP-01–WP-09C.
 - WP-08A is `ACCEPTED` after current deterministic evidence, Codex review PASS, and Human approval; it earns **2/2 points**.
 - WP-08B is `ACCEPTED` after current deterministic evidence, Codex review PASS, and Human approval on 2026-08-19; it earns **2/2 points**.
 - WP-09A is `ACCEPTED_ARCHITECTURE_GATE` after Human approval and Codex confirmation on 2026-08-19; it has no separate product point weight.
 - WP-09B is `ACCEPTED` after Attempt 5 deterministic evidence, Codex review PASS, and Human acceptance on 2026-08-20; it earns **2/2 points**.
-- The remaining CP-02 allocation is explicit: WP-09C **1 point**, WP-09D **1 point**, and WP-10 **2 points**. This preserves the existing 22-point CP-02 total after assigning WP-09B **2 points** under the Human-authorized progress update on 2026-08-20.
-- Current project progress: **26/100 = 26% accepted progress**.
-- Current FVS progress: **18/22 = 81.8% accepted progress**.
+- WP-09C is `ACCEPTED` after Attempt 4 deterministic evidence, Codex review PASS, and Human acceptance on 2026-08-20; it earns **1/1 point**.
+- The remaining CP-02 allocation is explicit: WP-09D **1 point** and WP-10 **2 points**. This preserves the existing 22-point CP-02 total.
+- Current project progress: **27/100 = 27% accepted progress**.
+- Current FVS progress: **19/22 = 86.4% accepted progress**.
 - Browser E2E waiver is a limitation record, not additional earned progress.
 
 ## 4. Checkpoint register
@@ -105,7 +106,7 @@ WP-01–WP-07, WP-08A, WP-08B, and WP-09B are accepted. The following sequence c
 | WP-08B | ContextPackage UI authoring/selection and API client integration | Antigravity / Codex | 2 days | 2026-08-23 | UI can create/select a ContextPackage without direct DB/process access; Attempt 2 complete, Codex PASS + Human accepted 2026-08-19; 2/2 points |
 | WP-09A | Execution command API contract proposal and Human/Codex architecture gate | Codex / Human | 1 day | 2026-08-25 | `ACCEPTED_ARCHITECTURE_GATE`; Option A approved 2026-08-19; no separate product point weight |
 | WP-09B | Wire approved execution command to `ExecutionService` and RunSupervisor | OpenCode / Codex | 3 days | 2026-08-29 | `ACCEPTED`; Attempt 5 Codex PASS + Human accepted 2026-08-20; 2/2 points; existing Run identity, persisted lifecycle/result, failure isolation, no fabricated evidence |
-| WP-09C | Result, Finding, Evidence, Artifact, and History REST queries | OpenCode / Codex | 2 days | 2026-09-01 | 1 point; stable wrappers, ownership checks, 403/404/422 tests |
+| WP-09C | Result, Finding, Evidence, Artifact, and History REST queries | OpenCode / Codex | 2 days | 2026-09-01 | `ACCEPTED` Attempt 4 (IMPLEMENTATION_ATTEMPT: 3 / REVIEW_ATTEMPT: 4); 1/1 point; 24 query tests PASS, governance sync recorded |
 | WP-09D | Result/History UI with durable reload and error states | OpenCode / Codex | 2 days | 2026-09-04 | 1 point; React/Vitest coverage; no direct Core internals |
 | WP-10 | FVS final deterministic acceptance | Codex / Human | 2 days | 2026-09-06 | 2 points; fresh DB repeat, Core regression, UI regression, evidence/handoff complete |
 

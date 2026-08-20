@@ -4,23 +4,23 @@
 First Vertical Slice
 
 ## Status
-Previous: WP-09A — ACCEPTED_ARCHITECTURE_GATE; WP-08B and WP-08A previously accepted; ROADMAP-01 CONFIRMED.
-Current: WP-09B — ACCEPTED (Attempt 5); Codex review PASS and Human acceptance recorded on 2026-08-20.
-Next: Codex prepares the WP-09C task scope and single-Writer handoff.
+Previous: WP-09B — ACCEPTED (Attempt 5); Codex review PASS and Human acceptance recorded on 2026-08-20.
+Current: WP-09C — ACCEPTED (Attempt 4; IMPLEMENTATION_ATTEMPT: 3 / REVIEW_ATTEMPT: 4); Codex PASS and Human acceptance recorded on 2026-08-20.
+Next: Codex prepares WP-09D task scope and Writer handoff.
 
 Acceptance repair log: `docs/27_ACCEPTANCE_REPAIR_LOG.md`
 
-Task document: `docs/28_MASTER_DEVELOPMENT_ROADMAP.md` (project sequence/checkpoints), `docs/tasks/WP-08A.md` (accepted), `docs/tasks/WP-08B.md` (accepted), `docs/tasks/WP-09A.md` (accepted gate), and `docs/tasks/WP-09B.md` (accepted).
+Task document: `docs/tasks/WP-09C.md`; roadmap: `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`; accepted dependencies: `docs/tasks/WP-09A.md` and `docs/tasks/WP-09B.md`.
 Historical task document: `docs/tasks/FVS-03.md`
 
 ## Active Writer
-NONE — WP-09B accepted; WP-09C Writer handoff has not been issued.
+NONE — WP-09C accepted; WP-09D task handoff is pending.
 
 ## Reviewer
-Codex — WP-09B independent Core/API review PASS; next prepares WP-09C scope.
+Codex — WP-09C PASS recorded; prepares WP-09D scope.
 
 ## Antigravity
-WP-08B implementation and review are complete; Browser DOM / Playwright E2E remains UNVERIFIED/SKIPPED.
+`NOT_REQUIRED` for WP-09C because it is Core-only. Browser DOM / Playwright E2E remains `UNVERIFIED/SKIPPED`.
 
 ## Starting Branch
 feature/first-vertical-slice
@@ -624,7 +624,7 @@ Earlier WP-08B preparation and review text in this handoff is historical; this a
 - **WRITER**: OpenCode
 - **REVIEWER**: Codex — PASS
 - **ANTIGRAVITY_STATUS**: `NOT_REQUIRED` (Core-only task; no browser/E2E involvement)
-- **NEXT_OWNER**: Codex — prepare WP-09C task scope and Writer handoff
+- **NEXT_OWNER**: transition completed; current owner is OpenCode for WP-09C
 - **HANDOFF_DOC**: `docs/12_HANDOFF_CURRENT.md`
 - **TASK_DOC**: `docs/tasks/WP-09B.md`
 
@@ -723,7 +723,7 @@ NONE.
 
 ### Next
 
-- Prepare WP-09C Result/Finding/Evidence/Artifact/History REST query task scope; do not change the accepted WP-09B execution command contract.
+- WP-09C task preparation is complete; OpenCode implements `docs/tasks/WP-09C.md` without changing the accepted WP-09B execution command contract.
 
 ## WP-09A Architecture Gate Acceptance
 
@@ -773,3 +773,72 @@ WP-09A gate is complete. OpenCode may implement WP-09B under `docs/tasks/WP-09B.
 - Do not add unrelated V1 features.
 - Do not allow multiple active writers.
 - Do not claim PASS without current deterministic evidence.
+
+## WP-09C Acceptance Update (Attempt 4)
+
+- **TASK_ID**: `WP-09C`
+- **ATTEMPT**: 4
+- **IMPLEMENTATION_ATTEMPT**: 3
+- **REVIEW_ATTEMPT**: 4
+- **STATUS**: `ACCEPTED`
+- **TASK_DOC**: `docs/tasks/WP-09C.md`
+- **HANDOFF_DOC**: `docs/12_HANDOFF_CURRENT.md`
+- **BRANCH**: `feature/first-vertical-slice`
+- **WRITER**: OpenCode
+- **REVIEWER**: Codex
+- **ANTIGRAVITY_STATUS**: `NOT_REQUIRED` — Core-only task; Browser E2E remains `UNVERIFIED/SKIPPED`
+- **NEXT_OWNER**: Codex
+- **CODEX_REVIEW**: `PASS`
+- **HUMAN_ACCEPTANCE**: Confirmed on 2026-08-20
+- **ITEM_PROGRESS**: `100%` — 1/1 point accepted
+- **PROJECT_PROGRESS**: `27/100 = 27%`
+- **FVS_PROGRESS**: `19/22 = 86.4%`
+
+### Changed files (actual git status)
+
+Modified:
+- `docs/11_PROJECT_STATE.md`
+- `docs/12_HANDOFF_CURRENT.md`
+- `docs/15_DOCUMENT_INDEX.md` — PRE_EXISTING task-preparation change (not WP-09C scope; see SCOPE_DEVIATION)
+- `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`
+- `services/core/src/polynexus_core/api/schemas.py` — Modified (wrappers added)
+- `services/core/src/polynexus_core/app.py` — Modified (router mount)
+- `services/core/src/polynexus_core/persistence/repository.py` — Modified (RunEvent tie-breaker order_by(occurred_at, id); list_by_run ordering)
+
+Untracked:
+- `docs/tasks/WP-09C.md` — Untracked (task document, part of WP-09C handoff)
+- `services/core/src/polynexus_core/api/run_outputs.py` — Untracked (new, 5 endpoints)
+- `services/core/tests/test_wp09_query_api.py` — Untracked (new, now 24 tests)
+
+### Tests (Attempt 4 — current acceptance evidence; implementation baseline Attempt 3 historical)
+
+- `test_wp09_query_api.py`: 24 passed, exit code 0
+- `test_wp09_execution_api.py`: 36 passed, exit code 0 (unchanged)
+- `services/core` full: 169 passed, 1 skipped, exit code 0 (170 collected)
+- `services/core` collect: 170 tests, exit code 0
+- `validate_baseline.py`: PASS, exit code 0
+- `git diff --check`: PASS, exit code 0
+
+### Protected areas
+
+- WP-09B execution/lifecycle/CAS, WP-08A/B, ADR-001–010, Domain/ORM/Alembic, frontend — all unchanged
+
+### ADR impact
+
+NONE — extends ADR-004 query boundary, preserves ADR-008/010
+
+### SCOPE_DEVIATION
+
+- `docs/15_DOCUMENT_INDEX.md` modification is PRE_EXISTING task-preparation change (cross-attempt historical; not introduced in any WP-09C attempt); no product scope change
+
+### UNVERIFIED
+
+Symlink containment `UNVERIFIED/SKIPPED`, Browser E2E `UNVERIFIED/SKIPPED`, concurrent HTTP `UNVERIFIED`
+
+### Next
+
+Codex prepares WP-09D task scope and Writer handoff. Do not modify WP-09D product source before its task gate is recorded.
+
+### Do not change
+
+- ADR-001–010, Domain/ORM/Alembic, WP-08A/B, WP-09A/B, frontend, dependencies, artifact file content, or secret handling.

@@ -1,8 +1,8 @@
 # Project State
 
-Date: 2026-08-19
+Date: 2026-08-20
 Version: Development Baseline v1.0 + Dev Preparation Profile v1.0.2
-Milestone: First Vertical Slice — WP-08A and WP-08B ACCEPTED; UI/Core waiver accepted; ROADMAP-01 CONFIRMED
+Milestone: First Vertical Slice — WP-08A/WP-08B/WP-09B/WP-09C ACCEPTED; UI/Core waiver accepted; ROADMAP-01 CONFIRMED
 
 ## Confirmed
 - Product Scope Decisions D01–D10 confirmed.
@@ -22,7 +22,7 @@ Milestone: First Vertical Slice — WP-08A and WP-08B ACCEPTED; UI/Core waiver a
 - Absolute path is a local profile only; product code remains repo-relative.
 
 ## Current Priority
-1. Prepare WP-09C Result/Finding/Evidence/Artifact/History REST query scope after WP-09B acceptance; defer Browser E2E re-test until development is complete.
+1. Prepare WP-09D Result/History UI task scope and Writer handoff; defer Browser E2E re-test until development is complete.
 2. Prepare competition proposal/deck content confidence gate by 2026-08-25.
 
 ## Current Product Slice
@@ -37,27 +37,27 @@ First Vertical Slice target by 2026-09-06:
 - Actual competition upload-form fields/demo requirement still require recheck before submission.
 
 ## Next Gate
-WP-09C task definition and Writer handoff under the accepted WP-09B execution contract.
+Prepare WP-09D task scope and handoff; then OpenCode implementation and Codex review.
 
 ## Current Development State
 
-Phase: First Vertical Slice — WP-09B execution command (Attempt 5) ACCEPTED after Codex PASS and Human acceptance on 2026-08-20
-Next Phase: WP-09C Result/Finding/Evidence/Artifact/History REST query task; Browser E2E Re-test deferred
+Phase: First Vertical Slice — WP-09C REST queries (Attempt 4) ACCEPTED; Codex PASS and Human acceptance recorded on 2026-08-20
+Next Phase: WP-09D Result/History UI task preparation; Browser E2E Re-test deferred
 
 Current Branch: feature/first-vertical-slice
 Current Baseline Commit: 337bc47
 Latest FVS Checkpoint: d7060c4 (`feat(core): add WP-07 execution integration`)
-Current Planned Task: WP-09C — Result, Finding, Evidence, Artifact, and History REST queries
-Active Writer: NONE — WP-09B accepted; WP-09C task handoff not yet issued
-Reviewer: Codex — WP-09B PASS recorded; WP-09C review pending future implementation
-Antigravity: NOT_REQUIRED for WP-09B (Core-only); Browser E2E UNVERIFIED/SKIPPED
+Current Planned Task: WP-09D — Result/History UI with durable reload and error states (task scope preparation pending)
+Active Writer: NONE — WP-09C accepted; WP-09D task handoff pending
+Reviewer: Codex — WP-09C PASS recorded; next prepares WP-09D scope
+Antigravity: NOT_REQUIRED for WP-09C (Core-only); Browser E2E UNVERIFIED/SKIPPED
 
 Architecture:
 - ADR-001 through ADR-010 are CONFIRMED / FROZEN FOR V1 IMPLEMENTATION.
 
 Development Environment:
 - Windows development readiness: PASS
-- Core pytest: 134 passed, 1 skipped (symlink containment UNVERIFIED; Human waiver accepted)
+- Core pytest: 169 passed, 1 skipped (170 collected, symlink containment UNVERIFIED; Human waiver accepted) — historical WP-09B evidence was 134 passed, 1 skipped
 - Frontend Vitest: 61 passed
 - Frontend build: PASS
 - Local Git backup: PASS
@@ -88,16 +88,18 @@ OpenCode Model Routing:
 
 ## Latest Verification
 
-WP-09B Attempt 5 was accepted after current Core evidence, Codex independent review PASS, and Human acceptance on 2026-08-20. Browser DOM / Playwright E2E remains UNVERIFIED/SKIPPED and is deferred until development is complete; true concurrent HTTP duplicate-command execution remains UNVERIFIED.
+WP-09C Attempt 4 was accepted after current Core evidence, Codex independent review PASS, and Human acceptance on 2026-08-20. Browser DOM / Playwright E2E remains UNVERIFIED/SKIPPED and is deferred until development is complete; true concurrent HTTP duplicate-command execution remains UNVERIFIED.
 
-- WP-09B targeted Core tests: 36 passed, exit code 0.
-- Full Core tests: 134 passed, 1 skipped, exit code 0.
+- WP-09C targeted query tests: 24 passed, exit code 0.
+- WP-09B regression tests: 36 passed, exit code 0.
+- Full Core tests: 169 passed, 1 skipped, exit code 0 (170 collected).
 - Baseline validation: PASS, exit code 0.
 - Git diff check: PASS, exit code 0.
-- WP-09B: ACCEPTED, 2/2 points earned.
-- Accepted product baseline: `337bc47`; governance acceptance commit: `eaf847c`.
+- WP-09C: ACCEPTED, 1/1 point earned.
+- Accepted project progress: **27/100 = 27%**.
+- Accepted FVS progress: **19/22 = 86.4%**.
 - ADR impact: NONE.
-- Scope deviation: NONE; symlink, Browser E2E, and concurrent HTTP limitations remain explicitly unverified.
+- Scope deviation: `docs/15_DOCUMENT_INDEX.md` remains a pre-existing cross-attempt task-preparation change; no product scope change.
 
 ## ROADMAP-01 / WP-08A + WP-08B Acceptance (Historical checkpoint before WP-09B)
 
@@ -142,7 +144,7 @@ WP-09B Attempt 5 was accepted after current Core evidence, Codex independent rev
 
 ## Current Next Gate
 
-WP-09B Attempt 5 is accepted. Prepare WP-09C task scope and Writer handoff without changing the accepted execution command contract.
+WP-09B Attempt 5 and WP-09C Attempt 4 are accepted. Next gate is WP-09D task scope and Writer handoff preparation.
 
 ## WP-09B Development Gate
 
@@ -151,5 +153,17 @@ WP-09B Attempt 5 is accepted. Prepare WP-09C task scope and Writer handoff witho
 - Scope: wire `POST /api/v1/runs/{run_id}/execute` to the existing persisted Run using the accepted Option A contract.
 - Protected behavior: existing Run-create remains `201 CREATED` and inert; Run identity, ContextPackage reference, lifecycle events, failure persistence, sanitized reason, and no-fabricated-output rules are mandatory.
 - Accepted project progress: **26/100 = 26%**; accepted FVS progress: **18/22 = 81.8%**; WP-09B earns **2/2 points**.
-- Required next owner: Codex prepares WP-09C task scope, then assigns a single implementation Writer.
+- Completed transition: WP-09C was implemented, independently reviewed, and Human-accepted; WP-09D preparation is next.
 - Symlink containment remains `UNVERIFIED/SKIPPED`; Browser E2E remains `UNVERIFIED/SKIPPED`; true concurrent HTTP duplicate execution remains `UNVERIFIED`.
+
+## WP-09C Development Gate
+
+- Task document: `docs/tasks/WP-09C.md`.
+- Status: `ACCEPTED` (Attempt 4; IMPLEMENTATION_ATTEMPT: 3 / REVIEW_ATTEMPT: 4); Codex review PASS and Human acceptance recorded on 2026-08-20.
+- Architecture result: implementation detail under ADR-004/008/010; no new ADR, migration, dependency, Domain model, or frontend change.
+- Scope: five authenticated, run-scoped, read-only REST queries for Result, Finding, Evidence, Artifact metadata/reference, and durable RunEvent history.
+- Required behavior: stable wrappers, deterministic ordering, `403/404/422`, durable reload, fail-closed ownership validation, and no fabricated output.
+- Protected behavior: WP-09B execution command, Run-create semantics, lifecycle/CAS/failure persistence, WP-08A/B, ADR-001–010, and all migration/frontend files.
+- Accepted project progress is **27/100 = 27%**; accepted FVS progress is **19/22 = 86.4%**; WP-09C earns **1/1 point**.
+- Next owner: Codex prepares WP-09D task scope and handoff.
+- Antigravity: `NOT_REQUIRED` for this Core-only task; Browser E2E remains `UNVERIFIED/SKIPPED`.

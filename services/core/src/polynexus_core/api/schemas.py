@@ -142,3 +142,67 @@ class ContextPackageResponse(BaseModel):
     memory_refs: tuple[str, ...]
     source_refs: tuple[str, ...]
     created_at: datetime
+
+
+# ---------------------------------------------------------------------------
+# Finding / Evidence / Artifact — read-only query responses (WP-09C)
+# ---------------------------------------------------------------------------
+
+class FindingResponse(BaseModel):
+    id: str
+    task_id: str
+    run_id: str
+    title: str
+    description: str
+    severity: str
+    evidence_refs: tuple[str, ...]
+    status: str
+    created_at: datetime
+
+
+class EvidenceResponse(BaseModel):
+    id: str
+    task_id: str
+    run_id: str
+    actor_id: str
+    source: str
+    type: str
+    status: str
+    artifact_refs: tuple[str, ...]
+    metadata: dict[str, str]
+    observed_at: datetime
+
+
+class ArtifactResponse(BaseModel):
+    id: str
+    project_id: str
+    task_id: str | None
+    run_id: str | None
+    artifact_type: str
+    mime_type: str
+    source_type: str
+    storage_ref: str
+    sha256: str
+    size: int
+
+
+# Wrappers — stable JSON, empty returns 200 with null/[]
+
+class RunResultWrapper(BaseModel):
+    result: RunResultResponse | None
+
+
+class FindingsWrapper(BaseModel):
+    findings: list[FindingResponse]
+
+
+class EvidenceWrapper(BaseModel):
+    evidence: list[EvidenceResponse]
+
+
+class ArtifactsWrapper(BaseModel):
+    artifacts: list[ArtifactResponse]
+
+
+class HistoryWrapper(BaseModel):
+    events: list[RunEventResponse]

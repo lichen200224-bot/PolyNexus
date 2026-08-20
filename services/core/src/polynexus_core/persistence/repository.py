@@ -377,6 +377,9 @@ class ArtifactRepository(ABC):
     @abstractmethod
     def list_by_project(self, project_id: str) -> Sequence[Artifact]: ...
 
+    @abstractmethod
+    def list_by_run(self, run_id: str) -> Sequence[Artifact]: ...
+
 
 class FindingRepository(ABC):
     @abstractmethod
@@ -388,6 +391,9 @@ class FindingRepository(ABC):
     @abstractmethod
     def list_by_task(self, task_id: str) -> Sequence[Finding]: ...
 
+    @abstractmethod
+    def list_by_run(self, run_id: str) -> Sequence[Finding]: ...
+
 
 class EvidenceRepository(ABC):
     @abstractmethod
@@ -398,6 +404,9 @@ class EvidenceRepository(ABC):
 
     @abstractmethod
     def list_by_task(self, task_id: str) -> Sequence[Evidence]: ...
+
+    @abstractmethod
+    def list_by_run(self, run_id: str) -> Sequence[Evidence]: ...
 
 
 # ---------------------------------------------------------------------------
@@ -472,7 +481,7 @@ class SqlRunRepository(RunRepository):
         event_rows = (
             self._s.query(RunEventRow)
             .filter_by(run_id=run_id)
-            .order_by(RunEventRow.occurred_at)
+            .order_by(RunEventRow.occurred_at, RunEventRow.id)
             .all()
         )
         run.events = [_row_to_event(er) for er in event_rows]
@@ -491,7 +500,7 @@ class SqlRunRepository(RunRepository):
             event_rows = (
                 self._s.query(RunEventRow)
                 .filter_by(run_id=r.id)
-                .order_by(RunEventRow.occurred_at)
+                .order_by(RunEventRow.occurred_at, RunEventRow.id)
                 .all()
             )
             run.events = [_row_to_event(er) for er in event_rows]
@@ -551,7 +560,7 @@ class SqlRunEventRepository(RunEventRepository):
         rows = (
             self._s.query(RunEventRow)
             .filter_by(run_id=run_id)
-            .order_by(RunEventRow.occurred_at)
+            .order_by(RunEventRow.occurred_at, RunEventRow.id)
             .all()
         )
         return [_row_to_event(r) for r in rows]
@@ -572,6 +581,15 @@ class SqlArtifactRepository(ArtifactRepository):
         rows = self._s.query(ArtifactRow).filter_by(project_id=project_id).all()
         return [_row_to_artifact(r) for r in rows]
 
+    def list_by_run(self, run_id: str) -> Sequence[Artifact]:
+        rows = (
+            self._s.query(ArtifactRow)
+            .filter_by(run_id=run_id)
+            .order_by(ArtifactRow.id)
+            .all()
+        )
+        return [_row_to_artifact(r) for r in rows]
+
 
 class SqlFindingRepository(FindingRepository):
     def __init__(self, session: Session) -> None:
@@ -588,6 +606,15 @@ class SqlFindingRepository(FindingRepository):
         rows = self._s.query(FindingRow).filter_by(task_id=task_id).all()
         return [_row_to_finding(r) for r in rows]
 
+    def list_by_run(self, run_id: str) -> Sequence[Finding]:
+        rows = (
+            self._s.query(FindingRow)
+            .filter_by(run_id=run_id)
+            .order_by(FindingRow.created_at, FindingRow.id)
+            .all()
+        )
+        return [_row_to_finding(r) for r in rows]
+
 
 class SqlEvidenceRepository(EvidenceRepository):
     def __init__(self, session: Session) -> None:
@@ -602,4 +629,13 @@ class SqlEvidenceRepository(EvidenceRepository):
 
     def list_by_task(self, task_id: str) -> Sequence[Evidence]:
         rows = self._s.query(EvidenceRow).filter_by(task_id=task_id).all()
+        return [_row_to_evidence(r) for r in rows]
+
+    def list_by_run(self, run_id: str) -> Sequence[Evidence]:
+        rows = (
+            self._s.query(EvidenceRow)
+            .filter_by(run_id=run_id)
+            .order_by(EvidenceRow.observed_at, EvidenceRow.id)
+            .all()
+        )
         return [_row_to_evidence(r) for r in rows]
