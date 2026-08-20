@@ -2,7 +2,7 @@
 
 Date: 2026-08-20
 Version: Development Baseline v1.0 + Dev Preparation Profile v1.0.2
-Milestone: First Vertical Slice — WP-08A/WP-08B/WP-09B/WP-09C/WP-09D ACCEPTED; UI/Core waiver accepted; ROADMAP-01 CONFIRMED
+Milestone: First Vertical Slice — WP-08A/WP-08B/WP-09B/WP-09C/WP-09D/WP-10 ACCEPTED; CP-02 complete; UI/Core waiver accepted; ROADMAP-01 CONFIRMED
 
 ## Confirmed
 - Product Scope Decisions D01–D10 confirmed.
@@ -22,7 +22,7 @@ Milestone: First Vertical Slice — WP-08A/WP-08B/WP-09B/WP-09C/WP-09D ACCEPTED;
 - Absolute path is a local profile only; product code remains repo-relative.
 
 ## Current Priority
-1. Prepare WP-10 FVS final deterministic acceptance; defer Browser E2E re-test until development is complete.
+1. Prepare WP-11 Discuss / Review / Validate work-mode semantics and contract tests; defer Browser E2E re-test until development is complete.
 2. Prepare competition proposal/deck content confidence gate by 2026-08-25.
 
 ## Current Product Slice
@@ -37,20 +37,20 @@ First Vertical Slice target by 2026-09-06:
 - Actual competition upload-form fields/demo requirement still require recheck before submission.
 
 ## Next Gate
-Prepare WP-10 FVS final deterministic acceptance and Human/Codex checkpoint review.
+Prepare WP-11 task scope and acceptance tests for the CP-03 Core product baseline.
 
 ## Current Development State
 
-Phase: First Vertical Slice — WP-09D Result/History UI ACCEPTED (Attempt 3); Codex PASS and Human acceptance recorded on 2026-08-20
-Next Phase: WP-10 FVS final deterministic acceptance; Browser E2E Re-test deferred
+Phase: First Vertical Slice — WP-10 final deterministic acceptance PASS; Human acceptance recorded on 2026-08-20; CP-02 complete
+Next Phase: CP-03 Core product baseline — WP-11; Browser E2E Re-test deferred
 
 Current Branch: feature/first-vertical-slice
 Current Baseline Commit: 3a0237d (`feat(core): add WP-09C run output queries`)
 Latest FVS Checkpoint: 3a0237d (`feat(core): add WP-09C run output queries`)
-Current Planned Task: WP-10 — FVS final deterministic acceptance
-Active Writer: NONE — WP-09D accepted; WP-10 planning pending
-Reviewer: Codex / Human — WP-09D PASS and acceptance recorded; WP-10 is next
-Antigravity: NOT_REQUIRED_FOR_IMPLEMENTATION; Browser E2E UNVERIFIED/SKIPPED
+Current Planned Task: WP-11 — Discuss / Review / Validate work-mode semantics and contract tests
+Active Writer: NONE — WP-10 accepted; WP-11 planning pending
+Reviewer: Codex / Human — WP-10 PASS and acceptance recorded; WP-11 is next
+Antigravity: NOT_REQUIRED_FOR_WP-10; Browser E2E UNVERIFIED/SKIPPED
 
 Architecture:
 - ADR-001 through ADR-010 are CONFIRMED / FROZEN FOR V1 IMPLEMENTATION.
@@ -88,18 +88,19 @@ OpenCode Model Routing:
 
 ## Latest Verification
 
-WP-09C Attempt 4 was accepted after current Core evidence, Codex independent review PASS, and Human acceptance on 2026-08-20. Browser DOM / Playwright E2E remains UNVERIFIED/SKIPPED and is deferred until development is complete; true concurrent HTTP duplicate-command execution remains UNVERIFIED.
+WP-10 final deterministic acceptance passed current Core, fresh-DB, frontend, baseline, and diff checks. Human acceptance was confirmed on 2026-08-20. Browser DOM / Playwright E2E remains `UNVERIFIED/SKIPPED` and is deferred until development is complete; true concurrent HTTP duplicate-command execution remains `UNVERIFIED`.
 
-- WP-09C targeted query tests: 24 passed, exit code 0.
-- WP-09B regression tests: 36 passed, exit code 0.
 - Full Core tests: 169 passed, 1 skipped, exit code 0 (170 collected).
+- Fresh DB / Alembic / reopen-reload checks: 4 passed, exit code 0.
+- Frontend Vitest: 78 passed, exit code 0.
+- Frontend build: PASS, exit code 0.
 - Baseline validation: PASS, exit code 0.
-- Git diff check: PASS, exit code 0.
-- WP-09C: ACCEPTED, 1/1 point earned.
-- Accepted project progress: **27/100 = 27%**.
-- Accepted FVS progress: **19/22 = 86.4%**.
+- `git diff --check`: PASS, exit code 0.
+- WP-10: ACCEPTED, 2/2 CP-02 points earned.
+- Accepted project progress: **30/100 = 30%**.
+- Accepted FVS progress: **22/22 = 100%**.
 - ADR impact: NONE.
-- Scope deviation: `docs/15_DOCUMENT_INDEX.md` remains a pre-existing cross-attempt task-preparation change; no product scope change.
+- Scope deviation: NONE; `docs/15_DOCUMENT_INDEX.md` remains pre-existing, unstaged, and excluded.
 
 ## ROADMAP-01 / WP-08A + WP-08B Acceptance (Historical checkpoint before WP-09B)
 
@@ -144,7 +145,7 @@ WP-09C Attempt 4 was accepted after current Core evidence, Codex independent rev
 
 ## Current Next Gate
 
-WP-09B, WP-09C, and WP-09D are accepted. Next gate is WP-10 FVS final deterministic acceptance.
+WP-09B, WP-09C, WP-09D, and WP-10 are accepted. CP-02 is complete; next gate is WP-11 task preparation for the CP-03 Core product baseline.
 
 ## WP-09B Development Gate
 
@@ -179,3 +180,15 @@ WP-09B, WP-09C, and WP-09D are accepted. Next gate is WP-10 FVS final determinis
 - Accepted project progress is **28/100 = 28%**; accepted FVS progress is **20/22 = 90.9%**; WP-09D earns **1/1 point**.
 - Browser E2E remains `UNVERIFIED/SKIPPED`; it is not a WP-09D implementation acceptance requirement.
 - Next owner: Codex/Human prepare WP-10 final deterministic acceptance.
+
+## WP-10 Final Deterministic Acceptance
+
+- Task document: `docs/tasks/WP-10.md`.
+- Status: `ACCEPTED` (Attempt 1); Codex deterministic acceptance PASS and Human acceptance recorded on 2026-08-20.
+- Scope: final acceptance-only verification of the First Vertical Slice; no product source, REST contract, schema, migration, dependency, or ADR changes.
+- Evidence: Core `169 passed, 1 skipped` from `170 collected`, fresh DB/Alembic/reopen-reload `4 passed`, frontend `78 passed`, frontend build PASS, baseline PASS, and `git diff --check` PASS; all exit code 0.
+- Skipped/unverified: Browser DOM / Playwright E2E, Windows symlink escape, and true concurrent HTTP duplicate execution remain explicitly `UNVERIFIED/SKIPPED`.
+- ADR impact: `NONE`.
+- Scope deviation: `NONE`; pre-existing `docs/15_DOCUMENT_INDEX.md` remains unstaged and excluded.
+- Accepted project progress is **30/100 = 30%**; accepted FVS progress is **22/22 = 100%**; WP-10 earns **2/2 CP-02 points**.
+- CP-02 First Vertical Slice is complete. Next owner: Codex/Human prepare WP-11 task scope and acceptance tests.

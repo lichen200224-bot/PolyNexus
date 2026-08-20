@@ -4,23 +4,23 @@
 First Vertical Slice
 
 ## Status
-Previous: WP-09C — ACCEPTED (Attempt 4; IMPLEMENTATION_ATTEMPT: 3 / REVIEW_ATTEMPT: 4); Codex PASS and Human acceptance recorded on 2026-08-20.
-Current: WP-09D — ACCEPTED (Attempt 3); Codex PASS and Human acceptance recorded on 2026-08-20.
-Next: Prepare WP-10 FVS final deterministic acceptance.
+Previous: WP-09D — ACCEPTED (Attempt 3); Codex PASS and Human acceptance recorded on 2026-08-20.
+Current: WP-10 — ACCEPTED (Attempt 1); Codex deterministic acceptance PASS and Human acceptance recorded on 2026-08-20.
+Next: Prepare WP-11 task scope and acceptance tests for the CP-03 Core product baseline.
 
 Acceptance repair log: `docs/27_ACCEPTANCE_REPAIR_LOG.md`
 
-Task document: `docs/tasks/WP-09D.md`; roadmap: `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`; accepted dependencies: `docs/tasks/WP-09A.md`, `docs/tasks/WP-09B.md`, and `docs/tasks/WP-09C.md`.
+Task document: `docs/tasks/WP-10.md`; roadmap: `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`; accepted dependencies: `docs/tasks/WP-09A.md`, `docs/tasks/WP-09B.md`, `docs/tasks/WP-09C.md`, and `docs/tasks/WP-09D.md`.
 Historical task document: `docs/tasks/FVS-03.md`
 
 ## Active Writer
-NONE — WP-09D accepted; WP-10 planning pending.
+NONE — WP-10 acceptance complete; WP-11 planning pending.
 
 ## Reviewer
-Codex / Human — WP-09D PASS and acceptance recorded; prepare WP-10 final acceptance.
+Codex / Human — WP-10 PASS and acceptance recorded; prepare WP-11 task documentation.
 
 ## Antigravity
-`NOT_REQUIRED_FOR_IMPLEMENTATION` for WP-09D; this task does not include real-browser E2E. Browser DOM / Playwright E2E remains `UNVERIFIED/SKIPPED`.
+`NOT_REQUIRED_FOR_WP-10`; this acceptance task does not include real-browser E2E. Browser DOM / Playwright E2E remains `UNVERIFIED/SKIPPED`.
 
 ## Starting Branch
 feature/first-vertical-slice
@@ -965,3 +965,51 @@ Excluded and preserved: `docs/15_DOCUMENT_INDEX.md` remains pre-existing dirty s
 ### Next
 
 Prepare WP-10 FVS final deterministic acceptance. Do not relabel Browser E2E, symlink containment, or concurrent HTTP limitations as verified.
+
+## WP-10 Acceptance Update (Attempt 1)
+
+- `TASK_ID`: `WP-10`
+- `STATUS`: `ACCEPTED`
+- `ATTEMPT`: `1`
+- `BRANCH`: `feature/first-vertical-slice`
+- `WRITER`: `Codex (acceptance runner)`
+- `REVIEWER`: `Human`
+- `ANTIGRAVITY_STATUS`: `NOT_REQUIRED_FOR_IMPLEMENTATION` (Browser E2E remains `UNVERIFIED/SKIPPED`)
+- `NEXT_OWNER`: `Codex/Human` for WP-11 task preparation
+- `CODEX_RESULT`: `PASS`
+- `HUMAN_ACCEPTANCE`: Confirmed on `2026-08-20`
+- `ITEM_PROGRESS`: `100%` — 2/2 CP-02 points accepted
+- `PROJECT_PROGRESS`: `30/100 = 30%`
+- `FVS_PROGRESS`: `22/22 = 100%`
+
+### Acceptance evidence
+
+- Full Core: `169 passed, 1 skipped`, `170 collected`, exit code `0`.
+- Fresh DB / Alembic / reopen-reload focused checks: `4 passed`, exit code `0`.
+- Frontend Vitest: `78 passed`, exit code `0`.
+- Frontend build: PASS, exit code `0`.
+- Baseline validation: PASS, exit code `0`.
+- `git diff --check`: PASS, exit code `0`.
+- The skipped test is the Windows-policy-limited symlink escape test. A non-fatal pytest temp cleanup `PermissionError` was emitted, but the test exit code remained `0`.
+
+### Protected areas and limitations
+
+- ADR-001–010, WP-08A/WP-08B, WP-09B/WP-09C/WP-09D behavior, REST contracts, migrations, dependencies, storage, and secret boundaries were not changed.
+- ADR impact: `NONE`.
+- Scope deviation: `NONE`; pre-existing `docs/15_DOCUMENT_INDEX.md` remains unstaged and excluded.
+- Browser DOM / Playwright E2E: `UNVERIFIED/SKIPPED` under the accepted waiver.
+- Symlink containment: `UNVERIFIED/SKIPPED` under Windows policy.
+- True concurrent HTTP duplicate-command execution: `UNVERIFIED`; repository-level CAS coverage remains available.
+
+### WP-10 stage allowlist
+
+- `docs/tasks/WP-10.md`
+- `docs/11_PROJECT_STATE.md`
+- `docs/12_HANDOFF_CURRENT.md`
+- `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`
+
+Excluded and preserved: `docs/15_DOCUMENT_INDEX.md` remains pre-existing dirty state and is not part of the WP-10 checkpoint commit.
+
+### Next
+
+Prepare `docs/tasks/WP-11.md` for Discuss / Review / Validate work-mode semantics and contract tests. Do not begin WP-11 implementation before its scope, acceptance tests, protected areas, and handoff fields are documented.
