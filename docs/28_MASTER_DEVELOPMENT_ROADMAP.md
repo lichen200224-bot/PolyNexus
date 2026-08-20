@@ -58,6 +58,7 @@ The project uses a 100-point checkpoint-weighted progress model. Only `ACCEPTED`
 - WP-09B is `ACCEPTED` after Attempt 5 deterministic evidence, Codex review PASS, and Human acceptance on 2026-08-20; it earns **2/2 points**.
 - WP-09C is `ACCEPTED` after Attempt 4 deterministic evidence, Codex review PASS, and Human acceptance on 2026-08-20; it earns **1/1 point**.
 - WP-10 is `ACCEPTED` after current deterministic evidence, Codex PASS, and Human acceptance on 2026-08-20; it earns **2/2 points** and closes CP-02.
+- WP-11 is `ACCEPTED` after Attempt 4 deterministic evidence, Codex review PASS, and Human acceptance on 2026-08-20; item progress is 100%. No standalone WP-11 point allocation inside CP-03 is defined in this roadmap, so project progress remains **30/100** until that allocation is explicitly recorded.
 - Current project progress: **30/100 = 30% accepted progress**.
 - Current FVS progress: **22/22 = 100% accepted progress**.
 - Browser E2E waiver is a limitation record, not additional earned progress.
@@ -69,7 +70,7 @@ The project uses a 100-point checkpoint-weighted progress model. Only `ACCEPTED`
 | CP-00 | Baseline, governance, environment, frozen ADRs | 8% | 2026-08-19 | Baseline validation, branch/Git rules, source-of-truth docs, tool roles | ACCEPTED |
 | CP-01 | Competition content and submission readiness | 5% | 2026-09-07 | Content truthfulness, actual form/field check, required package, evidence of submission readiness | PLANNED |
 | CP-02 | First Vertical Slice runnable path | 22% | 2026-09-06 | Project → ContextPackage → Task → Run execution → Finding/Evidence → Result → History, fresh DB repeat, actual exit codes | ACCEPTED |
-| CP-03 | Core product baseline | 25% | 2026-09-20 | Work modes, Council, hard gates, deep runtime adapters, Doctor/Conformance evidence | PLANNED |
+| CP-03 | Core product baseline | 25% | 2026-09-20 | Work modes, Council, hard gates, deep runtime adapters, Doctor/Conformance evidence | IN_PROGRESS |
 | CP-04 | Web, Local, Policy integration baseline | 18% | 2026-10-04 | Local profiles, routing/classification, WebSurface/companion fallback, Browser E2E evidence | PLANNED |
 | CP-05 | Product completion and feature freeze | 12% | 2026-10-18 | Workflow breadth, backup/restore, resource guards, metrics, UX pass, Golden Workflow regression | PLANNED |
 | CP-06 | Hardening and V1 RC acceptance | 10% | 2026-10-31 | Failure injection, security/egress, migration/restore, clean install, compatibility, RC acceptance | PLANNED |
@@ -114,7 +115,7 @@ WP-01–WP-07, WP-08A, WP-08B, WP-09B, WP-09C, WP-09D, and WP-10 are accepted. C
 
 | Item | Scope | Owner / reviewer | Estimate | Target | Acceptance checkpoint |
 |---|---|---|---:|---|---|
-| WP-11 | Discuss / Review / Validate work-mode semantics and contract tests | OpenCode / Codex | 2 days | 2026-09-09 | Mode behavior, validation, error paths, no fourth top-level mode |
+| WP-11 | Discuss / Review / Validate work-mode semantics and contract tests | OpenCode / Codex | 2 days | 2026-09-09 | `ACCEPTED` Attempt 4: Codex review PASS + Human acceptance 2026-08-20; 23 contract tests PASS, full Core 193 collected / 192 passed / 1 skipped, validate_baseline PASS; 422/201/403/404 verified; no fourth top-level mode; item progress 100%; standalone CP-03 point allocation not defined |
 | WP-12 | Council, parallel analysis, cross review, synthesis, partial failures | Codex/OpenCode / Codex | 3 days | 2026-09-12 | Durable disagreement/partial result representation |
 | WP-13 | Workflow hard gates, Evidence_Check, Human gate, verified verdict rules | Codex / Human | 2 days | 2026-09-14 | Tool failure cannot be AI-voted into deterministic PASS |
 | WP-14 | Codex Runtime adapter conformance | Codex / Human | 2 days | 2026-09-17 | Contract, lifecycle, result/error, evidence, cleanup, maturity label |

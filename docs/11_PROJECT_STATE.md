@@ -37,27 +37,27 @@ First Vertical Slice target by 2026-09-06:
 - Actual competition upload-form fields/demo requirement still require recheck before submission.
 
 ## Next Gate
-Prepare WP-11 task scope and acceptance tests for the CP-03 Core product baseline.
+Prepare WP-12 task scope and acceptance tests for the CP-03 Core product baseline; WP-11 is accepted.
 
 ## Current Development State
 
 Phase: First Vertical Slice — WP-10 final deterministic acceptance PASS; Human acceptance recorded on 2026-08-20; CP-02 complete
-Next Phase: CP-03 Core product baseline — WP-11; Browser E2E Re-test deferred
+Next Phase: CP-03 Core product baseline — WP-11 accepted; WP-12 next; Browser E2E Re-test deferred
 
 Current Branch: feature/first-vertical-slice
 Current Baseline Commit: 3a0237d (`feat(core): add WP-09C run output queries`)
 Latest FVS Checkpoint: 3a0237d (`feat(core): add WP-09C run output queries`)
-Current Planned Task: WP-11 — Discuss / Review / Validate work-mode semantics and contract tests
-Active Writer: NONE — WP-10 accepted; WP-11 planning pending
-Reviewer: Codex / Human — WP-10 PASS and acceptance recorded; WP-11 is next
-Antigravity: NOT_REQUIRED_FOR_WP-10; Browser E2E UNVERIFIED/SKIPPED
+Current Planned Task: WP-12 — Council, parallel analysis, cross review, synthesis, and partial failures (WP-11 accepted)
+Active Writer: None — WP-11 accepted; WP-12 task scope/planning pending
+Reviewer: Codex — WP-11 independent review PASS; Human acceptance recorded on 2026-08-20
+Antigravity: NOT_REQUIRED for WP-11; Browser E2E UNVERIFIED/SKIPPED
 
 Architecture:
 - ADR-001 through ADR-010 are CONFIRMED / FROZEN FOR V1 IMPLEMENTATION.
 
 Development Environment:
 - Windows development readiness: PASS
-- Core pytest: 169 passed, 1 skipped (170 collected, symlink containment UNVERIFIED; Human waiver accepted)
+- Core pytest: 192 passed, 1 skipped (193 collected; Windows symlink creation policy denied → 1 skipped; pytest temp cleanup PermissionError is a non-fatal environment warning; Human waiver accepted). WP-10 accepted baseline was 169 passed / 170 collected.
 - Frontend Vitest: 78 passed (61 baseline + 17 WP-09D)
 - Frontend build: PASS
 - Local Git backup: PASS
@@ -90,7 +90,7 @@ OpenCode Model Routing:
 
 WP-10 final deterministic acceptance passed current Core, fresh-DB, frontend, baseline, and diff checks. Human acceptance was confirmed on 2026-08-20. Browser DOM / Playwright E2E remains `UNVERIFIED/SKIPPED` and is deferred until development is complete; true concurrent HTTP duplicate-command execution remains `UNVERIFIED`.
 
-- Full Core tests: 169 passed, 1 skipped, exit code 0 (170 collected).
+- Full Core tests: 192 passed, 1 skipped, exit code 0 (193 collected; Windows symlink creation policy denied → 1 skipped; pytest temp cleanup PermissionError is a non-fatal environment warning). WP-10 accepted baseline was 169 passed / 170 collected.
 - Fresh DB / Alembic / reopen-reload checks: 4 passed, exit code 0.
 - Frontend Vitest: 78 passed, exit code 0.
 - Frontend build: PASS, exit code 0.
@@ -145,7 +145,7 @@ WP-10 final deterministic acceptance passed current Core, fresh-DB, frontend, ba
 
 ## Current Next Gate
 
-WP-09B, WP-09C, WP-09D, and WP-10 are accepted. CP-02 is complete; next gate is WP-11 task preparation for the CP-03 Core product baseline.
+WP-09B, WP-09C, WP-09D, WP-10, and WP-11 are accepted. CP-02 is complete; WP-12 is the next gate for the CP-03 Core product baseline.
 
 ## WP-09B Development Gate
 
@@ -186,9 +186,9 @@ WP-09B, WP-09C, WP-09D, and WP-10 are accepted. CP-02 is complete; next gate is 
 - Task document: `docs/tasks/WP-10.md`.
 - Status: `ACCEPTED` (Attempt 1); Codex deterministic acceptance PASS and Human acceptance recorded on 2026-08-20.
 - Scope: final acceptance-only verification of the First Vertical Slice; no product source, REST contract, schema, migration, dependency, or ADR changes.
-- Evidence: Core `169 passed, 1 skipped` from `170 collected`, fresh DB/Alembic/reopen-reload `4 passed`, frontend `78 passed`, frontend build PASS, baseline PASS, and `git diff --check` PASS; all exit code 0.
+- Evidence: Core `169 passed, 1 skipped` from `170 collected` (WP-10 accepted baseline; current WP-11 full-Core run is `193 collected / 192 passed / 1 skipped`), fresh DB/Alembic/reopen-reload `4 passed`, frontend `78 passed`, frontend build PASS, baseline PASS, and `git diff --check` PASS; all exit code 0.
 - Skipped/unverified: Browser DOM / Playwright E2E, Windows symlink escape, and true concurrent HTTP duplicate execution remain explicitly `UNVERIFIED/SKIPPED`.
 - ADR impact: `NONE`.
 - Scope deviation: `NONE`; pre-existing `docs/15_DOCUMENT_INDEX.md` remains unstaged and excluded.
 - Accepted project progress is **30/100 = 30%**; accepted FVS progress is **22/22 = 100%**; WP-10 earns **2/2 CP-02 points**.
-- CP-02 First Vertical Slice is complete. Next owner: Codex/Human prepare WP-11 task scope and acceptance tests.
+- CP-02 First Vertical Slice is complete. WP-11 is `ACCEPTED` (Attempt 4): Codex review PASS and Human acceptance recorded on 2026-08-20; `services/core/tests/test_wp11_work_mode.py` has 23 passed, full Core is `193 collected / 192 passed / 1 skipped`, and `validate_baseline.py` is PASS. WP-11 item progress is 100%. The roadmap does not define a standalone WP-11 point allocation inside CP-03, so accepted project progress remains **30/100** until that allocation is explicitly recorded; CP-03 is now in progress. Next owner: WP-12 planning.

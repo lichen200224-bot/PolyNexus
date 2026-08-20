@@ -1,26 +1,26 @@
 # Current Handoff
 
 ## Task
-First Vertical Slice
+WP-11 — Discuss / Review / Validate work-mode semantics and contract tests (CP-03 Core product baseline)
 
 ## Status
-Previous: WP-09D — ACCEPTED (Attempt 3); Codex PASS and Human acceptance recorded on 2026-08-20.
-Current: WP-10 — ACCEPTED (Attempt 1); Codex deterministic acceptance PASS and Human acceptance recorded on 2026-08-20.
-Next: Prepare WP-11 task scope and acceptance tests for the CP-03 Core product baseline.
+Previous: WP-10 — ACCEPTED (Attempt 1); Codex deterministic acceptance PASS and Human acceptance recorded on 2026-08-20.
+Current: WP-11 — ACCEPTED (Attempt 4); Codex review PASS and Human acceptance recorded on 2026-08-20.
+Next: Prepare WP-12 task scope and acceptance tests; WP-11 item progress is 100%.
 
 Acceptance repair log: `docs/27_ACCEPTANCE_REPAIR_LOG.md`
 
-Task document: `docs/tasks/WP-10.md`; roadmap: `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`; accepted dependencies: `docs/tasks/WP-09A.md`, `docs/tasks/WP-09B.md`, `docs/tasks/WP-09C.md`, and `docs/tasks/WP-09D.md`.
-Historical task document: `docs/tasks/FVS-03.md`
+Task document: `docs/tasks/WP-11.md`; roadmap: `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`; accepted dependencies: `docs/tasks/WP-10.md` (CP-02 closed; 30/100 project, 22/22 FVS), `docs/tasks/WP-08A.md`, `docs/tasks/WP-09B.md`, `docs/tasks/WP-09C.md`.
+Historical task document: `docs/tasks/WP-10.md`
 
 ## Active Writer
-NONE — WP-10 acceptance complete; WP-11 planning pending.
+None — WP-11 accepted; WP-12 planning pending. The WP-11 writer was OpenCode.
 
 ## Reviewer
-Codex / Human — WP-10 PASS and acceptance recorded; prepare WP-11 task documentation.
+Codex — WP-11 independent review PASS; Human acceptance recorded on 2026-08-20.
 
 ## Antigravity
-`NOT_REQUIRED_FOR_WP-10`; this acceptance task does not include real-browser E2E. Browser DOM / Playwright E2E remains `UNVERIFIED/SKIPPED`.
+`NOT_REQUIRED` — Core/API contract task; no Browser E2E in WP-11 scope. Browser DOM / Playwright E2E remains `UNVERIFIED/SKIPPED`.
 
 ## Starting Branch
 feature/first-vertical-slice
@@ -1010,6 +1010,159 @@ Prepare WP-10 FVS final deterministic acceptance. Do not relabel Browser E2E, sy
 
 Excluded and preserved: `docs/15_DOCUMENT_INDEX.md` remains pre-existing dirty state and is not part of the WP-10 checkpoint commit.
 
+### Next (historical)
+
+`docs/tasks/WP-11.md` creation was the next step — now complete (see WP-11 Task Document section below). Do not begin WP-11 implementation before Codex confirms the scope/tests.
+
+## WP-11 Implementation (Attempt 4) — READY_FOR_CODEX_REVIEW
+
+- `TASK_ID`: `WP-11`
+- `STATUS`: `READY_FOR_CODEX_REVIEW`
+- `ATTEMPT`: `4`
+- `BRANCH`: `feature/first-vertical-slice`
+- `WRITER`: `OpenCode`
+- `REVIEWER`: `Codex`
+- `ANTIGRAVITY_STATUS`: `NOT_REQUIRED` — Core/API contract task; no Browser E2E
+- `NEXT_OWNER`: `Codex` (independent review) → `Human` (acceptance)
+- `HANDOFF_DOC`: `docs/12_HANDOFF_CURRENT.md`
+- `TASK_DOC`: `docs/tasks/WP-11.md`
+- `ROADMAP_DOC`: `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`
+
+### Goal
+
+Lock `WorkMode` semantics to exactly three top-level modes (`DISCUSS`, `REVIEW`, `VALIDATE`), prove `422` for any other value (including `DEVELOP`, lower-case, whitespace-padded — but **not** `""` which under current code is `201 REVIEW`), record omitted-mode (and `""`/`null` → `REVIEW`) default as `REVIEW` (per `services/core/src/polynexus_core/domain/enums.py:42-46`, `services/core/src/polynexus_core/domain/models.py:49`, `services/core/src/polynexus_core/api/tasks.py:72-80`, `services/core/src/polynexus_core/api/schemas.py:46`), and prove persistence/reload round-trip. No fourth mode, no ADR change, no new Domain/migration/dependency. If `""` must be `422`, stop and report `NEED_ACTION` before modifying `api/tasks.py`.
+
+### Three legal modes
+
+- `DISCUSS` — Independent analysis → Cross Review → Consensus/Disagreement/Risks/Missing Info → Human Decision
+- `REVIEW` — Artifact/Code/Document → Findings/Severity/Blockers/Recommendations
+- `VALIDATE` — Tool/Command/Rule/Document Check → Evidence → PASS/FAIL/NEED_ACTION/HUMAN_DECISION
+- Notes: case-sensitive upper-case only; `Develop` is a Workflow action/Agent role, not a top-level Task mode (scope baseline §3). Any other string is illegal.
+
+### Illegal mode — 422 contract
+
+- Any provided `mode` not in `["DISCUSS","REVIEW","VALIDATE"]` → `422` with detail `Invalid mode: {value}. Must be one of: DISCUSS, REVIEW, VALIDATE` (`services/core/src/polynexus_core/api/tasks.py:77-80`), no row created, no secret leak.
+- Covers: `INVALID`, `DEVELOP`, `discuss`, `review`, `validate`, `DISCUSS `, ` REVIEW`.
+- Note: `""` (empty string) is **not** `422` under current code — `api/tasks.py:72` checks `if body.mode:` (falsy) → `201` with `mode == "REVIEW"` (see Omitted mode). If `""` must be `422`, report `NEED_ACTION` before modifying `api/tasks.py`.
+
+### Omitted mode — default behavior
+
+- **Current contract**: omitted field, `null`, or `""` (empty string, falsy) → `201` with `mode == "REVIEW"` (`api/tasks.py:72` `mode = WorkMode.REVIEW` if falsy; `domain/models.py:49` default `WorkMode.REVIEW`; `api/schemas.py:46` `mode: str | None = None`; persistence stores `"REVIEW"` string and reloads `WorkMode(r.mode)`).
+- **Decision gate**: If Human/Codex requires explicit required mode or a different default (e.g., `DISCUSS`), this task must return `NEED_ACTION` with a Decision/ADR update **before** any code change. Writer will implement tests against `REVIEW` default unless a new decision is recorded in `docs/10_DECISION_LOG.md` / `docs/18_ARCHITECTURE_DECISIONS.md`.
+
+### Persistence / reload and API contract
+
+- Stored as `String(32)` (`persistence/models.py: mode`) via `t.mode.value` / `WorkMode(r.mode)` (`persistence/repository.py`).
+- Proof: create Task with each legal mode and omitted, commit, **close → reopen** DB file, `GET /projects/{project_id}/tasks` and `GET /tasks/{task_id}` both return same `mode`.
+- `POST /api/v1/projects/{project_id}/tasks`: `201` for legal/omitted, `422` for illegal, `403` without auth, `404` for missing project; `GET` endpoints mirror same `mode` string, with `403`/`404` preserved.
+
+### Test matrix (WP-11)
+
+1. `WorkMode` enum exactly `DISCUSS, REVIEW, VALIDATE` — no `DEVELOP`.
+2. `Task(project_id="p_1", title="T", workflow_id="wf", workflow_version=1)` without `mode` (all required params except `mode` supplied) defaults to `REVIEW` in-memory; `Task(..., mode=WorkMode.DISCUSS|REVIEW|VALIDATE)` round-trips.
+3-5. `POST` with `DISCUSS`/`REVIEW`/`VALIDATE` → `201` `mode` matches.
+6. `POST` omitted → `201` `mode == REVIEW`; `POST` `""` and `null` (both falsy under current code) also → `201` `mode == REVIEW`.
+7. (removed — `""` is `201` not `422`; if `""` must be `422`, report `NEED_ACTION`).
+8-11. `POST` `INVALID`/`DEVELOP`/`discuss`/` REVIEW ` (whitespace-padded) → `422` with `Invalid mode` detail, no creation.
+12-13. Persistence close/reopen round-trip for each legal, omitted, and `""` (all `REVIEW`) → `GET` returns same; `GET /projects/{id}/tasks` and `GET /tasks/{id}` both verified.
+14. Cross-project isolation of `mode`.
+15-17. Regression: `test_api.py::test_create_task_invalid_mode` stays green, `422` creates no row, auth/existence (`403`/`404`) not bypassed; report this run’s actual Core total / skipped (symlink `SKIPPED` if present) and exit code — do not hard-code fixed totals.
+
+### Changed files (Attempt 4 — implementation)
+
+Modified:
+- `docs/12_HANDOFF_CURRENT.md` — sync Status/Active Writer to WP-11 Attempt 4 READY_FOR_CODEX_REVIEW; correct full-Core stats to `193 collected / 192 passed / 1 skipped`, fix changed-files ledger (WP-11.md only Untracked, test file Untracked, 15_DOCUMENT_INDEX pre-existing excluded), and record symlink/skip reasons
+- `docs/11_PROJECT_STATE.md` — sync Current Planned Task / Next Gate to WP-11 READY_FOR_CODEX_REVIEW Attempt 4; correct Core stats (`193 collected / 192 passed / 1 skipped`) and clarify WP-10 169 baseline to avoid confusion
+- `docs/28_MASTER_DEVELOPMENT_ROADMAP.md` — WP-11 row → READY_FOR_CODEX_REVIEW Attempt 4 with `193 collected / 192 passed / 1 skipped`; CP-03 0/25 maintained
+
+Untracked (new):
+- `services/core/tests/test_wp11_work_mode.py` — 23 contract tests (tests-only; no product source change): enum semantics, domain default, API valid modes, default contract (omitted/null/"" → 201 REVIEW), illegal modes (422 + no row), persistence/reload round-trip, cross-project isolation, 403/404 not bypassed
+- `docs/tasks/WP-11.md` — full WP-11 task document (Attempt 4: STATUS READY_FOR_CODEX_REVIEW; Implementation evidence with corrected Core stats)
+
+Pre-existing (excluded):
+- `docs/15_DOCUMENT_INDEX.md` — remains pre-existing dirty state, not WP-11 scope, excluded from commit
+
+No product source, ADR, migration, dependency, or `services/core/src`/`apps/web` change in this Attempt 4 implementation. `git status` confirms only the files above.
+
+### Protected areas
+
+- ADR-001–010 (frozen; no change)
+- `services/core/src/polynexus_core/domain/enums.py` `WorkMode` values, `services/core/src/polynexus_core/domain/models.py` `Task.mode` default, `services/core/src/polynexus_core/api/tasks.py` `422` detail, `services/core/src/polynexus_core/api/schemas.py` `TaskCreate.mode`, `services/core/src/polynexus_core/persistence/models.py`/`repository.py` conversion
+- WP-08A/WP-08B WP-09B/WP-09C/WP-09D contracts and frontend baseline
+- Migrations, Alembic, dependencies, storage, secrets, WebSocket, plugin/MCP infrastructure
+
+### ADR impact
+
+`NONE` — task document records existing `WorkMode` contract and proves it with tests; no enum, schema, persistence, or ADR text change. A change would require a new ADR/Decision Log entry and Human approval.
+
+### Scope deviation
+
+`NONE` for this task-doc creation. `docs/15_DOCUMENT_INDEX.md` is pre-existing and excluded; no product scope change.
+
+### Known limitations
+
+- WP-11 is contract-test scope only; it does not implement Discuss/Review/Validate business logic or Council/hard-gate semantics (WP-12–WP-13).
+- Omitted-mode `REVIEW` default is per current code; a stricter policy needs Human/Codex decision before implementation.
+- Frontend mode handling is out of scope for WP-11.
+
+### Unverified / skipped
+
+- Browser DOM / Playwright E2E: `UNVERIFIED/SKIPPED` (accepted waiver, deferred to browser-capable environment)
+- Windows symlink containment: `UNVERIFIED/SKIPPED` (Windows policy, Human waiver)
+- True concurrent HTTP duplicate-command execution: `UNVERIFIED` (repository-level CAS exists but concurrent HTTP not re-proven here)
+
+### Verification (Attempt 4 — implementation, actual evidence)
+
+- `pytest -q services/core/tests/test_wp11_work_mode.py` → **23 passed**, exit code `0`
+- `pytest -q services/core/tests/test_api.py -k mode` → **1 passed** (`test_create_task_invalid_mode` regression preserved), exit code `0`
+- `pytest -q -rA services/core` (full Core) → **193 collected, 192 passed, 1 skipped, 0 failed**, exit code `0` (1 skipped = Windows symlink creation policy denied; the pytest temp cleanup `PermissionError` at exit is a separate non-fatal environment warning, not a test failure; all WP-11 targets pass)
+- `python scripts/validate_baseline.py` → **Baseline validation PASS** (11 required files; workflows valid; MV3 manifest valid), exit code `0`
+- `git diff --check` → clean, exit code `0`
+- `git status --short --branch` → ` M docs/12_HANDOFF_CURRENT.md`, ` M docs/15_DOCUMENT_INDEX.md` (pre-existing excluded), `?? docs/tasks/WP-11.md`, `?? services/core/tests/test_wp11_work_mode.py`, branch `feature/first-vertical-slice`, exit code `0`
+- Product source not modified: `services/core/src` (enums/models/api/schemas/persistence/repository), `apps/web`, ADR, migrations, dependencies unchanged — verified via `git status` (no `services/core/src`/`apps/web` entries)
+
 ### Next
 
-Prepare `docs/tasks/WP-11.md` for Discuss / Review / Validate work-mode semantics and contract tests. Do not begin WP-11 implementation before its scope, acceptance tests, protected areas, and handoff fields are documented.
+Historical pre-acceptance next step: Codex review followed by Human acceptance. That condition was satisfied on 2026-08-20; see the WP-11 Human Acceptance section below.
+
+### Do not change
+
+- Do not add a fourth top-level `WorkMode` (e.g., `DEVELOP`); `Develop` remains a Workflow action/Agent role per scope baseline.
+- Do not change `services/core/src/polynexus_core/domain/enums.py`, `domain/models.py`, `api/tasks.py`, `api/schemas.py`, `persistence/models.py`, `persistence/repository.py`, `services/core` tests (except the new `test_wp11_work_mode.py`), `apps/web`, migrations, dependencies, storage, or secret handling.
+- Do not stage, commit, push, or rewrite unrelated working-tree changes without explicit authorization.
+- Do not relabel `UNVERIFIED/SKIPPED` limitations as `PASS` without a browser-capable rerun.
+
+## WP-11 Human Acceptance and Git Checkpoint (Attempt 4) — ACCEPTED
+
+- `TASK_ID`: `WP-11`
+- `ATTEMPT`: `4`
+- `BRANCH`: `feature/first-vertical-slice`
+- `WRITER`: `OpenCode`
+- `REVIEWER`: `Codex`
+- `ANTIGRAVITY_STATUS`: `NOT_REQUIRED`
+- `RESULT`: `PASS`; Codex independent review completed with no blocker/major finding.
+- `HUMAN_ACCEPTANCE`: accepted on `2026-08-20`; Human authorized allowlist-only stage, commit, and push.
+- WP-11 item progress: `100%`.
+- Accepted project progress: `30/100`; accepted FVS progress: `22/22`. The roadmap does not define a standalone WP-11 point allocation inside CP-03, so no unsupported numeric points are added. CP-03 is `IN_PROGRESS`.
+
+### Accepted Git allowlist
+
+- `docs/11_PROJECT_STATE.md`
+- `docs/12_HANDOFF_CURRENT.md`
+- `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`
+- `docs/tasks/WP-11.md`
+- `services/core/tests/test_wp11_work_mode.py`
+
+Excluded and left untouched: `docs/15_DOCUMENT_INDEX.md` (pre-existing dirty governance change).
+
+### Acceptance evidence
+
+- WP-11 contract tests: `23 passed`, exit code `0`.
+- Existing mode regression: `1 passed`, exit code `0`.
+- Full Core: `193 collected / 192 passed / 1 skipped`, exit code `0`; symlink skip and pytest temp cleanup warning remain explicitly environment-limited.
+- `validate_baseline.py`: PASS, exit code `0`.
+- `git diff --check`: clean, exit code `0`.
+
+### Next
+
+Prepare WP-12 task scope and acceptance tests. Preserve ADR-001–010, WP-11 contract tests, Browser E2E `UNVERIFIED/SKIPPED`, Windows symlink `UNVERIFIED/SKIPPED`, and concurrent HTTP `UNVERIFIED` records.
