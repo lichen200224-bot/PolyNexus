@@ -15,6 +15,12 @@ from typing import Sequence
 
 from sqlalchemy.orm import Session
 
+from polynexus_core.errors import (
+    ClaimConflictError,
+    ContractViolationError,
+    ResourceNotFoundError,
+    RunNotFoundError,
+)
 from polynexus_core.domain.models import (
     ContextPackage,
     Finding,
@@ -114,6 +120,118 @@ class ExecutionService:
         self._session.commit()
 
         return execution
+
+    async def execute_existing_run(self, run_id: str) -> RunExecution:
+        """Execute an existing persisted Run through the full lifecycle.
+
+        Flow:
+          1. Load and validate all references (no CAS yet).
+          2. CAS claim: CREATED → STARTING, commit immediately.
+          3. Execute via RunSupervisor (starting from STARTING state).
+          4. Persist all runtime outputs.
+
+        The CAS claim and the CREATED→STARTING event are committed in the
+        same atomic transaction BEFORE the runtime adapter is invoked.
+        Validation happens before the claim so no adapter work is wasted
+        on an invalid Run.
+
+        RunSupervisor is the sole lifecycle owner for FAILED transitions.
+        ExecutionService only persists the final state.
+
+        Raises:
+            RunNotFoundError: if Run does not exist.
+            ResourceNotFoundError: if Task or ContextPackage not found.
+            ContractViolationError: if project/workflow mismatch.
+            ClaimConflictError: if CAS claim fails.
+        """
+        # --- Phase 1: Validate all references (no CAS yet) ---
+        run = self._run_repo.get(run_id)
+        if run is None:
+            raise RunNotFoundError(f"Run {run_id} not found")
+
+        task = self._task_repo.get(run.task_id)
+        if task is None:
+            raise ResourceNotFoundError(f"Task {run.task_id} not found")
+
+        context = self._cp_repo.get(run.context_package_id)
+        if context is None:
+            raise ResourceNotFoundError(f"ContextPackage {run.context_package_id} not found")
+
+        if task.project_id != context.project_id:
+            raise ContractViolationError("Task and ContextPackage belong to different projects")
+
+        if run.workflow_id != task.workflow_id or run.workflow_version != task.workflow_version:
+            raise ContractViolationError("Run workflow reference does not match Task workflow")
+
+        workflow = self._load_workflow(run.workflow_id, run.workflow_version)
+
+        # --- Phase 2: CAS claim + commit (atomic, separate transaction) ---
+        claimed = self._run_repo.claim_for_execution(run_id)
+        if not claimed:
+            raise ClaimConflictError(
+                f"Run {run_id} is not in CREATED state (current: {run.state.value})"
+            )
+
+        # Persist the CREATED→STARTING event and commit the claim
+        from polynexus_core.domain.enums import RunState
+        from polynexus_core.domain.models import RunEvent
+        claim_event = RunEvent(
+            run_id=run_id,
+            from_state=RunState.CREATED,
+            to_state=RunState.STARTING,
+        )
+        self._run_repo.append_event(claim_event)
+        self._session.commit()
+
+        # Reload the Run (now in STARTING state, with claim event committed)
+        run = self._run_repo.get(run_id)
+        assert run is not None
+
+        # --- Phase 3: Execute via RunSupervisor ---
+        adapter = ReferenceRuntimeAdapter()
+        supervisor = RunSupervisor(adapter)
+
+        # Supervisor is the sole lifecycle owner — it catches runtime-boundary
+        # failures internally, transitions to FAILED with sanitized reason,
+        # and returns RunExecution with result=None on failure.
+        # Programmer/domain validation errors (ValueError) propagate to caller.
+        execution = await supervisor.execute_claimed_run(run, task, context, workflow)
+
+        # --- Phase 4: Persist runtime outputs ---
+        # Always persist the Run state and events.
+        self._run_repo.update(execution.run)
+
+        # Only persist Finding/Evidence/Artifact when runtime produced a real result.
+        # When result is None, the runtime failed before producing outputs —
+        # do not fabricate any Finding/Evidence/Artifact.
+        if execution.result is not None:
+            for finding in execution.findings:
+                self._finding_repo.add(finding)
+            for evidence in execution.evidence:
+                self._evidence_repo.add(evidence)
+            for artifact in execution.artifacts:
+                self._artifact_repo.add(artifact)
+
+        self._session.commit()
+
+        return execution
+
+    def _persist_run_update(self, execution: RunExecution) -> None:
+        """Persist updated Run, Evidence, Finding, Artifact through repositories."""
+        # Update the Run (state, events, result)
+        self._run_repo.update(execution.run)
+
+        # Persist Finding
+        for finding in execution.findings:
+            self._finding_repo.add(finding)
+
+        # Persist Evidence
+        for evidence in execution.evidence:
+            self._evidence_repo.add(evidence)
+
+        # Persist Artifact
+        for artifact in execution.artifacts:
+            self._artifact_repo.add(artifact)
 
     def _load_workflow(self, workflow_id: str, workflow_version: int) -> WorkflowDefinition:
         """Load a workflow from builtin YAML and validate it matches the task reference.

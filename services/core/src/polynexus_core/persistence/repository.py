@@ -342,6 +342,22 @@ class RunRepository(ABC):
     @abstractmethod
     def update(self, run: Run) -> None: ...
 
+    @abstractmethod
+    def claim_for_execution(self, run_id: str) -> bool:
+        """Atomically claim a Run for execution using CAS.
+
+        Executes: UPDATE runs SET state = 'STARTING' WHERE id = :run_id AND state = 'CREATED'
+        Returns True if the claim succeeded (1 row updated), False if another caller
+        already claimed the Run or the Run is not in CREATED state.
+
+        This is a one-winner mechanism — two sessions calling simultaneously will
+        produce at most one successful claim.
+        """
+
+    @abstractmethod
+    def append_event(self, event: RunEvent) -> None:
+        """Append a single RunEvent to the database (used for claim event persistence)."""
+
 
 class RunEventRepository(ABC):
     @abstractmethod
@@ -496,6 +512,32 @@ class SqlRunRepository(RunRepository):
         for event in run.events:
             if event.id not in existing_event_ids:
                 self._s.add(_event_to_row(event))
+
+    def claim_for_execution(self, run_id: str) -> bool:
+        """Atomically claim a Run for execution using CAS.
+
+        Executes: UPDATE runs SET state = 'STARTING' WHERE id = :run_id AND state = 'CREATED'
+        Returns True if the claim succeeded (1 row updated), False if another caller
+        already claimed the Run or the Run is not in CREATED state.
+
+        This is a one-winner mechanism — two sessions calling simultaneously will
+        produce at most one successful claim.
+        """
+        from sqlalchemy import update as sa_update
+
+        stmt = (
+            sa_update(RunRow)
+            .where(RunRow.id == run_id, RunRow.state == RunState.CREATED.value)
+            .values(state=RunState.STARTING.value)
+        )
+        result = self._s.execute(stmt)
+        self._s.flush()
+        return result.rowcount == 1
+
+    def append_event(self, event: RunEvent) -> None:
+        """Append a single RunEvent to the database."""
+        self._s.add(_event_to_row(event))
+        self._s.flush()
 
 
 class SqlRunEventRepository(RunEventRepository):

@@ -1,7 +1,8 @@
-"""Run API endpoints — persistence-backed CRUD via Repository boundary.
+"""Run API endpoints — persistence-backed CRUD and execution via Repository boundary.
 
 Run creation only persists a CREATED record; it does NOT start the runtime,
-RunSupervisor, or RuntimeAdapter.
+RunSupervisor, or RuntimeAdapter.  The execute command triggers the full
+lifecycle on an existing persisted Run.
 """
 
 from __future__ import annotations
@@ -9,6 +10,12 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException, status
 
 from polynexus_core.api.dependencies import AuthLoopback, DbSession
+from polynexus_core.errors import (
+    ClaimConflictError,
+    ContractViolationError,
+    ResourceNotFoundError,
+    RunNotFoundError,
+)
 from polynexus_core.api.schemas import (
     RunCreate,
     RunEventResponse,
@@ -16,7 +23,9 @@ from polynexus_core.api.schemas import (
     RunResponse,
     RunResultResponse,
 )
+from polynexus_core.domain.enums import RunState
 from polynexus_core.domain.models import Run
+from polynexus_core.execution_service import ExecutionService
 from polynexus_core.persistence.repository import (
     SqlContextPackageRepository,
     SqlRunRepository,
@@ -152,3 +161,107 @@ def get_run(
             detail=f"Run {run_id} not found",
         )
     return _run_to_response(run)
+
+
+# ---------------------------------------------------------------------------
+# Execute — POST /runs/{run_id}/execute
+# ---------------------------------------------------------------------------
+
+# Terminal states that return 200 (immutable, do not restart)
+_TERMINAL_STATES = {
+    RunState.COMPLETED,
+    RunState.FAILED,
+    RunState.TIMED_OUT,
+    RunState.CANCELLED,
+    RunState.ORPHANED,
+}
+
+# Active states that return 202 idempotently (no duplicate runtime)
+_ACTIVE_STATES = {RunState.STARTING, RunState.RUNNING}
+
+
+@router.post(
+    "/runs/{run_id}/execute",
+    response_model=RunResponse,
+)
+async def execute_run(
+    run_id: str,
+    _auth: AuthLoopback,
+    db: DbSession,
+) -> RunResponse:
+    """Execute an existing persisted Run through the full lifecycle.
+
+    Idempotency matrix:
+      - CREATED: accept once via CAS claim, return 202
+      - STARTING/RUNNING: return 202, no duplicate runtime
+      - COMPLETED/FAILED/TIMED_OUT/CANCELLED/ORPHANED: return 200
+      - CANCEL_REQUESTED: return 409
+    """
+    from fastapi.responses import JSONResponse
+
+    run_repo = SqlRunRepository(db)
+    run = run_repo.get(run_id)
+    if run is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Run {run_id} not found",
+        )
+
+    # Lifecycle guard — CANCEL_REQUESTED
+    if run.state is RunState.CANCEL_REQUESTED:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Run {run_id} is in CANCEL_REQUESTED state",
+        )
+
+    # Terminal states — return current Run with 200
+    if run.state in _TERMINAL_STATES:
+        return _run_to_response(run)
+
+    # Active states — return current Run with 202, no duplicate runtime
+    if run.state in _ACTIVE_STATES:
+        return JSONResponse(
+            status_code=status.HTTP_202_ACCEPTED,
+            content=_run_to_response(run).model_dump(mode="json"),
+        )
+
+    # CREATED — execute the Run via CAS claim
+    assert run.state is RunState.CREATED, f"Unexpected state: {run.state}"
+
+    service = ExecutionService(db)
+    try:
+        execution = await service.execute_existing_run(run_id)
+    except RunNotFoundError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(exc),
+        )
+    except ResourceNotFoundError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str(exc),
+        )
+    except ContractViolationError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str(exc),
+        )
+    except ClaimConflictError as exc:
+        # Reload to determine current state for idempotent response
+        run = run_repo.get(run_id)
+        if run is not None and run.state in _TERMINAL_STATES:
+            return _run_to_response(run)
+        return JSONResponse(
+            status_code=status.HTTP_409_CONFLICT,
+            content=_run_to_response(run).model_dump(mode="json") if run else {"detail": str(exc)},
+        )
+
+    # Reload from DB to ensure persisted state
+    run = run_repo.get(run_id)
+    assert run is not None
+
+    # First execution of a CREATED Run returns 202 per contract
+    return JSONResponse(
+        status_code=status.HTTP_202_ACCEPTED,
+        content=_run_to_response(run).model_dump(mode="json"),
+    )
