@@ -1,26 +1,28 @@
 # Current Handoff
 
 ## Task
-WP-11 — Discuss / Review / Validate work-mode semantics and contract tests (CP-03 Core product baseline)
+WP-12 — Council, Cross Review, Synthesis, and Partial Failure Semantics (CP-03 Core product baseline)
 
 ## Status
 Previous: WP-10 — ACCEPTED (Attempt 1); Codex deterministic acceptance PASS and Human acceptance recorded on 2026-08-20.
-Current: WP-11 — ACCEPTED (Attempt 4); Codex review PASS and Human acceptance recorded on 2026-08-20.
-Next: Prepare WP-12 task scope and acceptance tests; WP-11 item progress is 100%.
+Previous: WP-12 — Attempt 6 READY_FOR_CODEX_REVIEW; Codex independent review returned FAIL with 2 MAJOR issues (non-COMPLETED Run mislabeled COMPLETED; sanitized failure breaking Run event lifecycle).
+Previous: WP-12 — Attempt 7 READY_FOR_CODEX_REVIEW; Codex independent re-review returned FAIL with 2 further MAJOR issues (raw status.error leaked into persisted run.result; generic exception handler rewrote an already-terminal TIMED_OUT/CANCELLED participant to FAILED).
+Current: WP-12 — Attempt 8 READY_FOR_CODEX_REVIEW (both Attempt-7 MAJOR issues fixed; new deterministic tests for result-leak and terminal-state consistency added).
+Next: Codex independently re-reviews WP-12 implementation and evidence; then Human acceptance.
 
 Acceptance repair log: `docs/27_ACCEPTANCE_REPAIR_LOG.md`
 
-Task document: `docs/tasks/WP-11.md`; roadmap: `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`; accepted dependencies: `docs/tasks/WP-10.md` (CP-02 closed; 30/100 project, 22/22 FVS), `docs/tasks/WP-08A.md`, `docs/tasks/WP-09B.md`, `docs/tasks/WP-09C.md`.
+Task document: `docs/tasks/WP-12.md`; roadmap: `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`; accepted dependencies: `docs/tasks/WP-10.md`, `docs/tasks/WP-11.md` (CP-02 closed; 30/100 project, 22/22 FVS), `docs/tasks/WP-08A.md`, `docs/tasks/WP-09B.md`, `docs/tasks/WP-09C.md`.
 Historical task document: `docs/tasks/WP-10.md`
 
 ## Active Writer
-None — WP-11 accepted; WP-12 planning pending. The WP-11 writer was OpenCode.
+OpenCode — WP-12 contract tests implemented (Attempt 6), `services/core/src/polynexus_core/council/` and `services/core/tests/test_wp12_council.py` added; awaiting Codex review.
 
 ## Reviewer
-Codex — WP-11 independent review PASS; Human acceptance recorded on 2026-08-20.
+Codex — WP-12 independent review after implementation; Human acceptance required.
 
 ## Antigravity
-`NOT_REQUIRED` — Core/API contract task; no Browser E2E in WP-11 scope. Browser DOM / Playwright E2E remains `UNVERIFIED/SKIPPED`.
+`NOT_REQUIRED` — Core orchestration/contract task; no Browser E2E in WP-12 scope. Browser DOM / Playwright E2E remains `UNVERIFIED/SKIPPED`.
 
 ## Starting Branch
 feature/first-vertical-slice
@@ -1165,4 +1167,371 @@ Excluded and left untouched: `docs/15_DOCUMENT_INDEX.md` (pre-existing dirty gov
 
 ### Next
 
-Prepare WP-12 task scope and acceptance tests. Preserve ADR-001–010, WP-11 contract tests, Browser E2E `UNVERIFIED/SKIPPED`, Windows symlink `UNVERIFIED/SKIPPED`, and concurrent HTTP `UNVERIFIED` records.
+WP-12 task scope and acceptance tests are prepared below. OpenCode implementation is next. Preserve ADR-001–010, WP-11 contract tests, Browser E2E `UNVERIFIED/SKIPPED`, Windows symlink `UNVERIFIED/SKIPPED`, and concurrent HTTP `UNVERIFIED` records.
+
+## WP-12 Task Document Creation (Attempt 1) — READY_FOR_IMPLEMENTATION
+
+- `TASK_ID`: `WP-12`
+- `ATTEMPT`: `1`
+- `BRANCH`: `feature/first-vertical-slice`
+- `WRITER`: `OpenCode`
+- `REVIEWER`: `Codex`
+- `ANTIGRAVITY_STATUS`: `NOT_REQUIRED` — Core orchestration/contract task; no Browser E2E scope
+- `NEXT_OWNER`: `OpenCode` implementation → `Codex` review → `Human` acceptance
+- `TASK_DOC`: `docs/tasks/WP-12.md`
+- `STATUS`: `READY_FOR_IMPLEMENTATION`
+- `GOAL`: Council 2–4 participant orchestration with independent analysis, Cross Review, Synthesis, bounded execution, and truthful partial-failure semantics.
+- `ITEM_PROGRESS`: `0%` until implementation, deterministic tests, Codex PASS, and Human acceptance.
+- `PROJECT_PROGRESS`: `30/100`; accepted FVS `22/22`; CP-03 `IN_PROGRESS`. No standalone WP-11 point allocation is defined; no unsupported points are added.
+
+### Changed files for task preparation
+
+- Modified: `docs/11_PROJECT_STATE.md`
+- Modified: `docs/12_HANDOFF_CURRENT.md`
+- Modified: `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`
+- Untracked: `docs/tasks/WP-12.md`
+- Pre-existing and excluded: `docs/15_DOCUMENT_INDEX.md`
+- Product source, tests, ADRs, migrations, frontend, and dependencies: unchanged.
+
+### Protected areas and architecture gate
+
+- ADR-001–010, WP-08A/B, WP-09B/C/D, WP-11 WorkMode contract, Run lifecycle, evidence/secret boundaries, and Browser waiver remain protected.
+- Preferred implementation uses existing WorkflowDefinition, PARALLEL_AI/CROSS_REVIEW/SYNTHESIS, Task/Run, RunEvent, Evidence, and repository boundaries.
+- New Domain entities, migrations, public REST contracts, RunState/WorkMode/Evidence authority changes, or WP-09B lifecycle changes require `NEED_ACTION` and a recorded Human/Codex architecture decision before source changes.
+
+### Verification for task preparation
+
+- `git diff --check` — PASS, exit code `0`.
+- `git status --short --branch` — branch `feature/first-vertical-slice`; only pre-existing `docs/15_DOCUMENT_INDEX.md` plus the three governance modifications and new `docs/tasks/WP-12.md`.
+- No product source or test command was changed or run by this document-only preparation step.
+
+### Known limitations / unverified
+
+- Browser DOM / Playwright E2E: `UNVERIFIED/SKIPPED` and not a WP-12 gate.
+- Windows symlink containment: `UNVERIFIED/SKIPPED` under the accepted Human waiver.
+- True concurrent HTTP duplicate-command execution: `UNVERIFIED`.
+- No production/vendor Council runtime is certified; reference/test adapters must remain deterministic and no-network.
+
+### Next
+
+OpenCode reads `docs/tasks/WP-12.md`, performs the architecture compatibility check, implements only the approved scope, runs the listed tests, updates this handoff with actual evidence, and returns `READY_FOR_CODEX_REVIEW`. No stage/commit/push without later Human authorization.
+
+## WP-12 Implementation (Attempt 6) — READY_FOR_CODEX_REVIEW
+
+- `TASK_ID`: `WP-12`
+- `STATUS`: `READY_FOR_CODEX_REVIEW`
+- `ATTEMPT`: `6`
+- `BRANCH`: `feature/first-vertical-slice`
+- `WRITER`: `OpenCode`
+- `REVIEWER`: `Codex`
+- `ANTIGRAVITY_STATUS`: `NOT_REQUIRED`
+- `NEXT_OWNER`: `Codex` (independent review) → `Human` (acceptance)
+
+### Goal
+
+Implement and verify the first durable Council orchestration contract for three top-level work modes. Council supports independent participant analysis, cross review, synthesis, and truthful partial-failure representation without fabricating AI opinion into verified evidence.
+
+### Architecture compatibility (PASSED)
+
+Council is implemented additively using existing Task/Run/RunEvent/Evidence boundaries. No new persisted table, migration, REST endpoint, RunState, WorkMode, EvidenceType, or WP-09B lifecycle change is required.
+
+- Participant analysis = Run executed via RunSupervisor + ReferenceRuntimeAdapter (no network)
+- Cross-review = additional Run per completed participant
+- Synthesis = final Run with AI_OPINION Evidence (not VERIFIED)
+- Stage ordering/participant correlation = RunEvents on council run
+- Plan durability = CouncilPlan stored as DOCUMENT_EVIDENCE
+
+### Changed files
+
+Modified:
+- `docs/11_PROJECT_STATE.md` — sync WP-12 status
+- `docs/12_HANDOFF_CURRENT.md` — WP-12 implementation handoff
+- `docs/28_MASTER_DEVELOPMENT_ROADMAP.md` — WP-12 row → READY_FOR_CODEX_REVIEW
+
+Untracked (new):
+- `services/core/src/polynexus_core/council/__init__.py` — package exports
+- `services/core/src/polynexus_core/council/models.py` — CouncilPlan (adds `round` + runtime `max_concurrency_observed`), CouncilParticipant, CouncilSpec, CouncilStage, ParticipantOutcome
+- `services/core/src/polynexus_core/council/orchestrator.py` — CouncilOrchestrator (run_council, rerun_council, reload_council); bounded-parallel analysis via `asyncio.gather` + `asyncio.Semaphore` + per-participant isolated sessions, serialized SQLite persistence via `asyncio.Lock`
+- `services/core/tests/test_wp12_council.py` — **36 contract tests** covering all WP-12 acceptance criteria (2 added in Attempt 6: timeout isolation, failure sanitization)
+- `docs/tasks/WP-12.md` — task document
+
+Pre-existing (excluded):
+- `docs/15_DOCUMENT_INDEX.md` — pre-existing dirty state, excluded from commit
+
+Stage allowlist / exclusions (Attempt 6):
+- `__pycache__/*.pyc` (and any `*.pyc`) are **explicitly excluded** from changed-files and from any stage allowlist. The `council/` directory is enumerated **per source file** (above), never staged as a whole directory blob, so generated artifacts can never be swept in.
+
+### Verification (Attempt 6 — actual evidence; statistics from this round's command output)
+
+- `pytest -q services/core/tests/test_wp12_council.py` → **36 passed**, exit code `0`
+- `pytest -q services/core/tests/test_wp09_execution_api.py services/core/tests/test_wp09_query_api.py` → **passed**, exit code `0`
+- `pytest -q services/core` → **229 collected, 228 passed, 1 skipped**, exit code `0`
+- `python scripts/validate_baseline.py` → **Baseline validation PASS**, exit code `0`
+- `git diff --check` → clean, exit code `0`
+- `git status --short --branch` → M docs/11_PROJECT_STATE.md, M docs/12_HANDOFF_CURRENT.md, M docs/15_DOCUMENT_INDEX.md (pre-excluded), M docs/28_MASTER_DEVELOPMENT_ROADMAP.md, ?? docs/tasks/WP-12.md, ?? services/core/src/polynexus_core/council/__init__.py, ?? services/core/src/polynexus_core/council/models.py, ?? services/core/src/polynexus_core/council/orchestrator.py, ?? services/core/tests/test_wp12_council.py; exit code `0`
+
+### Protected areas
+
+- ADR-001–010 (frozen; no change)
+- RunState lifecycle rules in `run_lifecycle.py` (not modified; orchestrator respects them)
+- WP-08A/B, WP-09B/C/D contracts and frontend baseline
+- Migrations, dependencies, secrets, apps/web unchanged
+
+### ADR impact
+
+`NONE` — Council uses existing Run/RunEvent/Evidence boundaries; no enum, schema, persistence, or ADR change.
+
+### Scope deviation
+
+`NONE` — implementation stays within the approved WP-12 task document scope.
+
+### Known limitations
+
+- Browser DOM / Playwright E2E: `UNVERIFIED/SKIPPED`
+- Windows symlink containment: `UNVERIFIED/SKIPPED`
+- True concurrent HTTP duplicate-command execution: `UNVERIFIED`
+- No production/vendor Council runtime certified; reference/test adapters remain deterministic and no-network
+
+### Next
+
+Codex independently reviews `services/core/tests/test_wp12_council.py` and the deterministic evidence (WP-12 36 passed, full Core 229 collected/228 passed/1 skipped, validate_baseline PASS, git diff/status clean). If Codex returns `PASS`, Human may authorize stage/commit/push and accept WP-12. Do not stage, commit, or push without explicit Human authorization. Generated `__pycache__/*.pyc` are excluded from any stage allowlist; the `council/` directory is listed per source file.
+
+## WP-12 Attempt 7 — Codex FAIL repair (READY_FOR_CODEX_REVIEW)
+
+- `TASK_ID`: `WP-12`
+- `ATTEMPT`: `7`
+- `STATUS`: `READY_FOR_CODEX_REVIEW`
+- `BRANCH`: `feature/first-vertical-slice`
+- `WRITER`: `OpenCode`
+- `REVIEWER`: `Codex`
+- `ANTIGRAVITY_STATUS`: `NOT_REQUIRED`
+- `NEXT_OWNER`: `Codex` (independent re-review) → `Human` (acceptance)
+
+### Codex FAIL → fix summary
+
+Codex review of Attempt 6 returned `FAIL` with two MAJOR issues. Both are fixed in Attempt 7.
+
+**MAJOR Issue 1 — non-COMPLETED Run mislabeled COMPLETED.**
+
+`CouncilOrchestrator._run_analysis_stage()` previously unconditionally set
+`participant.outcome = COMPLETED`, `participant.output_ref = run.id`, and
+`evidence_to_persist = execution.evidence` after `RunSupervisor.execute_run()`
+returned. `execute_run()` may return `RunExecution` with
+`run.state in {FAILED, TIMED_OUT, CANCELLED}`.
+
+Fix (`services/core/src/polynexus_core/council/orchestrator.py`):
+- `RunState.COMPLETED` → `ParticipantOutcome.COMPLETED`, set `output_ref`, persist execution evidence only.
+- `RunState.FAILED` → `ParticipantOutcome.FAILED` + sanitized fixed reason; no `output_ref`.
+- `RunState.TIMED_OUT` → `ParticipantOutcome.TIMED_OUT` + sanitized fixed reason; no `output_ref`.
+- `RunState.CANCELLED` → `ParticipantOutcome.CANCELLED` + sanitized fixed reason; no `output_ref`.
+- Unexpected intermediate state → contained as FAILED.
+- Non-COMPLETED participants never set `output_ref`, never enter Cross Review (the cross-review stage only selects `outcome is COMPLETED`), and never produce fabricated consensus (synthesis stays truthful partial or truthful failed).
+
+**MAJOR Issue 2 — sanitized failure breaking Run event lifecycle.**
+
+`_apply_sanitized_failure()` previously did `run.state = RunState.FAILED` directly and
+only replaced an already-existing FAILED event. When the adapter-boundary exception
+occurred while the Run was still CREATED/STARTING/RUNNING (no FAILED event), the
+persisted Run state became FAILED while the last event stayed RUNNING, violating
+ADR-007 durable event history.
+
+Fix (`services/core/src/polynexus_core/council/orchestrator.py`):
+- Added `_sanitize_terminal_reason(run, reason)` to replace the reason on an
+  already-legal terminal event (FAILED/TIMED_OUT/CANCELLED) while preserving the
+  original event id / occurred_at / ordering and terminal state. Used for terminal
+  states returned by `execute_run()` (whose reason may come from raw `status.error`).
+- Rewrote `_apply_sanitized_failure(run, reason)`:
+  - If `run.state in {COMPLETED, TIMED_OUT, CANCELLED}` → returns WITHOUT regressing
+    a terminal Run to FAILED (lifecycle protected).
+  - If a raw FAILED event already exists → sanitizes it in place (id/occurred_at/order preserved).
+  - Otherwise applies the legal lifecycle CREATED→STARTING→RUNNING→FAILED (or the
+    available prefix) so exactly one FAILED terminal event is appended and
+    `state`/`updated_at` stay consistent with the last event.
+
+**Supervisor hardening (WP-09B scope impact noted).**
+
+`services/core/src/polynexus_core/runtime/supervisor.py::execute_run()` previously
+called `version_info()` inside `_build_execution_from_existing()` *after* the
+`COMPLETED` transition, so a `version_info()` failure could leave a COMPLETED event
+with the Run state later regressed to FAILED. Aligned `execute_run()` with the
+already-safe `execute_claimed_run()` pattern: fetch `runtime_version` via a guarded
+`try/except` *before* `run.transition(RunState.COMPLETED)`, transitioning to FAILED
+with the public-safe reason on failure. No new RunState/EvidenceType/migration/contract.
+
+### Changed files (Attempt 7)
+
+Modified (product source):
+- `services/core/src/polynexus_core/council/orchestrator.py` — `_run_analysis_stage` outcome mapping; rewritten `_apply_sanitized_failure`; new `_sanitize_terminal_reason`.
+- `services/core/src/polynexus_core/runtime/supervisor.py` — `execute_run()` fetches `version_info()` before COMPLETED (mirrors `execute_claimed_run`).
+
+Modified (governance):
+- `docs/11_PROJECT_STATE.md`
+- `docs/12_HANDOFF_CURRENT.md`
+- `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`
+- `docs/tasks/WP-12.md`
+
+Untracked (new/changed):
+- `docs/tasks/WP-12.md`
+- `services/core/src/polynexus_core/council/` (package: `__init__.py`, `models.py`, `orchestrator.py`)
+- `services/core/tests/test_wp12_council.py` — now **43 contract tests** (7 new deterministic adapter-boundary failure tests, each verifying close/reopen reload, state/terminal-event consistency, single terminal event, no raw secret, no fabricated Finding/Evidence/Artifact, failed participant without `output_ref`, no Cross Review entry, truthful partial/failed synthesis).
+
+Pre-existing (excluded):
+- `docs/15_DOCUMENT_INDEX.md` — pre-existing dirty state, excluded from commit.
+
+### Verification (Attempt 7 — actual evidence; statistics from this round's command output)
+
+- `pytest -q services/core/tests/test_wp12_council.py` → **43 passed**, exit code `0`
+- `pytest -q services/core/tests/test_wp09_execution_api.py services/core/tests/test_wp09_query_api.py` → **passed**, exit code `0`
+- `pytest -q services/core` → **236 collected, 235 passed, 1 skipped**, exit code `0`
+- `python scripts/validate_baseline.py` → **Baseline validation PASS**, exit code `0`
+- `git diff --check` → clean, exit code `0`
+- `git status --short --branch` → M docs/11/12/15/28, M services/core/src/polynexus_core/runtime/supervisor.py, ?? docs/tasks/WP-12.md, ?? services/core/src/polynexus_core/council/, ?? services/core/tests/test_wp12_council.py; exit code `0`
+
+(The pytest temp-dir `PermissionError` at interpreter exit is a non-fatal Windows
+environment warning; all test commands returned exit code `0`.)
+
+### Protected areas
+
+- ADR-001–010 (frozen; no change)
+- RunState lifecycle rules in `run_lifecycle.py` (not modified; orchestrator respects them)
+- WP-08A/B, WP-09B/C/D contracts and frontend baseline
+- Migrations, dependencies, secrets, apps/web unchanged
+- No new RunState / WorkMode / EvidenceType / REST endpoint / migration introduced
+
+### ADR impact
+
+`NONE` — Council uses existing Run/RunEvent/Evidence boundaries; the supervisor change
+is an internal lifecycle hardening that mirrors the already-accepted `execute_claimed_run`
+pattern (WP-09B Attempt 5). No enum, schema, persistence, or ADR text change.
+
+### Scope deviation
+
+`NONE` for product source. The supervisor `execute_run()` change is within WP-09B
+runtime-adapter lifecycle containment scope and was required to satisfy Issue 2
+("version_info() 若可能在完成後失敗… 在 terminal completion 前先取得"); documented here per the
+handoff rule requiring explicit scope-impact disclosure for WP-09B supervisor edits.
+
+### Known limitations
+
+- Browser DOM / Playwright E2E: `UNVERIFIED/SKIPPED`
+- Windows symlink containment: `UNVERIFIED/SKIPPED`
+- True concurrent HTTP duplicate-command execution: `UNVERIFIED`
+- No production/vendor Council runtime certified; reference/test adapters remain deterministic and no-network
+
+### Next
+
+Codex independently re-reviews the Attempt 7 fixes and the new deterministic boundary
+tests. If Codex returns `PASS`, Human may authorize stage/commit/push and accept WP-12.
+Do not stage, commit, or push without explicit Human authorization. Generated
+`__pycache__/*.pyc` are excluded from any stage allowlist.
+
+## WP-12 Attempt 8 — Codex FAIL repair (READY_FOR_CODEX_REVIEW)
+
+- `TASK_ID`: `WP-12`
+- `ATTEMPT`: `8`
+- `STATUS`: `READY_FOR_CODEX_REVIEW`
+- `BRANCH`: `feature/first-vertical-slice`
+- `WRITER`: `OpenCode`
+- `REVIEWER`: `Codex`
+- `ANTIGRAVITY_STATUS`: `NOT_REQUIRED`
+- `NEXT_OWNER`: `Codex` (independent re-review) → `Human` (acceptance)
+
+### Codex FAIL → fix summary (Attempt 7 → Attempt 8)
+
+Codex review of Attempt 7 returned `FAIL` with two further MAJOR issues. Both fixed in Attempt 8.
+
+**MAJOR Issue 1 — raw `status.error` leaked into persisted `run.result`.**
+
+`RunSupervisor.execute_run()` returned `RuntimeResult(summary=status.error or status.state)`
+for `FAILED`/`TIMED_OUT` terminal statuses, and `SqlRunRepository` persisted
+`run.result.summary` into `RunRow.result_summary` (raw secret). The orchestrator
+previously only sanitized the terminal event reason and set `evidence_to_persist` to
+empty, but left `run.result` populated.
+
+Fix (`services/core/src/polynexus_core/council/orchestrator.py`): in the analysis
+`else` branch, every non-`COMPLETED` outcome (`FAILED`/`TIMED_OUT`/`CANCELLED` and the
+fallback) now sets `run.result = None` before persistence. The sanitized terminal event
+reason is preserved. No dangling `finding_ids`/`evidence_ids`/`artifact_ids` survive
+because `run.result` is `None` (the repository serializes those from `run.result`).
+`evidence_to_persist` remains empty, so no `RUNTIME_EVIDENCE` is written for failed runs.
+
+**MAJOR Issue 2 — generic exception handler rewrote an already-terminal TIMED_OUT/CANCELLED participant to FAILED.**
+
+The generic `except Exception` handler unconditionally called `_apply_sanitized_failure`
+(running its no-regress guard) and set `ParticipantOutcome.FAILED`. When
+`status()` returned `TIMED_OUT`/`CANCELLED` and a *later* boundary (`version_info()`)
+raised inside `RunSupervisor._build_execution_from_existing`, `run.state` was already
+`TIMED_OUT`/`CANCELLED`; the participant outcome became `FAILED` while the Run stayed
+`TIMED_OUT`/`CANCELLED` — inconsistent.
+
+Fix (`services/core/src/polynexus_core/council/orchestrator.py`): the generic handler
+now maps the participant outcome to the Run's ACTUAL terminal state:
+- `run.state == FAILED` → `ParticipantOutcome.FAILED` + sanitized FAILED reason
+- `run.state == TIMED_OUT` → `ParticipantOutcome.TIMED_OUT` + sanitized timeout reason
+- `run.state == CANCELLED` → `ParticipantOutcome.CANCELLED` + sanitized cancel reason
+- `CREATED`/`STARTING`/`RUNNING` → legal lifecycle to a single FAILED terminal event
+In all branches `run.result` is set to `None`. An already-terminal `TIMED_OUT`/`CANCELLED`
+Run is never regressed to `FAILED`, and its terminal event reason is sanitized in place
+(id/occurred_at/order preserved).
+
+### Changed files (Attempt 8)
+
+Modified (product source):
+- `services/core/src/polynexus_core/council/orchestrator.py` — analysis `else` branch nulls `run.result` for non-COMPLETED; generic exception handler maps outcome to `run.state`.
+
+Modified (governance):
+- `docs/11_PROJECT_STATE.md`
+- `docs/12_HANDOFF_CURRENT.md`
+- `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`
+- `docs/tasks/WP-12.md`
+
+Untracked (new/changed):
+- `docs/tasks/WP-12.md`
+- `services/core/src/polynexus_core/council/` (`__init__.py`, `models.py`, `orchestrator.py`)
+- `services/core/tests/test_wp12_council.py` — now **45 contract tests** (2 new: `test_status_error_not_persisted_in_result` [parametrized FAILED/TIMED_OUT with secret in status.error, close/reopen verified], `test_status_then_version_info_raises_keeps_terminal` [parametrized TIMED_OUT/CANCELLED with later version_info secret exception]; the 7 Attempt-7 boundary tests now also assert `child.result is None`).
+
+Pre-existing (excluded):
+- `docs/15_DOCUMENT_INDEX.md` — pre-existing dirty state, excluded from commit.
+
+### Verification (Attempt 8 — actual evidence)
+
+- `pytest -q services/core/tests/test_wp12_council.py` → **45 passed**, exit code `0`
+- `pytest -q services/core/tests/test_wp09_execution_api.py services/core/tests/test_wp09_query_api.py` → **passed**, exit code `0`
+- `pytest -q services/core` → **238 collected, 237 passed, 1 skipped**, exit code `0`
+- `python scripts/validate_baseline.py` → **Baseline validation PASS**, exit code `0`
+- `git diff --check` → clean, exit code `0`
+- `git status --short --branch` → M docs/11/12/15/28, M services/core/src/polynexus_core/runtime/supervisor.py, ?? docs/tasks/WP-12.md, ?? services/core/src/polynexus_core/council/, ?? services/core/tests/test_wp12_council.py; exit code `0`
+
+(The pytest temp-dir `PermissionError` at interpreter exit is a non-fatal Windows
+environment warning; all test commands returned exit code `0`.)
+
+### Protected areas
+
+- ADR-001–010 (frozen; no change)
+- RunState lifecycle rules in `run_lifecycle.py` (not modified; orchestrator respects them)
+- WP-08A/B, WP-09B/C/D contracts and frontend baseline
+- Migrations, dependencies, secrets, apps/web unchanged
+- No new RunState / WorkMode / EvidenceType / REST endpoint / migration introduced
+
+### ADR impact
+
+`NONE` — Council uses existing Run/RunEvent/Evidence boundaries; no enum, schema, persistence, or ADR text change.
+
+### Scope deviation
+
+`NONE` for product source. The `supervisor.py` change (version_info before COMPLETED) was made in Attempt 7 within WP-09B lifecycle-containment scope and remains in effect; no additional supervisor change in Attempt 8.
+
+### Known limitations
+
+- Browser DOM / Playwright E2E: `UNVERIFIED/SKIPPED`
+- Windows symlink containment: `UNVERIFIED/SKIPPED`
+- True concurrent HTTP duplicate-command execution: `UNVERIFIED`
+- No production/vendor Council runtime certified; reference/test adapters remain deterministic and no-network
+
+### Next
+
+Codex independently re-reviews the Attempt 8 fixes and the new deterministic tests
+(result-leak prevention; terminal-state/outcome consistency under a later boundary
+exception). If Codex returns `PASS`, Human may authorize stage/commit/push and accept
+WP-12. Do not stage, commit, or push without explicit Human authorization. Generated
+`__pycache__/*.pyc` are excluded from any stage allowlist.

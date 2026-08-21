@@ -35,9 +35,9 @@ First Vertical Slice target by 2026-09-06:
 - Final Python/Node dependency lock strategy after first local install.
 - CI provider/remote Git service only after approved environment is known.
 - Actual competition upload-form fields/demo requirement still require recheck before submission.
-
 ## Next Gate
-Prepare WP-12 task scope and acceptance tests for the CP-03 Core product baseline; WP-11 is accepted.
+
+WP-12 is `READY_FOR_CODEX_REVIEW` (Attempt 8, both Codex MAJOR issues from Attempt 7 fixed; 45 contract tests PASS); Codex independent re-review is next for the CP-03 Core product baseline.
 
 ## Current Development State
 
@@ -47,10 +47,10 @@ Next Phase: CP-03 Core product baseline — WP-11 accepted; WP-12 next; Browser 
 Current Branch: feature/first-vertical-slice
 Current Baseline Commit: 3a0237d (`feat(core): add WP-09C run output queries`)
 Latest FVS Checkpoint: 3a0237d (`feat(core): add WP-09C run output queries`)
-Current Planned Task: WP-12 — Council, parallel analysis, cross review, synthesis, and partial failures (WP-11 accepted)
-Active Writer: None — WP-11 accepted; WP-12 task scope/planning pending
-Reviewer: Codex — WP-11 independent review PASS; Human acceptance recorded on 2026-08-20
-Antigravity: NOT_REQUIRED for WP-11; Browser E2E UNVERIFIED/SKIPPED
+Current Planned Task: WP-12 — Council, parallel analysis, cross review, synthesis, and partial failures (READY_FOR_CODEX_REVIEW, Attempt 8; both Codex MAJOR issues from Attempt 7 fixed, 45 contract tests PASS)
+Active Writer: OpenCode — WP-12 contract tests implemented (Attempt 8), `services/core/src/polynexus_core/council/` and `services/core/tests/test_wp12_council.py` added; both Codex MAJOR issues from Attempt 7 fixed; awaiting Codex re-review
+Reviewer: Codex — WP-12 independent review after OpenCode implementation; Human acceptance required
+Antigravity: NOT_REQUIRED for WP-12; Browser E2E UNVERIFIED/SKIPPED
 
 Architecture:
 - ADR-001 through ADR-010 are CONFIRMED / FROZEN FOR V1 IMPLEMENTATION.
@@ -145,7 +145,7 @@ WP-10 final deterministic acceptance passed current Core, fresh-DB, frontend, ba
 
 ## Current Next Gate
 
-WP-09B, WP-09C, WP-09D, WP-10, and WP-11 are accepted. CP-02 is complete; WP-12 is the next gate for the CP-03 Core product baseline.
+WP-09B, WP-09C, WP-09D, WP-10, and WP-11 are accepted. CP-02 is complete; WP-12 is `READY_FOR_CODEX_REVIEW` (Attempt 8) and is the next gate for the CP-03 Core product baseline — awaiting Codex independent re-review after both Attempt-7 MAJOR issues were fixed.
 
 ## WP-09B Development Gate
 
@@ -192,3 +192,4 @@ WP-09B, WP-09C, WP-09D, WP-10, and WP-11 are accepted. CP-02 is complete; WP-12 
 - Scope deviation: `NONE`; pre-existing `docs/15_DOCUMENT_INDEX.md` remains unstaged and excluded.
 - Accepted project progress is **30/100 = 30%**; accepted FVS progress is **22/22 = 100%**; WP-10 earns **2/2 CP-02 points**.
 - CP-02 First Vertical Slice is complete. WP-11 is `ACCEPTED` (Attempt 4): Codex review PASS and Human acceptance recorded on 2026-08-20; `services/core/tests/test_wp11_work_mode.py` has 23 passed, full Core is `193 collected / 192 passed / 1 skipped`, and `validate_baseline.py` is PASS. WP-11 item progress is 100%. The roadmap does not define a standalone WP-11 point allocation inside CP-03, so accepted project progress remains **30/100** until that allocation is explicitly recorded; CP-03 is now in progress. Next owner: WP-12 planning.
+- WP-12 is `READY_FOR_CODEX_REVIEW` (Attempt 8): `services/core/src/polynexus_core/council/` and `services/core/tests/test_wp12_council.py` added (45 contract tests PASS), full Core 238 collected / 237 passed / 1 skipped, `validate_baseline.py` PASS. Attempt 8 fixed both Codex MAJOR issues from Attempt 7 (raw status.error leaked into persisted run.result; generic exception handler rewrote an already-terminal TIMED_OUT/CANCELLED participant to FAILED) and added 2 deterministic tests (result-leak prevention with close/reopen verification; terminal-state/outcome consistency when a later version_info() exception follows a TIMED_OUT/CANCELLED status). Architecture compatibility PASSED — Council uses existing Task/Run/RunEvent/Evidence boundaries. CP-03 item progress remains 0% until Codex review PASS and Human acceptance.

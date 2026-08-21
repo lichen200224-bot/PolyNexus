@@ -267,8 +267,24 @@ class RunSupervisor:
 
         runtime_result = await self._adapter.result(run.runtime_ref)
         adapter_artifacts = await self._adapter.artifacts(run.runtime_ref)
+        # Guarded success preparation: fetch runtime metadata BEFORE transitioning
+        # COMPLETED so a version_info failure cannot leave a COMPLETED event with a
+        # Run state that is later regressed to FAILED (ADR-007 lifecycle).
+        try:
+            runtime_version = self._adapter.version_info()
+        except Exception:
+            run.transition(RunState.FAILED, reason=_RUNTIME_FAILURE_REASON)
+            return RunExecution(
+                run=run,
+                result=None,
+                findings=(),
+                evidence=(),
+                artifacts=(),
+            )
         run.transition(RunState.COMPLETED)
-        return self._build_execution_from_existing(run, runtime_result, adapter_artifacts)
+        return self._build_execution_from_existing(
+            run, runtime_result, adapter_artifacts, runtime_version=runtime_version
+        )
 
     async def collect(self, session: RunSession) -> RunExecution:
         self._require_active(session)
