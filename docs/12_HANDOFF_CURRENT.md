@@ -1,28 +1,191 @@
 # Current Handoff
 
 ## Task
-WP-12 — Council, Cross Review, Synthesis, and Partial Failure Semantics (CP-03 Core product baseline)
+WP-13 — Workflow Hard Gates, Evidence_Check, Human Gate, and Verified Verdict Rules (CP-03 Core product baseline)
 
 ## Status
 Previous: WP-10 — ACCEPTED (Attempt 1); Codex deterministic acceptance PASS and Human acceptance recorded on 2026-08-20.
 Previous: WP-12 — Attempt 6 READY_FOR_CODEX_REVIEW; Codex independent review returned FAIL with 2 MAJOR issues (non-COMPLETED Run mislabeled COMPLETED; sanitized failure breaking Run event lifecycle).
 Previous: WP-12 — Attempt 7 READY_FOR_CODEX_REVIEW; Codex independent re-review returned FAIL with 2 further MAJOR issues (raw status.error leaked into persisted run.result; generic exception handler rewrote an already-terminal TIMED_OUT/CANCELLED participant to FAILED).
-Current: WP-12 — Attempt 8 READY_FOR_CODEX_REVIEW (both Attempt-7 MAJOR issues fixed; new deterministic tests for result-leak and terminal-state consistency added).
-Next: Codex independently re-reviews WP-12 implementation and evidence; then Human acceptance.
+Previous: WP-12 — Attempt 8 ACCEPTED; Codex PASS and Human acceptance recorded on 2026-08-21; commit `d6823d6` pushed to `backup/feature/first-vertical-slice`.
+Previous: WP-13 — Attempt 1 READY_FOR_CODEX_REVIEW; Codex independent review returned FAIL: FAIL not overriding PASS for same gate; terminal Runs could produce PASS; no Task/workflow identity/version validation; hard gate missing command/exit metadata validation; HUMAN_GATE not requiring HUMAN_DECISION status and actor attribution; persist_gate_report not idempotent; missing regression tests.
+Previous: WP-13 — Attempt 2 READY_FOR_CODEX_REVIEW; Codex independent review returned FAIL: gate evaluation not wired into execution path; persist/reload not truthfully updating stale verdicts; no tamper detection on reload; unverified actor prefixes not blocked for human gate; command metadata not validated for non-empty/non-whitespace; run.task_id not validated; missing persist→FAIL→re-evaluate and tamper tests.
+Previous: WP-13 — Attempt 3 READY_FOR_CODEX_REVIEW; Codex independent review returned FAIL: durable persist/reload not writing through persistence boundary; tamper detection only validates verdict vs evaluations; unverified actor prefix deny-list is not identity verification; HUMAN_GATE approve can still PASS with certain actors; WP-09C exact evidence parity assertion weakened.
+Previous: WP-13 — Attempt 7 READY_FOR_CODEX_REVIEW; Codex independent review returned FAIL: D11 reject was still treated as deterministic FAIL; combined source/type/metadata tamper replay detection was incomplete.
+Current: WP-13 — Attempt 9 READY_FOR_CODEX_REVIEW; 135 WP-13 tests passed; 375 Core collected / 374 passed / 1 skipped; D11 Option C actor_id, bound_task_id, bound_run_id, identity_hash, provenance_token all validated in reload and persist with fail-closed; independent dual-hash provenance (identity_hash covers workflow/task/run, provenance_token covers actor/source/task/run) for multi-field tamper detection including actor/source tamper; extended-key candidate detection prevents ordinary DOCUMENT_EVIDENCE false positives; cross-task and same-task multi-run isolation verified; maturity: PARTIAL_INTEGRITY (full-consistent 8-field rewrite NOT detectable; D12 deferred to CP-04+ per Human Option B); no duplicates within threat model; terminal reports round-trip.
+Next: Codex independently reviews WP-13 Attempt 9 implementation, actor_id provenance validation, row-level identity tamper detection, and current deterministic evidence; then Human acceptance.
 
 Acceptance repair log: `docs/27_ACCEPTANCE_REPAIR_LOG.md`
 
-Task document: `docs/tasks/WP-12.md`; roadmap: `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`; accepted dependencies: `docs/tasks/WP-10.md`, `docs/tasks/WP-11.md` (CP-02 closed; 30/100 project, 22/22 FVS), `docs/tasks/WP-08A.md`, `docs/tasks/WP-09B.md`, `docs/tasks/WP-09C.md`.
+Task document: `docs/tasks/WP-13.md`; roadmap: `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`; accepted dependencies: `docs/tasks/WP-12.md`, `docs/tasks/WP-11.md`, `docs/tasks/WP-10.md`, `docs/tasks/WP-08A.md`, `docs/tasks/WP-09B.md`, `docs/tasks/WP-09C.md` (CP-02 closed; 30/100 project, 22/22 FVS; CP-03 points deferred until CP-03 completion).
 Historical task document: `docs/tasks/WP-10.md`
 
+## WP-13 Attempt 7 (superseded by Attempt 9) - 2026-08-21
+
+- TASK_ID: WP-13
+- ATTEMPT: 7
+- STATUS: READY_FOR_CODEX_REVIEW
+- DECISION: D11 / Option C
+- BRANCH: feature/first-vertical-slice
+- WRITER: OpenCode
+- REVIEWER: Codex
+- ANTIGRAVITY_STATUS: NOT_REQUIRED
+- NEXT_OWNER: Codex -> Human
+- TASK_DOC: `docs/tasks/WP-13.md`
+- HANDOFF_DOC: `docs/12_HANDOFF_CURRENT.md`
+- APPROVED_FOR_COMMIT: NO
+
+### Attempt 7 implementation
+
+- Workflow identity: `evaluate_workflow_gates()` validates `run.workflow_version == workflow.version` (was missing).
+- Terminal report durable reload: `_validate_evaluation_structure()` skips validation when evaluations are empty (terminal runs produce `evaluations=()`).
+- Persist idempotency: `persist_gate_report()` detects corrupted source/type/identity/malformed workflow_version and fails closed with `GateReportTamperedError`.
+- Evidence boundary: `extra_evidence` injection parameter removed from `RunSupervisor.execute_claimed_run()`, `_build_execution_from_existing()`, and `_build_execution()`.
+- 9 new regression tests (83 total, up from 74).
+- Full Core 312 passed, 1 skipped, 313 collected.
+
+## WP-13 Attempt 9 READY_FOR_CODEX_REVIEW - 2026-08-24
+
+- TASK_ID: WP-13
+- ATTEMPT: 9
+- STATUS: READY_FOR_CODEX_REVIEW
+- DECISION: D11 / Option C
+- BRANCH: feature/first-vertical-slice
+- WRITER: OpenCode
+- REVIEWER: Codex
+- ANTIGRAVITY_STATUS: NOT_REQUIRED
+- NEXT_OWNER: Codex -> Human
+- TASK_DOC: `docs/tasks/WP-13.md`
+- HANDOFF_DOC: `docs/12_HANDOFF_CURRENT.md`
+- APPROVED_FOR_COMMIT: NO
+
+### Attempt 9 Implementation
+
+- D11 Option C: approve and reject HUMAN_EVIDENCE remain `HUMAN_DECISION` / `NEED_ACTION` for every actor value; neither can produce PASS/VERIFIED or deterministic FAIL.
+- Reload validates `actor_id` as canonical `system:workflow-gate`; actor tamper raises `GateReportTamperedError`.
+- Row-level `task_id`/`run_id` tamper detected via Phase 1 scoped lookup with run-level disambiguation and Phase 2 durable-binding metadata scan. Combined multi-field tamper detected via independent dual-hash provenance (`identity_hash` covers workflow/task/run; `provenance_token` covers actor/source/task/run). Single-field and partial multi-field tamper are fail-closed within the PARTIAL_INTEGRITY threat model; full-consistent 8-field rewrite (including both hashes) is NOT detectable and is an accepted limitation per Human Option B.
+- Combined-tamper replay: canonical actor/source are independent markers; if both are damaged, a cross-family workflow-identity/report-payload metadata fingerprint still detects the candidate. Multiple candidates, malformed identity, and corrupted source/type fail closed without duplicates.
+- Terminal FAILED/TIMED_OUT/CANCELLED/ORPHANED reports persist and reload with `FAIL`, `authority=none`, and empty evaluations.
+- `run.workflow_version == workflow.version` validation added; unused supervisor evidence injection remains absent.
+
+### Attempt 9 Changed Files (actual current Git status)
+
+Modified:
+- `docs/10_DECISION_LOG.md` (pre-existing D11 decision)
+- `docs/11_PROJECT_STATE.md`
+- `docs/12_HANDOFF_CURRENT.md`
+- `docs/15_DOCUMENT_INDEX.md` (pre-existing dirty state; excluded and not modified by Attempt 8)
+- `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`
+- `docs/tasks/WP-12.md` (pre-existing)
+- `services/core/src/polynexus_core/execution_service.py` (pre-existing WP-13 execution integration)
+- `services/core/src/polynexus_core/persistence/repository.py` (pre-existing WP-13 update boundary)
+- `services/core/src/polynexus_core/runtime/supervisor.py` (pre-existing; unused injection removed in Attempt 7)
+- `services/core/src/polynexus_core/workflows/models.py` (pre-existing)
+- `services/core/tests/test_wp07_integration.py` (pre-existing WP-13 parity integration adjustment)
+- `services/core/tests/test_wp09_query_api.py` (pre-existing WP-13 exact parity adjustment)
+
+Untracked:
+- `docs/tasks/WP-13.md`
+- `services/core/src/polynexus_core/workflows/gates.py`
+- `services/core/tests/test_wp13_workflow_gates.py`
+- `workflows/builtin/verified-gate.yaml`
+
+Protected/excluded:
+- `docs/15_DOCUMENT_INDEX.md` is pre-existing and excluded; no modification permitted.
+
+### Attempt 9 Protected Areas / ADR / Scope
+
+- Protected: ADR-001-010, D01-D10, D11 decision, Run lifecycle/transitions, WP-08A/B, WP-09B/C/D, WP-10, WP-11, WP-12, migrations, frontend, secrets, and accepted API contracts.
+- ADR impact: D11 / Option C only; no new model/table/migration/endpoint/auth subsystem/evidence ledger.
+- Scope deviation: NONE.
+- Known limitations: Windows pytest cleanup PermissionError is a non-fatal post-test environment warning; no production/vendor runtime is certified; CP-03 point allocation remains deferred.
+- UNVERIFIED / SKIPPED: Browser DOM / Playwright E2E `UNVERIFIED/SKIPPED`; Windows symlink containment `UNVERIFIED/SKIPPED`; true concurrent HTTP duplicate-command execution `UNVERIFIED`.
+
+### Attempt 9 Verification (actual commands)
+
+- `C:\temp_pn_venv2\Scripts\python.exe -m pytest -q services\core\tests\test_wp13_workflow_gates.py` -> 135 passed; exit code `0`.
+- `C:\temp_pn_venv2\Scripts\python.exe -m pytest -q services\core\tests\test_wp12_council.py services\core\tests\test_wp09_execution_api.py services\core\tests\test_wp09_query_api.py` -> 107 passed; exit code `0`.
+- `C:\temp_pn_venv2\Scripts\python.exe -m pytest --collect-only --disable-warnings services\core` -> 375 collected; exit code `0`.
+- `C:\temp_pn_venv2\Scripts\python.exe -m pytest -q --disable-warnings services\core` -> 374 passed, 1 skipped; exit code `0`.
+- `C:\temp_pn_venv2\Scripts\python.exe scripts\validate_baseline.py` -> PASS; exit code `0`.
+- `git diff --check` -> PASS; exit code `0`.
+- `git status --short --branch` -> exit code `0`; worktree dirty with ledger above.
+- Pytest cleanup `PermissionError` appeared and is non-fatal; symlink test is `SKIPPED/UNVERIFIED` by Windows policy.
+
 ## Active Writer
-OpenCode — WP-12 contract tests implemented (Attempt 6), `services/core/src/polynexus_core/council/` and `services/core/tests/test_wp12_council.py` added; awaiting Codex review.
+OpenCode — WP-13 Attempt 9 implementation complete; actor_id, bound_task_id, bound_run_id, identity_hash, provenance_token validated in reload and persist with fail-closed; Phase 1 scoped lookup with run-level disambiguation + Phase 2 durable-binding metadata scan; independent dual-hash provenance (identity_hash covers workflow_id/workflow_version/task_id/run_id, provenance_token covers actor_id/source/task_id/run_id); single-field and partial multi-field tamper fail closed within PARTIAL_INTEGRITY; full-consistent 8-field rewrite including both hashes is NOT detectable per Human Option B; D12 deferred to CP-04+; same-task multi-run isolation verified; cross-task isolation verified (corrupted Task A does not block legitimate Task B); 375 current Core tests collected / 374 passed / 1 skipped.
 
 ## Reviewer
-Codex — WP-12 independent review after implementation; Human acceptance required.
+Codex — WP-13 independent Core/contract review; Human acceptance required.
 
 ## Antigravity
-`NOT_REQUIRED` — Core orchestration/contract task; no Browser E2E in WP-12 scope. Browser DOM / Playwright E2E remains `UNVERIFIED/SKIPPED`.
+`NOT_REQUIRED` — WP-13 is a Core workflow/evidence contract task; Browser DOM / Playwright E2E remains `UNVERIFIED/SKIPPED`.
+
+## WP-13 Attempt 3 (historical; superseded by Attempt 4) — 2026-08-21
+
+- TASK_ID: WP-13
+- ATTEMPT: 3
+- STATUS: READY_FOR_CODEX_REVIEW
+- BRANCH: feature/first-vertical-slice
+- WRITER: OpenCode
+- REVIEWER: Codex
+- ANTIGRAVITY_STATUS: NOT_REQUIRED
+- NEXT_OWNER: Codex -> Human
+- TASK_DOC: `docs/tasks/WP-13.md`
+- HANDOFF_DOC: `docs/12_HANDOFF_CURRENT.md`
+
+### Completed acceptance carried into this handoff
+
+- WP-12 Attempt 8: Codex PASS and Human acceptance recorded on 2026-08-21.
+- Evidence carried from the accepted review: WP-12 `45 passed`; full Core `238 collected / 237 passed / 1 skipped`; baseline validation PASS; `git diff --check` PASS.
+- Git: `d6823d6` was committed from the exact WP-12 allowlist and pushed to `backup/feature/first-vertical-slice`.
+- Project progress remains `30/100`; FVS remains `22/22`; CP-03 point allocation is deferred until CP-03 completion per Human decision.
+
+### WP-13 Attempt 3 goal and scope
+
+- Remediates Codex FAIL findings on Attempt 2.
+- Gate evaluation wired into ExecutionService.execute_existing_run() for COMPLETED runs (post-execution evaluation layer).
+- persist_gate_report updates existing evidence in place; never returns stale PASS verdict.
+- reload_gate_report re-validates stored evaluations against verdict; fails closed on tamper (GateReportTamperedError).
+- Unverified actor prefixes (agent:, tool:, test:, system:) rejected for HUMAN_GATE approval.
+- TOOL_EVIDENCE command must be non-empty, non-whitespace string; exit_code must be '0'.
+- run.task_id == task.id validated before evaluation.
+- 13 new regression tests added (54 total, up from 41).
+- Integration test through actual ExecutionService.execute_existing_run() path.
+- WP-09C test assertions updated to account for additive gate evaluation evidence.
+- ADR-007 Run lifecycle unchanged; gate evaluation is additive post-execution layer.
+- Current source facts and the verdict mapping are recorded in `docs/tasks/WP-13.md`.
+
+### Changed files for Attempt 3
+
+- Modified: `services/core/src/polynexus_core/workflows/gates.py`, `services/core/tests/test_wp13_workflow_gates.py`, `services/core/src/polynexus_core/execution_service.py`, `services/core/tests/test_wp09_query_api.py`, `docs/11_PROJECT_STATE.md`, `docs/12_HANDOFF_CURRENT.md`, `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`, `docs/tasks/WP-13.md`.
+- New: `workflows/builtin/verified-gate.yaml` (pre-existing from Attempt 1).
+- Pre-existing and excluded: `docs/15_DOCUMENT_INDEX.md`.
+- Product source (API contracts, persistence schema, frontend, migrations, dependencies, ADR): unchanged by Attempt 3.
+
+### ADR / scope / protected areas (Attempt 3)
+
+- ADR impact: `NONE`. Gate evaluation is an additive post-execution layer over existing Evidence boundaries; no new model/table/migration/endpoint/RunState/WorkMode/EvidenceType.
+- ADR-007 Run lifecycle unchanged; gate evaluation does not alter Run state or lifecycle events.
+- WP-09C test assertions updated to account for additive DOCUMENT_EVIDENCE gate report; contract behavior unchanged.
+- WP-12, WP-11, WP-09B/C/D, WP-08A/B, Run lifecycle, WorkMode, migrations, frontend, secrets, and accepted API contracts remain protected.
+- WP-13 does not add a new Decision/Verdict persistence contract or public API field.
+
+### Current verification for this transition
+
+- `git diff --check` -> PASS, exit code `0`.
+- `git status --short --branch` -> branch synchronized; only the listed governance changes plus pre-existing `docs/15_DOCUMENT_INDEX.md`, exit code `0`.
+- No product tests were rerun because this transition changes governance/task documents only; WP-12 acceptance evidence remains the evidence listed above.
+
+### Next exact step
+
+Codex independently reviews WP-13 Attempt 2 changes, re-runs deterministic evidence, and returns PASS/FAIL/NEED_ACTION. Human acceptance required after Codex PASS.
+
+### Do not change
+
+- Do not change ADR-001-010, D01-D10, accepted Run lifecycle/idempotency/failure semantics, or the three top-level WorkModes.
+- Do not add a new Decision/Verdict table, migration, endpoint, dependency, frontend/browser path, vendor-specific Core branch, or arbitrary workflow script node without the required decision.
+- Do not include pre-existing `docs/15_DOCUMENT_INDEX.md` in the WP-13 allowlist.
 
 ## Starting Branch
 feature/first-vertical-slice
@@ -1535,3 +1698,155 @@ Codex independently re-reviews the Attempt 8 fixes and the new deterministic tes
 exception). If Codex returns `PASS`, Human may authorize stage/commit/push and accept
 WP-12. Do not stage, commit, or push without explicit Human authorization. Generated
 `__pycache__/*.pyc` are excluded from any stage allowlist.
+
+## WP-13 Attempt 1 — READY_FOR_CODEX_REVIEW
+
+- `TASK_ID`: `WP-13`
+- `ATTEMPT`: `1`
+- `STATUS`: `READY_FOR_CODEX_REVIEW`
+- `BRANCH`: `feature/first-vertical-slice`
+- `WRITER`: `OpenCode`
+- `REVIEWER`: `Codex`
+- `ANTIGRAVITY_STATUS`: `NOT_REQUIRED`
+- `NEXT_OWNER`: `Codex` (independent review) → `Human` (acceptance)
+- `TASK_DOC`: `docs/tasks/WP-13.md`
+- `HANDOFF_DOC`: `docs/12_HANDOFF_CURRENT.md`
+
+### Goal
+
+Implement the first deterministic workflow-gate contract: EVIDENCE_CHECK hard-gate
+evaluation, HUMAN_GATE explicit decision handling, verified-verdict rules, and
+truthful durable results. AI opinion, synthesis, or council output must never
+convert a failed/missing/pending gate into PASS/VERIFIED.
+
+### Architecture compatibility (PASSED)
+
+WP-13 is implemented additively over existing Task/Run/Evidence boundaries.
+
+- **WorkflowStep extended** (`services/core/src/polynexus_core/workflows/models.py`):
+  added `parameters: Mapping[str, object]` to retain EVIDENCE_CHECK `hard_gates`,
+  HUMAN_GATE `human_gate` id, TOOL `profile`, PARALLEL_AI `roles`, etc. This is
+  an additive field with `default_factory=dict` — all existing workflows without
+  extra params continue to load unchanged (review-minimal, release-validation
+  validated by `validate_baseline.py`). No new model/table/migration.
+
+- **Gate evaluation engine** (`services/core/src/polynexus_core/workflows/gates.py`):
+  new module providing `validate_workflow_gates()`, `evaluate_workflow_gates()`,
+  `persist_gate_report()`, and `reload_gate_report()`. Uses existing
+  `EvidenceRepository.list_by_run()` to read `TOOL_EVIDENCE`/`HUMAN_EVIDENCE`
+  scoped to the current Task/Run. Verdict stored as `DOCUMENT_EVIDENCE` with
+  source `"workflow-gate-evaluation"` (same durable boundary as CouncilPlan).
+  No new REST endpoint, schema, or public field.
+
+- **No changes to**: ADR-001–010, RunState/WorkMode/EvidenceType enums, WP-09B
+  lifecycle/idempotency, WP-12 council, ExecutionService, RunSupervisor,
+  migrations, dependencies, frontend, or secrets.
+
+### Gate semantics implemented
+
+| Scenario | Gate outcome | Verdict | Authority |
+|---|---|---|---|
+| TOOL_EVIDENCE PASS + matching gate id | PASS | continues | continues |
+| TOOL_EVIDENCE FAIL | FAIL | FAIL | none |
+| Missing / malformed / cross-task / cross-run | NEED_ACTION | NEED_ACTION | none |
+| AI_OPINION claims PASS | NEED_ACTION (not satisfied) | depends | none |
+| HUMAN_GATE absent | HUMAN_DECISION | HUMAN_DECISION | none |
+| HUMAN_GATE approve + all gates PASS | PASS | PASS | verified-deterministic |
+| HUMAN_GATE reject | FAIL | FAIL | none |
+| HUMAN_GATE ambiguous decision | HUMAN_DECISION | HUMAN_DECISION | none |
+
+### Changed files
+
+**Modified (product source):**
+- `services/core/src/polynexus_core/workflows/models.py` — added `parameters` field to `WorkflowStep`; `from_mapping()` captures all non-identity step keys.
+
+**Modified (governance):**
+- `docs/11_PROJECT_STATE.md`
+- `docs/12_HANDOFF_CURRENT.md`
+- `docs/15_DOCUMENT_INDEX.md` (pre-existing dirty state, excluded from commit)
+- `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`
+- `docs/tasks/WP-12.md`
+
+**Untracked (new):**
+- `services/core/src/polynexus_core/workflows/gates.py` — deterministic gate evaluation engine (validate, evaluate, persist, reload)
+- `services/core/tests/test_wp13_workflow_gates.py` — **25 contract tests** covering the full acceptance matrix
+- `workflows/builtin/verified-gate.yaml` — builtin workflow with EVIDENCE_CHECK + HUMAN_GATE steps (validated by `validate_baseline.py`)
+- `docs/tasks/WP-13.md` — task document
+
+### Verification (Attempt 1 — actual evidence)
+
+- `pytest -q services/core/tests/test_wp13_workflow_gates.py` → **25 passed**, exit code `0`
+- `pytest -q services/core/tests/test_wp12_council.py services/core/tests/test_wp09_execution_api.py services/core/tests/test_wp09_query_api.py` → **107 passed**, exit code `0`
+- `pytest -q services/core` → **264 collected, 264 passed, 1 skipped**, exit code `0`
+- `python scripts/validate_baseline.py` → **Baseline validation PASS**, exit code `0`
+- `git diff --check` → clean, exit code `0`
+- `git status --short --branch` → (listed above); exit code `0`
+
+(The pytest temp-dir `PermissionError` at interpreter exit is a non-fatal Windows
+environment warning; all test commands returned exit code `0`.)
+
+### Test coverage mapping (acceptance matrix items 1–15)
+
+| Item | Test | Behavior |
+|---|---|---|
+| 1 | `test_valid_workflow_preserves_gate_config` | Load verified-gate.yaml; assert hard_gates, human_gate, validate returns [] |
+| 2 | `test_invalid_gate_config_fails_closed` | 5 parametrized cases: duplicate gate id, empty hard_gates, missing depends_on, unsupported type, duplicate step id |
+| 3 | `test_required_tool_evidence_pass_satisfies_gate` | Two TOOL_EVIDENCE PASS → both gates PASS |
+| 4 | `test_tool_evidence_fail_blocks_pass` | TOOL_EVIDENCE FAIL blocks; AI opinion override rejected |
+| 5 | `test_missing_evidence_is_need_action` + `test_cross_run_evidence_rejected` + `test_cross_task_evidence_rejected` + `test_malformed_tool_evidence_is_need_action` | Missing/cross-run/cross-task/malformed → NEED_ACTION |
+| 6 | `test_ai_opinion_never_satisfies_gate` | AI_OPINION PASS → NEED_ACTION, not PASS |
+| 7 | `test_human_gate_pending_without_decision` | No HUMAN_EVIDENCE → HUMAN_DECISION |
+| 8 | `test_human_approval_yields_verified_pass` + `test_human_rejection_blocks_verified` | Approve → verified-deterministic PASS; Reject → FAIL |
+| 9 | `test_verified_impossible_with_ai_only_evidence` | AI-only → verdict not PASS |
+| 10 | `test_council_cannot_mutate_gate_verdict` | Council run on same task; gate verdict unchanged |
+| 11 | `test_gate_report_close_reopen_durable` | Evaluate → persist Evidence → close → reopen → reload → equal |
+| 12 | `test_idempotent_replay_no_fabricated_evidence` | Two evaluate calls → equal; no evidence fabricated by evaluation |
+| 13 | `test_terminal_required_run_no_verified_verdict` | Parametrized FAILED/TIMED_OUT/CANCELLED → not PASS; run state unchanged |
+| 14 | `test_secret_not_in_gate_result_or_persisted` | TOOL_EVIDENCE with secret → secret absent from report + persisted record |
+| 15 | WP-12 + WP-09 regression | 107 passed (existing tests green) |
+
+### Protected areas
+
+- ADR-001–010 (frozen; no change)
+- RunState lifecycle rules in `run_lifecycle.py` (not modified)
+- WP-08A/B, WP-09B/C/D contracts and frontend baseline (unchanged)
+- WP-11 WorkMode contract (unchanged)
+- WP-12 council orchestration (unchanged)
+- Migrations, dependencies, secrets, apps/web (unchanged)
+- No new RunState / WorkMode / EvidenceType / REST endpoint / migration introduced
+
+### ADR impact
+
+`NONE` — gate evaluation uses existing `EvidenceType`/`EvidenceStatus` values and
+persists verdict as `DOCUMENT_EVIDENCE` (same boundary as CouncilPlan). The
+`WorkflowStep.parameters` extension is additive (default `{}`), schema-valid
+(`additionalProperties: true`), and backward-compatible. No ADR text change.
+
+### Scope deviation
+
+`NONE` — implementation stays within the approved WP-13 task document scope. The
+`WorkflowStep` extension is the minimal change required to retain gate config
+(`hard_gates`, `human_gate`) that the YAML schema already permits but the old
+`from_mapping()` dropped.
+
+### Known limitations
+
+- Browser DOM / Playwright E2E: `UNVERIFIED/SKIPPED`
+- Windows symlink containment: `UNVERIFIED/SKIPPED`
+- True concurrent HTTP duplicate-command execution: `UNVERIFIED`
+- No production/vendor runtime is certified; reference/test adapters remain deterministic and no-network
+- CP-03 point allocation is deferred until CP-03 completion per Human decision
+
+### UNVERIFIED / SKIPPED
+
+- Browser DOM / Playwright E2E: `UNVERIFIED/SKIPPED` under accepted Human waiver
+- Windows symlink containment: `UNVERIFIED/SKIPPED` under accepted Human waiver
+- True concurrent HTTP duplicate-command execution: `UNVERIFIED`
+
+### Next
+
+Codex independently reviews the WP-13 gate evaluation engine, workflow schema
+extension, and deterministic contract tests. If Codex returns `PASS`, Human may
+authorize stage/commit/push and accept WP-13. Do not stage, commit, or push
+without explicit Human authorization. Generated `__pycache__/*.pyc` are excluded
+from any stage allowlist.

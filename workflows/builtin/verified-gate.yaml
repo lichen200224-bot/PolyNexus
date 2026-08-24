@@ -1,0 +1,40 @@
+id: verified-gate
+version: 1
+assurance: VERIFIED
+parameters:
+  reviewers: 2
+steps:
+  - id: prepare-context
+    type: CONTEXT
+  - id: independent-review
+    type: PARALLEL_AI
+    roles:
+      - code-reviewer
+      - risk-reviewer
+    depends_on:
+      - prepare-context
+  - id: cross-review
+    type: CROSS_REVIEW
+    depends_on:
+      - independent-review
+  - id: validation-tools
+    type: TOOL
+    profile: release-test
+    depends_on:
+      - cross-review
+  - id: evidence-gate
+    type: EVIDENCE_CHECK
+    hard_gates:
+      - build
+      - unit-test
+    depends_on:
+      - validation-tools
+  - id: human-approval
+    type: HUMAN_GATE
+    human_gate: release-signoff
+    depends_on:
+      - evidence-gate
+  - id: verdict
+    type: SYNTHESIS
+    depends_on:
+      - human-approval

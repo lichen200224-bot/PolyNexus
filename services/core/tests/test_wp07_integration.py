@@ -179,7 +179,11 @@ class TestWP07ExecutionPersistence:
         assert execution.result.status is RunState.COMPLETED
         assert execution.result.summary == "Reference runtime completed without vendor execution"
         assert len(execution.evidence) > 0
-        assert all(e.type is EvidenceType.RUNTIME_EVIDENCE for e in execution.evidence)
+        # Evidence includes RUNTIME_EVIDENCE from supervisor and
+        # DOCUMENT_EVIDENCE gate report from post-execution gate evaluation.
+        evidence_types = {e.type for e in execution.evidence}
+        assert EvidenceType.RUNTIME_EVIDENCE in evidence_types
+        assert EvidenceType.DOCUMENT_EVIDENCE in evidence_types
         assert not any(e.type is EvidenceType.AI_OPINION for e in execution.evidence)
         assert execution.artifacts == ()
 
@@ -208,8 +212,11 @@ class TestWP07ExecutionPersistence:
 
         loaded_evidence = SqlEvidenceRepository(session1).list_by_task(task.id)
         assert len(loaded_evidence) == len(execution.evidence)
-        assert all(e.type is EvidenceType.RUNTIME_EVIDENCE for e in loaded_evidence)
-        assert all(e.status is EvidenceStatus.PASS for e in loaded_evidence)
+        loaded_types = {e.type for e in loaded_evidence}
+        assert EvidenceType.RUNTIME_EVIDENCE in loaded_types
+        assert EvidenceType.DOCUMENT_EVIDENCE in loaded_types
+        assert all(e.status is EvidenceStatus.PASS for e in loaded_evidence
+                   if e.type is EvidenceType.RUNTIME_EVIDENCE)
 
         loaded_findings = SqlFindingRepository(session1).list_by_task(task.id)
         assert len(loaded_findings) == 0  # Reference runtime produces no findings
@@ -267,9 +274,10 @@ class TestWP07ExecutionPersistence:
         reloaded_evidence = SqlEvidenceRepository(session2).list_by_task(task.id)
         assert len(reloaded_evidence) == len(execution.evidence)
         for ev in reloaded_evidence:
-            assert ev.type is EvidenceType.RUNTIME_EVIDENCE
-            assert ev.status is EvidenceStatus.PASS
-            assert ev.actor_id == "system:run-supervisor"
+            assert ev.type in {EvidenceType.RUNTIME_EVIDENCE, EvidenceType.DOCUMENT_EVIDENCE}
+            if ev.type is EvidenceType.RUNTIME_EVIDENCE:
+                assert ev.status is EvidenceStatus.PASS
+                assert ev.actor_id == "system:run-supervisor"
 
         # Reload and verify no findings (reference runtime produces none)
         reloaded_findings = SqlFindingRepository(session2).list_by_task(task.id)

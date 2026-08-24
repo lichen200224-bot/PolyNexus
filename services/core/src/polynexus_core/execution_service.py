@@ -116,7 +116,36 @@ class ExecutionService:
         # 4. Persist all results
         self._persist_execution(execution)
 
-        # 5. Commit
+        # 5. Gate evaluation (post-execution, before commit)
+        from polynexus_core.domain.enums import RunState as _RunState
+        from polynexus_core.workflows.gates import evaluate_workflow_gates, persist_gate_report
+        if execution.run.state is _RunState.COMPLETED:
+            gate_report = evaluate_workflow_gates(
+                workflow, task, execution.run, self._evidence_repo
+            )
+            gate_ev = persist_gate_report(gate_report, self._evidence_repo)
+            gate_evidence = [gate_ev]
+            all_evidence = list(execution.evidence) + gate_evidence
+            new_result = RunResult(
+                run_id=execution.result.run_id,
+                status=execution.result.status,
+                summary=execution.result.summary,
+                finding_ids=execution.result.finding_ids,
+                evidence_ids=tuple(e.id for e in all_evidence),
+                artifact_ids=execution.result.artifact_ids,
+            ) if execution.result is not None else None
+            # Update the persisted Run with gate evidence in RunResult.
+            execution.run.result = new_result
+            self._run_repo.update(execution.run)
+            execution = RunExecution(
+                run=execution.run,
+                result=new_result,
+                findings=execution.findings,
+                evidence=tuple(all_evidence),
+                artifacts=execution.artifacts,
+            )
+
+        # 6. Commit
         self._session.commit()
 
         return execution
@@ -211,6 +240,43 @@ class ExecutionService:
                 self._evidence_repo.add(evidence)
             for artifact in execution.artifacts:
                 self._artifact_repo.add(artifact)
+
+        # --- Phase 5: Gate evaluation (post-execution) ---
+        # Evaluate deterministic gates and persist the gate report as
+        # DOCUMENT_EVIDENCE. This is an additive evaluation layer that does
+        # not alter the Run state or lifecycle events.
+        # Only evaluate on COMPLETED runs — terminal failed runs cannot
+        # produce PASS, and gate evaluation is not needed for the failure path.
+        # Gate evidence is included in RunResult.evidence_ids for exact parity.
+        from polynexus_core.domain.enums import RunState as _RunState
+        from polynexus_core.workflows.gates import evaluate_workflow_gates, persist_gate_report
+        if execution.run.state is _RunState.COMPLETED:
+            gate_report = evaluate_workflow_gates(
+                workflow, task, execution.run, self._evidence_repo
+            )
+            gate_ev = persist_gate_report(gate_report, self._evidence_repo)
+            # Rebuild RunResult to include gate evidence in evidence_ids.
+            gate_evidence = [gate_ev]
+            all_evidence = list(execution.evidence) + gate_evidence
+            execution = RunExecution(
+                run=execution.run,
+                result=RunResult(
+                    run_id=execution.result.run_id,
+                    status=execution.result.status,
+                    summary=execution.result.summary,
+                    finding_ids=execution.result.finding_ids,
+                    evidence_ids=tuple(e.id for e in all_evidence),
+                    artifact_ids=execution.result.artifact_ids,
+                ) if execution.result is not None else None,
+                findings=execution.findings,
+                evidence=tuple(all_evidence),
+                artifacts=execution.artifacts,
+            )
+            # Persist the updated RunResult to the database so the API
+            # returns result.evidence_ids with gate evidence included.
+            if execution.result is not None:
+                execution.run.result = execution.result
+                self._run_repo.update(execution.run)
 
         self._session.commit()
 

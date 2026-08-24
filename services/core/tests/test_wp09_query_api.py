@@ -226,6 +226,8 @@ def test_success_fidelity_and_reload(tmp_path: Path):
     r4 = c2.get(f"/api/v1/runs/{rid}/artifacts")
     assert r2.status_code == 200 and r3.status_code == 200 and r4.status_code == 200
     assert set(result["finding_ids"]) == {f["id"] for f in r3.json()["findings"]}
+    # Gate evaluation evidence is included in RunResult.evidence_ids before
+    # construction, so exact parity holds.
     assert set(result["evidence_ids"]) == {e["id"] for e in r2.json()["evidence"]}
     assert set(result["artifact_ids"]) == {a["id"] for a in r4.json()["artifacts"]}
     # Also verify injected IDs are present
@@ -457,7 +459,11 @@ def test_evidence_type_status_exact(ctx: _Ctx):
     assert by_id[ai_ev.id]["type"] == EvidenceType.AI_OPINION.value
     assert by_id[ai_ev.id]["status"] == EvidenceStatus.OBSERVED.value
     # supervisor evidence remains RUNTIME_EVIDENCE PASS, not upgraded
-    runtime_evs = [e for e in evs if e["id"] != ai_ev.id]
+    # Filter out gate evaluation DOCUMENT_EVIDENCE (additive layer from WP-13)
+    runtime_evs = [
+        e for e in evs
+        if e["id"] != ai_ev.id and e.get("source") != "workflow-gate-evaluation"
+    ]
     assert len(runtime_evs) >= 1
     for ev in runtime_evs:
         assert ev["type"] == EvidenceType.RUNTIME_EVIDENCE.value

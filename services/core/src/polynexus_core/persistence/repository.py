@@ -408,6 +408,12 @@ class EvidenceRepository(ABC):
     @abstractmethod
     def list_by_run(self, run_id: str) -> Sequence[Evidence]: ...
 
+    @abstractmethod
+    def list_all(self) -> Sequence[Evidence]: ...
+
+    @abstractmethod
+    def update(self, evidence: Evidence) -> None: ...
+
 
 # ---------------------------------------------------------------------------
 # SQLite Implementations
@@ -639,3 +645,17 @@ class SqlEvidenceRepository(EvidenceRepository):
             .all()
         )
         return [_row_to_evidence(r) for r in rows]
+
+    def list_all(self) -> Sequence[Evidence]:
+        rows = self._s.query(EvidenceRow).order_by(
+            EvidenceRow.observed_at, EvidenceRow.id
+        ).all()
+        return [_row_to_evidence(r) for r in rows]
+
+    def update(self, evidence: Evidence) -> None:
+        existing = self._s.get(EvidenceRow, evidence.id)
+        if existing is None:
+            raise ValueError(f"Evidence {evidence.id} not found")
+        updated = _evidence_to_row(evidence)
+        for col in EvidenceRow.__table__.columns:
+            setattr(existing, col.name, getattr(updated, col.name))

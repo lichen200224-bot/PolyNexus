@@ -1,8 +1,8 @@
 # Project State
 
-Date: 2026-08-20
+Date: 2026-08-24
 Version: Development Baseline v1.0 + Dev Preparation Profile v1.0.2
-Milestone: First Vertical Slice — WP-08A/WP-08B/WP-09B/WP-09C/WP-09D/WP-10 ACCEPTED; CP-02 complete; UI/Core waiver accepted; ROADMAP-01 CONFIRMED
+Milestone: First Vertical Slice — WP-08A/WP-08B/WP-09B/WP-09C/WP-09D/WP-10/WP-12 ACCEPTED; CP-02 complete; CP-03 in progress; UI/Core waiver accepted; ROADMAP-01 CONFIRMED
 
 ## Confirmed
 - Product Scope Decisions D01–D10 confirmed.
@@ -22,7 +22,7 @@ Milestone: First Vertical Slice — WP-08A/WP-08B/WP-09B/WP-09C/WP-09D/WP-10 ACC
 - Absolute path is a local profile only; product code remains repo-relative.
 
 ## Current Priority
-1. Prepare WP-11 Discuss / Review / Validate work-mode semantics and contract tests; defer Browser E2E re-test until development is complete.
+1. Prepare WP-13 Workflow hard gates, Evidence_Check, Human gate, and verified verdict contract; defer Browser E2E re-test until development is complete.
 2. Prepare competition proposal/deck content confidence gate by 2026-08-25.
 
 ## Current Product Slice
@@ -37,27 +37,27 @@ First Vertical Slice target by 2026-09-06:
 - Actual competition upload-form fields/demo requirement still require recheck before submission.
 ## Next Gate
 
-WP-12 is `READY_FOR_CODEX_REVIEW` (Attempt 8, both Codex MAJOR issues from Attempt 7 fixed; 45 contract tests PASS); Codex independent re-review is next for the CP-03 Core product baseline.
+WP-13 task gate is `READY_FOR_CODEX_REVIEW` (Attempt 9); D11 Option C confirmed by Human. CP-03 points remain deferred until CP-03 completion.
 
 ## Current Development State
 
 Phase: First Vertical Slice — WP-10 final deterministic acceptance PASS; Human acceptance recorded on 2026-08-20; CP-02 complete
-Next Phase: CP-03 Core product baseline — WP-11 accepted; WP-12 next; Browser E2E Re-test deferred
+Next Phase: CP-03 Core product baseline — WP-12 accepted; WP-13 next; Browser E2E Re-test deferred
 
 Current Branch: feature/first-vertical-slice
-Current Baseline Commit: 3a0237d (`feat(core): add WP-09C run output queries`)
-Latest FVS Checkpoint: 3a0237d (`feat(core): add WP-09C run output queries`)
-Current Planned Task: WP-12 — Council, parallel analysis, cross review, synthesis, and partial failures (READY_FOR_CODEX_REVIEW, Attempt 8; both Codex MAJOR issues from Attempt 7 fixed, 45 contract tests PASS)
-Active Writer: OpenCode — WP-12 contract tests implemented (Attempt 8), `services/core/src/polynexus_core/council/` and `services/core/tests/test_wp12_council.py` added; both Codex MAJOR issues from Attempt 7 fixed; awaiting Codex re-review
-Reviewer: Codex — WP-12 independent review after OpenCode implementation; Human acceptance required
-Antigravity: NOT_REQUIRED for WP-12; Browser E2E UNVERIFIED/SKIPPED
+Current Baseline Commit: d6823d6 (`feat(core): accept WP-12 council orchestration`)
+Latest FVS Checkpoint: d6823d6 (`feat(core): accept WP-12 council orchestration`)
+Current Planned Task: WP-13 — Workflow hard gates, Evidence_Check, Human gate, and verified verdict rules (READY_FOR_CODEX_REVIEW, Attempt 9)
+Active Writer: OpenCode — WP-13 Attempt 9 implementation complete; D11 Option C, independent dual-hash provenance (identity_hash + provenance_token), extended-key candidate detection, PARTIAL_INTEGRITY maturity, 375 collected
+Reviewer: Codex — independent WP-13 review; Human acceptance required
+Antigravity: NOT_REQUIRED for WP-13; Core-only task, Browser E2E remains UNVERIFIED/SKIPPED
 
 Architecture:
 - ADR-001 through ADR-010 are CONFIRMED / FROZEN FOR V1 IMPLEMENTATION.
 
 Development Environment:
 - Windows development readiness: PASS
-- Core pytest: 192 passed, 1 skipped (193 collected; Windows symlink creation policy denied → 1 skipped; pytest temp cleanup PermissionError is a non-fatal environment warning; Human waiver accepted). WP-10 accepted baseline was 169 passed / 170 collected.
+- Core pytest: 374 passed, 1 skipped (375 collected; Windows symlink creation policy denied → 1 skipped; pytest temp cleanup PermissionError is a non-fatal environment warning). Earlier WP-10/WP-11 counts are historical.
 - Frontend Vitest: 78 passed (61 baseline + 17 WP-09D)
 - Frontend build: PASS
 - Local Git backup: PASS
@@ -88,18 +88,15 @@ OpenCode Model Routing:
 
 ## Latest Verification
 
-WP-10 final deterministic acceptance passed current Core, fresh-DB, frontend, baseline, and diff checks. Human acceptance was confirmed on 2026-08-20. Browser DOM / Playwright E2E remains `UNVERIFIED/SKIPPED` and is deferred until development is complete; true concurrent HTTP duplicate-command execution remains `UNVERIFIED`.
+WP-13 Attempt 9 current verification: 375 Core tests collected, 374 passed, 1 skipped, exit code 0; baseline and diff checks pass. Browser DOM / Playwright E2E remains `UNVERIFIED/SKIPPED`; Windows symlink containment remains `UNVERIFIED/SKIPPED`; true concurrent HTTP duplicate-command execution remains `UNVERIFIED`.
 
-- Full Core tests: 192 passed, 1 skipped, exit code 0 (193 collected; Windows symlink creation policy denied → 1 skipped; pytest temp cleanup PermissionError is a non-fatal environment warning). WP-10 accepted baseline was 169 passed / 170 collected.
-- Fresh DB / Alembic / reopen-reload checks: 4 passed, exit code 0.
-- Frontend Vitest: 78 passed, exit code 0.
-- Frontend build: PASS, exit code 0.
-- Baseline validation: PASS, exit code 0.
+- WP-13 targeted: 135 passed, exit code 0; pytest cleanup PermissionError is a non-fatal Windows warning.
+- WP-12/WP-09 regression: 107 passed, exit code 0; pytest cleanup PermissionError is a non-fatal Windows warning.
+- Full Core: 375 collected, 374 passed, 1 skipped, exit code 0; symlink test is `SKIPPED/UNVERIFIED` by Windows policy; pytest cleanup PermissionError is non-fatal.
+- `scripts/validate_baseline.py`: PASS, exit code 0.
 - `git diff --check`: PASS, exit code 0.
-- WP-10: ACCEPTED, 2/2 CP-02 points earned.
-- Accepted project progress: **30/100 = 30%**.
-- Accepted FVS progress: **22/22 = 100%**.
-- ADR impact: NONE.
+- Current project progress remains **30/100 = 30%**; accepted FVS remains **22/22 = 100%**.
+- ADR impact: D11 / Option C; no new model/table/migration/endpoint.
 - Scope deviation: NONE; `docs/15_DOCUMENT_INDEX.md` remains pre-existing, unstaged, and excluded.
 
 ## ROADMAP-01 / WP-08A + WP-08B Acceptance (Historical checkpoint before WP-09B)
@@ -145,7 +142,17 @@ WP-10 final deterministic acceptance passed current Core, fresh-DB, frontend, ba
 
 ## Current Next Gate
 
-WP-09B, WP-09C, WP-09D, WP-10, and WP-11 are accepted. CP-02 is complete; WP-12 is `READY_FOR_CODEX_REVIEW` (Attempt 8) and is the next gate for the CP-03 Core product baseline — awaiting Codex independent re-review after both Attempt-7 MAJOR issues were fixed.
+## Current WP-12 Acceptance / WP-13 Gate
+
+- WP-12 Attempt 8 is `ACCEPTED`: Codex review PASS and Human acceptance recorded on 2026-08-21.
+- Acceptance evidence: 45 WP-12 contract tests passed; full Core reported `238 collected / 237 passed / 1 skipped`; `validate_baseline.py` PASS; `git diff --check` PASS.
+- Git checkpoint: commit `d6823d6` (`feat(core): accept WP-12 council orchestration`) pushed to `backup/feature/first-vertical-slice`.
+- Accepted project progress remains **30/100** and accepted FVS remains **22/22**. CP-03 point allocation is intentionally deferred until CP-03 completion per Human decision.
+- WP-13 is `READY_FOR_CODEX_REVIEW` (Attempt 9); task gate is `docs/tasks/WP-13.md`. Next owner: Codex independent review -> Human acceptance.
+- WP-13 Attempt 9: D11 Option C keeps both approve and reject HUMAN_EVIDENCE unverified; reload validates actor_id, bound_task_id, bound_run_id, identity_hash (SHA-256 of workflow/task/run), and provenance_token (SHA-256 of actor/source/task/run) via independent canonical recomputation; persist uses dual-hash provenance for multi-field tamper detection; extended-key candidate detection prevents ordinary DOCUMENT_EVIDENCE false positives; cross-task and same-task multi-run isolation verified; maturity: PARTIAL_INTEGRITY (full-consistent 8-field rewrite NOT detectable; D12 deferred to CP-04+); 375 collected / 374 passed / 1 skipped in current Core verification.
+- WP-13 architecture decision gate: if Human-gate or verified-verdict semantics require a new Decision/Verdict model, table, migration, endpoint, or public field, stop with `NEED_ACTION` before source changes.
+
+WP-09B, WP-09C, WP-09D, WP-10, WP-11, and WP-12 are accepted. CP-02 is complete; WP-13 is the next gate for the CP-03 Core product baseline. CP-03 point allocation remains deferred until CP-03 completion per Human decision.
 
 ## WP-09B Development Gate
 
@@ -192,4 +199,4 @@ WP-09B, WP-09C, WP-09D, WP-10, and WP-11 are accepted. CP-02 is complete; WP-12 
 - Scope deviation: `NONE`; pre-existing `docs/15_DOCUMENT_INDEX.md` remains unstaged and excluded.
 - Accepted project progress is **30/100 = 30%**; accepted FVS progress is **22/22 = 100%**; WP-10 earns **2/2 CP-02 points**.
 - CP-02 First Vertical Slice is complete. WP-11 is `ACCEPTED` (Attempt 4): Codex review PASS and Human acceptance recorded on 2026-08-20; `services/core/tests/test_wp11_work_mode.py` has 23 passed, full Core is `193 collected / 192 passed / 1 skipped`, and `validate_baseline.py` is PASS. WP-11 item progress is 100%. The roadmap does not define a standalone WP-11 point allocation inside CP-03, so accepted project progress remains **30/100** until that allocation is explicitly recorded; CP-03 is now in progress. Next owner: WP-12 planning.
-- WP-12 is `READY_FOR_CODEX_REVIEW` (Attempt 8): `services/core/src/polynexus_core/council/` and `services/core/tests/test_wp12_council.py` added (45 contract tests PASS), full Core 238 collected / 237 passed / 1 skipped, `validate_baseline.py` PASS. Attempt 8 fixed both Codex MAJOR issues from Attempt 7 (raw status.error leaked into persisted run.result; generic exception handler rewrote an already-terminal TIMED_OUT/CANCELLED participant to FAILED) and added 2 deterministic tests (result-leak prevention with close/reopen verification; terminal-state/outcome consistency when a later version_info() exception follows a TIMED_OUT/CANCELLED status). Architecture compatibility PASSED — Council uses existing Task/Run/RunEvent/Evidence boundaries. CP-03 item progress remains 0% until Codex review PASS and Human acceptance.
+- WP-12 is `ACCEPTED` (Attempt 8): 45 contract tests PASS, full Core 238 collected / 237 passed / 1 skipped, `validate_baseline.py` PASS, Codex PASS and Human acceptance recorded on 2026-08-21, and commit `d6823d6` pushed. WP-13 is the next task; CP-03 point allocation remains deferred until CP-03 completion.
