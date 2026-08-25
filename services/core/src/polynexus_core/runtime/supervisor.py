@@ -26,6 +26,18 @@ from polynexus_core.workflows.models import WorkflowDefinition
 # or credential fragments.
 _RUNTIME_FAILURE_REASON = "Runtime boundary error"
 
+# Public-safe sanitized reason for timeout with successful cleanup.
+_TIMEOUT_CLEANUP_REASON = "Runtime timed out and cleanup verified"
+
+# Public-safe sanitized reason for cleanup verification failure.
+_CLEANUP_FAILED_REASON = "Runtime cleanup verification failed"
+
+# Public-safe sanitized reason for orphaned runs (cleanup failed).
+_ORPHANED_REASON = "Run orphaned because cleanup verification failed"
+
+# Public-safe sanitized reason for adapter-reported cancellation.
+_CANCELLED_REASON = "Run cancelled"
+
 
 @dataclass
 class RunSession:
@@ -145,8 +157,28 @@ class RunSupervisor:
                 artifacts=(),
             )
 
-        if adapter_status.state in {RunState.FAILED, RunState.TIMED_OUT}:
-            run.transition(adapter_status.state, reason=_RUNTIME_FAILURE_REASON)
+        if adapter_status.state is RunState.FAILED:
+            run.transition(RunState.FAILED, reason=_RUNTIME_FAILURE_REASON)
+            return RunExecution(
+                run=run,
+                result=None,
+                findings=(),
+                evidence=(),
+                artifacts=(),
+            )
+
+        if adapter_status.state is RunState.TIMED_OUT:
+            # Timeout: perform cleanup/verify before transitioning
+            cleanup_ok = await self._cleanup_and_verify(
+                run.runtime_ref, expected_state=RunState.TIMED_OUT
+            )
+            if cleanup_ok:
+                # Cleanup succeeded: RUNNING -> TIMED_OUT
+                run.transition(RunState.TIMED_OUT, reason=_TIMEOUT_CLEANUP_REASON)
+            else:
+                # Cleanup failed: RUNNING -> CANCEL_REQUESTED -> ORPHANED
+                run.transition(RunState.CANCEL_REQUESTED)
+                run.transition(RunState.ORPHANED, reason=_CLEANUP_FAILED_REASON)
             return RunExecution(
                 run=run,
                 result=None,
@@ -217,7 +249,8 @@ class RunSupervisor:
 
         run.transition(RunState.COMPLETED)
         return self._build_execution_from_existing(
-            run, runtime_result, adapter_artifacts, runtime_version=runtime_version
+            run, runtime_result, adapter_artifacts,
+            runtime_version=runtime_version,
         )
 
     async def execute_run(
@@ -255,15 +288,28 @@ class RunSupervisor:
 
         # Collect results from the adapter
         status = await self._adapter.status(run.runtime_ref)
-        if status.state in {RunState.FAILED, RunState.TIMED_OUT}:
-            run.transition(status.state, reason=status.error)
-            return self._build_execution_from_existing(run, RuntimeResult(summary=status.error or status.state))
+        if status.state is RunState.FAILED:
+            run.transition(RunState.FAILED, reason=_RUNTIME_FAILURE_REASON)
+            return self._build_execution_from_existing(run, RuntimeResult(summary=_RUNTIME_FAILURE_REASON))
+        if status.state is RunState.TIMED_OUT:
+            # Timeout: perform cleanup/verify before transitioning
+            cleanup_ok = await self._cleanup_and_verify(
+                run.runtime_ref, expected_state=RunState.TIMED_OUT
+            )
+            if cleanup_ok:
+                # Cleanup succeeded: RUNNING -> TIMED_OUT
+                run.transition(RunState.TIMED_OUT, reason=_TIMEOUT_CLEANUP_REASON)
+            else:
+                # Cleanup failed: RUNNING -> CANCEL_REQUESTED -> ORPHANED
+                run.transition(RunState.CANCEL_REQUESTED)
+                run.transition(RunState.ORPHANED, reason=_CLEANUP_FAILED_REASON)
+            return self._build_execution_from_existing(run, RuntimeResult(summary=_TIMEOUT_CLEANUP_REASON if cleanup_ok else _CLEANUP_FAILED_REASON))
         if status.state is RunState.ORPHANED:
             raise ValueError("Runtime reported ORPHANED before cancel cleanup")
         if status.state is RunState.CANCELLED:
             run.transition(RunState.CANCEL_REQUESTED)
-            run.transition(RunState.CANCELLED, reason=status.error)
-            return self._build_execution_from_existing(run, RuntimeResult(summary="Run cancelled"))
+            run.transition(RunState.CANCELLED, reason=_CANCELLED_REASON)
+            return self._build_execution_from_existing(run, RuntimeResult(summary=_CANCELLED_REASON))
 
         runtime_result = await self._adapter.result(run.runtime_ref)
         adapter_artifacts = await self._adapter.artifacts(run.runtime_ref)
@@ -289,15 +335,28 @@ class RunSupervisor:
     async def collect(self, session: RunSession) -> RunExecution:
         self._require_active(session)
         status = await self._adapter.status(session.runtime_ref)
-        if status.state in {RunState.FAILED, RunState.TIMED_OUT}:
-            session.run.transition(status.state, reason=status.error)
-            return self._build_execution(session, RuntimeResult(summary=status.error or status.state))
+        if status.state is RunState.FAILED:
+            session.run.transition(RunState.FAILED, reason=_RUNTIME_FAILURE_REASON)
+            return self._build_execution(session, RuntimeResult(summary=_RUNTIME_FAILURE_REASON))
+        if status.state is RunState.TIMED_OUT:
+            # Timeout: perform cleanup/verify before transitioning
+            cleanup_ok = await self._cleanup_and_verify(
+                session.runtime_ref, expected_state=RunState.TIMED_OUT
+            )
+            if cleanup_ok:
+                # Cleanup succeeded: RUNNING -> TIMED_OUT
+                session.run.transition(RunState.TIMED_OUT, reason=_TIMEOUT_CLEANUP_REASON)
+            else:
+                # Cleanup failed: RUNNING -> CANCEL_REQUESTED -> ORPHANED
+                session.run.transition(RunState.CANCEL_REQUESTED)
+                session.run.transition(RunState.ORPHANED, reason=_CLEANUP_FAILED_REASON)
+            return self._build_execution(session, RuntimeResult(summary=_TIMEOUT_CLEANUP_REASON if cleanup_ok else _CLEANUP_FAILED_REASON))
         if status.state is RunState.ORPHANED:
             raise ValueError("Runtime reported ORPHANED before cancel cleanup")
         if status.state is RunState.CANCELLED:
             session.run.transition(RunState.CANCEL_REQUESTED)
-            session.run.transition(RunState.CANCELLED, reason=status.error)
-            return self._build_execution(session, RuntimeResult(summary="Run cancelled"))
+            session.run.transition(RunState.CANCELLED, reason=_CANCELLED_REASON)
+            return self._build_execution(session, RuntimeResult(summary=_CANCELLED_REASON))
 
         runtime_result = await self._adapter.result(session.runtime_ref)
         adapter_artifacts = await self._adapter.artifacts(session.runtime_ref)
@@ -307,23 +366,71 @@ class RunSupervisor:
     async def cancel(self, session: RunSession) -> RunExecution:
         self._require_active(session)
         session.run.transition(RunState.CANCEL_REQUESTED)
-        await self._adapter.cancel(session.runtime_ref)
-        cleanup_ok = await self._adapter.cleanup(session.runtime_ref)
-        status = await self._adapter.status(session.runtime_ref)
-        if cleanup_ok and status.state is RunState.CANCELLED:
-            session.run.transition(RunState.CANCELLED, reason="cancelled and cleanup verified")
+        # Shared cleanup/verification machinery (same standard as timeout):
+        # adapter cancel/cleanup/status exceptions are contained inside
+        # _cleanup_and_verify; raw errors never reach the caller or persistence.
+        cleanup_ok = await self._cleanup_and_verify(
+            session.runtime_ref, expected_state=RunState.CANCELLED
+        )
+        if cleanup_ok:
+            session.run.transition(
+                RunState.CANCELLED, reason="cancelled and cleanup verified"
+            )
             summary = "Run cancelled and cleanup verified"
         else:
-            session.run.transition(
-                RunState.ORPHANED,
-                reason="runtime cleanup verification failed",
-            )
+            session.run.transition(RunState.ORPHANED, reason=_CLEANUP_FAILED_REASON)
             summary = "Run orphaned because cleanup verification failed"
         return self._build_execution(session, RuntimeResult(summary=summary))
 
     def _require_active(self, session: RunSession) -> None:
         if session.run.state is not RunState.RUNNING:
             raise ValueError(f"Run is not active: {session.run.state}")
+
+    async def _cleanup_and_verify(
+        self,
+        runtime_ref: str,
+        expected_state: RunState,
+    ) -> bool:
+        """Shared cleanup/verification machinery for timeout and cancel paths.
+
+        Calls adapter.cancel -> adapter.cleanup -> adapter.status and verifies
+        the post-cleanup status proves owned work stopped in the expected
+        terminal state. Any exception from any step is contained here and
+        yields False — raw exceptions never propagate to the caller and raw
+        error text is never persisted.
+
+        Returns True only when cleanup succeeded AND the post-cleanup status
+        state is exactly ``expected_state``:
+          - timeout path: expected_state=RunState.TIMED_OUT
+          - cancel path:  expected_state=RunState.CANCELLED
+        Any other state (FAILED/ORPHANED/RUNNING/STARTING/CREATED/...) is a
+        verification failure; the caller must fail closed via
+        CANCEL_REQUESTED -> ORPHANED.
+        """
+        try:
+            await self._adapter.cancel(runtime_ref)
+        except Exception:
+            return False
+
+        try:
+            cleanup_ok = await self._adapter.cleanup(runtime_ref)
+        except Exception:
+            return False
+
+        try:
+            status = await self._adapter.status(runtime_ref)
+        except Exception:
+            return False
+
+        if not cleanup_ok:
+            return False
+
+        # Fail closed unless the post-cleanup state exactly matches the
+        # expected terminal state proving owned work stopped.
+        if status.state is not expected_state:
+            return False
+
+        return True
 
     def _build_execution_from_existing(
         self,

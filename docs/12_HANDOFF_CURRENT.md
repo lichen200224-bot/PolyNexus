@@ -1,61 +1,64 @@
 # Current Handoff
 
 ## Task
-`ADR-011-HUMAN-ACCEPTANCE-STATE-SYNC` — record explicit Human ADR-011 architecture acceptance without authorizing PRE-WP14-A/B implementation
+`PRE-WP14-A-ADR007-TIMEOUT-CLEANUP` — ADR-007 timeout/cancel cleanup compliance in RunSupervisor (Attempt 2)
 
 ## Status
-Current operational status: `ADR_011_HUMAN_ACCEPTED / NOT_IMPLEMENTED / INDEPENDENT_REVIEWER_REQUIRED / NOT_APPROVED_FOR_COMMIT`.
+Current operational status: `IMPLEMENTATION_COMPLETE / READY_FOR_CODEX_REVIEW / NOT_APPROVED_FOR_COMMIT`.
 
 - Branch: `feature/first-vertical-slice`
-- Baseline/checkpoint: `358d263e16ccafca413672399f968fe769e57563` (`docs(governance): consolidate v1.1 and plan pre-WP14 runtime gates`)
-- Previous gates: WP-13 accepted at `330adbc`; Governance checkpoint `358d263`; ADR-011 docs independently `VERIFIED_PASS`; ADR-011 architecture explicitly Human-accepted on 2026-08-25
-- Current documentation Writer: Codex (current context; Human-authorized ADR-011 acceptance-state synchronization)
-- Required documentation Reviewer: fresh independent reviewer/context other than the current Writer
-- Future implementation Writer / Reviewer: OpenCode / fresh independent Codex; Human retains Architecture, Acceptance and Git Gates
-- Antigravity: `NOT_REQUIRED` — no UI/browser/E2E surface
-- Next owner: fresh independent accepted-state Reviewer -> separate Human docs-checkpoint decision -> separately bounded PRE-WP14-A/B OpenCode implementation authorization
+- Baseline/checkpoint: `8994ef913a6255379ebdf76ef691a655b57efe11`
+- Previous gates: WP-13 accepted at `330adbc`; Governance checkpoint `358d263`; ADR-011 Human-accepted
+- Current Writer: OpenCode (Human-authorized PRE-WP14-A implementation)
+- Required Reviewer: fresh independent Codex context
+- Antigravity: `NOT_REQUIRED` — Core Runtime lifecycle task, no UI/browser/E2E surface
+- Next owner: fresh independent Codex Reviewer -> Human Acceptance/Git Gate
 - GitHub status: not configured/verified by this task; `CROSS_MACHINE_CONTINUATION_READY` is not established
 
 ## Current Goal and Delta
 
-Record the explicit Human Architecture Gate decision as `ADR_011_HUMAN_ACCEPTED / NOT_IMPLEMENTED / IMPLEMENTATION_NOT_AUTHORIZED` across the already independently reviewed architecture documents. Preserve existing ADR-001～010 semantics, D11 Option C fail closed, `Task != Run`, One-Hop routing and `Writer != Reviewer`. Run-owned immutable snapshot / future Alembic `0002` remain accepted architecture direction only; implementation, migration, Git checkpoint and PRE-WP14-A/B source changes each require separate Human authorization.
+Attempt 1 review (fresh independent Codex) returned FAIL with three MAJOR findings; all fixed in Attempt 2:
 
-Current documentation-only changed-file allowlist (no staging currently authorized):
-- `docs/02_SA.md`
-- `docs/03_SD.md`
-- `docs/08_ACCEPTANCE_STRATEGY.md`
-- `docs/10_DECISION_LOG.md`
-- `docs/11_PROJECT_STATE.md`
+1. `cancel()` now transitions CANCEL_REQUESTED first and delegates to the shared `_cleanup_and_verify()` machinery. Adapter cancel/cleanup/post-cleanup-status exceptions are contained inside the shared method; raw exceptions never propagate to the caller; failure path is CANCEL_REQUESTED -> ORPHANED with a sanitized constant reason.
+2. `_cleanup_and_verify(runtime_ref, expected_state)` now requires the post-cleanup adapter status state to EXACTLY equal `expected_state` ({TIMED_OUT} for timeout paths, {CANCELLED} for the cancel path). Any other state (FAILED/ORPHANED/wrong-terminal/RUNNING/STARTING/CREATED) or cleanup=False or any exception returns False -> caller fails closed via CANCEL_REQUESTED -> ORPHANED. Timeout success remains RUNNING -> TIMED_OUT directly (CANCEL_REQUESTED -> TIMED_OUT never occurs).
+3. `execute_run()`/`collect()` adapter-reported CANCELLED branches now persist the sanitized constant reason `"Run cancelled"` instead of raw `status.error` in both the terminal event reason and result summary.
+
+Owned changed files:
+- `services/core/src/polynexus_core/runtime/supervisor.py`
+- `services/core/tests/test_runtime_skeleton.py` (17 tests total; +5 new in Attempt 2: cancel-exception x3 fail-closed, timeout wrong post-cleanup status x3 fail-closed, execute_run/collect cancellation sanitization x2, shared-machinery cancel regression)
 - `docs/12_HANDOFF_CURRENT.md`
-- `docs/18_ARCHITECTURE_DECISIONS.md` — records Human-accepted ADR-011 architecture only; frozen ADR-001～010 decision text is unchanged
-- `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`
-- `docs/29_ADR_011_RUNTIME_BINDING_AND_TRANSPORT.md` — new untracked, Human-accepted architecture decision; no implementation authority
-- `docs/30_RUNTIME_CONTRACT_FOUNDATION_GATE.md` — new untracked PRE-WP14-A/B plan
 
 Excluded pre-existing changes not owned, modified or stageable by this task:
 - `docs/15_DOCUMENT_INDEX.md`
 - `docs/tasks/WP-12.md`
-- `services/core/src/polynexus_core/runtime/supervisor.py`
 
-Protected areas: all Product Core, tests, migrations, schemas, apps/web, browser companion, workflows, ADR-001～010 semantics, D11, WP-13/Governance checkpoints, docs-only source worktree and pre-existing dirty-file ownership.
+Protected areas: ADR-001～010, ADR-011, domain/enums.py, domain/run_lifecycle.py (lifecycle table unchanged — no new RunState/transition), runtime/contracts.py, runtime/reference.py, execution_service.py, council/orchestrator.py, API files, persistence/model/repository files, Alembic migrations, schema/workflow files, dependencies/lockfiles, PRE-WP14-B.
 
-ADR impact: ADR-001～010 unchanged. FULL ADR-011 is explicitly `HUMAN_ACCEPTED / NOT_IMPLEMENTED / IMPLEMENTATION_NOT_AUTHORIZED`. Future Run-owned immutable `RuntimeBindingSnapshot` and Alembic `0002` require separately approved source/migration scope, legacy backfill, rollback/restore and deterministic tests. Attempt, RoutingEnvelope and trusted-human authentication remain deferred. PRE-WP14-A cannot silently absorb the existing dirty `runtime/supervisor.py` change.
+ADR impact: ADR-007 compliance implementation only; ADR-011 unchanged; no new ADR.
 
-Current verification:
-- `tools\validate-polynexus-governance.ps1 -RepoRoot D:\AI學習教材\PolyNexus` -> additive Governance package validator `PASS`, exit code `0`; this does not certify the complete repository diff or replace independent acceptance.
-- `git branch --show-current` -> `feature/first-vertical-slice`, exit code `0`; `git rev-parse HEAD` -> `358d263e16ccafca413672399f968fe769e57563`, exit code `0`.
-- `git diff --check` -> no output, exit code `0`; `git status --short --branch` and `git diff --name-status` -> exit code `0`; 10 owned documentation files including two untracked proposals, exactly three excluded pre-existing changes, and zero unexpected paths.
-- `git diff --cached --name-status` -> no output, exit code `0`; `git ls-files --others --exclude-standard` -> exactly `docs/29_ADR_011_RUNTIME_BINDING_AND_TRANSPORT.md` and `docs/30_RUNTIME_CONTRACT_FOUNDATION_GATE.md`, exit code `0`.
-- `.venv\Scripts\python.exe --version` -> `Unable to create process`, actual exit code `1` (`ENVIRONMENT_FAILURE`).
-- `C:\temp_pn_venv2\Scripts\python.exe --version` -> `Unable to create process`, actual exit code `1` (`ENVIRONMENT_FAILURE`).
-- `scripts\validate_baseline.py`: `NOT_RUN / UNVERIFIED`; no functional Python launcher and no dependency installation/fallback was authorized.
-- Product tests: not run; documentation-only patch does not modify Product Core, tests, schemas, workflows or runtime behavior.
+Current verification (Attempt 2 actual commands, all exit code 0):
+- `git branch --show-current` -> `feature/first-vertical-slice`; `git rev-parse HEAD` -> `8994ef913a6255379ebdf76ef691a655b57efe11`.
+- Targeted: pytest `-q services\core\tests\test_runtime_skeleton.py` -> JUnit XML `tests=17 failures=0 errors=0 skipped=0`; exit code `0`.
+- Regression 1: pytest `-q services\core\tests\test_run_lifecycle.py services\core\tests\test_wp07_integration.py` -> `tests=17 failures=0 errors=0 skipped=1`; exit code `0`.
+- Regression 2: pytest `-q services\core\tests\test_wp09_execution_api.py services\core\tests\test_wp12_council.py services\core\tests\test_wp13_workflow_gates.py` -> `tests=218 failures=0 errors=0 skipped=0`; exit code `0`.
+- Collect-only: `390 collected`; exit code `0`.
+- Full Core: pytest `-q --disable-warnings services\core` -> JUnit XML `tests=390 failures=0 errors=0 skipped=1` (389 passed); exit code `0`.
+- Baseline: `.\scripts\validate_baseline.py` -> `Baseline validation PASS: 11 required files; workflows valid; MV3 manifest valid`; exit code `0`.
+- `git diff --check` -> clean; exit code `0`. Staged = empty; untracked = empty.
+- Adversarial re-test (reviewer Part A/B/C suites via stdin-piped fake-adapter scripts): ALL PASS — cancel/cleanup/status exceptions -> ORPHANED with no raw propagation and no secret leak; timeout wrong post-cleanup CANCELLED/FAILED/ORPHANED -> ORPHANED; timeout correct -> direct TIMED_OUT without CANCEL_REQUESTED; user-cancel success CANCEL_REQUESTED -> CANCELLED preserved; E1/E2 cancellation reason is exactly `"Run cancelled"`.
 
-No stage, commit, push, remote operation, source-worktree mutation, source/schema/migration implementation, dependency installation or GitHub repository operation is authorized.
+Known limitations / UNVERIFIED (not PASS):
+- Pytest temp-dir `PermissionError` at interpreter exit: non-fatal Windows environment warning.
+- Windows symlink containment: `UNVERIFIED/SKIPPED` under accepted Human waiver.
+- Browser DOM / Playwright E2E: `UNVERIFIED/SKIPPED` (no UI surface in this task).
+- True concurrent HTTP duplicate-command execution: `UNVERIFIED`.
+- Adversarial checks were executed as read-only stdin scripts against the working tree; they are reviewer-style evidence, not repo test files.
+
+No stage, commit, push, remote operation or GitHub repository operation is authorized.
 
 ## Next Routing
 
-Fresh independent Reviewer reruns branch/HEAD/status/diff/staged/untracked/protected-area checks, Governance validator and actual environment preflight; compares all 10 documentation files including both untracked ADR documents; confirms unchanged ownership/hashes of the three excluded dirty files and frozen ADR-001～010 semantics; verifies explicit Human-accepted but unimplemented ADR-011, D11, Run-owned snapshot direction, Alembic-only migration planning and PRE-WP14-A/B separation. Independent acceptance routes only to Human for a separately authorized exact-allowlist docs checkpoint and later separate PRE-WP14-A/B task Gates. OpenCode product implementation requires a new Human-approved task, explicit source/migration allowlist, resolution of existing supervisor.py dirty ownership, executable Python environment and fresh independent Codex Reviewer.
+Fresh independent Codex Reviewer reruns branch/HEAD/status/diff/staged/untracked checks and the full targeted/regression/full-core/baseline command set; confirms the three Attempt-1 MAJOR findings are closed (cancel exception containment, exact expected_state verification, sanitized cancellation reasons); verifies no lifecycle-table/RunState/schema/API/dependency changes and excluded files untouched. Only independent VERIFIED_PASS routes to Human for Acceptance/Git Gate.
 
 ## Handoff Retention Rule
 
