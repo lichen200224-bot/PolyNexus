@@ -1,14 +1,12 @@
 # Runtime Contract Foundation Gate — Pre-WP14
 
-- Status: `ARCHITECTURE_ACCEPTED / STATE_SYNC_INDEPENDENT_REVIEW_REQUIRED`
-- Architecture decision status: `ADR-011 HUMAN_ACCEPTED / IMPLEMENTATION_NOT_AUTHORIZED`
-- Product implementation status: `NOT_STARTED`
+- Status: `PRE-WP14-A IMPLEMENTATION_ACCEPTED @ 28196c9 / PRE-WP14-B PLANNING_ONLY NOT_AUTHORIZED / STATE_SYNC_INDEPENDENT_REVIEW_REQUIRED`
+- Architecture decision status: `ADR-011 HUMAN_ACCEPTED / IMPLEMENTATION_NOT_AUTHORIZED` (unchanged)
+- Sub-gate A (ADR-007 timeout cleanup): `HUMAN_ACCEPTED / IMPLEMENTATION_ACCEPTED` at checkpoint `28196c9`
+- Sub-gate B (Runtime Binding contract): `PLANNING_ONLY / NOT_IMPLEMENTED / NOT_AUTHORIZED`; Alembic `0002`, RuntimeBindingSnapshot persistence/reload, legacy backfill and rollback/restore are NOT implemented
 - Gate type: Architecture and contract gate
-- Implementation status: `NOT_IMPLEMENTED`
-- Entry condition: satisfied for planning — WP-13 checkpoint `330adbc` and Governance checkpoint `358d263`; implementation remains separately gated
-- Documentation Writer: Codex (current context)
-- Documentation Reviewer: fresh independent context
-- Future implementation Writer / Reviewer: OpenCode / fresh independent Codex
+- Accepted-state sync Writer: OpenCode
+- Required Reviewer: fresh independent Codex context; Writer != Reviewer is mandatory
 - Decision and Git authority: Human
 - Accepted ADR: `docs/29_ADR_011_RUNTIME_BINDING_AND_TRANSPORT.md`
 - Existing authority: ADR-007 and ADR-010 remain frozen
@@ -21,7 +19,7 @@ It does not implement Runtime Binding, Registry, SecretStore, migrations, APIs, 
 
 ## 2. Verified current implementation
 
-As of current Governance checkpoint `358d263e16ccafca413672399f968fe769e57563` and the current read-only source inspection:
+As of the PRE-WP14-A accepted checkpoint `28196c9705e688ee05c0bb4703cdf5b254d400c6`:
 
 - `RunSupervisor` accepts a generic `RuntimeAdapter` and owns normalized Run lifecycle.
 - `ExecutionService` constructs `ReferenceRuntimeAdapter` directly.
@@ -32,7 +30,8 @@ As of current Governance checkpoint `358d263e16ccafca413672399f968fe769e57563` a
 - Workflow nodes are vendor-neutral, but step additional properties are not a Runtime Binding contract.
 - No implemented Provider, TransportKind, RuntimeProfile, RuntimeBindingSnapshot, Adapter Registry, SecretRef/SecretStore, or managed CLI process abstraction exists.
 - Existing tests are Reference Runtime-centric and assert the current `LOCAL/NONE` default.
-- User cancel verifies Adapter cleanup; timeout paths do not yet prove the complete ADR-007 timeout-to-cleanup sequence.
+- PRE-WP14-A implemented: timeout paths (`execute_claimed_run()` / `execute_run()` / `collect()`) and user cancel share one `_cleanup_and_verify(runtime_ref, expected_state)` machinery — adapter cancel -> cleanup -> post-cleanup status must return exactly `{TIMED_OUT}` (timeout) or `{CANCELLED}` (cancel) with `cleanup=True`; any exception or mismatch inside this shared boundary fails closed via CANCEL_REQUESTED -> ORPHANED with sanitized constant reasons; timeout success is a direct RUNNING -> TIMED_OUT transition.
+- PRE-WP14-A sanitization evidence scope (boundary-only): the shared `_cleanup_and_verify()` cancel/cleanup/post-cleanup-status exception containment, timeout/cancel `status.error` sanitization to constant reasons, and no PASS evidence for TIMED_OUT/ORPHANED executions. Generic workflow-executor exception handling elsewhere in `execute_run()` (the workflow-executor try/except persists `str(exc)` as the event reason and re-raises) is pre-existing behavior, unchanged by PRE-WP14-A, and NOT covered by its evidence.
 
 These are `CURRENT IMPLEMENTATION` facts, not statements that accepted architecture capabilities already exist.
 
@@ -40,7 +39,9 @@ These are `CURRENT IMPLEMENTATION` facts, not statements that accepted architect
 
 The Foundation Gate has two independent sub-gates. Neither may be hidden inside the other.
 
-### PRE-WP14-A. ADR-007 Timeout Cleanup Compliance
+### PRE-WP14-A. ADR-007 Timeout Cleanup Compliance — `ACCEPTED`
+
+Status: `HUMAN_ACCEPTED / IMPLEMENTATION_ACCEPTED` at checkpoint `28196c9`.
 
 Goal: prove the existing ADR-007 requirement for every real process/session Runtime.
 
@@ -54,18 +55,18 @@ timeout detection
   -> record a truthful legal final state and evidence
 ```
 
-Acceptance requirements:
+Acceptance requirements (all implemented and independently reviewed):
 
-1. Timeout uses the same cleanup machinery and verification standard as cancel.
-2. A Run is not reported as cleanly timed out until cleanup is verified.
-3. Cleanup failure produces the existing diagnostic behavior (`ORPHANED` through a legal lifecycle path) and never PASS evidence.
-4. Raw vendor errors, process output, paths, tokens, and credentials are sanitized before durable persistence.
-5. Deterministic fake-process/fake-resource tests prove success and cleanup-failure paths.
-6. Adapter maturity cannot exceed the highest level supported by current cleanup evidence.
+1. Timeout uses the same cleanup machinery and verification standard as cancel. — DONE: shared `_cleanup_and_verify()`.
+2. A Run is not reported as cleanly timed out until cleanup is verified. — DONE: post-cleanup status must be exactly `TIMED_OUT`; otherwise fail closed.
+3. Cleanup failure produces the existing diagnostic behavior (`ORPHANED` through a legal lifecycle path) and never PASS evidence. — DONE: CANCEL_REQUESTED -> ORPHANED; no PASS evidence for TIMED_OUT/ORPHANED.
+4. Raw vendor errors, process output, paths, tokens, and credentials are sanitized before durable persistence. — DONE within the PRE-WP14-A cleanup/cancel/timeout boundary only: shared `_cleanup_and_verify()` exception containment and timeout/cancel `status.error` sanitization to constant reasons; TIMED_OUT/ORPHANED produce no PASS evidence. This DONE does not extend to generic workflow-executor failure paths outside that boundary (pre-existing behavior, unchanged).
+5. Deterministic fake-process/fake-resource tests prove success and cleanup-failure paths. — DONE: 17 tests in `test_runtime_skeleton.py`, including cancel-exception x3, wrong post-cleanup status x3, sanitization x2.
+6. Adapter maturity cannot exceed the highest level supported by current cleanup evidence. — standing rule; unchanged.
 
-This sub-gate is existing ADR-007 compliance work. It is not introduced by subscription support.
+### PRE-WP14-B. Runtime Binding Contract — `PLANNING_ONLY / NOT_AUTHORIZED`
 
-### PRE-WP14-B. Runtime Binding Contract
+Status: NOT implemented. Alembic `0002`, Run-owned immutable RuntimeBindingSnapshot persistence/reload, deterministic legacy backfill, rollback/restore and their tests remain unimplemented; implementation requires a separate Human gate with an explicit source/migration allowlist.
 
 Goal: approve a durable, vendor-neutral Runtime identity and resolution contract before production Adapter wiring.
 
@@ -142,25 +143,21 @@ WP-19/WP-20 remain the WebSurface/Browser Companion path. They are not Subscript
 
 ## 7. Entry and exit conditions
 
-Planning entry is satisfied:
+Sub-gate A entry/exit is satisfied:
 
-- WP-13 was independently accepted and checkpointed at `330adbc`.
-- Governance v1.1 was independently accepted, Human-approved and checkpointed at `358d263`.
-- Human authorized curated docs-only integration without merging or overwriting the older docs worktree.
-- The integrated ADR documentation received independent `VERIFIED_PASS`, and Human explicitly accepted ADR-011 architecture on 2026-08-25.
+- PRE-WP14-A was implemented by OpenCode (Attempt 2), independently reviewed by a fresh Codex context after an initial FAIL was remediated, Human-accepted, and checkpointed at `28196c9`.
+- PRE-WP14-A Attempt 2 deterministic evidence (2026-08-25, basis `8994ef9`): targeted 17 passed; lifecycle+WP07 regression 17 tests / 16 passed / 1 skipped; WP09+WP12+WP13 regression 218 passed; Full Core 390 collected / 389 passed / 1 skipped; baseline PASS — all exit code 0. These are historical evidence for checkpoint `28196c9`, not new claims.
 
-Implementation entry remains blocked until:
+Implementation entry for Sub-gate B remains blocked until:
 
-- a fresh independent Reviewer validates the Human-accepted ADR-011 state synchronization;
-- Human separately authorizes each PRE-WP14 implementation gate and resolves existing `supervisor.py` dirty-file ownership before any task touches it;
-- the exact product source/test/migration allowlist, legacy policy, rollback/restore path, and executable Python environment are approved/available;
-- OpenCode is explicitly assigned as the single implementation Writer.
+- a fresh independent Reviewer validates this PRE-WP14-A accepted-state synchronization;
+- Human separately authorizes the PRE-WP14-B implementation gate with an explicit product source/test/migration allowlist, legacy backfill policy, rollback/restore path, and executable Python environment;
+- OpenCode is explicitly assigned as the single implementation Writer and a fresh independent Codex context as Reviewer (Writer != Reviewer).
 
-Exit requires:
+Exit for Sub-gate B requires:
 
-- recorded Human acceptance of ADR-011 architecture, without implying implementation authority;
-- separate PASS/decision records for Sub-gate A and Sub-gate B;
-- approved implementation scope and migration/rollback plan;
+- separate PASS/decision records for Sub-gate B;
+- approved implementation scope, migration, legacy-backfill and rollback/restore plan;
 - explicit next owner for WP-14.
 
 ## 8. Do not change during this preparation task
@@ -173,4 +170,4 @@ Exit requires:
 
 ## 9. Next exact step
 
-A fresh independent Reviewer verifies the Human-accepted ADR-011 state synchronization against checkpoint `358d263`, the two protected worktrees, ADR-001–010, D11, and the three excluded pre-existing dirty files. Human may then separately authorize an exact-allowlist documentation checkpoint and later bounded PRE-WP14-A/B implementation tasks for OpenCode. No stage, commit, push, worktree merge, product implementation, migration, or AI self-acceptance is implied.
+This accepted-state synchronization (docs/11_PROJECT_STATE.md, docs/12_HANDOFF_CURRENT.md, docs/30_RUNTIME_CONTRACT_FOUNDATION_GATE.md) is handed to a fresh independent Codex Reviewer. Only after independent review PASS may Human separately authorize an exact-allowlist docs-only checkpoint (owned: the three synced docs; excluded dirty files `docs/15_DOCUMENT_INDEX.md` and `docs/tasks/WP-12.md` keep their ownership and must not be silently absorbed). PRE-WP14-B implementation, Alembic `0002`, RuntimeBindingSnapshot, legacy backfill, rollback/restore and persistence/reload remain NOT_AUTHORIZED until their own Human gate. No stage, commit, push, product implementation, migration, or AI self-acceptance is implied by this document update.

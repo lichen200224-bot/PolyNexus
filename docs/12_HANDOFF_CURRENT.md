@@ -1,64 +1,53 @@
 # Current Handoff
 
 ## Task
-`PRE-WP14-A-ADR007-TIMEOUT-CLEANUP` — ADR-007 timeout/cancel cleanup compliance in RunSupervisor (Attempt 2)
+`PRE-WP14-A-STATE-SYNC` — documentation-only accepted-state synchronization after PRE-WP14-A Human acceptance
 
 ## Status
-Current operational status: `IMPLEMENTATION_COMPLETE / READY_FOR_CODEX_REVIEW / NOT_APPROVED_FOR_COMMIT`.
+Current operational status: `DOCS_SYNC_COMPLETE / READY_FOR_CODEX_REVIEW / NOT_APPROVED_FOR_COMMIT`.
 
 - Branch: `feature/first-vertical-slice`
-- Baseline/checkpoint: `8994ef913a6255379ebdf76ef691a655b57efe11`
-- Previous gates: WP-13 accepted at `330adbc`; Governance checkpoint `358d263`; ADR-011 Human-accepted
-- Current Writer: OpenCode (Human-authorized PRE-WP14-A implementation)
-- Required Reviewer: fresh independent Codex context
-- Antigravity: `NOT_REQUIRED` — Core Runtime lifecycle task, no UI/browser/E2E surface
-- Next owner: fresh independent Codex Reviewer -> Human Acceptance/Git Gate
+- Checkpoint: `28196c9705e688ee05c0bb4703cdf5b254d400c6` (`PRE-WP14-A` accepted checkpoint; basis working tree was `8994ef9`)
+- Previous gates: WP-13 accepted at `330adbc`; Governance v1.1 at `358d263`; ADR-011 architecture Human-accepted (unchanged); PRE-WP14-A `HUMAN_ACCEPTED / IMPLEMENTATION_ACCEPTED`
+- Current Writer: OpenCode (Human-authorized docs-only state sync)
+- Required Reviewer: fresh independent Codex context; Writer != Reviewer is mandatory
+- Antigravity: `NOT_REQUIRED` — no UI/browser/E2E surface
+- Next owner: fresh independent Codex Reviewer -> separate Human docs-only checkpoint authorization
 - GitHub status: not configured/verified by this task; `CROSS_MACHINE_CONTINUATION_READY` is not established
 
 ## Current Goal and Delta
 
-Attempt 1 review (fresh independent Codex) returned FAIL with three MAJOR findings; all fixed in Attempt 2:
+Record PRE-WP14-A as `HUMAN_ACCEPTED / IMPLEMENTATION_ACCEPTED` at checkpoint `28196c9`, keep PRE-WP14-B at `PLANNING_ONLY / NOT_AUTHORIZED`, and preserve ADR-001～010 / ADR-011 semantics unchanged. No product code, schema, migration, API, dependency or test changes are part of this sync.
 
-1. `cancel()` now transitions CANCEL_REQUESTED first and delegates to the shared `_cleanup_and_verify()` machinery. Adapter cancel/cleanup/post-cleanup-status exceptions are contained inside the shared method; raw exceptions never propagate to the caller; failure path is CANCEL_REQUESTED -> ORPHANED with a sanitized constant reason.
-2. `_cleanup_and_verify(runtime_ref, expected_state)` now requires the post-cleanup adapter status state to EXACTLY equal `expected_state` ({TIMED_OUT} for timeout paths, {CANCELLED} for the cancel path). Any other state (FAILED/ORPHANED/wrong-terminal/RUNNING/STARTING/CREATED) or cleanup=False or any exception returns False -> caller fails closed via CANCEL_REQUESTED -> ORPHANED. Timeout success remains RUNNING -> TIMED_OUT directly (CANCEL_REQUESTED -> TIMED_OUT never occurs).
-3. `execute_run()`/`collect()` adapter-reported CANCELLED branches now persist the sanitized constant reason `"Run cancelled"` instead of raw `status.error` in both the terminal event reason and result summary.
+Accuracy correction (this revision): sanitization claims are narrowed to the PRE-WP14-A cleanup/cancel/timeout boundary actually covered by evidence — (a) shared `_cleanup_and_verify()` containment of adapter cancel/cleanup/post-cleanup-status exceptions, (b) timeout/cancel `status.error` sanitized to constant reasons, and (c) no PASS evidence for TIMED_OUT/ORPHANED executions. The docs do NOT claim generic `execute_run()` workflow-executor exceptions are globally sanitized: that path (`supervisor.py` workflow-executor try/except persisting `str(exc)` and re-raising) is pre-existing scope and unchanged while product code stays untouched by this task.
 
 Owned changed files:
-- `services/core/src/polynexus_core/runtime/supervisor.py`
-- `services/core/tests/test_runtime_skeleton.py` (17 tests total; +5 new in Attempt 2: cancel-exception x3 fail-closed, timeout wrong post-cleanup status x3 fail-closed, execute_run/collect cancellation sanitization x2, shared-machinery cancel regression)
-- `docs/12_HANDOFF_CURRENT.md`
+- `docs/11_PROJECT_STATE.md` — milestone/priority/next-gate/state/governance-status/verification updated for PRE-WP14-A acceptance at `28196c9`
+- `docs/12_HANDOFF_CURRENT.md` — this operational block replaced with current state + delta + next routing
+- `docs/30_RUNTIME_CONTRACT_FOUNDATION_GATE.md` — Sub-gate A marked ACCEPTED with implemented contract facts; Sub-gate B remains PLANNING_ONLY / NOT_AUTHORIZED
 
-Excluded pre-existing changes not owned, modified or stageable by this task:
+Explicitly still NOT implemented (PRE-WP14-B scope, unchanged): Alembic `0002`, Run-owned immutable RuntimeBindingSnapshot persistence/reload, deterministic legacy backfill, rollback/restore.
+
+Excluded pre-existing dirty files with preserved ownership (must not be silently absorbed):
 - `docs/15_DOCUMENT_INDEX.md`
 - `docs/tasks/WP-12.md`
 
-Protected areas: ADR-001～010, ADR-011, domain/enums.py, domain/run_lifecycle.py (lifecycle table unchanged — no new RunState/transition), runtime/contracts.py, runtime/reference.py, execution_service.py, council/orchestrator.py, API files, persistence/model/repository files, Alembic migrations, schema/workflow files, dependencies/lockfiles, PRE-WP14-B.
+Protected areas: all Product Core, tests, migrations, schemas, apps/web, browser companion, workflows, ADR-001～010 decision text, ADR-011 semantics, WP-13/Governance/PRE-WP14-A checkpoints.
 
-ADR impact: ADR-007 compliance implementation only; ADR-011 unchanged; no new ADR.
+ADR impact: NONE. ADR-007 compliance was already implemented and accepted in checkpoint `28196c9`; this sync records that fact only. No new ADR.
 
-Current verification (Attempt 2 actual commands, all exit code 0):
-- `git branch --show-current` -> `feature/first-vertical-slice`; `git rev-parse HEAD` -> `8994ef913a6255379ebdf76ef691a655b57efe11`.
-- Targeted: pytest `-q services\core\tests\test_runtime_skeleton.py` -> JUnit XML `tests=17 failures=0 errors=0 skipped=0`; exit code `0`.
-- Regression 1: pytest `-q services\core\tests\test_run_lifecycle.py services\core\tests\test_wp07_integration.py` -> `tests=17 failures=0 errors=0 skipped=1`; exit code `0`.
-- Regression 2: pytest `-q services\core\tests\test_wp09_execution_api.py services\core\tests\test_wp12_council.py services\core\tests\test_wp13_workflow_gates.py` -> `tests=218 failures=0 errors=0 skipped=0`; exit code `0`.
-- Collect-only: `390 collected`; exit code `0`.
-- Full Core: pytest `-q --disable-warnings services\core` -> JUnit XML `tests=390 failures=0 errors=0 skipped=1` (389 passed); exit code `0`.
-- Baseline: `.\scripts\validate_baseline.py` -> `Baseline validation PASS: 11 required files; workflows valid; MV3 manifest valid`; exit code `0`.
-- `git diff --check` -> clean; exit code `0`. Staged = empty; untracked = empty.
-- Adversarial re-test (reviewer Part A/B/C suites via stdin-piped fake-adapter scripts): ALL PASS — cancel/cleanup/status exceptions -> ORPHANED with no raw propagation and no secret leak; timeout wrong post-cleanup CANCELLED/FAILED/ORPHANED -> ORPHANED; timeout correct -> direct TIMED_OUT without CANCEL_REQUESTED; user-cancel success CANCEL_REQUESTED -> CANCELLED preserved; E1/E2 cancellation reason is exactly `"Run cancelled"`.
-
-Known limitations / UNVERIFIED (not PASS):
-- Pytest temp-dir `PermissionError` at interpreter exit: non-fatal Windows environment warning.
-- Windows symlink containment: `UNVERIFIED/SKIPPED` under accepted Human waiver.
-- Browser DOM / Playwright E2E: `UNVERIFIED/SKIPPED` (no UI surface in this task).
-- True concurrent HTTP duplicate-command execution: `UNVERIFIED`.
-- Adversarial checks were executed as read-only stdin scripts against the working tree; they are reviewer-style evidence, not repo test files.
+Verification:
+- Docs-only patch: no product tests are run by this sync; no PASS claim is made for it.
+- `git branch --show-current` -> `feature/first-vertical-slice`; `git rev-parse HEAD` -> `28196c9705e688ee05c0bb4703cdf5b254d400c6`; exit code `0`.
+- `git status --short --branch` / `git diff --name-status` -> exactly the three owned docs modified plus the two excluded pre-existing dirty files; exit code `0`.
+- `git diff --cached --name-status` -> empty; `git ls-files --others --exclude-standard` -> empty; exit code `0`.
+- Historical evidence referenced (labeled historical, not rerun here): PRE-WP14-A Attempt 2 verification recorded in `docs/11_PROJECT_STATE.md` Latest Verification — targeted 17 passed; lifecycle+WP07 17 tests / 16 passed / 1 skipped; WP09+WP12+WP13 218 passed; Full Core 390 collected / 389 passed / 1 skipped; baseline PASS; all exit code 0.
 
 No stage, commit, push, remote operation or GitHub repository operation is authorized.
 
 ## Next Routing
 
-Fresh independent Codex Reviewer reruns branch/HEAD/status/diff/staged/untracked checks and the full targeted/regression/full-core/baseline command set; confirms the three Attempt-1 MAJOR findings are closed (cancel exception containment, exact expected_state verification, sanitized cancellation reasons); verifies no lifecycle-table/RunState/schema/API/dependency changes and excluded files untouched. Only independent VERIFIED_PASS routes to Human for Acceptance/Git Gate.
+Fresh independent Codex Reviewer verifies this three-doc sync against checkpoint `28196c9`: confirms PRE-WP14-A acceptance recording is accurate, PRE-WP14-B remains PLANNING_ONLY / NOT_AUTHORIZED with Alembic 0002 / RuntimeBindingSnapshot / legacy backfill / rollback-restore / persistence-reload unimplemented, ADR-001～010 and ADR-011 semantics unchanged, excluded dirty files untouched, and no fabricated test claims. Only independent VERIFIED_PASS routes to Human for a separately authorized exact-allowlist docs-only checkpoint.
 
 ## Handoff Retention Rule
 
