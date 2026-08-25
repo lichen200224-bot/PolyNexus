@@ -1,24 +1,69 @@
 # Current Handoff
 
 ## Task
-WP-13 — Workflow Hard Gates, Evidence_Check, Human Gate, and Verified Verdict Rules (CP-03 Core product baseline)
+`POLYNEXUS-V1.1-CONSOLIDATION` — Governance alignment, accepted WP-13 state synchronization and Pre-WP14 architecture planning
 
 ## Status
-Previous: WP-10 — ACCEPTED (Attempt 1); Codex deterministic acceptance PASS and Human acceptance recorded on 2026-08-20.
-Previous: WP-12 — Attempt 6 READY_FOR_CODEX_REVIEW; Codex independent review returned FAIL with 2 MAJOR issues (non-COMPLETED Run mislabeled COMPLETED; sanitized failure breaking Run event lifecycle).
-Previous: WP-12 — Attempt 7 READY_FOR_CODEX_REVIEW; Codex independent re-review returned FAIL with 2 further MAJOR issues (raw status.error leaked into persisted run.result; generic exception handler rewrote an already-terminal TIMED_OUT/CANCELLED participant to FAILED).
-Previous: WP-12 — Attempt 8 ACCEPTED; Codex PASS and Human acceptance recorded on 2026-08-21; commit `d6823d6` pushed to `backup/feature/first-vertical-slice`.
-Previous: WP-13 — Attempt 1 READY_FOR_CODEX_REVIEW; Codex independent review returned FAIL: FAIL not overriding PASS for same gate; terminal Runs could produce PASS; no Task/workflow identity/version validation; hard gate missing command/exit metadata validation; HUMAN_GATE not requiring HUMAN_DECISION status and actor attribution; persist_gate_report not idempotent; missing regression tests.
-Previous: WP-13 — Attempt 2 READY_FOR_CODEX_REVIEW; Codex independent review returned FAIL: gate evaluation not wired into execution path; persist/reload not truthfully updating stale verdicts; no tamper detection on reload; unverified actor prefixes not blocked for human gate; command metadata not validated for non-empty/non-whitespace; run.task_id not validated; missing persist→FAIL→re-evaluate and tamper tests.
-Previous: WP-13 — Attempt 3 READY_FOR_CODEX_REVIEW; Codex independent review returned FAIL: durable persist/reload not writing through persistence boundary; tamper detection only validates verdict vs evaluations; unverified actor prefix deny-list is not identity verification; HUMAN_GATE approve can still PASS with certain actors; WP-09C exact evidence parity assertion weakened.
-Previous: WP-13 — Attempt 7 READY_FOR_CODEX_REVIEW; Codex independent review returned FAIL: D11 reject was still treated as deterministic FAIL; combined source/type/metadata tamper replay detection was incomplete.
-Current: WP-13 — Attempt 9 READY_FOR_CODEX_REVIEW; 135 WP-13 tests passed; 375 Core collected / 374 passed / 1 skipped; D11 Option C actor_id, bound_task_id, bound_run_id, identity_hash, provenance_token all validated in reload and persist with fail-closed; independent dual-hash provenance (identity_hash covers workflow/task/run, provenance_token covers actor/source/task/run) for multi-field tamper detection including actor/source tamper; extended-key candidate detection prevents ordinary DOCUMENT_EVIDENCE false positives; cross-task and same-task multi-run isolation verified; maturity: PARTIAL_INTEGRITY (full-consistent 8-field rewrite NOT detectable; D12 deferred to CP-04+ per Human Option B); no duplicates within threat model; terminal reports round-trip.
-Next: Codex independently reviews WP-13 Attempt 9 implementation, actor_id provenance validation, row-level identity tamper detection, and current deterministic evidence; then Human acceptance.
+Current operational status: `INDEPENDENT_REVIEWER_REQUIRED / NOT_ACCEPTED / NOT_APPROVED_FOR_COMMIT`.
 
-Acceptance repair log: `docs/27_ACCEPTANCE_REPAIR_LOG.md`
+- Branch: `feature/first-vertical-slice`
+- Baseline/checkpoint: `330adbc` (`feat(core): accept WP-13 workflow gates`)
+- Previous product gate: WP-13 accepted and checkpointed
+- Current Writer: Codex (current context; Human-authorized documentation patch)
+- Required Reviewer: fresh independent reviewer/context other than the current Writer
+- Antigravity: `NOT_REQUIRED` — no UI/browser/E2E surface
+- Next owner: fresh independent Governance reviewer -> Human checkpoint decision; subsequent OpenCode product Writer requires separate task/Architecture Gate authorization
+- GitHub status: not configured/verified by this task; `CROSS_MACHINE_CONTINUATION_READY` is not established
 
-Task document: `docs/tasks/WP-13.md`; roadmap: `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`; accepted dependencies: `docs/tasks/WP-12.md`, `docs/tasks/WP-11.md`, `docs/tasks/WP-10.md`, `docs/tasks/WP-08A.md`, `docs/tasks/WP-09B.md`, `docs/tasks/WP-09C.md` (CP-02 closed; 30/100 project, 22/22 FVS; CP-03 points deferred until CP-03 completion).
-Historical task document: `docs/tasks/WP-10.md`
+## Current Goal and Delta
+
+Integrate Human-approved Governance v1.1 boundaries, explicitly include the pre-existing D11 ownership decision, synchronize WP-13 accepted status, and document FULL ADR-011 / Pre-WP14 planning without changing Product Core, ADR-001～010, schema, migration, tests, remote or Git history. D11 Option C remains fail closed; `Task != Run`, `NEXT_PROMPT != delegation permission`, `Writer != Reviewer`, lossless context and Human Git/Architecture Gates remain mandatory.
+
+Human-approved Governance ownership / future explicit staged-file allowlist (no staging currently authorized):
+- `AGENTS.md`
+- `docs/02_SA.md`
+- `docs/03_SD.md`
+- `docs/05_GIT_WORKFLOW.md`
+- `docs/06_AI_TOOL_COLLABORATION.md`
+- `docs/07_SHARED_MEMORY.md`
+- `docs/08_ACCEPTANCE_STRATEGY.md`
+- `docs/09_RISK_REGISTER.md`
+- `docs/10_DECISION_LOG.md` — pre-existing D11 change explicitly accepted into Governance ownership by the Human; not silently absorbed
+- `docs/11_PROJECT_STATE.md`
+- `docs/12_HANDOFF_CURRENT.md`
+- `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`
+- `docs/tasks/WP-13.md`
+
+Excluded pre-existing changes not owned, modified or stageable by this task:
+- `docs/15_DOCUMENT_INDEX.md`
+- `docs/tasks/WP-12.md`
+- `services/core/src/polynexus_core/runtime/supervisor.py`
+
+Protected areas: all Product Core, tests, migrations, schemas, apps/web, browser companion, workflows, ADR-001～010 semantics, WP-13 checkpoint and pre-existing dirty-file ownership.
+
+ADR impact: ADR-001～010 unchanged. FULL ADR-011 direction is `APPROVED_FOR_DOCUMENT_INTEGRATION_AND_IMPLEMENTATION_PLANNING`; its separate docs-only worktree proposal remains `PROPOSED / NOT_IMPLEMENTED` until curated integration, independent review and Human Architecture Gate. Future Run-owned immutable `RuntimeBindingSnapshot` and Alembic `0002` require separately approved source/migration scope, legacy backfill, rollback/restore and deterministic tests. Attempt, RoutingEnvelope and trusted-human authentication remain deferred.
+
+Current verification:
+- `tools\validate-polynexus-governance.ps1 -RepoRoot D:\AI學習教材\PolyNexus` -> additive Governance package validator `PASS`, exit code `0`; this does not certify the complete repository diff or replace independent acceptance.
+- `git diff --check` -> no whitespace errors, exit code `0`; Git emits a non-blocking `docs/tasks/WP-13.md` CRLF-to-LF working-copy warning.
+- `git status --short --branch` and `git diff --name-status` -> exit code `0`; Governance allowlist plus exactly three explicitly excluded pre-existing changes.
+- `git diff --cached --name-status` and `git ls-files --others --exclude-standard` -> no output, exit code `0`; no staged or untracked files.
+- `.venv\Scripts\python.exe --version` -> `Unable to create process`, actual exit code `1` (`ENVIRONMENT_FAILURE`).
+- `C:\temp_pn_venv2\Scripts\python.exe --version` -> `Unable to create process`, actual exit code `1` (`ENVIRONMENT_FAILURE`).
+- `scripts\validate_baseline.py`: `NOT_RUN / UNVERIFIED`; no functional Python launcher and no dependency installation/fallback was authorized.
+- Product tests: not run; documentation-only patch does not modify Product Core, tests, schemas, workflows or runtime behavior.
+
+No stage, commit, push, remote operation, worktree mutation, source/schema/migration implementation, dependency installation or GitHub repository operation is authorized.
+
+## Next Routing
+
+Fresh independent Reviewer reruns branch/HEAD/status/diff/staged/untracked/protected-area checks, Governance validator and actual environment preflight, compares all 13 authorized Governance files, confirms unchanged ownership/hashes of the three excluded dirty files, and independently evaluates D11 + ADR-011 planning boundaries. Only independent `VERIFIED_PASS` may route to Human for a separate exact-allowlist Governance checkpoint decision. After that checkpoint: separately authorized curated docs-only ADR import -> Human Pre-WP14-A/B Architecture Gates -> separately authorized OpenCode Writer -> fresh independent Codex Reviewer -> Human acceptance.
+
+## Handoff Retention Rule
+
+The sections above are the only session-bootstrap operational state. `Handoff != Archive` and `Handoff != Complete Project History`. Historical material below is retained temporarily as reference-only legacy content; it must not be loaded by default or treated as current status. Future handoffs replace the operational block above with current state + current delta + next routing instead of appending another complete history.
+
+## Legacy History — Reference Only
 
 ## WP-13 Attempt 7 (superseded by Attempt 9) - 2026-08-21
 

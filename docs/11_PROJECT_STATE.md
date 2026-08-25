@@ -1,8 +1,8 @@
 # Project State
 
-Date: 2026-08-24
+Date: 2026-08-25
 Version: Development Baseline v1.0 + Dev Preparation Profile v1.0.2
-Milestone: First Vertical Slice — WP-08A/WP-08B/WP-09B/WP-09C/WP-09D/WP-10/WP-12 ACCEPTED; CP-02 complete; CP-03 in progress; UI/Core waiver accepted; ROADMAP-01 CONFIRMED
+Milestone: First Vertical Slice — WP-08A/WP-08B/WP-09B/WP-09C/WP-09D/WP-10/WP-12/WP-13 ACCEPTED; CP-02 complete; CP-03 in progress; Governance v1.1 consolidation in progress
 
 ## Confirmed
 - Product Scope Decisions D01–D10 confirmed.
@@ -15,15 +15,16 @@ Milestone: First Vertical Slice — WP-08A/WP-08B/WP-09B/WP-09C/WP-09D/WP-10/WP-
 - Secret boundary: SecretRef + OS-backed SecretStore; secret values excluded from Git/Evidence/Export.
 - Development target: Feature Freeze 2026-10-18; V1 acceptance 2026-10-31.
 - Competition latest notice: initial-review deadline 2026-09-07.
-- Development tools: Codex + OpenCode Go + Antigravity, same Git project directory, Single Active Writer.
+- Development tools: Codex + OpenCode Go + Antigravity + Claude (on-demand bounded role), same Git project directory, Single Active Writer.
 
 ## Local Workspace
 - Primary Windows path: `D:\AI學習教材\PolyNexus`
 - Absolute path is a local profile only; product code remains repo-relative.
 
 ## Current Priority
-1. Prepare WP-13 Workflow hard gates, Evidence_Check, Human gate, and verified verdict contract; defer Browser E2E re-test until development is complete.
-2. Prepare competition proposal/deck content confidence gate by 2026-08-25.
+1. Complete Governance v1.1 documentation alignment, including the explicitly Human-approved D11 ownership decision, WP-13 status synchronization and independent acceptance; preserve the three excluded pre-existing dirty files.
+2. After an independently accepted and Human-approved Governance checkpoint, perform a separately authorized curated import of the existing docs-only ADR-011 worktree; do not merge overlapping dirty worktrees.
+3. Complete Pre-WP14-A ADR-007 lifecycle/cleanup and Pre-WP14-B FULL ADR-011 Runtime Binding architecture gates before separately authorized OpenCode implementation; GitHub enablement and Browser E2E remain independent future gates.
 
 ## Current Product Slice
 First Vertical Slice target by 2026-09-06:
@@ -33,34 +34,34 @@ First Vertical Slice target by 2026-09-06:
 - Final UI visual design system/components.
 - Exact Windows SecretStore provider implementation detail.
 - Final Python/Node dependency lock strategy after first local install.
-- CI provider/remote Git service only after approved environment is known.
+- GitHub URL, remote rename/add, initial branch/tag push allowlist, and clean-clone verification path require separate Human approval.
 - Actual competition upload-form fields/demo requirement still require recheck before submission.
 ## Next Gate
 
-WP-13 task gate is `READY_FOR_CODEX_REVIEW` (Attempt 9); D11 Option C confirmed by Human. CP-03 points remain deferred until CP-03 completion.
+WP-13 is accepted at checkpoint `330adbc`. Current gate is the uncommitted Governance v1.1 consolidation patch -> independent review by a reviewer other than the current Writer/context -> Human checkpoint decision. GitHub/cross-machine enablement remains not ready and must be handled by later gated steps.
 
 ## Current Development State
 
 Phase: First Vertical Slice — WP-10 final deterministic acceptance PASS; Human acceptance recorded on 2026-08-20; CP-02 complete
-Next Phase: CP-03 Core product baseline — WP-12 accepted; WP-13 next; Browser E2E Re-test deferred
+Next Phase: Governance v1.1 alignment -> fresh independent acceptance -> Human checkpoint -> curated ADR-011 document integration -> Pre-WP14-A/B Human Architecture Gates -> separately authorized OpenCode implementation / independent Codex review
 
 Current Branch: feature/first-vertical-slice
-Current Baseline Commit: d6823d6 (`feat(core): accept WP-12 council orchestration`)
-Latest FVS Checkpoint: d6823d6 (`feat(core): accept WP-12 council orchestration`)
-Current Planned Task: WP-13 — Workflow hard gates, Evidence_Check, Human gate, and verified verdict rules (READY_FOR_CODEX_REVIEW, Attempt 9)
-Active Writer: OpenCode — WP-13 Attempt 9 implementation complete; D11 Option C, independent dual-hash provenance (identity_hash + provenance_token), extended-key candidate detection, PARTIAL_INTEGRITY maturity, 375 collected
-Reviewer: Codex — independent WP-13 review; Human acceptance required
-Antigravity: NOT_REQUIRED for WP-13; Core-only task, Browser E2E remains UNVERIFIED/SKIPPED
+Current Baseline Commit: 330adbc (`feat(core): accept WP-13 workflow gates`)
+Latest FVS Checkpoint: 330adbc (`feat(core): accept WP-13 workflow gates`)
+Current Planned Task: `POLYNEXUS-V1.1-CONSOLIDATION` — Governance/Contract/Documentation patch only; no Product Core changes
+Active Writer: Codex — Human-authorized Governance v1.1 documentation patch; cannot independently accept its own work
+Reviewer: Independent reviewer other than the current Writer/context; verdict required before Human checkpoint
+Antigravity: `NOT_REQUIRED` for this documentation-only patch; no UI/browser/E2E surface
 
 Architecture:
 - ADR-001 through ADR-010 are CONFIRMED / FROZEN FOR V1 IMPLEMENTATION.
 
 Development Environment:
-- Windows development readiness: PASS
-- Core pytest: 374 passed, 1 skipped (375 collected; Windows symlink creation policy denied → 1 skipped; pytest temp cleanup PermissionError is a non-fatal environment warning). Earlier WP-10/WP-11 counts are historical.
-- Frontend Vitest: 78 passed (61 baseline + 17 WP-09D)
-- Frontend build: PASS
-- Local Git backup: PASS
+- Windows development readiness: `ENVIRONMENT_BLOCKED` for current Python execution; both `.venv\Scripts\python.exe --version` and `C:\temp_pn_venv2\Scripts\python.exe --version` cannot create a process, actual exit code `1` each on 2026-08-25.
+- Core pytest: historical WP-13 accepted-checkpoint evidence only — 374 passed, 1 skipped (375 collected); not rerun in the current governance session.
+- Frontend Vitest: historical accepted-checkpoint evidence only — 78 passed (61 baseline + 17 WP-09D); not rerun in the current governance session.
+- Frontend build: historical accepted-checkpoint evidence only; not rerun in the current governance session.
+- Local Git backup: historical checkpoint transport; no current push or cross-machine readiness claim.
 
 Tool Onboarding:
 - OpenCode Desktop: PASS
@@ -74,11 +75,21 @@ Tool Roles:
 - Codex: Architecture / Core / Contract / Hard Bug / Critical Review
 - OpenCode: Primary Builder / Tests / Templates / Routine Implementation
 - Antigravity: Browser / UI / E2E / Integration / Milestone Red Team
+- Claude: task-assigned bounded analysis/documentation/second opinion; no default Writer/Reviewer/Git authority
 
 Development Rule:
 - Single Active Writer.
 - AI opinion does not override deterministic evidence.
 - Existing deterministic evidence is not rerun solely because the active AI tool changes.
+
+Governance v1.1 status:
+- WP-13 checkpoint exists at `330adbc`; no WP-13 source/test changes are part of the current patch.
+- Current Governance patch is uncommitted and not yet independently accepted.
+- Local backup remains a local checkpoint transport; GitHub remote configuration, push and clean-clone verification are separate future Human Gates.
+- `CROSS_MACHINE_CONTINUATION_READY` is not yet established.
+- Human explicitly includes pre-existing D11 in the Governance checkpoint ownership/staged-allowlist decision; `docs/15_DOCUMENT_INDEX.md`, `docs/tasks/WP-12.md` and `services/core/src/polynexus_core/runtime/supervisor.py` remain excluded.
+- ADR impact: ADR-001～010 unchanged. FULL ADR-011 / Run-owned immutable persisted Runtime Binding is approved for document integration and implementation planning only; the separate docs-worktree proposal remains `PROPOSED / NOT_IMPLEMENTED` until its own Architecture Gate. Attempt, RoutingEnvelope and trusted-human authentication remain deferred.
+- Future runtime implementation requires a separately approved Alembic migration, legacy backfill/rollback coverage, OpenCode Writer and fresh independent Codex Reviewer; no product source/schema/migration change is authorized by this governance task.
 
 OpenCode Model Routing:
 1. Default: DeepSeek V4 Flash
@@ -88,13 +99,14 @@ OpenCode Model Routing:
 
 ## Latest Verification
 
-WP-13 Attempt 9 current verification: 375 Core tests collected, 374 passed, 1 skipped, exit code 0; baseline and diff checks pass. Browser DOM / Playwright E2E remains `UNVERIFIED/SKIPPED`; Windows symlink containment remains `UNVERIFIED/SKIPPED`; true concurrent HTTP duplicate-command execution remains `UNVERIFIED`.
+WP-13 accepted-checkpoint verification (historical evidence for commit `330adbc`): 375 Core tests collected, 374 passed, 1 skipped, exit code 0; baseline and diff checks passed at acceptance. Browser DOM / Playwright E2E remains `UNVERIFIED/SKIPPED`; Windows symlink containment remains `UNVERIFIED/SKIPPED`; true concurrent HTTP duplicate-command execution remains `UNVERIFIED`.
 
 - WP-13 targeted: 135 passed, exit code 0; pytest cleanup PermissionError is a non-fatal Windows warning.
 - WP-12/WP-09 regression: 107 passed, exit code 0; pytest cleanup PermissionError is a non-fatal Windows warning.
 - Full Core: 375 collected, 374 passed, 1 skipped, exit code 0; symlink test is `SKIPPED/UNVERIFIED` by Windows policy; pytest cleanup PermissionError is non-fatal.
 - `scripts/validate_baseline.py`: PASS, exit code 0.
 - `git diff --check`: PASS, exit code 0.
+- Current governance-session environment preflight: both Python launchers failed to create a process, actual exit code `1` each; `scripts/validate_baseline.py` and product pytest were not executed and are `UNVERIFIED`, not current PASS.
 - Current project progress remains **30/100 = 30%**; accepted FVS remains **22/22 = 100%**.
 - ADR impact: D11 / Option C; no new model/table/migration/endpoint.
 - Scope deviation: NONE; `docs/15_DOCUMENT_INDEX.md` remains pre-existing, unstaged, and excluded.
@@ -142,17 +154,19 @@ WP-13 Attempt 9 current verification: 375 Core tests collected, 374 passed, 1 sk
 
 ## Current Next Gate
 
-## Current WP-12 Acceptance / WP-13 Gate
+## Current Governance v1.1 Gate
 
 - WP-12 Attempt 8 is `ACCEPTED`: Codex review PASS and Human acceptance recorded on 2026-08-21.
 - Acceptance evidence: 45 WP-12 contract tests passed; full Core reported `238 collected / 237 passed / 1 skipped`; `validate_baseline.py` PASS; `git diff --check` PASS.
 - Git checkpoint: commit `d6823d6` (`feat(core): accept WP-12 council orchestration`) pushed to `backup/feature/first-vertical-slice`.
 - Accepted project progress remains **30/100** and accepted FVS remains **22/22**. CP-03 point allocation is intentionally deferred until CP-03 completion per Human decision.
-- WP-13 is `READY_FOR_CODEX_REVIEW` (Attempt 9); task gate is `docs/tasks/WP-13.md`. Next owner: Codex independent review -> Human acceptance.
-- WP-13 Attempt 9: D11 Option C keeps both approve and reject HUMAN_EVIDENCE unverified; reload validates actor_id, bound_task_id, bound_run_id, identity_hash (SHA-256 of workflow/task/run), and provenance_token (SHA-256 of actor/source/task/run) via independent canonical recomputation; persist uses dual-hash provenance for multi-field tamper detection; extended-key candidate detection prevents ordinary DOCUMENT_EVIDENCE false positives; cross-task and same-task multi-run isolation verified; maturity: PARTIAL_INTEGRITY (full-consistent 8-field rewrite NOT detectable; D12 deferred to CP-04+); 375 collected / 374 passed / 1 skipped in current Core verification.
-- WP-13 architecture decision gate: if Human-gate or verified-verdict semantics require a new Decision/Verdict model, table, migration, endpoint, or public field, stop with `NEED_ACTION` before source changes.
+- WP-13 is `ACCEPTED` at checkpoint `330adbc` (`feat(core): accept WP-13 workflow gates`). Its D11 Option C and PARTIAL_INTEGRITY limitations remain recorded in `docs/tasks/WP-13.md`; they are not modified by the current Governance patch.
+- Current gate: Governance v1.1 documentation patch -> independent reviewer other than the current Writer/context -> Human checkpoint approval. No stage, commit, push or remote operation is authorized.
+- D11 is explicitly Human-approved for Governance ownership; the three unrelated pre-existing dirty files remain excluded from the future exact staged-file allowlist.
+- Product sequence after a separately Human-approved Governance checkpoint: curated ADR-011 docs-only integration -> Human-approved Pre-WP14-A ADR-007 lifecycle gate and Pre-WP14-B FULL ADR-011 binding/migration plan -> separately authorized OpenCode implementation -> fresh independent Codex review -> Human acceptance.
+- Separate infrastructure gate: GitHub enablement precheck -> Human-approved remote configuration -> separate Human-approved controlled push -> clean-clone verification; GitHub remains Development Collaboration Infrastructure only.
 
-WP-09B, WP-09C, WP-09D, WP-10, WP-11, and WP-12 are accepted. CP-02 is complete; WP-13 is the next gate for the CP-03 Core product baseline. CP-03 point allocation remains deferred until CP-03 completion per Human decision.
+WP-09B, WP-09C, WP-09D, WP-10, WP-11, WP-12 and WP-13 are accepted. CP-02 is complete; CP-03 point allocation remains deferred until CP-03 completion per Human decision. Product development resumes only after the current governance gate is resolved.
 
 ## WP-09B Development Gate
 

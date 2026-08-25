@@ -79,3 +79,55 @@ Resume 允許 NATIVE / MANAGED / NOT_AVAILABLE，但必須如實 capability 宣�
 - `PASS` 只在本輪必要 evidence 全部符合 acceptance criteria、actual exit codes 正確、無 BLOCKER/MAJOR、scope 未越界且 handoff 與 working tree 一致時成立。
 - `FAIL` 必須列出 severity、檔案/行號、證據、影響與修正方向，並附可直接交給 OpenCode 的 `FIX_PROMPT`。`FIX_PROMPT` 必須包含要修改的檔案、測試案例、完整驗證命令與預期 exit code。
 - `NEED_ACTION` 只用於缺少授權、輸入或環境條件；不得將未驗證項目、工具失敗或 AI 意見轉成 PASS。
+
+## 9. Governance Change Acceptance
+
+Governance／Contract／Documentation patch 採以下 progression：
+
+```text
+Human-approved scope
+-> Single Active Writer patch
+-> deterministic diff/scope checks
+-> independent review (Writer != Reviewer)
+-> VERIFIED_PASS / NEED_FIX / FAIL
+-> Human checkpoint approval
+-> explicit staged-file allowlist
+-> commit
+```
+
+Reviewer 必須比對 Human-approved scope、完整 diff、protected areas、ADR impact、duplicate abstraction 與 current Git state。至少執行 `git status --short --branch`、`git diff --name-status`、`git diff --check`、`git diff --cached --name-status`，並記錄 actual exit code。適用時使用既有 docs/baseline validator，不為本 task 新增 validator。
+
+若 Writer 是 Codex，同一 Codex context 不得自我驗收。`NEED_FIX`／`FAIL` 必須提供 Finding、severity、file/line、evidence、impact、fix owner、完整 FIX_PROMPT 與 re-acceptance prompt。只有 independent `VERIFIED_PASS` 後，才可輸出 `GOVERNANCE_CHECKPOINT_READY / HUMAN_APPROVAL_REQUIRED`；Reviewer 不得自行 commit 或 push。
+
+## 10. Automation-ready / Human Trust
+
+`Automation-ready != fully automated trusted-human approval`。D11 Option C 下，未經 approved identity boundary 驗證的 Human approve/reject 維持 `HUMAN_DECISION / NEED_ACTION`，不得被轉成 machine-verifiable PASS/FAIL 或無人化推進。Trusted Human authentication／attestation 是 deferred architecture，不是目前 V1.1 governance alignment blocker。
+
+## 11. Cross-machine Readiness Acceptance
+
+Push 成功本身不是跨機驗收。只有以下全部成立，才能宣告 `CROSS_MACHINE_CONTINUATION_READY`：
+
+- approved remote Git checkpoint 已存在。
+- clean clone 成功且 checkout 到 approved branch/checkpoint。
+- cloned HEAD 與批准 SHA 相符。
+- `AGENTS.md`、Project State、Current Handoff、task docs、canonical skills 與必要 product directories 存在。
+- clone 的 Git state clean/expected。
+- applicable deterministic baseline validation 通過並記錄 exit code。
+
+否則必須輸出 `CROSS_MACHINE_CONTINUATION_NOT_READY` 與 Findings。若 readiness 在 Governance checkpoint 後才確定，Project State／Handoff 更新必須是獨立 `CROSS-MACHINE-STATE-UPDATE`，不得 amend 或偷偷混入既有 Governance commit。
+
+## 12. Consolidation Final Report
+
+`POLYNEXUS-V1.1-CONSOLIDATION` 只能報告實際完成且已獲 Human 授權的階段。最終報告至少列出：
+
+- Repository branch、HEAD、clean/dirty/staged state。
+- WP-13 checkpoint SHA 與 acceptance evidence reference。
+- Governance checkpoint SHA 與 independent acceptance evidence；若尚未 commit，明確標示 pending。
+- Local backup 的實際 remote name、checkpoint 與 push status。
+- GitHub 的實際 remote name、pushed branches/tags、每個 push command/result/exit code。
+- Clean-clone verification path、cloned commit、branch、Git state、validation commands/results/exit codes。
+- Cross-machine verdict：只能是 `CROSS_MACHINE_CONTINUATION_READY` 或 `CROSS_MACHINE_CONTINUATION_NOT_READY`。
+- Deferred architecture／P2 未提前實作確認。
+- 由 Repository current state 決定的 next product task；不得依舊 conversation 猜測 WP/FVS 編號。
+
+Routing footer 必須包含 `TASK_ID`、actual `CURRENT_STATUS`、deterministic `RESULT`、`NEXT_ACTION`、`NEXT_OWNER`、complete `NEXT_PROMPT`、`BLOCKERS` 與 `HUMAN_ACTION_REQUIRED`。未執行、未批准或 blocked 的 phase 不得寫成完成。
