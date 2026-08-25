@@ -2,11 +2,11 @@
 
 Date: 2026-08-25
 Version: Development Baseline v1.0 + Dev Preparation Profile v1.0.2
-Milestone: First Vertical Slice — WP-08A/WP-08B/WP-09B/WP-09C/WP-09D/WP-10/WP-12/WP-13 ACCEPTED; CP-02 complete; CP-03 in progress; Governance v1.1 consolidation in progress
+Milestone: First Vertical Slice — WP-08A/WP-08B/WP-09B/WP-09C/WP-09D/WP-10/WP-12/WP-13 ACCEPTED; CP-02 complete; CP-03 in progress; Governance v1.1 checkpointed; ADR-011 architecture Human-accepted, not implemented
 
 ## Confirmed
 - Product Scope Decisions D01–D10 confirmed.
-- ADR-001～ADR-010 confirmed.
+- ADR-001～ADR-010 confirmed and frozen; ADR-011 Human-accepted as architecture only, not implemented or authorized for implementation.
 - Stack: React/TypeScript/Vite + Python/FastAPI/asyncio + SQLAlchemy/Alembic/SQLite + REST/WebSocket + pytest/Vitest/Playwright + Chrome MV3 companion.
 - Runtime process model: Core-owned Run Supervisor; Adapter-owned vendor logic.
 - Artifact: SQLite metadata + filesystem content + SHA-256 identity.
@@ -22,9 +22,9 @@ Milestone: First Vertical Slice — WP-08A/WP-08B/WP-09B/WP-09C/WP-09D/WP-10/WP-
 - Absolute path is a local profile only; product code remains repo-relative.
 
 ## Current Priority
-1. Complete Governance v1.1 documentation alignment, including the explicitly Human-approved D11 ownership decision, WP-13 status synchronization and independent acceptance; preserve the three excluded pre-existing dirty files.
-2. After an independently accepted and Human-approved Governance checkpoint, perform a separately authorized curated import of the existing docs-only ADR-011 worktree; do not merge overlapping dirty worktrees.
-3. Complete Pre-WP14-A ADR-007 lifecycle/cleanup and Pre-WP14-B FULL ADR-011 Runtime Binding architecture gates before separately authorized OpenCode implementation; GitHub enablement and Browser E2E remain independent future gates.
+1. Preserve independently accepted, Human-approved Governance checkpoint `358d263` and the three excluded pre-existing dirty files; WP-13 remains accepted at `330adbc`.
+2. Synchronize the explicit Human acceptance of independently reviewed ADR-011 as `HUMAN_ACCEPTED / NOT_IMPLEMENTED / IMPLEMENTATION_NOT_AUTHORIZED`, then obtain fresh independent review of the accepted-state documentation.
+3. Plan `PRE-WP14-A` ADR-007 lifecycle/cleanup and `PRE-WP14-B` Run-owned immutable snapshot / Alembic migration / legacy-backfill gates before separately authorized OpenCode implementation; GitHub enablement and Browser E2E remain independent future gates.
 
 ## Current Product Slice
 First Vertical Slice target by 2026-09-06:
@@ -38,23 +38,24 @@ First Vertical Slice target by 2026-09-06:
 - Actual competition upload-form fields/demo requirement still require recheck before submission.
 ## Next Gate
 
-WP-13 is accepted at checkpoint `330adbc`. Current gate is the uncommitted Governance v1.1 consolidation patch -> independent review by a reviewer other than the current Writer/context -> Human checkpoint decision. GitHub/cross-machine enablement remains not ready and must be handled by later gated steps.
+WP-13 is accepted at checkpoint `330adbc`, Governance v1.1 is independently accepted and Human-checkpointed at `358d263`, and ADR-011 architecture was explicitly Human-accepted after independent document review. Current gate is accepted-state documentation synchronization -> fresh independent review -> separate Human docs-checkpoint decision -> separately bounded `PRE-WP14-A/B` implementation authorization. GitHub/cross-machine enablement remains not ready and must be handled by later gated steps.
 
 ## Current Development State
 
 Phase: First Vertical Slice — WP-10 final deterministic acceptance PASS; Human acceptance recorded on 2026-08-20; CP-02 complete
-Next Phase: Governance v1.1 alignment -> fresh independent acceptance -> Human checkpoint -> curated ADR-011 document integration -> Pre-WP14-A/B Human Architecture Gates -> separately authorized OpenCode implementation / independent Codex review
+Next Phase: Human-accepted ADR-011 documentation synchronization -> fresh independent state review -> separate Human docs-checkpoint decision -> Pre-WP14-A/B bounded task approval -> separately authorized OpenCode implementation / independent Codex review
 
 Current Branch: feature/first-vertical-slice
-Current Baseline Commit: 330adbc (`feat(core): accept WP-13 workflow gates`)
+Current Baseline Commit: 358d263 (`docs(governance): consolidate v1.1 and plan pre-WP14 runtime gates`)
 Latest FVS Checkpoint: 330adbc (`feat(core): accept WP-13 workflow gates`)
-Current Planned Task: `POLYNEXUS-V1.1-CONSOLIDATION` — Governance/Contract/Documentation patch only; no Product Core changes
-Active Writer: Codex — Human-authorized Governance v1.1 documentation patch; cannot independently accept its own work
-Reviewer: Independent reviewer other than the current Writer/context; verdict required before Human checkpoint
+Current Planned Task: `ADR-011-HUMAN-ACCEPTANCE-STATE-SYNC` — synchronize Human-accepted architecture documentation only; no Product Core changes
+Active Writer: Codex — Human-authorized ADR acceptance-state synchronization; cannot independently accept its own work
+Reviewer: Fresh independent reviewer other than the current Writer/context; ADR-011 architecture acceptance is already explicitly recorded by Human
 Antigravity: `NOT_REQUIRED` for this documentation-only patch; no UI/browser/E2E surface
 
 Architecture:
 - ADR-001 through ADR-010 are CONFIRMED / FROZEN FOR V1 IMPLEMENTATION.
+- ADR-011 is `HUMAN_ACCEPTED / NOT_IMPLEMENTED / IMPLEMENTATION_NOT_AUTHORIZED`; each migration/source task requires separate Human authorization.
 
 Development Environment:
 - Windows development readiness: `ENVIRONMENT_BLOCKED` for current Python execution; both `.venv\Scripts\python.exe --version` and `C:\temp_pn_venv2\Scripts\python.exe --version` cannot create a process, actual exit code `1` each on 2026-08-25.
@@ -82,13 +83,14 @@ Development Rule:
 - AI opinion does not override deterministic evidence.
 - Existing deterministic evidence is not rerun solely because the active AI tool changes.
 
-Governance v1.1 status:
+Governance v1.1 / Pre-WP14 status:
 - WP-13 checkpoint exists at `330adbc`; no WP-13 source/test changes are part of the current patch.
-- Current Governance patch is uncommitted and not yet independently accepted.
+- Governance v1.1 is independently accepted, Human-approved and checkpointed at `358d263`; the current uncommitted patch is separately authorized ADR documentation integration.
 - Local backup remains a local checkpoint transport; GitHub remote configuration, push and clean-clone verification are separate future Human Gates.
 - `CROSS_MACHINE_CONTINUATION_READY` is not yet established.
 - Human explicitly includes pre-existing D11 in the Governance checkpoint ownership/staged-allowlist decision; `docs/15_DOCUMENT_INDEX.md`, `docs/tasks/WP-12.md` and `services/core/src/polynexus_core/runtime/supervisor.py` remain excluded.
-- ADR impact: ADR-001～010 unchanged. FULL ADR-011 / Run-owned immutable persisted Runtime Binding is approved for document integration and implementation planning only; the separate docs-worktree proposal remains `PROPOSED / NOT_IMPLEMENTED` until its own Architecture Gate. Attempt, RoutingEnvelope and trusted-human authentication remain deferred.
+- ADR impact: ADR-001～010 unchanged. FULL ADR-011 / Run-owned immutable persisted Runtime Binding is explicitly `HUMAN_ACCEPTED / NOT_IMPLEMENTED / IMPLEMENTATION_NOT_AUTHORIZED`; the accepted decision is recorded in `docs/29_ADR_011_RUNTIME_BINDING_AND_TRANSPORT.md`. Attempt, RoutingEnvelope and trusted-human authentication remain deferred.
+- `docs/30_RUNTIME_CONTRACT_FOUNDATION_GATE.md` defines independently reviewed `PRE-WP14-A` timeout/cleanup and `PRE-WP14-B` binding/migration/backfill/rollback plans; no implementation gate has been accepted or started.
 - Future runtime implementation requires a separately approved Alembic migration, legacy backfill/rollback coverage, OpenCode Writer and fresh independent Codex Reviewer; no product source/schema/migration change is authorized by this governance task.
 
 OpenCode Model Routing:
@@ -161,7 +163,7 @@ WP-13 accepted-checkpoint verification (historical evidence for commit `330adbc`
 - Git checkpoint: commit `d6823d6` (`feat(core): accept WP-12 council orchestration`) pushed to `backup/feature/first-vertical-slice`.
 - Accepted project progress remains **30/100** and accepted FVS remains **22/22**. CP-03 point allocation is intentionally deferred until CP-03 completion per Human decision.
 - WP-13 is `ACCEPTED` at checkpoint `330adbc` (`feat(core): accept WP-13 workflow gates`). Its D11 Option C and PARTIAL_INTEGRITY limitations remain recorded in `docs/tasks/WP-13.md`; they are not modified by the current Governance patch.
-- Current gate: Governance v1.1 documentation patch -> independent reviewer other than the current Writer/context -> Human checkpoint approval. No stage, commit, push or remote operation is authorized.
+- Governance v1.1 checkpoint is `358d263` after independent review and Human approval. ADR-011 architecture is Human-accepted; current gate: accepted-state synchronization -> fresh independent documentation reviewer -> separately authorized docs checkpoint or PRE-WP14 implementation Gate. No stage, commit, push or remote operation is authorized.
 - D11 is explicitly Human-approved for Governance ownership; the three unrelated pre-existing dirty files remain excluded from the future exact staged-file allowlist.
 - Product sequence after a separately Human-approved Governance checkpoint: curated ADR-011 docs-only integration -> Human-approved Pre-WP14-A ADR-007 lifecycle gate and Pre-WP14-B FULL ADR-011 binding/migration plan -> separately authorized OpenCode implementation -> fresh independent Codex review -> Human acceptance.
 - Separate infrastructure gate: GitHub enablement precheck -> Human-approved remote configuration -> separate Human-approved controlled push -> clean-clone verification; GitHub remains Development Collaboration Infrastructure only.

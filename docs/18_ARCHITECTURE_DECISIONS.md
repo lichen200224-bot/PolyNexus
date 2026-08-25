@@ -63,3 +63,11 @@ Secret value is prohibited from ordinary Domain tables, Event Ledger, Evidence, 
 - No AI opinion masquerading as deterministic evidence.
 - No silent sensitive-data cloud fallback.
 - No architecture change merely to support one vendor if an adapter boundary is sufficient.
+
+## ADR-011 — Runtime Binding and Transport Contract
+
+- Decision status: `HUMAN_ACCEPTED` on 2026-08-25 after independent documentation review.
+- Implementation status: `NOT_IMPLEMENTED / NOT_AUTHORIZED`.
+- Decision: Preserve independent Provider / TransportKind / Runtime / Adapter / ExecutionTarget semantics and plan a Run-owned immutable RuntimeBindingSnapshot through existing Supervisor/Adapter boundaries; see `docs/29_ADR_011_RUNTIME_BINDING_AND_TRANSPORT.md`.
+- A future Alembic migration, deterministic legacy backfill, rollback/restore, product source changes and each `PRE-WP14-A/B` implementation task require separate Human authorization; architecture acceptance is not Git, migration or implementation permission.
+- ADR-001 through ADR-010 remain unchanged, confirmed and frozen; `docs/30_RUNTIME_CONTRACT_FOUNDATION_GATE.md` separately defines `PRE-WP14-A` and `PRE-WP14-B`.

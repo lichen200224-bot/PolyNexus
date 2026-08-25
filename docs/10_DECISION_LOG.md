@@ -44,15 +44,15 @@ authenticated principal mapping（Option A）或 attestation/provenance contract
 （Option B）的 architecture decision；本決策不新增 model、migration、endpoint
 或 authentication subsystem。
 
-### Pre-WP14 Runtime Foundation Direction — HUMAN APPROVED FOR PLANNING (2026-08-25)
+### Pre-WP14 Runtime Foundation Direction — ADR-011 HUMAN ACCEPTED (2026-08-25)
 
 - Governance checkpoint 明確納入本檔與既有 D11；D11 Option C 持續 fail closed，不能由 automation-ready、任意 actor string 或 AI approval 取代 authenticated trusted-human decision。
-- 完整 ADR-011 方向為 `APPROVED_FOR_DOCUMENT_INTEGRATION_AND_IMPLEMENTATION_PLANNING`；隔離 docs-only worktree 中的 ADR proposal 在 curated import、獨立 review 與 Human Architecture Gate 前仍為 `PROPOSED / NOT_IMPLEMENTED`。
+- 完整 ADR-011 已在獨立文件 review `VERIFIED_PASS` 後由 Human 明確批准為 `HUMAN_ACCEPTED / NOT_IMPLEMENTED`；正式決策見 `docs/29_ADR_011_RUNTIME_BINDING_AND_TRANSPORT.md`，Foundation Gate 見 `docs/30_RUNTIME_CONTRACT_FOUNDATION_GATE.md`。Architecture acceptance 僅接受 contract／migration 方向，不授權產品實作、migration、stage、commit 或 push。
 - Pre-WP14-A 驗證 ADR-007 的 timeout、cancel 與 cleanup 契約；Pre-WP14-B 規劃 Run-owned immutable `RuntimeBindingSnapshot`、既有 Run identity、future Alembic `0002` migration、legacy backfill、rollback/restore 與 deterministic coverage。
 - `Task != Run`，不得 frozen `Run == Attempt`；不得引入 Attempt、RoutingEnvelope、Packet Domain、Memory Domain、Provider Gateway、vendor-specific Core branch 或 trusted-human authentication subsystem。
-- 先完成 Governance checkpoint，再依後續 Human 授權 curated import docs-only ADR worktree；不得直接合併互相重疊的 dirty worktrees。
+- Governance checkpoint `358d263` 已由 Human 批准完成；依後續 Human 授權 curated import docs-only ADR 文件，不得 merge、rebase、checkout 或覆寫互相重疊的 dirty worktrees。
 - 後續產品實作角色固定為 OpenCode Writer、fresh independent Codex Reviewer、Human Architecture / Acceptance / Git Gate；`Writer != Reviewer`。
-- 本決策只授權治理文件同步與環境／實作規劃，不授權 stage、commit、push、remote operation、worktree mutation、source/schema/migration 修改或 dependency 安裝。
+- 本決策只授權 ADR-011 架構接受狀態同步與環境／實作規劃，不授權 stage、commit、push、remote operation、worktree mutation、source/schema/migration 修改或 dependency 安裝；PRE-WP14-A/B 各自需要新的 Human implementation Gate。
 
 ### Cross-cutting — CONFIRMED
 V1 補足最小必要：Compatibility/Migration、Evaluation/Quality、Cost/Resource Control、Context Lifecycle、Artifact Lifecycle、UX Complexity Control。

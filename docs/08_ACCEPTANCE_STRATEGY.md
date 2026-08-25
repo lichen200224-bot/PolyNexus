@@ -43,7 +43,7 @@ Migration、Backup/Restore、security boundary、packaging、known limitations�
 - artifacts traceable
 - version/compatibility recorded
 
-Resume 允許 NATIVE / MANAGED / NOT_AVAILABLE，但必須如實 capability 宣告。
+Resume 允許 NATIVE / MANAGED / NONE，但必須如實 capability 宣告，與 ADR-007 及既有 `ResumeMode` 保持一致。
 
 ## 5. Failure Isolation
 
@@ -73,6 +73,13 @@ Resume 允許 NATIVE / MANAGED / NOT_AVAILABLE，但必須如實 capability 宣�
 - 每個必要 command 的完整文字、實際結果摘要與 actual exit code；歷史結果只能標為 historical，不得當作 current PASS。
 - Browser/E2E 需補 route、fixture、browser/environment、journey result、failure-path result 與 screenshot/video/artifact ref。手動驗證沒有 process exit code 時，必須明確寫 `exit_code: N/A`，不可虛構。
 - 被 `SKIPPED`、環境限制或外部依賴阻擋的檢查，必須標示原因、影響範圍與重新執行方式。
+
+### 8.1a Pre-WP14 Runtime Contract Foundation Evidence
+
+- `PRE-WP14-A`: independently verify ADR-007 timeout -> cancel/terminate -> cleanup -> cleanup verification -> truthful final state; cover successful termination, cleanup failure, sanitized evidence and maturity limits.
+- `PRE-WP14-B`: ADR-011 architecture is Human-accepted; only after separate implementation/migration authorization may the independent Reviewer verify immutable Run-owned RuntimeBindingSnapshot identity, vendor-neutral registry selection, capability/auth ownership, Alembic upgrade, deterministic legacy/reference backfill, reopen/reload, mutation rejection and documented downgrade/restore.
+- Product implementation, migration and tests require a separate approved allowlist and an executable environment. Historical evidence, blocked Python launchers and unimplemented Runtime capability must remain `UNVERIFIED`, not PASS.
+- Architecture proposal and detailed matrix: `docs/29_ADR_011_RUNTIME_BINDING_AND_TRANSPORT.md` and `docs/30_RUNTIME_CONTRACT_FOUNDATION_GATE.md`.
 
 ### 8.2 Result conditions
 

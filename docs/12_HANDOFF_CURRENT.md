@@ -1,63 +1,61 @@
 # Current Handoff
 
 ## Task
-`POLYNEXUS-V1.1-CONSOLIDATION` — Governance alignment, accepted WP-13 state synchronization and Pre-WP14 architecture planning
+`ADR-011-HUMAN-ACCEPTANCE-STATE-SYNC` — record explicit Human ADR-011 architecture acceptance without authorizing PRE-WP14-A/B implementation
 
 ## Status
-Current operational status: `INDEPENDENT_REVIEWER_REQUIRED / NOT_ACCEPTED / NOT_APPROVED_FOR_COMMIT`.
+Current operational status: `ADR_011_HUMAN_ACCEPTED / NOT_IMPLEMENTED / INDEPENDENT_REVIEWER_REQUIRED / NOT_APPROVED_FOR_COMMIT`.
 
 - Branch: `feature/first-vertical-slice`
-- Baseline/checkpoint: `330adbc` (`feat(core): accept WP-13 workflow gates`)
-- Previous product gate: WP-13 accepted and checkpointed
-- Current Writer: Codex (current context; Human-authorized documentation patch)
-- Required Reviewer: fresh independent reviewer/context other than the current Writer
+- Baseline/checkpoint: `358d263e16ccafca413672399f968fe769e57563` (`docs(governance): consolidate v1.1 and plan pre-WP14 runtime gates`)
+- Previous gates: WP-13 accepted at `330adbc`; Governance checkpoint `358d263`; ADR-011 docs independently `VERIFIED_PASS`; ADR-011 architecture explicitly Human-accepted on 2026-08-25
+- Current documentation Writer: Codex (current context; Human-authorized ADR-011 acceptance-state synchronization)
+- Required documentation Reviewer: fresh independent reviewer/context other than the current Writer
+- Future implementation Writer / Reviewer: OpenCode / fresh independent Codex; Human retains Architecture, Acceptance and Git Gates
 - Antigravity: `NOT_REQUIRED` — no UI/browser/E2E surface
-- Next owner: fresh independent Governance reviewer -> Human checkpoint decision; subsequent OpenCode product Writer requires separate task/Architecture Gate authorization
+- Next owner: fresh independent accepted-state Reviewer -> separate Human docs-checkpoint decision -> separately bounded PRE-WP14-A/B OpenCode implementation authorization
 - GitHub status: not configured/verified by this task; `CROSS_MACHINE_CONTINUATION_READY` is not established
 
 ## Current Goal and Delta
 
-Integrate Human-approved Governance v1.1 boundaries, explicitly include the pre-existing D11 ownership decision, synchronize WP-13 accepted status, and document FULL ADR-011 / Pre-WP14 planning without changing Product Core, ADR-001～010, schema, migration, tests, remote or Git history. D11 Option C remains fail closed; `Task != Run`, `NEXT_PROMPT != delegation permission`, `Writer != Reviewer`, lossless context and Human Git/Architecture Gates remain mandatory.
+Record the explicit Human Architecture Gate decision as `ADR_011_HUMAN_ACCEPTED / NOT_IMPLEMENTED / IMPLEMENTATION_NOT_AUTHORIZED` across the already independently reviewed architecture documents. Preserve existing ADR-001～010 semantics, D11 Option C fail closed, `Task != Run`, One-Hop routing and `Writer != Reviewer`. Run-owned immutable snapshot / future Alembic `0002` remain accepted architecture direction only; implementation, migration, Git checkpoint and PRE-WP14-A/B source changes each require separate Human authorization.
 
-Human-approved Governance ownership / future explicit staged-file allowlist (no staging currently authorized):
-- `AGENTS.md`
+Current documentation-only changed-file allowlist (no staging currently authorized):
 - `docs/02_SA.md`
 - `docs/03_SD.md`
-- `docs/05_GIT_WORKFLOW.md`
-- `docs/06_AI_TOOL_COLLABORATION.md`
-- `docs/07_SHARED_MEMORY.md`
 - `docs/08_ACCEPTANCE_STRATEGY.md`
-- `docs/09_RISK_REGISTER.md`
-- `docs/10_DECISION_LOG.md` — pre-existing D11 change explicitly accepted into Governance ownership by the Human; not silently absorbed
+- `docs/10_DECISION_LOG.md`
 - `docs/11_PROJECT_STATE.md`
 - `docs/12_HANDOFF_CURRENT.md`
+- `docs/18_ARCHITECTURE_DECISIONS.md` — records Human-accepted ADR-011 architecture only; frozen ADR-001～010 decision text is unchanged
 - `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`
-- `docs/tasks/WP-13.md`
+- `docs/29_ADR_011_RUNTIME_BINDING_AND_TRANSPORT.md` — new untracked, Human-accepted architecture decision; no implementation authority
+- `docs/30_RUNTIME_CONTRACT_FOUNDATION_GATE.md` — new untracked PRE-WP14-A/B plan
 
 Excluded pre-existing changes not owned, modified or stageable by this task:
 - `docs/15_DOCUMENT_INDEX.md`
 - `docs/tasks/WP-12.md`
 - `services/core/src/polynexus_core/runtime/supervisor.py`
 
-Protected areas: all Product Core, tests, migrations, schemas, apps/web, browser companion, workflows, ADR-001～010 semantics, WP-13 checkpoint and pre-existing dirty-file ownership.
+Protected areas: all Product Core, tests, migrations, schemas, apps/web, browser companion, workflows, ADR-001～010 semantics, D11, WP-13/Governance checkpoints, docs-only source worktree and pre-existing dirty-file ownership.
 
-ADR impact: ADR-001～010 unchanged. FULL ADR-011 direction is `APPROVED_FOR_DOCUMENT_INTEGRATION_AND_IMPLEMENTATION_PLANNING`; its separate docs-only worktree proposal remains `PROPOSED / NOT_IMPLEMENTED` until curated integration, independent review and Human Architecture Gate. Future Run-owned immutable `RuntimeBindingSnapshot` and Alembic `0002` require separately approved source/migration scope, legacy backfill, rollback/restore and deterministic tests. Attempt, RoutingEnvelope and trusted-human authentication remain deferred.
+ADR impact: ADR-001～010 unchanged. FULL ADR-011 is explicitly `HUMAN_ACCEPTED / NOT_IMPLEMENTED / IMPLEMENTATION_NOT_AUTHORIZED`. Future Run-owned immutable `RuntimeBindingSnapshot` and Alembic `0002` require separately approved source/migration scope, legacy backfill, rollback/restore and deterministic tests. Attempt, RoutingEnvelope and trusted-human authentication remain deferred. PRE-WP14-A cannot silently absorb the existing dirty `runtime/supervisor.py` change.
 
 Current verification:
 - `tools\validate-polynexus-governance.ps1 -RepoRoot D:\AI學習教材\PolyNexus` -> additive Governance package validator `PASS`, exit code `0`; this does not certify the complete repository diff or replace independent acceptance.
-- `git diff --check` -> no whitespace errors, exit code `0`; Git emits a non-blocking `docs/tasks/WP-13.md` CRLF-to-LF working-copy warning.
-- `git status --short --branch` and `git diff --name-status` -> exit code `0`; Governance allowlist plus exactly three explicitly excluded pre-existing changes.
-- `git diff --cached --name-status` and `git ls-files --others --exclude-standard` -> no output, exit code `0`; no staged or untracked files.
+- `git branch --show-current` -> `feature/first-vertical-slice`, exit code `0`; `git rev-parse HEAD` -> `358d263e16ccafca413672399f968fe769e57563`, exit code `0`.
+- `git diff --check` -> no output, exit code `0`; `git status --short --branch` and `git diff --name-status` -> exit code `0`; 10 owned documentation files including two untracked proposals, exactly three excluded pre-existing changes, and zero unexpected paths.
+- `git diff --cached --name-status` -> no output, exit code `0`; `git ls-files --others --exclude-standard` -> exactly `docs/29_ADR_011_RUNTIME_BINDING_AND_TRANSPORT.md` and `docs/30_RUNTIME_CONTRACT_FOUNDATION_GATE.md`, exit code `0`.
 - `.venv\Scripts\python.exe --version` -> `Unable to create process`, actual exit code `1` (`ENVIRONMENT_FAILURE`).
 - `C:\temp_pn_venv2\Scripts\python.exe --version` -> `Unable to create process`, actual exit code `1` (`ENVIRONMENT_FAILURE`).
 - `scripts\validate_baseline.py`: `NOT_RUN / UNVERIFIED`; no functional Python launcher and no dependency installation/fallback was authorized.
 - Product tests: not run; documentation-only patch does not modify Product Core, tests, schemas, workflows or runtime behavior.
 
-No stage, commit, push, remote operation, worktree mutation, source/schema/migration implementation, dependency installation or GitHub repository operation is authorized.
+No stage, commit, push, remote operation, source-worktree mutation, source/schema/migration implementation, dependency installation or GitHub repository operation is authorized.
 
 ## Next Routing
 
-Fresh independent Reviewer reruns branch/HEAD/status/diff/staged/untracked/protected-area checks, Governance validator and actual environment preflight, compares all 13 authorized Governance files, confirms unchanged ownership/hashes of the three excluded dirty files, and independently evaluates D11 + ADR-011 planning boundaries. Only independent `VERIFIED_PASS` may route to Human for a separate exact-allowlist Governance checkpoint decision. After that checkpoint: separately authorized curated docs-only ADR import -> Human Pre-WP14-A/B Architecture Gates -> separately authorized OpenCode Writer -> fresh independent Codex Reviewer -> Human acceptance.
+Fresh independent Reviewer reruns branch/HEAD/status/diff/staged/untracked/protected-area checks, Governance validator and actual environment preflight; compares all 10 documentation files including both untracked ADR documents; confirms unchanged ownership/hashes of the three excluded dirty files and frozen ADR-001～010 semantics; verifies explicit Human-accepted but unimplemented ADR-011, D11, Run-owned snapshot direction, Alembic-only migration planning and PRE-WP14-A/B separation. Independent acceptance routes only to Human for a separately authorized exact-allowlist docs checkpoint and later separate PRE-WP14-A/B task Gates. OpenCode product implementation requires a new Human-approved task, explicit source/migration allowlist, resolution of existing supervisor.py dirty ownership, executable Python environment and fresh independent Codex Reviewer.
 
 ## Handoff Retention Rule
 
