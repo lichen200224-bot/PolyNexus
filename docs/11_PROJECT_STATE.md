@@ -2,11 +2,11 @@
 
 Date: 2026-08-25
 Version: Development Baseline v1.0 + Dev Preparation Profile v1.0.2
-Milestone: First Vertical Slice — WP-08A/WP-08B/WP-09B/WP-09C/WP-09D/WP-10/WP-12/WP-13 ACCEPTED; CP-02 complete; CP-03 in progress; Governance v1.1 checkpointed; ADR-011 architecture Human-accepted, not implemented; PRE-WP14-A (ADR-007 timeout/cancel cleanup) HUMAN_ACCEPTED / IMPLEMENTATION_ACCEPTED at `28196c9`; PRE-WP14-B remains PLANNING_ONLY / NOT_AUTHORIZED
+Milestone: First Vertical Slice — WP-08A/WP-08B/WP-09B/WP-09C/WP-09D/WP-10/WP-12/WP-13 ACCEPTED; CP-02 complete; CP-03 in progress; PRE-WP14-A HUMAN_ACCEPTED / IMPLEMENTATION_ACCEPTED at `28196c9`; PRE-WP14-B HUMAN_ACCEPTED / IMPLEMENTATION_ACCEPTED (Human decision 2026-08-26; checkpoint SHA recorded after commit) on baseline `934a219`
 
 ## Confirmed
 - Product Scope Decisions D01–D10 confirmed.
-- ADR-001～ADR-010 confirmed and frozen; ADR-011 Human-accepted as architecture only, not implemented or authorized for implementation.
+- ADR-001～ADR-010 confirmed and frozen; ADR-011 Human-accepted as architecture; PRE-WP14-B implementation separately Human-authorized and accepted after fresh independent Codex `VERIFIED_PASS`.
 - Stack: React/TypeScript/Vite + Python/FastAPI/asyncio + SQLAlchemy/Alembic/SQLite + REST/WebSocket + pytest/Vitest/Playwright + Chrome MV3 companion.
 - Runtime process model: Core-owned Run Supervisor; Adapter-owned vendor logic.
 - Artifact: SQLite metadata + filesystem content + SHA-256 identity.
@@ -22,9 +22,9 @@ Milestone: First Vertical Slice — WP-08A/WP-08B/WP-09B/WP-09C/WP-09D/WP-10/WP-
 - Absolute path is a local profile only; product code remains repo-relative.
 
 ## Current Priority
-1. Preserve the three excluded pre-existing dirty files (`docs/15_DOCUMENT_INDEX.md`, `docs/tasks/WP-12.md`) and their ownership; WP-13 remains accepted at `330adbc`, Governance v1.1 at `358d263`.
-2. Complete the PRE-WP14-A accepted-state documentation synchronization, then obtain fresh independent Codex review; only after review PASS may Human separately authorize a docs-only checkpoint.
-3. Keep `PRE-WP14-B` at `PLANNING_ONLY / NOT_AUTHORIZED`: Alembic `0002`, RuntimeBindingSnapshot persistence/reload, legacy backfill and rollback/restore remain unimplemented and require separate Human authorization. GitHub enablement and Browser E2E remain independent future gates.
+1. Preserve the two excluded pre-existing dirty files (`docs/15_DOCUMENT_INDEX.md`, `docs/tasks/WP-12.md`) and their ownership; PRE-WP14-A remains accepted at `28196c9`.
+2. Complete and record the exact-allowlist PRE-WP14-B Git checkpoint authorized by Human; WP-14/WP-15 production adapter conformance remains separately gated.
+3. WP-14/WP-15 production adapter conformance remains out of scope until its own gates. GitHub enablement and Browser E2E remain independent future gates.
 
 ## Current Product Slice
 First Vertical Slice target by 2026-09-06:
@@ -38,24 +38,24 @@ First Vertical Slice target by 2026-09-06:
 - Actual competition upload-form fields/demo requirement still require recheck before submission.
 ## Next Gate
 
-PRE-WP14-A is Human-accepted and checkpointed at `28196c9` (`PRE-WP14-A-ADR007-TIMEOUT-CLEANUP`; ADR-007 timeout/cancel cleanup compliance in RunSupervisor). Current gate: PRE-WP14-A state-sync documentation (Project State / Handoff / Runtime Contract Foundation Gate) -> fresh independent Codex review -> separate Human docs-only checkpoint authorization. PRE-WP14-B implementation, Alembic `0002`, RuntimeBindingSnapshot, legacy backfill and rollback/restore remain NOT_AUTHORIZED. GitHub/cross-machine enablement remains not ready and must be handled by later gated steps.
+PRE-WP14-B is HUMAN_ACCEPTED / IMPLEMENTATION_ACCEPTED on baseline `934a219` under the Human-approved 15-file allowlist after fresh independent Codex `VERIFIED_PASS`. Review history: Attempt 1 FAIL remediated; Attempt 2 Codex FAIL (4 findings) remediated in Attempt 3; Attempt 3 Codex FAIL (false log-capture PASS label / missing migration-path trigger acceptance / stale docstring) remediated in Attempt 4. Log capture remains NOT_IN_SCOPE/UNVERIFIED, the migration-installed `trg_runs_reject_delete` was dynamically verified across upgrade/downgrade/re-upgrade, and the ExecutionService docstring matches actual lifecycle ownership. Current gate: exact-allowlist Git checkpoint authorized by Human; checkpoint SHA is recorded after commit.
 
 ## Current Development State
 
-Phase: First Vertical Slice — WP-10 final deterministic acceptance PASS; Human acceptance recorded on 2026-08-20; CP-02 complete
-Next Phase: PRE-WP14-A accepted-state documentation synchronization -> fresh independent Codex review -> separate Human docs-checkpoint decision -> PRE-WP14-B remains planning-only until a separate Human gate
+Phase: First Vertical Slice — CP-03 in progress; PRE-WP14-A accepted at `28196c9`; PRE-WP14-B Human-accepted / implementation-accepted (Attempt 4)
+Next Phase: Record the PRE-WP14-B exact-allowlist Git checkpoint -> WP-14 planning remains separately gated
 
 Current Branch: feature/first-vertical-slice
-Current Baseline Commit: 28196c9 (`PRE-WP14-A-ADR007-TIMEOUT-CLEANUP` accepted checkpoint)
+Current Baseline Commit: `934a2191a78a40c8a68b5195f786b1d9cc8bc0cc` (implementation base; acceptance checkpoint SHA recorded after commit)
 Latest FVS Checkpoint: 330adbc (`feat(core): accept WP-13 workflow gates`)
-Current Planned Task: `PRE-WP14-A-STATE-SYNC` — documentation-only accepted-state synchronization across docs/11_PROJECT_STATE.md, docs/12_HANDOFF_CURRENT.md and docs/30_RUNTIME_CONTRACT_FOUNDATION_GATE.md; no Product Core changes
-Active Writer: OpenCode — Human-authorized state-sync documentation patch; cannot independently accept its own work
-Reviewer: Fresh independent Codex context other than the current Writer; Writer != Reviewer is mandatory
-Antigravity: `NOT_REQUIRED` for this documentation-only patch; no UI/browser/E2E surface
+Current Planned Task: `PRE-WP14-B-GIT-CHECKPOINT` — explicit 15-file checkpoint after Human acceptance
+Active Writer: OpenCode — cannot independently accept its own work
+Reviewer: Fresh independent Codex context; Writer != Reviewer is mandatory
+Antigravity: `NOT_REQUIRED` for this Core-only task; no UI/browser/E2E surface
 
 Architecture:
-- ADR-001 through ADR-010 are CONFIRMED / FROZEN FOR V1 IMPLEMENTATION; decision text unchanged by this sync.
-- ADR-011 remains `HUMAN_ACCEPTED / NOT_IMPLEMENTED / IMPLEMENTATION_NOT_AUTHORIZED`; each migration/source task requires separate Human authorization.
+- ADR-001 through ADR-010 are CONFIRMED / FROZEN FOR V1 IMPLEMENTATION; decision text unchanged.
+- ADR-011 remains `HUMAN_ACCEPTED`; this task implements within the accepted architecture without modifying any ADR text.
 
 Development Environment:
 - Windows development readiness: PASS for the controlled launcher `C:\temp_pn_venv2\Scripts\python.exe` (used for all PRE-WP14-A Attempt 2 verification on 2026-08-25); plain `.venv\Scripts\python.exe` remains blocked in sandboxed contexts.
@@ -84,15 +84,13 @@ Development Rule:
 - Existing deterministic evidence is not rerun solely because the active AI tool changes.
 
 Governance v1.1 / Pre-WP14 status:
-- WP-13 checkpoint exists at `330adbc`; no WP-13 source/test changes were touched by PRE-WP14-A or this state sync.
-- Governance v1.1 is independently accepted, Human-approved and checkpointed at `358d263`.
-- PRE-WP14-A (ADR-007 timeout/cancel cleanup compliance in RunSupervisor) is `HUMAN_ACCEPTED / IMPLEMENTATION_ACCEPTED` and checkpointed at `28196c9`. Attempt 2 closed all three Attempt-1 MAJOR review findings: cancel exception containment via shared `_cleanup_and_verify()`, exact expected-state post-cleanup verification ({TIMED_OUT} timeout / {CANCELLED} cancel, fail closed to ORPHANED otherwise), and sanitized `"Run cancelled"` reasons replacing raw `status.error` passthrough in the timeout/cancel boundary. Sanitization evidence is boundary-scoped: generic workflow-executor exception handling elsewhere in `execute_run()` (persisting `str(exc)` and re-raising) remains pre-existing behavior, unchanged by PRE-WP14-A. TIMED_OUT/ORPHANED executions produce no PASS evidence. Lifecycle table, RunState set, schema, API and dependencies unchanged.
-- PRE-WP14-B remains `PLANNING_ONLY / NOT_AUTHORIZED`: Alembic `0002`, Run-owned immutable RuntimeBindingSnapshot persistence/reload, legacy backfill, rollback/restore and related tests are NOT implemented.
+- WP-13 checkpoint exists at `330adbc`; Governance v1.1 at `358d263`.
+- PRE-WP14-A (ADR-007 timeout/cancel cleanup compliance in RunSupervisor) is `HUMAN_ACCEPTED / IMPLEMENTATION_ACCEPTED` and checkpointed at `28196c9`. Sanitization evidence is boundary-scoped to the shared `_cleanup_and_verify()` cleanup/cancel/timeout machinery; generic workflow-executor exception handling elsewhere in `execute_run()` (persisting `str(exc)` and re-raising) remains pre-existing behavior.
+- PRE-WP14-B is HUMAN_ACCEPTED / IMPLEMENTATION_ACCEPTED on baseline `934a219` under the Human-approved 15-file allowlist: immutable Run-owned RuntimeBindingSnapshot, TransportKind/AuthOwnership/UsageVisibility enums, fail-closed Registry/Factory (no vendor Core branches), `run_binding_snapshots` table with insert-once/mutation-rejection semantics, Alembic `0002` with deterministic legacy/reference backfill. Status: accepted after fresh independent Codex `VERIFIED_PASS`; exact-allowlist Git checkpoint is authorized and SHA is recorded after commit.
 - Excluded pre-existing dirty files with preserved ownership: `docs/15_DOCUMENT_INDEX.md` and `docs/tasks/WP-12.md`; they must not be silently absorbed into any future allowlist.
 - Local backup remains a local checkpoint transport; GitHub remote configuration, push and clean-clone verification are separate future Human Gates. `CROSS_MACHINE_CONTINUATION_READY` is not yet established.
-- ADR impact: ADR-001～010 decision text unchanged; ADR-011 remains `HUMAN_ACCEPTED / NOT_IMPLEMENTED / IMPLEMENTATION_NOT_AUTHORIZED` per `docs/29_ADR_011_RUNTIME_BINDING_AND_TRANSPORT.md`. Attempt, RoutingEnvelope and trusted-human authentication remain deferred.
-- `docs/30_RUNTIME_CONTRACT_FOUNDATION_GATE.md` records the accepted PRE-WP14-A sub-gate result and the still-planning-only PRE-WP14-B sub-gate plan.
-- Future runtime implementation requires a separately approved Alembic migration, legacy backfill/rollback coverage, OpenCode Writer and fresh independent Codex Reviewer; no product source/schema/migration change is authorized by documentation tasks.
+- ADR impact: ADR-001～010 decision text unchanged; ADR-011 remains `HUMAN_ACCEPTED` per `docs/29_ADR_011_RUNTIME_BINDING_AND_TRANSPORT.md`; this implementation stays within the accepted architecture. Attempt, RoutingEnvelope and trusted-human authentication remain deferred.
+- Future production runtime work (WP-14/WP-15) requires its own gates; no production dependency was added by PRE-WP14-B.
 
 OpenCode Model Routing:
 1. Default: DeepSeek V4 Flash
@@ -102,18 +100,15 @@ OpenCode Model Routing:
 
 ## Latest Verification
 
-PRE-WP14-A Attempt 2 verification (historical evidence for accepted checkpoint `28196c9`; basis working tree `8994ef9`, 2026-08-25): targeted `test_runtime_skeleton.py` 17 passed; regression lifecycle+WP07 17 tests / 16 passed / 1 skipped; WP09+WP12+WP13 regression 218 passed; Full Core 390 collected / 389 passed / 1 skipped (JUnit XML failures=0, errors=0); `validate_baseline.py` PASS; `git diff --check` clean — all exit code 0. Independent adversarial reviewer suites Part A/B/C all PASS after the Attempt-2 fixes.
+PRE-WP14-B implementation verification (Attempt 4 current Writer evidence, baseline `934a219`, launcher `C:\temp_pn_venv2\Scripts\python.exe -B`): WP-14B targeted 84 passed; persistence + runtime skeleton 60 passed (43 + 17); WP07+WP09 regression 72 passed / 1 SKIPPED (Windows symlink policy — labeled SKIPPED, not PASS); collect-only 479 collected; Full Core 478 passed / 1 skipped; baseline validator PASS; governance validator PASS — all exit code 0. Migration lifecycle ran only inside pytest temporary isolated SQLite databases. The migration-installed `trg_runs_reject_delete` guard is dynamically accepted across upgrade/downgrade/re-upgrade.
 
-This docs-only state-sync task (`PRE-WP14-A-STATE-SYNC`) runs no product tests; the counts above are labeled historical evidence for checkpoint `28196c9`, not new PASS claims.
+These are Writer-produced results independently verified by fresh independent Codex; Human acceptance was granted on 2026-08-26. They are acceptance evidence for the bounded PRE-WP14-B implementation only; API/log/exports-handoff limitations remain explicitly NOT_IN_SCOPE/UNVERIFIED. The exact-allowlist Git checkpoint is authorized and its SHA is recorded after commit.
 
-- Browser DOM / Playwright E2E remains `UNVERIFIED/SKIPPED`; Windows symlink containment remains `UNVERIFIED/SKIPPED`; true concurrent HTTP duplicate-command execution remains `UNVERIFIED`. Pytest temp-dir cleanup PermissionError is a non-fatal Windows warning.
+- PRE-WP14-B Attempt 2 verification counts (80/43/49/475-collected/474-passed) are **historical/superseded** by the Attempt 4 evidence above and are retained only in task history (`docs/tasks/PRE-WP14-B.md`); they must not be cited as current state.
+- PRE-WP14-A Attempt 2 verification (historical evidence for accepted checkpoint `28196c9`): targeted `test_runtime_skeleton.py` 17 passed at the time; superseded counts are recorded in the task history.
+- Browser DOM / Playwright E2E remains `UNVERIFIED/SKIPPED`; Windows symlink containment remains `UNVERIFIED/SKIPPED`; true concurrent HTTP duplicate-command execution remains `UNVERIFIED`; application log capture, API response surface and exports/handoff secret-exclusion scans for PRE-WP14-B remain `NOT_IN_SCOPE/UNVERIFIED`. Pytest temp-dir cleanup PermissionError is a non-fatal Windows environment warning (all commands exit 0).
 - WP-13 accepted-checkpoint verification (historical evidence for commit `330adbc`): 375 Core tests collected, 374 passed, 1 skipped, exit code 0.
-- `scripts/validate_baseline.py`: PASS at PRE-WP14-A Attempt 2, exit code 0.
-- `git diff --check`: PASS, exit code 0.
-- Historical sandbox preflight / superseded by the controlled launcher evidence: during the earlier ADR-011 documentation-only session both plain Python launchers (`.venv\Scripts\python.exe` and `C:\temp_pn_venv2\Scripts\python.exe` invoked from that sandbox context) failed to create a process, actual exit code `1` each; `scripts\validate_baseline.py` and product pytest were not executed in that session and remain `UNVERIFIED` for it — this is not current PRE-WP14-A state-sync verification. The controlled `C:\temp_pn_venv2\Scripts\python.exe` launcher later produced all PRE-WP14-A Attempt 2 evidence listed above (exit codes recorded there); this docs-only sync reruns no product tests.
 - Current project progress remains **30/100 = 30%**; accepted FVS remains **22/22 = 100%**.
-- ADR impact: D11 / Option C; no new model/table/migration/endpoint.
-- Scope deviation: NONE; `docs/15_DOCUMENT_INDEX.md` remains pre-existing, unstaged, and excluded.
 
 ## ROADMAP-01 / WP-08A + WP-08B Acceptance (Historical checkpoint before WP-09B)
 

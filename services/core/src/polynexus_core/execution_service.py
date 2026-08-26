@@ -30,6 +30,7 @@ from polynexus_core.domain.models import (
     Run,
     RunResult,
 )
+from polynexus_core.domain.runtime_binding import RuntimeBindingError
 from polynexus_core.persistence.repository import (
     ArtifactRepository,
     ContextPackageRepository,
@@ -38,6 +39,7 @@ from polynexus_core.persistence.repository import (
     ProjectRepository,
     RunRepository,
     RunEventRepository,
+    RuntimeBindingSnapshotRepository,
     SqlArtifactRepository,
     SqlContextPackageRepository,
     SqlEvidenceRepository,
@@ -45,10 +47,16 @@ from polynexus_core.persistence.repository import (
     SqlProjectRepository,
     SqlRunRepository,
     SqlRunEventRepository,
+    SqlRuntimeBindingSnapshotRepository,
     SqlTaskRepository,
     TaskRepository,
 )
-from polynexus_core.runtime.reference import ReferenceRuntimeAdapter
+from polynexus_core.runtime.registry import (
+    REFERENCE_PROFILE_REF,
+    RuntimeProfile,
+    RuntimeRegistry,
+    build_default_registry,
+)
 from polynexus_core.runtime.supervisor import RunExecution, RunSupervisor
 from polynexus_core.workflows.loader import load_workflow_definition
 from polynexus_core.workflows.models import WorkflowDefinition
@@ -61,11 +69,16 @@ _BUILTIN_WORKFLOWS_DIR = _REPO_ROOT / "workflows" / "builtin"
 # Rejects path separators, dots, and any traversal characters.
 _WORKFLOW_ID_PATTERN = re.compile(r"^[a-zA-Z0-9_-]+$")
 
+# Public-safe sanitized reason for adapter factory construction failure after
+# the binding-first transaction committed. Never contains raw exception
+# messages, vendor payloads, paths, tokens, or credential fragments.
+_ADAPTER_CONSTRUCTION_FAILURE_REASON = "Runtime adapter construction failed"
+
 
 class ExecutionService:
     """Thin integration layer: load entities, execute via RunSupervisor, persist results."""
 
-    def __init__(self, session: Session) -> None:
+    def __init__(self, session: Session, registry: RuntimeRegistry | None = None) -> None:
         self._session = session
         self._project_repo: ProjectRepository = SqlProjectRepository(session)
         self._task_repo: TaskRepository = SqlTaskRepository(session)
@@ -74,19 +87,31 @@ class ExecutionService:
         self._finding_repo: FindingRepository = SqlFindingRepository(session)
         self._evidence_repo: EvidenceRepository = SqlEvidenceRepository(session)
         self._artifact_repo: ArtifactRepository = SqlArtifactRepository(session)
+        self._binding_repo: RuntimeBindingSnapshotRepository = (
+            SqlRuntimeBindingSnapshotRepository(session)
+        )
+        # Composition-root injectable; default registers only reference.local.
+        self._registry: RuntimeRegistry = registry or build_default_registry()
 
     async def execute_task(self, task_id: str) -> RunExecution:
         """Execute a task through RunSupervisor and persist all results.
 
-        Steps:
-        1. Load Task and ContextPackage from repositories, validate same project.
-        2. Load WorkflowDefinition from builtin YAML, validate task workflow reference.
-        3. Execute via RunSupervisor + ReferenceRuntimeAdapter.
-        4. Persist Run, RunEvents, RunResult, Finding, Evidence, Artifact through repositories.
-        5. Commit and return the RunExecution.
+        Binding-first transaction boundary (PRE-WP14-B):
+          1. Load and validate Task / ContextPackage / workflow.
+          2. Resolve the RuntimeProfile via the Registry (fail closed).
+          3. ONE atomic transaction: new CREATED Run identity + immutable
+             RuntimeBindingSnapshot insert_once + CREATED→STARTING event,
+             committed BEFORE any adapter invocation.
+          4. Execute via RunSupervisor (starting from STARTING state).
+          5. Persist all runtime outputs, evaluate gates, commit.
+
+        If binding/event persistence fails, the whole transaction rolls back:
+        no half-created Run, no orphan snapshot, and the adapter is never
+        invoked.
 
         Raises:
             ValueError: if Task/ContextPackage mismatch, workflow mismatch, or entity not found.
+            RuntimeBindingError: if registry resolution or binding fails.
         """
         # 1. Load Task and ContextPackage
         task = self._task_repo.get(task_id)
@@ -106,20 +131,71 @@ class ExecutionService:
         # 2. Load WorkflowDefinition from builtin YAML
         workflow = self._load_workflow(task.workflow_id, task.workflow_version)
 
-        # 3. Execute via RunSupervisor
-        adapter = ReferenceRuntimeAdapter()
+        # 2b. Resolve the RuntimeProfile via the Registry — fail closed before
+        # any Run identity or adapter work happens.
+        profile = self._registry.resolve(REFERENCE_PROFILE_REF)
+
+        # 3. Binding-first atomic transaction: Run identity + snapshot +
+        #    STARTING event committed together BEFORE adapter execution.
+        from polynexus_core.domain.enums import RunState
+        from polynexus_core.domain.models import RunEvent
+
+        run = Run(
+            task_id=task.id,
+            workflow_id=workflow.id,
+            workflow_version=workflow.version,
+            context_package_id=context.id,
+        )
+        self._run_repo.add(run)
+        # Claim the freshly created Run identity (CREATED -> STARTING) inside
+        # the same binding-first transaction.
+        if not self._run_repo.claim_for_execution(run.id):
+            raise RuntimeError("Failed to claim the newly created Run identity")
+        claim_event = RunEvent(
+            run_id=run.id,
+            from_state=RunState.CREATED,
+            to_state=RunState.STARTING,
+        )
+        try:
+            self._run_repo.append_event(claim_event)
+            self._binding_repo.insert_once(
+                self._registry.bind(
+                    REFERENCE_PROFILE_REF,
+                    run_id=run.id,
+                    resolved_at=claim_event.occurred_at,
+                )
+            )
+        except Exception:
+            self._session.rollback()
+            raise
+        self._session.commit()
+
+        # 4. Execute via RunSupervisor with the Registry-resolved adapter.
+        # The Run is reloaded in its claimed STARTING state.
+        adapter = self._construct_adapter_or_fail_closed(run.id, profile)
         supervisor = RunSupervisor(adapter)
 
-        session_data = await supervisor.start(task, context, workflow)
-        execution = await supervisor.collect(session_data)
+        stored_run = self._run_repo.get(run.id)
+        assert stored_run is not None
 
-        # 4. Persist all results
-        self._persist_execution(execution)
+        execution = await supervisor.execute_claimed_run(
+            stored_run, task, context, workflow
+        )
 
-        # 5. Gate evaluation (post-execution, before commit)
-        from polynexus_core.domain.enums import RunState as _RunState
+        # 5. Persist runtime outputs. The Run identity was already persisted
+        # and committed in the binding-first transaction (step 3) — update it
+        # instead of re-adding, and only persist real adapter outputs.
+        self._run_repo.update(execution.run)
+        for finding in execution.findings:
+            self._finding_repo.add(finding)
+        for evidence in execution.evidence:
+            self._evidence_repo.add(evidence)
+        for artifact in execution.artifacts:
+            self._artifact_repo.add(artifact)
+
+        # 6. Gate evaluation (post-execution, before commit)
         from polynexus_core.workflows.gates import evaluate_workflow_gates, persist_gate_report
-        if execution.run.state is _RunState.COMPLETED:
+        if execution.run.state is RunState.COMPLETED:
             gate_report = evaluate_workflow_gates(
                 workflow, task, execution.run, self._evidence_repo
             )
@@ -145,7 +221,8 @@ class ExecutionService:
                 artifacts=execution.artifacts,
             )
 
-        # 6. Commit
+        # 7. Commit — the binding snapshot was already persisted and committed
+        # in the binding-first transaction (step 3), before adapter execution.
         self._session.commit()
 
         return execution
@@ -164,14 +241,24 @@ class ExecutionService:
         Validation happens before the claim so no adapter work is wasted
         on an invalid Run.
 
-        RunSupervisor is the sole lifecycle owner for FAILED transitions.
-        ExecutionService only persists the final state.
+        Lifecycle failure ownership is split:
+        - RunSupervisor owns lifecycle failures at the adapter EXECUTION
+          boundary: it catches runtime-boundary exceptions and transitions
+          to FAILED with a sanitized reason.
+        - ExecutionService owns adapter FACTORY CONSTRUCTION failure after
+          the binding-first commit: `_construct_adapter_or_fail_closed()`
+          legally transitions STARTING -> FAILED with a sanitized constant
+          reason/event, commits, and raises a sanitized RuntimeBindingError.
 
         Raises:
             RunNotFoundError: if Run does not exist.
             ResourceNotFoundError: if Task or ContextPackage not found.
             ContractViolationError: if project/workflow mismatch.
             ClaimConflictError: if CAS claim fails.
+            RuntimeBindingError: if registry resolution fails before the claim,
+                binding persistence fails (transaction rolls back), or adapter
+                factory construction fails after the claim (Run is recovered
+                to FAILED).
         """
         # --- Phase 1: Validate all references (no CAS yet) ---
         run = self._run_repo.get(run_id)
@@ -194,14 +281,22 @@ class ExecutionService:
 
         workflow = self._load_workflow(run.workflow_id, run.workflow_version)
 
-        # --- Phase 2: CAS claim + commit (atomic, separate transaction) ---
+        # --- Phase 1b: Resolve the RuntimeProfile via the Registry ---
+        # Fail closed BEFORE any CAS claim or adapter work: an unknown or
+        # unavailable profile must leave the Run untouched (still CREATED).
+        profile = self._registry.resolve(REFERENCE_PROFILE_REF)
+
+        # --- Phase 2: CAS claim + immutable binding + STARTING event ---
+        # All three happen in ONE transaction committed atomically BEFORE the
+        # runtime adapter is invoked. Any failure rolls back the whole
+        # transaction — no claimed Run without a binding snapshot can exist,
+        # and no adapter is started after a rollback.
         claimed = self._run_repo.claim_for_execution(run_id)
         if not claimed:
             raise ClaimConflictError(
                 f"Run {run_id} is not in CREATED state (current: {run.state.value})"
             )
 
-        # Persist the CREATED→STARTING event and commit the claim
         from polynexus_core.domain.enums import RunState
         from polynexus_core.domain.models import RunEvent
         claim_event = RunEvent(
@@ -209,7 +304,21 @@ class ExecutionService:
             from_state=RunState.CREATED,
             to_state=RunState.STARTING,
         )
-        self._run_repo.append_event(claim_event)
+        try:
+            self._run_repo.append_event(claim_event)
+            # Bind before execution: resolved_at is the deterministic
+            # CREATED→STARTING claim event timestamp; rebinding a Run is
+            # rejected by insert_once.
+            self._binding_repo.insert_once(
+                self._registry.bind(
+                    REFERENCE_PROFILE_REF,
+                    run_id=run_id,
+                    resolved_at=claim_event.occurred_at,
+                )
+            )
+        except Exception:
+            self._session.rollback()
+            raise
         self._session.commit()
 
         # Reload the Run (now in STARTING state, with claim event committed)
@@ -217,7 +326,8 @@ class ExecutionService:
         assert run is not None
 
         # --- Phase 3: Execute via RunSupervisor ---
-        adapter = ReferenceRuntimeAdapter()
+        # Adapter comes from the Registry (no vendor-specific Core branch).
+        adapter = self._construct_adapter_or_fail_closed(run.id, profile)
         supervisor = RunSupervisor(adapter)
 
         # Supervisor is the sole lifecycle owner — it catches runtime-boundary
@@ -281,6 +391,34 @@ class ExecutionService:
         self._session.commit()
 
         return execution
+
+    def _construct_adapter_or_fail_closed(
+        self, run_id: str, profile: RuntimeProfile
+    ) -> object:
+        """Construct the adapter for a claimed Run; fail closed on factory error.
+
+        The binding-first transaction is already committed at this point, so a
+        factory construction failure must NOT leave the Run stuck in STARTING:
+        the Run is legally transitioned STARTING -> FAILED through the existing
+        lifecycle with a sanitized reason/event, the terminal state is
+        committed, and a sanitized RuntimeBindingError (never the raw
+        exception) propagates to the caller.
+        """
+        from polynexus_core.domain.enums import RunState
+
+        try:
+            return self._registry.create_adapter(profile)
+        except Exception:
+            stored = self._run_repo.get(run_id)
+            assert stored is not None
+            stored.transition(
+                RunState.FAILED, reason=_ADAPTER_CONSTRUCTION_FAILURE_REASON
+            )
+            self._run_repo.update(stored)
+            self._session.commit()
+            raise RuntimeBindingError(
+                _ADAPTER_CONSTRUCTION_FAILURE_REASON
+            ) from None
 
     def _persist_run_update(self, execution: RunExecution) -> None:
         """Persist updated Run, Evidence, Finding, Artifact through repositories."""

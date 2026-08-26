@@ -1171,3 +1171,120 @@ class TestAlembicLifecycle:
         session.close()
         engine_final = session.get_bind()
         engine_final.dispose()
+
+
+class TestRunBindingSnapshotPersistence:
+    """PRE-WP14-B: Run-owned immutable RuntimeBindingSnapshot persistence."""
+
+    def _snapshot(self, run_id: str):
+        from datetime import datetime, timezone
+
+        from polynexus_core.domain.runtime_binding import legacy_backfill_snapshot
+
+        return legacy_backfill_snapshot(
+            run_id, ExecutionTarget.LOCAL, datetime(2026, 8, 25, tzinfo=timezone.utc)
+        )
+
+    def test_snapshot_round_trip_and_reload(self, db_session) -> None:
+        from polynexus_core.persistence.repository import (
+            SqlRuntimeBindingSnapshotRepository,
+        )
+
+        repo = SqlRuntimeBindingSnapshotRepository(db_session)
+        snapshot = self._snapshot("run-rt-1")
+        repo.insert_once(snapshot)
+        db_session.commit()
+
+        loaded = repo.get_by_run("run-rt-1")
+        assert loaded == snapshot
+        assert loaded.snapshot_schema_version == snapshot.snapshot_schema_version
+        assert loaded.legacy_backfill is True
+
+    def test_snapshot_duplicate_insert_rejected(self, db_session) -> None:
+        from polynexus_core.domain.runtime_binding import RuntimeBindingError
+        from polynexus_core.persistence.repository import (
+            SqlRuntimeBindingSnapshotRepository,
+        )
+
+        repo = SqlRuntimeBindingSnapshotRepository(db_session)
+        repo.insert_once(self._snapshot("run-dup-p"))
+        with pytest.raises(RuntimeBindingError, match="already bound"):
+            repo.insert_once(self._snapshot("run-dup-p"))
+
+    def test_snapshot_repository_update_delete_rejected(self, db_session) -> None:
+        from polynexus_core.domain.runtime_binding import RuntimeBindingError
+        from polynexus_core.persistence.repository import (
+            SqlRuntimeBindingSnapshotRepository,
+        )
+
+        repo = SqlRuntimeBindingSnapshotRepository(db_session)
+        snapshot = self._snapshot("run-rej-p")
+        repo.insert_once(snapshot)
+
+        with pytest.raises(RuntimeBindingError, match="update is rejected"):
+            repo.update(snapshot)
+        with pytest.raises(RuntimeBindingError, match="delete is rejected"):
+            repo.delete(snapshot.run_id)
+
+    def test_snapshot_unknown_schema_version_fails_closed(self, db_session) -> None:
+        from sqlalchemy import text as sa_text
+
+        from polynexus_core.domain.runtime_binding import RuntimeBindingError
+        from polynexus_core.persistence.repository import (
+            SqlRuntimeBindingSnapshotRepository,
+        )
+
+        db_session.execute(
+            sa_text(
+                """
+                INSERT INTO run_binding_snapshots (
+                    run_id, provider_id, transport_kind, runtime_id, adapter_id,
+                    execution_target, runtime_profile_ref, profile_revision,
+                    adapter_version, resolved_at, legacy_backfill,
+                    snapshot_schema_version, auth_ownership, secret_ref_id,
+                    usage_visibility
+                ) VALUES (
+                    'run-badver-p', 'polynexus', 'LOCAL', 'reference',
+                    'builtin.reference', 'LOCAL', NULL, NULL, NULL,
+                    '2026-08-25 00:00:00.000000', 1, 99, 'NONE', NULL,
+                    'UNAVAILABLE'
+                )
+                """
+            )
+        )
+        db_session.commit()
+        repo = SqlRuntimeBindingSnapshotRepository(db_session)
+        with pytest.raises(RuntimeBindingError, match="snapshot_schema_version"):
+            repo.get_by_run("run-badver-p")
+
+    def test_run_update_does_not_mutate_persisted_snapshot(self, db_session) -> None:
+        from polynexus_core.persistence.repository import (
+            SqlRuntimeBindingSnapshotRepository,
+        )
+
+        project = _make_project("Snapshot Run Update")
+        cp = _make_context_package(project.id)
+        task = _make_task(project.id)
+        task.context_package_id = cp.id
+        run = _make_run(task, cp)
+        SqlProjectRepository(db_session).add(project)
+        SqlContextPackageRepository(db_session).add(cp)
+        SqlTaskRepository(db_session).add(task)
+        SqlRunRepository(db_session).add(run)
+        db_session.commit()
+
+        binding_repo = SqlRuntimeBindingSnapshotRepository(db_session)
+        snapshot = self._snapshot(run.id)
+        binding_repo.insert_once(snapshot)
+        db_session.commit()
+
+        # Legal lifecycle: CAS claim (CREATED→STARTING) then STARTING→RUNNING.
+        assert SqlRunRepository(db_session).claim_for_execution(run.id) is True
+        stored_run = SqlRunRepository(db_session).get(run.id)
+        assert stored_run is not None
+        stored_run.transition(RunState.RUNNING)
+        SqlRunRepository(db_session).update(stored_run)
+        db_session.commit()
+
+        reloaded = binding_repo.get_by_run(run.id)
+        assert reloaded == snapshot

@@ -23,6 +23,36 @@ class ExecutionTarget(StrEnum):
     LOCAL = "LOCAL"
 
 
+class TransportKind(StrEnum):
+    """How PolyNexus reaches a Runtime (ADR-011 §2.1).
+
+    WEB_INTERACTIVE is boundary-only: it reserves an identity for the
+    assisted WebSurface path and creates no execution semantics.
+    """
+
+    LOCAL = "LOCAL"
+    NATIVE_SUBSCRIPTION = "NATIVE_SUBSCRIPTION"
+    OFFICIAL_API = "OFFICIAL_API"
+    WEB_INTERACTIVE = "WEB_INTERACTIVE"
+
+
+class AuthOwnership(StrEnum):
+    """Who owns the credential for a Runtime (ADR-011 §6)."""
+
+    RUNTIME_MANAGED = "RUNTIME_MANAGED"
+    SECRET_REF = "SECRET_REF"
+    BROWSER_PROFILE_MANAGED = "BROWSER_PROFILE_MANAGED"
+    NONE = "NONE"
+
+
+class UsageVisibility(StrEnum):
+    """Truthful usage/quota visibility contract (ADR-011 §8)."""
+
+    UNAVAILABLE = "UNAVAILABLE"
+    ESTIMATED = "ESTIMATED"
+    EXACT = "EXACT"
+
+
 class EvidenceType(StrEnum):
     AI_OPINION = "AI_OPINION"
     RUNTIME_EVIDENCE = "RUNTIME_EVIDENCE"

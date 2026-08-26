@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from polynexus_core.domain.enums import (
     ArtifactType,
+    AuthOwnership,
     EvidenceStatus,
     EvidenceType,
     ExecutionTarget,
@@ -15,6 +16,8 @@ from polynexus_core.domain.enums import (
     FindingStatus,
     ResumeMode,
     RunState,
+    TransportKind,
+    UsageVisibility,
     WorkMode,
 )
 from polynexus_core.domain.models import (
@@ -28,6 +31,11 @@ from polynexus_core.domain.models import (
     RunResult,
     Task,
 )
+from polynexus_core.domain.runtime_binding import (
+    SUPPORTED_SNAPSHOT_SCHEMA_VERSIONS,
+    RuntimeBindingError,
+    RuntimeBindingSnapshot,
+)
 from polynexus_core.persistence.models import (
     ArtifactRow,
     Base,
@@ -35,6 +43,7 @@ from polynexus_core.persistence.models import (
     EvidenceRow,
     FindingRow,
     ProjectRow,
+    RunBindingSnapshotRow,
     RunEventRow,
     RunRow,
     TaskRow,
@@ -292,6 +301,48 @@ def _row_to_evidence(r: EvidenceRow) -> Evidence:
     )
 
 
+def _snapshot_to_row(s: RuntimeBindingSnapshot) -> RunBindingSnapshotRow:
+    return RunBindingSnapshotRow(
+        run_id=s.run_id,
+        provider_id=s.provider_id,
+        transport_kind=s.transport_kind.value,
+        runtime_id=s.runtime_id,
+        adapter_id=s.adapter_id,
+        execution_target=s.execution_target.value,
+        runtime_profile_ref=s.runtime_profile_ref,
+        profile_revision=s.profile_revision,
+        adapter_version=s.adapter_version,
+        resolved_at=_ensure_utc_naive(s.resolved_at),
+        legacy_backfill=s.legacy_backfill,
+        snapshot_schema_version=s.snapshot_schema_version,
+        auth_ownership=s.auth_ownership.value,
+        secret_ref_id=s.secret_ref_id,
+        usage_visibility=s.usage_visibility.value,
+    )
+
+
+def _row_to_snapshot(r: RunBindingSnapshotRow) -> RuntimeBindingSnapshot:
+    # Unknown snapshot_schema_version raises RuntimeBindingError here —
+    # reload of an unsupported version fails closed instead of guessing.
+    return RuntimeBindingSnapshot(
+        run_id=r.run_id,
+        provider_id=r.provider_id,
+        transport_kind=TransportKind(r.transport_kind),
+        runtime_id=r.runtime_id,
+        adapter_id=r.adapter_id,
+        execution_target=ExecutionTarget(r.execution_target),
+        runtime_profile_ref=r.runtime_profile_ref,
+        profile_revision=r.profile_revision,
+        adapter_version=r.adapter_version,
+        resolved_at=r.resolved_at.replace(tzinfo=timezone.utc),
+        legacy_backfill=bool(r.legacy_backfill),
+        snapshot_schema_version=r.snapshot_schema_version,
+        auth_ownership=AuthOwnership(r.auth_ownership),
+        secret_ref_id=r.secret_ref_id,
+        usage_visibility=UsageVisibility(r.usage_visibility),
+    )
+
+
 # ---------------------------------------------------------------------------
 # Repository Interfaces (ABC)
 # ---------------------------------------------------------------------------
@@ -365,6 +416,34 @@ class RunEventRepository(ABC):
 
     @abstractmethod
     def list_by_run(self, run_id: str) -> Sequence[RunEvent]: ...
+
+
+class RuntimeBindingSnapshotRepository(ABC):
+    """Minimal immutable snapshot contract (ADR-011 / PRE-WP14-B).
+
+    insert-once semantics: a second insert for the same Run fails closed,
+    update and delete are always rejected, and Run lifecycle updates can
+    never overwrite a persisted binding.
+    """
+
+    @abstractmethod
+    def insert_once(self, snapshot: RuntimeBindingSnapshot) -> None:
+        """Insert the snapshot; raise RuntimeBindingError if the Run is already bound."""
+
+    @abstractmethod
+    def get_by_run(self, run_id: str) -> RuntimeBindingSnapshot | None:
+        """Reload the snapshot for a Run; unknown schema versions fail closed."""
+
+    @abstractmethod
+    def exists_for_run(self, run_id: str) -> bool: ...
+
+    @abstractmethod
+    def update(self, snapshot: RuntimeBindingSnapshot) -> None:
+        """Always rejected — snapshots are immutable."""
+
+    @abstractmethod
+    def delete(self, run_id: str) -> None:
+        """Always rejected — snapshots are immutable."""
 
 
 class ArtifactRepository(ABC):
@@ -570,6 +649,39 @@ class SqlRunEventRepository(RunEventRepository):
             .all()
         )
         return [_row_to_event(r) for r in rows]
+
+
+class SqlRuntimeBindingSnapshotRepository(RuntimeBindingSnapshotRepository):
+    def __init__(self, session: Session) -> None:
+        self._s = session
+
+    def insert_once(self, snapshot: RuntimeBindingSnapshot) -> None:
+        if self.exists_for_run(snapshot.run_id):
+            raise RuntimeBindingError(
+                f"Run {snapshot.run_id} is already bound; rebinding is rejected"
+            )
+        self._s.add(_snapshot_to_row(snapshot))
+        self._s.flush()
+
+    def get_by_run(self, run_id: str) -> RuntimeBindingSnapshot | None:
+        r = self._s.get(RunBindingSnapshotRow, run_id)
+        if r is None:
+            return None
+        # Unknown snapshot_schema_version raises RuntimeBindingError (fail closed).
+        return _row_to_snapshot(r)
+
+    def exists_for_run(self, run_id: str) -> bool:
+        return self._s.get(RunBindingSnapshotRow, run_id) is not None
+
+    def update(self, snapshot: RuntimeBindingSnapshot) -> None:
+        raise RuntimeBindingError(
+            "RuntimeBindingSnapshot update is rejected (snapshots are immutable)"
+        )
+
+    def delete(self, run_id: str) -> None:
+        raise RuntimeBindingError(
+            "RuntimeBindingSnapshot delete is rejected (snapshots are immutable)"
+        )
 
 
 class SqlArtifactRepository(ArtifactRepository):

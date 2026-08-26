@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from uuid import uuid4
 
-from polynexus_core.domain.enums import ResumeMode, RunState
+from polynexus_core.domain.enums import AuthOwnership, ResumeMode, RunState, UsageVisibility
 from polynexus_core.domain.models import Artifact, ContextPackage, Task
 from polynexus_core.runtime.contracts import (
     RuntimeCapabilities,
@@ -33,7 +33,16 @@ class ReferenceRuntimeAdapter:
         return True
 
     def capabilities(self) -> RuntimeCapabilities:
-        return RuntimeCapabilities(cancel=True, resume=ResumeMode.NONE, artifacts=True)
+        # Reference runtime truth: PRE-WP14-A verified its cancel/cleanup
+        # machinery; it collects no usage and manages no credentials.
+        return RuntimeCapabilities(
+            cancel=True,
+            resume=ResumeMode.NONE,
+            artifacts=True,
+            timeout_cleanup_verified=True,
+            usage_visibility=UsageVisibility.UNAVAILABLE,
+            auth_ownership=AuthOwnership.NONE,
+        )
 
     async def create_run(self, context: ContextPackage) -> str:
         runtime_ref = f"reference:{uuid4().hex}"

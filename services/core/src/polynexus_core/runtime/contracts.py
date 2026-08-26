@@ -3,15 +3,24 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol
 
-from polynexus_core.domain.enums import ResumeMode, RunState
+from polynexus_core.domain.enums import AuthOwnership, ResumeMode, RunState, UsageVisibility
 from polynexus_core.domain.models import Artifact, ContextPackage, Evidence, Finding, Task
 
 
 @dataclass(frozen=True)
 class RuntimeCapabilities:
+    """Backward-compatible capability contract (ADR-011 §8).
+
+    New fields default to the conservative/fail-closed values so existing
+    three-argument constructions keep working unchanged.
+    """
+
     cancel: bool = True
     resume: ResumeMode = ResumeMode.NONE
     artifacts: bool = True
+    timeout_cleanup_verified: bool = False
+    usage_visibility: UsageVisibility = UsageVisibility.UNAVAILABLE
+    auth_ownership: AuthOwnership = AuthOwnership.NONE
 
 
 @dataclass(frozen=True)
