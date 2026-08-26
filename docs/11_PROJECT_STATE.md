@@ -2,7 +2,7 @@
 
 Date: 2026-08-25
 Version: Development Baseline v1.0 + Dev Preparation Profile v1.0.2
-Milestone: First Vertical Slice — WP-08A/WP-08B/WP-09B/WP-09C/WP-09D/WP-10/WP-12/WP-13 ACCEPTED; CP-02 complete; CP-03 in progress; PRE-WP14-A HUMAN_ACCEPTED / IMPLEMENTATION_ACCEPTED at `28196c9`; PRE-WP14-B HUMAN_ACCEPTED / IMPLEMENTATION_ACCEPTED (Human decision 2026-08-26; checkpoint SHA recorded after commit) on baseline `934a219`
+Milestone: First Vertical Slice — WP-08A/WP-08B/WP-09B/WP-09C/WP-09D/WP-10/WP-12/WP-13 ACCEPTED; CP-02 complete; CP-03 in progress; PRE-WP14-A HUMAN_ACCEPTED / IMPLEMENTATION_ACCEPTED at `28196c9`; PRE-WP14-B HUMAN_ACCEPTED / IMPLEMENTATION_ACCEPTED (Human decision 2026-08-26; checkpointed at `c615733`) on baseline `934a219`
 
 ## Confirmed
 - Product Scope Decisions D01–D10 confirmed.
@@ -23,7 +23,7 @@ Milestone: First Vertical Slice — WP-08A/WP-08B/WP-09B/WP-09C/WP-09D/WP-10/WP-
 
 ## Current Priority
 1. Preserve the two excluded pre-existing dirty files (`docs/15_DOCUMENT_INDEX.md`, `docs/tasks/WP-12.md`) and their ownership; PRE-WP14-A remains accepted at `28196c9`.
-2. Complete and record the exact-allowlist PRE-WP14-B Git checkpoint authorized by Human; WP-14/WP-15 production adapter conformance remains separately gated.
+2. PRE-WP14-B is checkpointed at `c615733`; WP-14/WP-15 production adapter conformance remains separately gated.
 3. WP-14/WP-15 production adapter conformance remains out of scope until its own gates. GitHub enablement and Browser E2E remain independent future gates.
 
 ## Current Product Slice
@@ -43,12 +43,12 @@ PRE-WP14-B is HUMAN_ACCEPTED / IMPLEMENTATION_ACCEPTED on baseline `934a219` und
 ## Current Development State
 
 Phase: First Vertical Slice — CP-03 in progress; PRE-WP14-A accepted at `28196c9`; PRE-WP14-B Human-accepted / implementation-accepted (Attempt 4)
-Next Phase: Record the PRE-WP14-B exact-allowlist Git checkpoint -> WP-14 planning remains separately gated
+Next Phase: WP-14 planning remains separately gated; no production adapter work is authorized by PRE-WP14-B
 
 Current Branch: feature/first-vertical-slice
-Current Baseline Commit: `934a2191a78a40c8a68b5195f786b1d9cc8bc0cc` (implementation base; acceptance checkpoint SHA recorded after commit)
+Current Baseline Commit: `c6157335069f3df3484030aa772bbf5c2aec248e` (`PRE-WP14-B` implementation and acceptance checkpoint)
 Latest FVS Checkpoint: 330adbc (`feat(core): accept WP-13 workflow gates`)
-Current Planned Task: `PRE-WP14-B-GIT-CHECKPOINT` — explicit 15-file checkpoint after Human acceptance
+Current Planned Task: WP-14 planning / separate Architecture Gate; PRE-WP14-B checkpoint `c615733`
 Active Writer: OpenCode — cannot independently accept its own work
 Reviewer: Fresh independent Codex context; Writer != Reviewer is mandatory
 Antigravity: `NOT_REQUIRED` for this Core-only task; no UI/browser/E2E surface

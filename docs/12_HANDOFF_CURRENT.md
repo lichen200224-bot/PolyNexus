@@ -4,17 +4,17 @@
 `PRE-WP14-B-RUNTIME-BINDING-IMPLEMENTATION` — ADR-011 Runtime Binding contract implementation (Attempt 4: remediation of Attempt-3 Codex Findings 1–3)
 
 ## Status
-Current operational status: `HUMAN_ACCEPTED / IMPLEMENTATION_ACCEPTED / GIT_CHECKPOINT_IN_PROGRESS`.
+Current operational status: `HUMAN_ACCEPTED / IMPLEMENTATION_ACCEPTED / CHECKPOINTED`.
 
 - Branch: `feature/first-vertical-slice`
-- HEAD: `934a2191a78a40c8a68b5195f786b1d9cc8bc0cc` before the authorized checkpoint commit; final checkpoint SHA is recorded after commit
+- HEAD: `c6157335069f3df3484030aa772bbf5c2aec248e` (`PRE-WP14-B` exact-allowlist checkpoint)
 - Previous gates: PRE-WP14-A `HUMAN_ACCEPTED / IMPLEMENTATION_ACCEPTED` at `28196c9`; ADR-011 architecture `HUMAN_ACCEPTED` (decision text unchanged)
 - Review history: Attempt 1 FAIL (remediated); Attempt 2 Codex FAIL (4 findings) -> Attempt 3 fixed Findings 1–3; Attempt 3 Codex FAIL (3 findings: false log-capture PASS label / missing migration-path trigger acceptance / stale docstring) -> Attempt 4 fixes all three within the same 15-file allowlist
 - Human decision: PRE-WP14-B Architecture / Acceptance approved on 2026-08-26 after fresh independent Codex `VERIFIED_PASS`; exact 15-file stage/commit checkpoint authorized; push, remote modification and migration-on-real-database remain unauthorized
 - Writer: OpenCode
 - Required Reviewer: fresh independent Codex context; Writer != Reviewer is mandatory
 - Antigravity: `NOT_REQUIRED` — no UI/browser/E2E surface
-- Next owner: Codex completes the explicit 15-file Git checkpoint; Human retains push/remote and future WP-14 gates
+- Next owner: Human retains push/remote and future WP-14 gates; PRE-WP14-B checkpoint is `c615733`
 - GitHub status: not configured/verified; `CROSS_MACHINE_CONTINUATION_READY` is not established
 
 ## Current Goal and Delta (Human Acceptance / Git Checkpoint)
@@ -49,14 +49,14 @@ Verification (actual commands and results, Attempt 4, independently rerun by fre
 - `git diff --check` -> clean (CRLF/LF warning on test_persistence.py is non-fatal)
 
 Known limitations / UNVERIFIED (not PASS):
-- Fresh independent Codex re-review verdict: `VERIFIED_PASS`. Human acceptance: granted 2026-08-26. Exact-allowlist Git checkpoint: in progress; final SHA is recorded after commit.
+- Fresh independent Codex re-review verdict: `VERIFIED_PASS`. Human acceptance: granted 2026-08-26. Exact-allowlist Git checkpoint: `c615733`.
 - API response surface, application log capture, and exports/handoff secret-exclusion scans: NOT_IN_SCOPE / UNVERIFIED (see matrix in docs/tasks/PRE-WP14-B.md); not claimed as verified.
 - SQLite FK enforcement is not assumed; integrity is enforced by repository contract + ORM listeners + database triggers (including `trg_runs_reject_delete`, now dynamically verified on the Alembic-migrated path too).
 - WEB_INTERACTIVE remains boundary-only; NATIVE_SUBSCRIPTION/OFFICIAL_API have no execution path.
 - No public API provenance endpoint (outside the allowlist).
 - Pytest temp-dir cleanup PermissionError at interpreter exit: non-fatal Windows environment warning.
 
-Stage/commit is authorized only for the exact 15-file allowlist in this checkpoint. Push, remote operation, GitHub operation and real/user database migration remain unauthorized.
+The exact 15-file checkpoint is committed at `c615733`. Push, remote operation, GitHub operation and real/user database migration remain unauthorized.
 
 ## Next Routing
 

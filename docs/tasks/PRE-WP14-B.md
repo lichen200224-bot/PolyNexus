@@ -3,15 +3,15 @@
 ## Task status
 
 - TASK_ID: PRE-WP14-B-RUNTIME-BINDING-IMPLEMENTATION
-- STATUS: `HUMAN_ACCEPTED / IMPLEMENTATION_ACCEPTED / GIT_CHECKPOINT_IN_PROGRESS`
+- STATUS: `HUMAN_ACCEPTED / IMPLEMENTATION_ACCEPTED / CHECKPOINTED`
 - ATTEMPT: 4
 - BRANCH: feature/first-vertical-slice
-- BASELINE HEAD: `934a2191a78a40c8a68b5195f786b1d9cc8bc0cc` before the authorized checkpoint commit; final checkpoint SHA is recorded after commit
+- BASELINE HEAD: `c6157335069f3df3484030aa772bbf5c2aec248e` (`PRE-WP14-B` exact-allowlist checkpoint)
 - WRITER: OpenCode
 - REVIEWER: Fresh independent Codex context (Writer != Reviewer)
 - ANTIGRAVITY_STATUS: NOT_REQUIRED — no UI/browser/E2E surface
-- NEXT_OWNER: Codex explicit-allowlist Git checkpoint -> Human retains push/remote and future WP-14 gates
-- HUMAN_AUTHORIZATION: PRE-WP14-B Architecture / Acceptance decision approved on 2026-08-26 after fresh independent Codex `VERIFIED_PASS`; exact 15-file stage/commit checkpoint authorized; no push/remote modification or migration-on-real-database authorization
+- NEXT_OWNER: Human retains push/remote and future WP-14 gates; WP-14 remains separately gated
+- HUMAN_AUTHORIZATION: PRE-WP14-B Architecture / Acceptance decision approved on 2026-08-26 after fresh independent Codex `VERIFIED_PASS`; exact 15-file checkpoint committed at `c615733`; no push/remote modification or migration-on-real-database authorization
 - ADR_IMPACT: ADR-011 implementation within the accepted architecture; ADR-001～ADR-011 decision text unchanged
 - DEPENDENCY: PRE-WP14-A HUMAN_ACCEPTED at checkpoint `28196c9`
 
@@ -118,7 +118,7 @@ Not modified: domain/models.py, domain/run_lifecycle.py, runtime/supervisor.py, 
 
 - Fresh independent Codex re-review verdict for Attempt 4: `VERIFIED_PASS`; Human acceptance granted 2026-08-26.
 - API response surface, application log capture, and exports/handoff marker scans: NOT_IN_SCOPE / UNVERIFIED (see matrix above).
-- Exact-allowlist Git checkpoint is in progress; final SHA is recorded after commit. Push, remote modification and real/user database migration remain unauthorized.
+- Exact-allowlist Git checkpoint: `c615733`. Push, remote modification and real/user database migration remain unauthorized.
 - Migration against real/user databases (prohibited here).
 
 ## Do not change
