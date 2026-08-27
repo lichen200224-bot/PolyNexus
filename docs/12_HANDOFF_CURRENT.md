@@ -13,7 +13,7 @@ Current operational status: `G02_HUMAN_APPROVED / G03_DECISION_REQUIRED / DOCX_S
 - Antigravity: `NOT_REQUIRED` — no product UI/browser journey was changed; official-source retrieval produced no browser artifact
 - Next owner: Human to decide whether to route G03; G03 has not started
 - G01 prerequisite: G01 state and its recorded clean-clone checkpoint remain documented in `docs/11_PROJECT_STATE.md` and the baseline context below; G02 does not create a new G01 acceptance
-- Git authorization: `NONE`; no stage, commit, push, merge, reset, rebase, clean, delete, or history operation was performed for G02
+- Git authorization: `LOCAL_COMMIT_ONLY`; G02 content checkpoint `382f2831aee39a8ed9330ff8062caae532fb8d26` was created from the exact seven-path allowlist; remote push remains `NONE`
 - Existing WP-12/WP-14/runtime dirty paths remain preserved and outside G02 ownership
 
 ## Baseline context retained
@@ -53,7 +53,7 @@ Scope deviation: `NONE`.
 
 - G02 start-of-task `git status --short --branch`, `git rev-parse HEAD`, `git remote -v`, staged/modified/untracked checks: exit code `0`; pre-existing ownership was recorded in the task document and preserved.
 - Current `git status --short --branch`: exit code `0`; worktree remains dirty only with the listed G02, prior project-content, and foreign paths.
-- Current `git rev-parse HEAD`: exit code `0`; `77b1b4b4d36e855dc24f0da07b6f69da2cee03d6`.
+- G02 content checkpoint: `git commit -m "docs: checkpoint G02 content confidence"` exit `0`; SHA `382f2831aee39a8ed9330ff8062caae532fb8d26`; exactly seven G02 allowlist paths were committed. `git push` was not run and remains unauthorized.
 - Current `git diff --name-status`: exit code `0`; current tracked deltas and untracked paths were reconciled against the G02 allowlist, the prior project-content delta, and preserved foreign ownership.
 - Current `git diff --cached --name-status`: exit code `0`; no staged files.
 - Source-to-claim matrix completeness/count/path check: exit `0`; `20` product rows, `6` official rows, maturity counts `IMPLEMENTED=8`, `IN_DEVELOPMENT=3`, `PLANNED_V1=5`, `FUTURE=4`, no foreign runtime-task references in the matrix, and all G02 allowlist paths present.
