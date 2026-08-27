@@ -1,79 +1,93 @@
 # Current Handoff
 
 ## Task
-`G01-PROJECT-STATE-RECONCILIATION-CONTINUATION` — project/runtime/document factual state reconciliation
+`G02-COMP-01-CONTENT-CONFIDENCE` — Cyber4.0 2026 initial-review proposal/deck content-confidence gate
 
 ## Status
-Current operational status: `DOCUMENT_STATE_SYNCED / CODEX_DOCUMENT_REVIEW_VERIFIED_PASS / GIT_CHECKPOINT_PUSHED / CLEAN_CLONE_VERIFIED`.
+Current operational status: `G02_HUMAN_APPROVED / G03_DECISION_REQUIRED / DOCX_STRUCTURAL_AND_PAGECOUNT / RENDERED_VISUAL_QA_PASS_FALLBACK / OFFICIAL_PARTIAL_CONFLICT_PENDING`.
 
 - Branch: `feature/first-vertical-slice`
-- Latest verified G01 checkpoint before this final handoff update: `e4fd6e300799cab89744966b462b6c4bb25354c4` on `backup:feature/first-vertical-slice`
-- Current branch: `feature/first-vertical-slice`; the first G01 checkpoint had staged state empty; the final handoff synchronization was staged as exactly the three allowlisted documents for review
-- Pre-sync working-tree observation: 5 modified paths and 5 untracked paths; before the first G01 checkpoint, the document delta made the working tree 7 modified paths and 5 untracked paths; after that checkpoint, the current tree retains 4 pre-existing modified paths and 5 untracked paths; protected/unknown paths remain preserved
-- Writer: Codex — G01 current-state documents only
-- Required Reviewer: Fresh independent Codex
-- Antigravity: `NOT_REQUIRED` — no UI/browser/E2E surface
-- Next owner: Human for final post-clean-clone acceptance and any later component gate
-- Canonical runtime ref: `backup/runtime-adapters-integration@65c6582c70c4e724005adb983d65aba10ea3e8be`
-- Canonical scope: Registry + WP-14 + WP-15 only
-- WP-16: `EXCLUDE_FROM_CANONICAL`; preserve its separate dirty checkout; no delete/overwrite/merge/commit/push/cleanup
-- Human acceptance status: component acceptance labels unchanged
-- Git operations: Human-authorized exact stage/commit/push gate executed for the three approved documents; no merge, cherry-pick, reset, rebase, clean, delete, or unrelated path operation was performed
-- GitHub status: not configured/verified; local `backup` contains the canonical runtime ref
+- HEAD at G02 start and current content base: `77b1b4b4d36e855dc24f0da07b6f69da2cee03d6`
+- Writer: Codex — G02 competition documents and existing proposal DOCX only
+- Independent Reviewer: fresh G02-only reviewer `01a04366-9b2b-7560-8135-bf0509a79c38` returned `NEED_ACTION` with `FINDINGS: NO BLOCKER`; the action is official-source/Human work, not a writer defect, and is not product or Git acceptance
+- Antigravity: `NOT_REQUIRED` — no product UI/browser journey was changed; official-source retrieval produced no browser artifact
+- Next owner: Human to decide whether to route G03; G03 has not started
+- G01 prerequisite: G01 state and its recorded clean-clone checkpoint remain documented in `docs/11_PROJECT_STATE.md` and the baseline context below; G02 does not create a new G01 acceptance
+- Git authorization: `NONE`; no stage, commit, push, merge, reset, rebase, clean, delete, or history operation was performed for G02
+- Existing WP-12/WP-14/runtime dirty paths remain preserved and outside G02 ownership
+
+## Baseline context retained
+
+- Latest verified G01 document checkpoint remains `backup:feature/first-vertical-slice@e4fd6e300799cab89744966b462b6c4bb25354c4`; this content-organization pass does not alter that checkpoint or its acceptance state.
+- Human-confirmed canonical runtime reference remains `backup/runtime-adapters-integration@65c6582c70c4e724005adb983d65aba10ea3e8be`, scoped to Registry, WP-14, and WP-15 only.
+- The canonical runtime clean-clone reference remains `artifacts/verification/clean-clone-runtime-adapters-integration-65c6582-20260827`; WP-16 remains excluded from that reference and separately gated.
+- G01 current-state details and evidence remain in `docs/11_PROJECT_STATE.md`; this pass does not mark any component, runtime integration, or cross-machine state as newly accepted.
+- The prior project-content organization pass created `docs/31_PROJECT_CONTENT_MAP.md` and updated `README.md`; both remain outside the G02 allowlist and are preserved without reclassification.
 
 ## Current Goal and Delta
 
-Human-confirmed factual state reconciliation:
-
-1. The canonical runtime checkpoint is `backup/runtime-adapters-integration@65c6582c70c4e724005adb983d65aba10ea3e8be`, scoped only to Registry, WP-14, and WP-15.
-2. The canonical integration clean clone is `artifacts/verification/clean-clone-runtime-adapters-integration-65c6582-20260827`, branch `runtime-adapters-integration`, HEAD `65c6582c70c4e724005adb983d65aba10ea3e8be`, clean, with required project paths present.
-3. WP-16 remains a separate dirty implementation at `artifacts/worktrees/wp16-runtime-doctor`, status `IMPLEMENTED_PENDING_INDEPENDENT_REVIEW`; it has no remote branch or clean clone and is excluded from the canonical runtime reference.
-4. Main protected and unknown dirty paths remain outside this task. The G01 document delta is limited to this current operational block/current task delta, `docs/11_PROJECT_STATE.md`, and `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`.
-5. Fresh independent Codex document review returned `VERIFIED_PASS` with `FINDINGS: NO BLOCKER`; the bounded review does not establish component acceptance, commit, push, or cross-machine readiness.
-6. Human authorized the exact G01 document checkpoint: stage the three allowlisted files, review the staged diff, commit with `docs: reconcile project and runtime state`, push `backup:feature/first-vertical-slice`, then perform fresh clean-clone verification. No other files or Git operations are authorized.
-7. The first authorized checkpoint completed at `e4fd6e300799cab89744966b462b6c4bb25354c4`; fresh clone `artifacts/verification/clean-clone-g01-docs-feature-first-vertical-slice-e4fd6e3-20260827` is clean at that exact SHA with required paths present and WP-16 files absent. Subsequent handoff synchronization remains within the same three-file allowlist.
+1. Added the complete G02 source-to-claim matrix with 20 product rows (`IMPLEMENTED 8 / IN_DEVELOPMENT 3 / PLANNED_V1 5 / FUTURE 4`) and 6 official-requirement rows, each retaining evidence, limitations, and corrections.
+2. Updated `competition/PROPOSAL_SOURCE.md`, `docs/13_COMPETITION_SUBMISSION_PLAN.md`, and `docs/14_COMPETITION_SLIDE_OUTLINE.md` so bounded capability is separated from vendor/browser/local integration, roadmap targets, Future scope, and internal historical dates.
+3. Updated the existing `competition/PolyNexus_Cyber4_Initial_Proposal_Draft_v0.2.docx` in place; no competing formal proposal version was created.
+4. Reverified the official homepage and linked brief on 2026-08-27. The official brief supports the `2026-08-31` initial-review document deadline, `20`-page limits, format/content rules, and `50/30/20` scoring; homepage/brief Demo and benefit-table differences plus live-form unknowns remain `OFFICIAL_CONFLICT / NEED_ACTION`.
+5. Fresh G02-only independent review `01a04366-9b2b-7560-8135-bf0509a79c38` returned `NEED_ACTION / FINDINGS: NO BLOCKER`; it confirmed the G02 content package and left only official-source/Human actions. Human then recorded `APPROVE G02` on 2026-08-27 for the bounded content package. The earlier project-content review was not used as G02 acceptance evidence; no product or Git acceptance was inferred.
+6. Product/runtime/test/migration/lockfile/secret/CI/deployment paths, the prior project-content map/README delta, and protected dirty paths were not modified by G02.
 
 ## Changed files
 
-- G01 document delta (approved allowlist):
-  - `docs/11_PROJECT_STATE.md`
-  - `docs/12_HANDOFF_CURRENT.md` current operational block/current task delta only
-  - `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`
-- Pre-existing modified/untracked runtime, task, test, protected, and unrelated-worktree paths were not modified by G01.
+- G02 exact allowlist:
+  - `docs/tasks/G02-COMP-01-CONTENT-CONFIDENCE.md`
+  - `competition/G02_SOURCE_TO_CLAIM_MATRIX.md`
+  - `competition/PROPOSAL_SOURCE.md`
+  - `docs/13_COMPETITION_SUBMISSION_PLAN.md`
+  - `docs/14_COMPETITION_SLIDE_OUTLINE.md`
+  - `competition/PolyNexus_Cyber4_Initial_Proposal_Draft_v0.2.docx`
+  - `docs/12_HANDOFF_CURRENT.md` current operational block only
+- Prior project-content organization files `docs/31_PROJECT_CONTENT_MAP.md` and `README.md` remain outside G02 ownership and were preserved.
+- Pre-existing modified/untracked WP-12/WP-14/runtime/test paths remain outside this allowlist and ownership.
 
-ADR impact: NONE. No ADR text was changed; ADR-012/WP-16 remains excluded.
+ADR impact: `NONE`. No Product Scope, ADR, runtime maturity, project progress, or public API was changed.
+Scope deviation: `NONE`.
 
-Verification evidence (current read-only evidence; no source/test files changed by G01):
-- Main status/HEAD/branch/staged/untracked checks: exit code 0.
-- `backup` ref listing: exit code 0; canonical `runtime-adapters-integration` ref resolves to `65c6582c70c4e724005adb983d65aba10ea3e8be`.
-- Canonical integration clean-clone status, HEAD, branch, and required-file checks: exit code 0.
-- Combined Registry/WP-14/WP-15 targeted tests: 87 passed, exit code 0.
-- Canonical integration collect-only: 566 collected, exit code 0.
-- Canonical integration Full Core: 565 passed / 1 skipped, exit code 0; non-fatal Windows pytest temporary-directory cleanup warning retained.
-- Canonical integration baseline validator: exit code 0; governance validator: exit code 0.
-- WP-16 targeted: 16 passed, exit code 0; WP-16 regression: 144 passed, exit code 0; WP-16 collect-only: 582 collected, exit code 0.
-- Post-sync allowlist `git diff --check`: exit code 0.
-- Post-sync governance validator: exit code 0.
-- Post-sync main `scripts/validate_baseline.py`: process creation failed, exit code 1; `C:\Windows\py.exe -3 -B scripts\validate_baseline.py` reported no installed Python, exit code 1. This is an environment result, not a product PASS/FAIL.
-- Fresh independent Codex review: `VERIFIED_PASS`, `FINDINGS: NO BLOCKER`; review was limited to the three approved documents and current read-only evidence, and no product/runtime tests were rerun by the reviewer.
-- First G01 commit: exit code 0; push to `backup:feature/first-vertical-slice`: exit code 0; fresh clean-clone structural, exact-SHA and diff checks: exit code 0.
+## Verification evidence
+
+- G02 start-of-task `git status --short --branch`, `git rev-parse HEAD`, `git remote -v`, staged/modified/untracked checks: exit code `0`; pre-existing ownership was recorded in the task document and preserved.
+- Current `git status --short --branch`: exit code `0`; worktree remains dirty only with the listed G02, prior project-content, and foreign paths.
+- Current `git rev-parse HEAD`: exit code `0`; `77b1b4b4d36e855dc24f0da07b6f69da2cee03d6`.
+- Current `git diff --name-status`: exit code `0`; current tracked deltas and untracked paths were reconciled against the G02 allowlist, the prior project-content delta, and preserved foreign ownership.
+- Current `git diff --cached --name-status`: exit code `0`; no staged files.
+- Source-to-claim matrix completeness/count/path check: exit `0`; `20` product rows, `6` official rows, maturity counts `IMPLEMENTED=8`, `IN_DEVELOPMENT=3`, `PLANNED_V1=5`, `FUTURE=4`, no foreign runtime-task references in the matrix, and all G02 allowlist paths present.
+- Official homepage and brief recheck via temporary read-only Node helper: exit code `0`; homepage HTTP `200`, length `167140`, SHA-256 `F1FDCA69B4B98A6DC3F9E8FF9D2A55A46D8D99EB69D68DBE6649172A9538CEC7`; brief HTTP `200`, `43640` bytes, SHA-256 `EFBB80A1F8D86CD3E496DF633D80F7BB2B5B08A139F1477AD31E8D9509CD8A42`.
+- Official brief OOXML extraction: exit code `0`; a 1-based enumeration of all `//w:body//w:p` nodes found eligibility/deliverables at P078–P082, schedule at P140–P154, scoring at P176–P189, and Attachment 1 fields plus Attachment 2 format/content at P242–P308; no login, form fill, upload, send, or submission.
+- Preliminary DOCX marker check: exit `1`; its direct-paragraph/marker predicates were incorrect for the document's table-contained text and actual wording; no DOCX edit followed. Corrected current DOCX structural check: exit `0`; `18` ZIP entries, `134` body paragraphs (`86` direct plus `48` table paragraphs), `2` tables, all required content-confidence markers present, tested stale positive-claim strings absent.
+- Prior Word COM page-count/PDF export: exit code `0`; `page_count=8`, temporary PDF `236461` bytes. Current Word COM recheck: exit `1`, Windows `80070520` logon-session error; no DOCX write occurred. Existing Windows `Windows.Data.Pdf` fallback rendered all `8` pages with exit code `0`; every corresponding page was visually inspected with no clipping, overlap, black-square, or unreadable-text defect. Canonical renderer equivalence remains `[待驗證]`.
+- Canonical `render_docx.py`: exit code `112`, `No installed Python found!`; LibreOffice/`soffice` and `pdftoppm` unavailable. Windows `Windows.Data.Pdf` fallback rendered all `8` pages with exit code `0`; every page was visually inspected with no clipping, overlap, black-square, or unreadable-text defect. Canonical renderer equivalence remains `[待驗證]`.
+- `git diff --check`: exit `0`; Git emitted only the existing CRLF normalization warning for the foreign runtime file, which remains outside G02 ownership.
+- Fresh G02-only independent review `01a04366-9b2b-7560-8135-bf0509a79c38`: `NEED_ACTION`, `FINDINGS: NO BLOCKER`; reviewer checks reported exit `0`, official conflict/live-form action remains, and no staged files were introduced.
+- Product tests: `SKIPPED` for G02 because no product source changed; this is not a product PASS.
 
 ## Next Routing
 
-Fresh independent Codex completed the three-file document review with `VERIFIED_PASS` and `FINDINGS: NO BLOCKER`; the authorized checkpoint was pushed to `backup:feature/first-vertical-slice` and clean-clone verified. No component acceptance label changes.
+`NEXT_OWNER: Human`
+
+`NEXT_ACTION: Human has approved G02. Human must separately decide whether to route G03 for live form/current-announcement verification; G03 is not started by this approval. No login, upload, submission, product acceptance, or Git authorization is granted.`
+
+`HUMAN_DECISION: APPROVE G02` — recorded 2026-08-27. Scope is limited to the bounded G02 content-confidence package; official conflicts and live-form unknowns remain open.
 
 ### Do Not Change
-- Do not modify `docs/15_DOCUMENT_INDEX.md`, `docs/tasks/WP-12.md`, WP-16 files, runtime source, or runtime tests.
+- Do not modify `docs/15_DOCUMENT_INDEX.md`, `docs/tasks/WP-12.md`, any WP-14/WP-16 files, runtime source, runtime tests, migrations, lockfiles, secrets, CI/CD, or deployment configuration.
 - Do not stage, commit, push, merge, cherry-pick, reset, rebase, clean, delete, or modify Git history.
+- Do not promote the internal `2026-09-07` date, unknown live-form fields, unresolved Demo/benefit-table conflict, or historical tests into official/current/accepted status; do not promote fallback DOCX QA to canonical-renderer PASS.
+- Do not promote runtime conformance, architecture acceptance, or empty reviewer turns into product acceptance.
 
 ## Active Writer
-Codex — G01 factual document reconciliation only.
+Codex — G02 competition content/document delta only.
 
 ## Reviewer
-Fresh independent Codex — `VERIFIED_PASS`; Writer != Reviewer was respected. Review scope was limited to the G01 document delta and read-only state evidence.
+Fresh G02-only independent read-only review `01a04366-9b2b-7560-8135-bf0509a79c38`: `NEED_ACTION`, `FINDINGS: NO BLOCKER`. Writer != Reviewer was respected; review did not authorize Git or product acceptance. The earlier project-content reviewer was not used as G02 acceptance evidence.
 
 ## Antigravity
-`NOT_REQUIRED` — no UI/browser/E2E surface.
+`NOT_REQUIRED` — no product UI/browser/E2E surface was changed.
 
 ## Handoff Retention Rule
 
