@@ -74,7 +74,8 @@ The project uses a 100-point checkpoint-weighted progress model. Only `ACCEPTED`
 - Fresh independent Codex review of the three-file G01 document delta returned `VERIFIED_PASS` with `FINDINGS: NO BLOCKER`; it did not establish component acceptance, commit, push, or cross-machine readiness.
 - This state decision does not change Registry, WP-14, or WP-15 component acceptance labels and does not add accepted project progress. CP-03 remains `IN_PROGRESS`; project progress remains **30/100 = 30%**.
 - WP-16 is explicitly excluded from the canonical runtime reference. Its separate dirty checkout remains `IMPLEMENTED_PENDING_INDEPENDENT_REVIEW` with no commit, remote branch, or clean clone.
-- The main checkout remains `feature/first-vertical-slice` at `c74a69629708f5c4dd03d69fca577ff70cf73297` with pre-existing protected/unknown dirty paths preserved. The G01 document delta performed no Git operation; the separately authorized document checkpoint does not change runtime scope or component acceptance.
+- The main checkout remains on `feature/first-vertical-slice`; the latest verified G01 document checkpoint before this final handoff update is `e4fd6e300799cab89744966b462b6c4bb25354c4` on `backup:feature/first-vertical-slice`. Pre-existing protected/unknown dirty paths remain preserved; the checkpoint does not change runtime scope or component acceptance.
+- The authorized G01 checkpoint has a fresh clean clone at `artifacts/verification/clean-clone-g01-docs-feature-first-vertical-slice-e4fd6e3-20260827` with the exact SHA, required paths, clean status, and no WP-16 files.
 - COMP-01～03 remain unchanged planning/submission items. No scope, dates, weights, product claims, ADR text, or merge strategy changed in this delta.
 
 ## 4. Checkpoint register

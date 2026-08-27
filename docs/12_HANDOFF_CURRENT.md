@@ -4,21 +4,21 @@
 `G01-PROJECT-STATE-RECONCILIATION-CONTINUATION` — project/runtime/document factual state reconciliation
 
 ## Status
-Current operational status: `DOCUMENT_STATE_SYNCED / CODEX_DOCUMENT_REVIEW_VERIFIED_PASS / HUMAN_GIT_CHECKPOINT_AUTHORIZED`.
+Current operational status: `DOCUMENT_STATE_SYNCED / CODEX_DOCUMENT_REVIEW_VERIFIED_PASS / GIT_CHECKPOINT_PUSHED / CLEAN_CLONE_VERIFIED`.
 
 - Branch: `feature/first-vertical-slice`
-- HEAD: `c74a69629708f5c4dd03d69fca577ff70cf73297`
-- Staged state: empty
-- Pre-sync working-tree observation: 5 modified paths and 5 untracked paths; after the approved G01 document delta, the current working tree is 7 modified paths and 5 untracked paths, with the two added modified paths limited to the allowlisted `docs/11_PROJECT_STATE.md` and `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`; existing protected/unknown paths remain preserved
+- Latest verified G01 checkpoint before this final handoff update: `e4fd6e300799cab89744966b462b6c4bb25354c4` on `backup:feature/first-vertical-slice`
+- Current branch: `feature/first-vertical-slice`; the first G01 checkpoint had staged state empty; the final handoff synchronization was staged as exactly the three allowlisted documents for review
+- Pre-sync working-tree observation: 5 modified paths and 5 untracked paths; before the first G01 checkpoint, the document delta made the working tree 7 modified paths and 5 untracked paths; after that checkpoint, the current tree retains 4 pre-existing modified paths and 5 untracked paths; protected/unknown paths remain preserved
 - Writer: Codex — G01 current-state documents only
 - Required Reviewer: Fresh independent Codex
 - Antigravity: `NOT_REQUIRED` — no UI/browser/E2E surface
-- Next owner: Codex for the Human-authorized document checkpoint; Human for final post-clean-clone acceptance and any later component gate
+- Next owner: Human for final post-clean-clone acceptance and any later component gate
 - Canonical runtime ref: `backup/runtime-adapters-integration@65c6582c70c4e724005adb983d65aba10ea3e8be`
 - Canonical scope: Registry + WP-14 + WP-15 only
 - WP-16: `EXCLUDE_FROM_CANONICAL`; preserve its separate dirty checkout; no delete/overwrite/merge/commit/push/cleanup
 - Human acceptance status: component acceptance labels unchanged
-- Git operations: Human-authorized exact stage/commit/push gate for the three approved documents; the earlier G01 document sync itself did not modify Git history
+- Git operations: Human-authorized exact stage/commit/push gate executed for the three approved documents; no merge, cherry-pick, reset, rebase, clean, delete, or unrelated path operation was performed
 - GitHub status: not configured/verified; local `backup` contains the canonical runtime ref
 
 ## Current Goal and Delta
@@ -31,6 +31,7 @@ Human-confirmed factual state reconciliation:
 4. Main protected and unknown dirty paths remain outside this task. The G01 document delta is limited to this current operational block/current task delta, `docs/11_PROJECT_STATE.md`, and `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`.
 5. Fresh independent Codex document review returned `VERIFIED_PASS` with `FINDINGS: NO BLOCKER`; the bounded review does not establish component acceptance, commit, push, or cross-machine readiness.
 6. Human authorized the exact G01 document checkpoint: stage the three allowlisted files, review the staged diff, commit with `docs: reconcile project and runtime state`, push `backup:feature/first-vertical-slice`, then perform fresh clean-clone verification. No other files or Git operations are authorized.
+7. The first authorized checkpoint completed at `e4fd6e300799cab89744966b462b6c4bb25354c4`; fresh clone `artifacts/verification/clean-clone-g01-docs-feature-first-vertical-slice-e4fd6e3-20260827` is clean at that exact SHA with required paths present and WP-16 files absent. Subsequent handoff synchronization remains within the same three-file allowlist.
 
 ## Changed files
 
@@ -55,10 +56,11 @@ Verification evidence (current read-only evidence; no source/test files changed 
 - Post-sync governance validator: exit code 0.
 - Post-sync main `scripts/validate_baseline.py`: process creation failed, exit code 1; `C:\Windows\py.exe -3 -B scripts\validate_baseline.py` reported no installed Python, exit code 1. This is an environment result, not a product PASS/FAIL.
 - Fresh independent Codex review: `VERIFIED_PASS`, `FINDINGS: NO BLOCKER`; review was limited to the three approved documents and current read-only evidence, and no product/runtime tests were rerun by the reviewer.
+- First G01 commit: exit code 0; push to `backup:feature/first-vertical-slice`: exit code 0; fresh clean-clone structural, exact-SHA and diff checks: exit code 0.
 
 ## Next Routing
 
-Fresh independent Codex completed the three-file document review with `VERIFIED_PASS` and `FINDINGS: NO BLOCKER` against the confirmed allowlist, protected paths, current Git state, canonical runtime ref, and factual evidence. Human-authorized Git checkpoint target: `backup:feature/first-vertical-slice`; no component acceptance label changes.
+Fresh independent Codex completed the three-file document review with `VERIFIED_PASS` and `FINDINGS: NO BLOCKER`; the authorized checkpoint was pushed to `backup:feature/first-vertical-slice` and clean-clone verified. No component acceptance label changes.
 
 ### Do Not Change
 - Do not modify `docs/15_DOCUMENT_INDEX.md`, `docs/tasks/WP-12.md`, WP-16 files, runtime source, or runtime tests.
