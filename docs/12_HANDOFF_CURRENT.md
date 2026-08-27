@@ -1,66 +1,77 @@
 # Current Handoff
 
 ## Task
-`PRE-WP14-B-RUNTIME-BINDING-IMPLEMENTATION` — ADR-011 Runtime Binding contract implementation (Attempt 4: remediation of Attempt-3 Codex Findings 1–3)
+`G01-PROJECT-STATE-RECONCILIATION-CONTINUATION` — project/runtime/document factual state reconciliation
 
 ## Status
-Current operational status: `HUMAN_ACCEPTED / IMPLEMENTATION_ACCEPTED / CHECKPOINTED`.
+Current operational status: `DOCUMENT_STATE_SYNCED / CODEX_DOCUMENT_REVIEW_VERIFIED_PASS / HUMAN_GIT_CHECKPOINT_AUTHORIZED`.
 
 - Branch: `feature/first-vertical-slice`
-- HEAD: `c6157335069f3df3484030aa772bbf5c2aec248e` (`PRE-WP14-B` exact-allowlist checkpoint)
-- Previous gates: PRE-WP14-A `HUMAN_ACCEPTED / IMPLEMENTATION_ACCEPTED` at `28196c9`; ADR-011 architecture `HUMAN_ACCEPTED` (decision text unchanged)
-- Review history: Attempt 1 FAIL (remediated); Attempt 2 Codex FAIL (4 findings) -> Attempt 3 fixed Findings 1–3; Attempt 3 Codex FAIL (3 findings: false log-capture PASS label / missing migration-path trigger acceptance / stale docstring) -> Attempt 4 fixes all three within the same 15-file allowlist
-- Human decision: PRE-WP14-B Architecture / Acceptance approved on 2026-08-26 after fresh independent Codex `VERIFIED_PASS`; exact 15-file stage/commit checkpoint authorized; push, remote modification and migration-on-real-database remain unauthorized
-- Writer: OpenCode
-- Required Reviewer: fresh independent Codex context; Writer != Reviewer is mandatory
+- HEAD: `c74a69629708f5c4dd03d69fca577ff70cf73297`
+- Staged state: empty
+- Pre-sync working-tree observation: 5 modified paths and 5 untracked paths; after the approved G01 document delta, the current working tree is 7 modified paths and 5 untracked paths, with the two added modified paths limited to the allowlisted `docs/11_PROJECT_STATE.md` and `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`; existing protected/unknown paths remain preserved
+- Writer: Codex — G01 current-state documents only
+- Required Reviewer: Fresh independent Codex
 - Antigravity: `NOT_REQUIRED` — no UI/browser/E2E surface
-- Next owner: Human retains push/remote and future WP-14 gates; PRE-WP14-B checkpoint is `c615733`
-- GitHub status: not configured/verified; `CROSS_MACHINE_CONTINUATION_READY` is not established
+- Next owner: Codex for the Human-authorized document checkpoint; Human for final post-clean-clone acceptance and any later component gate
+- Canonical runtime ref: `backup/runtime-adapters-integration@65c6582c70c4e724005adb983d65aba10ea3e8be`
+- Canonical scope: Registry + WP-14 + WP-15 only
+- WP-16: `EXCLUDE_FROM_CANONICAL`; preserve its separate dirty checkout; no delete/overwrite/merge/commit/push/cleanup
+- Human acceptance status: component acceptance labels unchanged
+- Git operations: Human-authorized exact stage/commit/push gate for the three approved documents; the earlier G01 document sync itself did not modify Git history
+- GitHub status: not configured/verified; local `backup` contains the canonical runtime ref
 
-## Current Goal and Delta (Human Acceptance / Git Checkpoint)
+## Current Goal and Delta
 
-Remediation of the Attempt-3 Codex review findings, strictly within the original 15-file allowlist:
+Human-confirmed factual state reconciliation:
 
-1. **Log secret-exclusion labeling corrected** (Finding 1): the former "Runtime-facing error/log capture = PASS" was a false PASS for logs. Split into persisted runtime error capture = PASS (`test_runtime_error_capture_sanitized_in_persistence`, DB-persisted surfaces only) and application log capture (logging handlers/stdout/stderr/caplog) = NOT_IN_SCOPE this round, UNVERIFIED — the Core runtime source has no logging surface in this allowlist. Synced across docs/tasks/PRE-WP14-B.md, docs/30 and this handoff. API / exports / handoff remain NOT_IN_SCOPE/UNVERIFIED.
-2. **Migration-installed Run-delete guard dynamically accepted** (Finding 2): new `test_migration_installs_run_delete_guard_and_fails_closed` (pytest temporary isolated SQLite ONLY): upgrade 0001 → head; all three triggers exist on the migrated DB; direct ORM delete (with and without child events), bulk ORM delete, and raw SQL DELETE all fail closed; Run rows AND snapshot rows preserved; downgrade removes the 0002 table + all 0002 triggers with runs/events preserved; re-upgrade restores legacy backfill + guard trigger which again rejects raw SQL deletion.
-3. **ExecutionService docstring synced** (Finding 3): `execute_existing_run()` docstring now splits lifecycle ownership — RunSupervisor owns adapter execution-boundary failures; ExecutionService owns post-binding-commit factory construction failure recovery (sanitized STARTING → FAILED). No runtime behavior/schema/API change.
+1. The canonical runtime checkpoint is `backup/runtime-adapters-integration@65c6582c70c4e724005adb983d65aba10ea3e8be`, scoped only to Registry, WP-14, and WP-15.
+2. The canonical integration clean clone is `artifacts/verification/clean-clone-runtime-adapters-integration-65c6582-20260827`, branch `runtime-adapters-integration`, HEAD `65c6582c70c4e724005adb983d65aba10ea3e8be`, clean, with required project paths present.
+3. WP-16 remains a separate dirty implementation at `artifacts/worktrees/wp16-runtime-doctor`, status `IMPLEMENTED_PENDING_INDEPENDENT_REVIEW`; it has no remote branch or clean clone and is excluded from the canonical runtime reference.
+4. Main protected and unknown dirty paths remain outside this task. The G01 document delta is limited to this current operational block/current task delta, `docs/11_PROJECT_STATE.md`, and `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`.
+5. Fresh independent Codex document review returned `VERIFIED_PASS` with `FINDINGS: NO BLOCKER`; the bounded review does not establish component acceptance, commit, push, or cross-machine readiness.
+6. Human authorized the exact G01 document checkpoint: stage the three allowlisted files, review the staged diff, commit with `docs: reconcile project and runtime state`, push `backup:feature/first-vertical-slice`, then perform fresh clean-clone verification. No other files or Git operations are authorized.
 
-Attempt 3 hardening retained unchanged: database-level run-delete guard on both create_all and Alembic paths, factory-construction fail-closed recovery, secret-exclusion matrix labels. Attempt 2 hardening retained: binding-first transaction ordering for both execute paths, RuntimeBindingError sanitization, auth ownership invariant (4×2 matrix), three-layer snapshot immutability.
+## Changed files
 
-## Changed files (full list, working tree vs HEAD `934a219`)
+- G01 document delta (approved allowlist):
+  - `docs/11_PROJECT_STATE.md`
+  - `docs/12_HANDOFF_CURRENT.md` current operational block/current task delta only
+  - `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`
+- Pre-existing modified/untracked runtime, task, test, protected, and unrelated-worktree paths were not modified by G01.
 
-- Modified (10): `services/core/src/polynexus_core/domain/enums.py`, `runtime/contracts.py`, `runtime/reference.py`, `persistence/models.py`, `persistence/repository.py`, `execution_service.py`, `tests/test_persistence.py`, `docs/11_PROJECT_STATE.md`, `docs/12_HANDOFF_CURRENT.md`, `docs/30_RUNTIME_CONTRACT_FOUNDATION_GATE.md`
-- Untracked (5): `domain/runtime_binding.py`, `runtime/registry.py`, `alembic/versions/0002_runtime_binding_snapshot.py`, `tests/test_wp14b_runtime_binding.py` (84 tests), `docs/tasks/PRE-WP14-B.md`
-- Excluded dirty, preserved ownership (2): `docs/15_DOCUMENT_INDEX.md`, `docs/tasks/WP-12.md`
-- STAGED = 0
+ADR impact: NONE. No ADR text was changed; ADR-012/WP-16 remains excluded.
 
-Protected areas respected: domain/models.py, domain/run_lifecycle.py, runtime/supervisor.py, persistence/database.py, api/* files, alembic 0001, apps/web/, workflows/, dependencies/lockfiles, ADR-001～011 decision text.
-
-ADR impact: ADR-011 implementation within the accepted architecture; no ADR text changed; no new Attempt entity; Task != Run preserved.
-
-Verification (actual commands and results, Attempt 4, independently rerun by fresh Codex with controlled launcher `C:\temp_pn_venv2\Scripts\python.exe` and `-B`, all exit code 0):
-- pytest `-B -m pytest -q -rA --disable-warnings services\core\tests\test_wp14b_runtime_binding.py` -> `84 passed`
-- pytest `-q -rA --disable-warnings services\core\tests\test_persistence.py services\core\tests\test_runtime_skeleton.py` -> `60 passed`, no FAILED/ERROR
-- pytest `-q -rA --disable-warnings test_wp07_integration.py test_wp09_execution_api.py test_wp09_query_api.py` -> `72 passed, 1 skipped` (symlink policy SKIPPED, labeled, not PASS)
-- pytest `--collect-only --disable-warnings services\core` -> `479 tests collected`
-- pytest `--disable-warnings -rN services\core` (Full Core) -> `478 passed, 1 skipped in 123.41s`
-- `.\scripts\validate_baseline.py` -> PASS
-- `.\tools\validate-polynexus-governance.ps1 -RepoRoot D:\AI學習教材\PolyNexus` -> PASS
-- `git diff --check` -> clean (CRLF/LF warning on test_persistence.py is non-fatal)
-
-Known limitations / UNVERIFIED (not PASS):
-- Fresh independent Codex re-review verdict: `VERIFIED_PASS`. Human acceptance: granted 2026-08-26. Exact-allowlist Git checkpoint: `c615733`.
-- API response surface, application log capture, and exports/handoff secret-exclusion scans: NOT_IN_SCOPE / UNVERIFIED (see matrix in docs/tasks/PRE-WP14-B.md); not claimed as verified.
-- SQLite FK enforcement is not assumed; integrity is enforced by repository contract + ORM listeners + database triggers (including `trg_runs_reject_delete`, now dynamically verified on the Alembic-migrated path too).
-- WEB_INTERACTIVE remains boundary-only; NATIVE_SUBSCRIPTION/OFFICIAL_API have no execution path.
-- No public API provenance endpoint (outside the allowlist).
-- Pytest temp-dir cleanup PermissionError at interpreter exit: non-fatal Windows environment warning.
-
-The exact 15-file checkpoint is committed at `c615733`. Push, remote operation, GitHub operation and real/user database migration remain unauthorized.
+Verification evidence (current read-only evidence; no source/test files changed by G01):
+- Main status/HEAD/branch/staged/untracked checks: exit code 0.
+- `backup` ref listing: exit code 0; canonical `runtime-adapters-integration` ref resolves to `65c6582c70c4e724005adb983d65aba10ea3e8be`.
+- Canonical integration clean-clone status, HEAD, branch, and required-file checks: exit code 0.
+- Combined Registry/WP-14/WP-15 targeted tests: 87 passed, exit code 0.
+- Canonical integration collect-only: 566 collected, exit code 0.
+- Canonical integration Full Core: 565 passed / 1 skipped, exit code 0; non-fatal Windows pytest temporary-directory cleanup warning retained.
+- Canonical integration baseline validator: exit code 0; governance validator: exit code 0.
+- WP-16 targeted: 16 passed, exit code 0; WP-16 regression: 144 passed, exit code 0; WP-16 collect-only: 582 collected, exit code 0.
+- Post-sync allowlist `git diff --check`: exit code 0.
+- Post-sync governance validator: exit code 0.
+- Post-sync main `scripts/validate_baseline.py`: process creation failed, exit code 1; `C:\Windows\py.exe -3 -B scripts\validate_baseline.py` reported no installed Python, exit code 1. This is an environment result, not a product PASS/FAIL.
+- Fresh independent Codex review: `VERIFIED_PASS`, `FINDINGS: NO BLOCKER`; review was limited to the three approved documents and current read-only evidence, and no product/runtime tests were rerun by the reviewer.
 
 ## Next Routing
 
-Fresh independent Codex review completed with `VERIFIED_PASS` against the 15-file allowlist (OWNED=15 including 5 approved new files, EXCLUDED=2 untouched, STAGED=0, UNEXPECTED=0, HEAD=`934a219`); targeted, regression, full-core, baseline and governance evidence all returned their recorded exit codes. Human accepted PRE-WP14-B on 2026-08-26. Current next step is the explicit 15-file stage/commit checkpoint; excluded dirty files remain untouched, push/remote changes and real-database migration remain unauthorized, and WP-14 remains out of scope.
+Fresh independent Codex completed the three-file document review with `VERIFIED_PASS` and `FINDINGS: NO BLOCKER` against the confirmed allowlist, protected paths, current Git state, canonical runtime ref, and factual evidence. Human-authorized Git checkpoint target: `backup:feature/first-vertical-slice`; no component acceptance label changes.
+
+### Do Not Change
+- Do not modify `docs/15_DOCUMENT_INDEX.md`, `docs/tasks/WP-12.md`, WP-16 files, runtime source, or runtime tests.
+- Do not stage, commit, push, merge, cherry-pick, reset, rebase, clean, delete, or modify Git history.
+
+## Active Writer
+Codex — G01 factual document reconciliation only.
+
+## Reviewer
+Fresh independent Codex — `VERIFIED_PASS`; Writer != Reviewer was respected. Review scope was limited to the G01 document delta and read-only state evidence.
+
+## Antigravity
+`NOT_REQUIRED` — no UI/browser/E2E surface.
 
 ## Handoff Retention Rule
 

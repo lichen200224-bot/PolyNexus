@@ -67,6 +67,16 @@ The project uses a 100-point checkpoint-weighted progress model. Only `ACCEPTED`
 - Current FVS progress: **22/22 = 100% accepted progress**.
 - Browser E2E waiver is a limitation record, not additional earned progress.
 
+### G01 Current state reconciliation delta — 2026-08-27
+
+- Human-confirmed canonical runtime reference: `backup/runtime-adapters-integration@65c6582c70c4e724005adb983d65aba10ea3e8be`, scoped to Registry + WP-14 + WP-15 only.
+- The canonical integration checkpoint has a clean clone with the approved SHA and required project paths. Current deterministic evidence is 87 combined Registry/WP-14/WP-15 targeted tests passed, exit code 0; 566 collected, exit code 0; Full Core 565 passed / 1 skipped, exit code 0; baseline and governance validators exit code 0. The post-sync main baseline validator process creation failed with exit code 1, and the `py.exe` fallback reported no installed Python with exit code 1; these are environment results, not product PASS/FAIL.
+- Fresh independent Codex review of the three-file G01 document delta returned `VERIFIED_PASS` with `FINDINGS: NO BLOCKER`; it did not establish component acceptance, commit, push, or cross-machine readiness.
+- This state decision does not change Registry, WP-14, or WP-15 component acceptance labels and does not add accepted project progress. CP-03 remains `IN_PROGRESS`; project progress remains **30/100 = 30%**.
+- WP-16 is explicitly excluded from the canonical runtime reference. Its separate dirty checkout remains `IMPLEMENTED_PENDING_INDEPENDENT_REVIEW` with no commit, remote branch, or clean clone.
+- The main checkout remains `feature/first-vertical-slice` at `c74a69629708f5c4dd03d69fca577ff70cf73297` with pre-existing protected/unknown dirty paths preserved. The G01 document delta performed no Git operation; the separately authorized document checkpoint does not change runtime scope or component acceptance.
+- COMP-01～03 remain unchanged planning/submission items. No scope, dates, weights, product claims, ADR text, or merge strategy changed in this delta.
+
 ## 4. Checkpoint register
 
 | Checkpoint | Scope | Weight | Baseline target | Entry / exit condition | Current status |

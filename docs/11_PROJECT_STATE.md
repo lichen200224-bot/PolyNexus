@@ -1,6 +1,6 @@
 # Project State
 
-Date: 2026-08-25
+Date: 2026-08-27
 Version: Development Baseline v1.0 + Dev Preparation Profile v1.0.2
 Milestone: First Vertical Slice — WP-08A/WP-08B/WP-09B/WP-09C/WP-09D/WP-10/WP-12/WP-13 ACCEPTED; CP-02 complete; CP-03 in progress; PRE-WP14-A HUMAN_ACCEPTED / IMPLEMENTATION_ACCEPTED at `28196c9`; PRE-WP14-B HUMAN_ACCEPTED / IMPLEMENTATION_ACCEPTED (Human decision 2026-08-26; checkpointed at `c615733`) on baseline `934a219`
 
@@ -23,8 +23,8 @@ Milestone: First Vertical Slice — WP-08A/WP-08B/WP-09B/WP-09C/WP-09D/WP-10/WP-
 
 ## Current Priority
 1. Preserve the two excluded pre-existing dirty files (`docs/15_DOCUMENT_INDEX.md`, `docs/tasks/WP-12.md`) and their ownership; PRE-WP14-A remains accepted at `28196c9`.
-2. PRE-WP14-B is checkpointed at `c615733`; WP-14/WP-15 production adapter conformance remains separately gated.
-3. WP-14/WP-15 production adapter conformance remains out of scope until its own gates. GitHub enablement and Browser E2E remain independent future gates.
+2. PRE-WP14-B is checkpointed at `c615733`; WP-14/WP-15 component acceptance remains separately gated. The Human-confirmed G01 runtime checkpoint is `backup/runtime-adapters-integration@65c6582c70c4e724005adb983d65aba10ea3e8be` for Registry, WP-14, and WP-15 only.
+3. WP-14/WP-15 component acceptance remains separately gated; WP-16 is excluded from the G01 canonical runtime reference and remains an independent review task. GitHub enablement and Browser E2E remain independent future gates.
 
 ## Current Product Slice
 First Vertical Slice target by 2026-09-06:
@@ -43,13 +43,14 @@ PRE-WP14-B is HUMAN_ACCEPTED / IMPLEMENTATION_ACCEPTED on baseline `934a219` und
 ## Current Development State
 
 Phase: First Vertical Slice — CP-03 in progress; PRE-WP14-A accepted at `28196c9`; PRE-WP14-B Human-accepted / implementation-accepted (Attempt 4)
-Next Phase: WP-14 planning remains separately gated; no production adapter work is authorized by PRE-WP14-B
+Next Phase: Registry/WP-14/WP-15 component acceptance remains separately gated; WP-16 requires independent review. No production-runtime support claim is authorized by this state reconciliation.
 
 Current Branch: feature/first-vertical-slice
-Current Baseline Commit: `c6157335069f3df3484030aa772bbf5c2aec248e` (`PRE-WP14-B` implementation and acceptance checkpoint)
+Accepted Baseline Commit: `c6157335069f3df3484030aa772bbf5c2aec248e` (`PRE-WP14-B` implementation and acceptance checkpoint)
+Current Checkout HEAD: `c74a69629708f5c4dd03d69fca577ff70cf73297` (working tree dirty; staged state empty at G01 revalidation)
 Latest FVS Checkpoint: 330adbc (`feat(core): accept WP-13 workflow gates`)
-Current Planned Task: WP-14 planning / separate Architecture Gate; PRE-WP14-B checkpoint `c615733`
-Active Writer: OpenCode — cannot independently accept its own work
+Current Planned Task: G01 project/runtime/document state reconciliation; next component gates remain separately routed
+Active Writer: Codex — G01 factual document reconciliation only; existing runtime task ownership is preserved
 Reviewer: Fresh independent Codex context; Writer != Reviewer is mandatory
 Antigravity: `NOT_REQUIRED` for this Core-only task; no UI/browser/E2E surface
 
@@ -62,7 +63,21 @@ Development Environment:
 - Core pytest: PRE-WP14-A Attempt 2 evidence (2026-08-25, checkpoint basis `8994ef9`) — targeted `test_runtime_skeleton.py` 17 passed (JUnit XML `failures=0`), regression lifecycle+WP07 17 tests / 16 passed / 1 skipped, WP09+WP12+WP13 regression 218 passed, Full Core 390 collected / 389 passed / 1 skipped (`failures=0`, `errors=0`); all exit code 0. Not rerun by this docs-only state-sync task.
 - Frontend Vitest: historical accepted-checkpoint evidence only — 78 passed (61 baseline + 17 WP-09D); not rerun.
 - Frontend build: historical accepted-checkpoint evidence only; not rerun.
-- Local Git backup: historical checkpoint transport; no current push or cross-machine readiness claim.
+- Local Git backup contains the runtime checkpoint refs; the G01 document delta performed no Git operation. The separately Human-authorized G01 document checkpoint does not change component acceptance, runtime scope, or whole-project cross-machine readiness.
+
+## G01 Current State Reconciliation — 2026-08-27
+
+- Human-confirmed canonical runtime reference: `backup/runtime-adapters-integration@65c6582c70c4e724005adb983d65aba10ea3e8be`, scoped to Registry + WP-14 + WP-15 only. Component acceptance labels are unchanged.
+- Main revalidation before this document sync: branch `feature/first-vertical-slice`, HEAD `c74a69629708f5c4dd03d69fca577ff70cf73297`, staged state empty, 5 modified paths and 5 untracked paths. After the approved G01 document delta, the current working tree is 7 modified paths and 5 untracked paths; the two additional modified paths are the allowlisted `docs/11_PROJECT_STATE.md` and `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`. Protected and unknown dirty paths remain excluded.
+- Component refs remain separately observable: Registry `b395be8619f7e97d8e2b1951cb928500175ea506`, WP-14 `20004a78d58b95d2cb017188ddb906a242b8a0ff`, and WP-15 `c26e10becb04da868cdc0038f5d99cc6ea3d21a1`.
+- Fresh independent Codex document review returned `VERIFIED_PASS` with `FINDINGS: NO BLOCKER`; the review was limited to the three approved documents and current read-only evidence, and does not establish component acceptance or Git/cross-machine gates.
+- Canonical integration clean clone `artifacts/verification/clean-clone-runtime-adapters-integration-65c6582-20260827` is on branch `runtime-adapters-integration`, HEAD `65c6582c70c4e724005adb983d65aba10ea3e8be`, clean, with required project paths present.
+- WP-16 remains `IMPLEMENTED_PENDING_INDEPENDENT_REVIEW` in `artifacts/worktrees/wp16-runtime-doctor`, based on `65c6582`, dirty, without a remote `wp16-runtime-doctor` ref or clean clone. It is excluded from the canonical runtime reference.
+- Current integration evidence: combined Registry/WP-14/WP-15 targeted tests 87 passed, exit code 0; collect-only 566 collected, exit code 0; Full Core 565 passed / 1 skipped, exit code 0; baseline validator and governance validator exit code 0.
+- Separate WP-16 evidence remains non-canonical: targeted tests 16 passed, exit code 0; regression 144 passed, exit code 0; collect-only 582 collected, exit code 0; Full Core 581 passed / 1 skipped, exit code 0; baseline and governance validators exit code 0.
+- The first sandbox launcher failure exit code 1, the first ownership-protected Git check exit code 1, and the WP-16 no-upstream query exit code 128 remain recorded as environment/state results. Controlled runtime reruns returned their separate exit codes 0; Full Core retained the non-fatal Windows pytest temporary-directory cleanup warning. The post-sync main baseline validator again failed process creation with exit code 1, and `C:\Windows\py.exe -3 -B scripts\validate_baseline.py` reported no installed Python with exit code 1; both are environment results, not product PASS/FAIL.
+- CP-03 remains `IN_PROGRESS`; project progress remains **30/100 = 30%** and accepted FVS remains **22/22 = 100%**. COMP-01～03 remain unchanged planning/submission items.
+- G01 changed only the approved current-state documents. No component was marked `HUMAN_ACCEPTED`, `COMMITTED`, `PUSHED`, or `CROSS_MACHINE_CONTINUATION_READY` by this document sync.
 
 Tool Onboarding:
 - OpenCode Desktop: PASS
