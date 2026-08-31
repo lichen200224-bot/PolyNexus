@@ -13,6 +13,14 @@ from polynexus_core.domain.models import (
     Task,
 )
 from polynexus_core.runtime.contracts import RuntimeAdapter, RuntimeResult
+from polynexus_core.runtime.redaction import (
+    redact_exception,
+    redact_text,
+    sanitize_artifact,
+    sanitize_finding,
+    sanitize_run,
+    sanitize_runtime_result,
+)
 from polynexus_core.workflows.execution import (
     ReferenceWorkflowExecutor,
     WorkflowExecutionRequest,
@@ -89,8 +97,9 @@ class RunSupervisor:
                 self._adapter,
             )
         except Exception as exc:
-            run.transition(RunState.FAILED, reason=str(exc))
-            raise
+            reason = redact_exception(exc, fallback=_RUNTIME_FAILURE_REASON)
+            run.transition(RunState.FAILED, reason=reason)
+            raise RuntimeError(reason) from None
 
         run.runtime_ref = execution.runtime_ref
         run.transition(RunState.RUNNING)
@@ -280,8 +289,9 @@ class RunSupervisor:
                 self._adapter,
             )
         except Exception as exc:
-            run.transition(RunState.FAILED, reason=str(exc))
-            raise
+            reason = redact_exception(exc, fallback=_RUNTIME_FAILURE_REASON)
+            run.transition(RunState.FAILED, reason=reason)
+            raise RuntimeError(reason) from None
 
         run.runtime_ref = execution.runtime_ref
         run.transition(RunState.RUNNING)
@@ -441,8 +451,9 @@ class RunSupervisor:
     ) -> RunExecution:
         """Build RunExecution for an existing Run (not wrapped in RunSession)."""
         if runtime_version is None:
-            runtime_version = self._adapter.version_info()
-        evidence = list(runtime_result.evidence)
+            runtime_version = self._safe_runtime_version()
+        safe_result = sanitize_runtime_result(runtime_result)
+        evidence = list(safe_result.evidence)
         evidence_status = (
             EvidenceStatus.PASS
             if run.state in {RunState.COMPLETED, RunState.CANCELLED}
@@ -456,27 +467,28 @@ class RunSupervisor:
                 source="runtime-adapter",
                 type=EvidenceType.RUNTIME_EVIDENCE,
                 status=evidence_status,
-                metadata={"runtime_version": runtime_version},
+                metadata={"runtime_version": redact_text(runtime_version, max_length=256)},
             )
         )
-        artifacts = tuple(runtime_result.artifacts) + tuple(
-            artifact
+        artifacts = tuple(sanitize_artifact(artifact) for artifact in safe_result.artifacts) + tuple(
+            sanitize_artifact(artifact)
             for artifact in adapter_artifacts
-            if artifact.id not in {item.id for item in runtime_result.artifacts}
+            if artifact.id not in {item.id for item in safe_result.artifacts}
         )
         result = RunResult(
             run_id=run.id,
             status=run.state,
-            summary=runtime_result.summary,
-            finding_ids=tuple(finding.id for finding in runtime_result.findings),
+            summary=safe_result.summary,
+            finding_ids=tuple(finding.id for finding in safe_result.findings),
             evidence_ids=tuple(item.id for item in evidence),
             artifact_ids=tuple(artifact.id for artifact in artifacts),
         )
         run.result = result
+        sanitize_run(run)
         return RunExecution(
             run=run,
             result=result,
-            findings=runtime_result.findings,
+            findings=tuple(sanitize_finding(finding) for finding in safe_result.findings),
             evidence=tuple(evidence),
             artifacts=artifacts,
         )
@@ -487,7 +499,8 @@ class RunSupervisor:
         runtime_result: RuntimeResult,
         adapter_artifacts: tuple[Artifact, ...] = (),
     ) -> RunExecution:
-        evidence = list(runtime_result.evidence)
+        safe_result = sanitize_runtime_result(runtime_result)
+        evidence = list(safe_result.evidence)
         evidence_status = (
             EvidenceStatus.PASS
             if session.run.state in {RunState.COMPLETED, RunState.CANCELLED}
@@ -501,27 +514,34 @@ class RunSupervisor:
                 source="runtime-adapter",
                 type=EvidenceType.RUNTIME_EVIDENCE,
                 status=evidence_status,
-                metadata={"runtime_version": self._adapter.version_info()},
+                metadata={"runtime_version": self._safe_runtime_version()},
             )
         )
-        artifacts = tuple(runtime_result.artifacts) + tuple(
-            artifact
+        artifacts = tuple(sanitize_artifact(artifact) for artifact in safe_result.artifacts) + tuple(
+            sanitize_artifact(artifact)
             for artifact in adapter_artifacts
-            if artifact.id not in {item.id for item in runtime_result.artifacts}
+            if artifact.id not in {item.id for item in safe_result.artifacts}
         )
         result = RunResult(
             run_id=session.run.id,
             status=session.run.state,
-            summary=runtime_result.summary,
-            finding_ids=tuple(finding.id for finding in runtime_result.findings),
+            summary=safe_result.summary,
+            finding_ids=tuple(finding.id for finding in safe_result.findings),
             evidence_ids=tuple(item.id for item in evidence),
             artifact_ids=tuple(artifact.id for artifact in artifacts),
         )
         session.run.result = result
+        sanitize_run(session.run)
         return RunExecution(
             run=session.run,
             result=result,
-            findings=runtime_result.findings,
+            findings=tuple(sanitize_finding(finding) for finding in safe_result.findings),
             evidence=tuple(evidence),
             artifacts=artifacts,
         )
+
+    def _safe_runtime_version(self) -> str:
+        try:
+            return redact_text(self._adapter.version_info(), max_length=256)
+        except Exception as exc:
+            return redact_exception(exc, fallback="runtime version unavailable")

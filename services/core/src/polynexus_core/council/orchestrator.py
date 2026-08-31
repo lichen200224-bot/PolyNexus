@@ -47,6 +47,7 @@ from polynexus_core.runtime.registry import (
     build_default_registry,
     build_reference_profile,
 )
+from polynexus_core.runtime.redaction import sanitize_evidence, sanitize_event
 from polynexus_core.workflows.loader import load_workflow_definition
 
 from polynexus_core.council.models import (
@@ -769,7 +770,7 @@ class CouncilOrchestrator:
                 if review_run.state is not RunState.COMPLETED:
                     raise RuntimeError("Council cross-review runtime did not complete")
 
-                self._evidence_repo.add(
+                self._persist_evidence(
                     Evidence(
                         task_id=council_run.task_id,
                         run_id=review_run.id,
@@ -944,7 +945,7 @@ class CouncilOrchestrator:
                 "verdict_authority": "none",
             },
         )
-        self._evidence_repo.add(evidence)
+        self._persist_evidence(evidence)
         plan.synthesis_run_id = synthesis_run.id
         plan.consensus_ref = evidence.id
         plan.partial = partial
@@ -1076,11 +1077,17 @@ class CouncilOrchestrator:
             to_state=council_run.state,
             reason=json.dumps(payload, sort_keys=True),
         )
+        event = sanitize_event(event)
         self._run_repo.append_event(event)
         council_run.events.append(event)
 
+    def _persist_evidence(self, evidence: Evidence) -> None:
+        """Persist Council evidence only after the shared output boundary."""
+
+        self._evidence_repo.add(sanitize_evidence(evidence))
+
     def _persist_plan(self, plan: CouncilPlan) -> None:
-        self._evidence_repo.add(
+        self._persist_evidence(
             Evidence(
                 task_id=self._council_task_id(plan),
                 run_id=plan.council_run_id,

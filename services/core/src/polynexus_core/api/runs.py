@@ -26,6 +26,7 @@ from polynexus_core.api.schemas import (
 from polynexus_core.domain.enums import RunState
 from polynexus_core.domain.models import Run
 from polynexus_core.execution_service import ExecutionService
+from polynexus_core.runtime.redaction import redact_text
 from polynexus_core.persistence.repository import (
     SqlContextPackageRepository,
     SqlRunRepository,
@@ -43,7 +44,7 @@ def _run_to_response(r: Run) -> RunResponse:
             from_state=e.from_state.value,
             to_state=e.to_state.value,
             occurred_at=e.occurred_at,
-            reason=e.reason,
+            reason=(redact_text(e.reason) if e.reason is not None else None),
         )
         for e in r.events
     ]
@@ -52,7 +53,7 @@ def _run_to_response(r: Run) -> RunResponse:
         result = RunResultResponse(
             run_id=r.result.run_id,
             status=r.result.status.value,
-            summary=r.result.summary,
+            summary=redact_text(r.result.summary),
             finding_ids=r.result.finding_ids,
             evidence_ids=r.result.evidence_ids,
             artifact_ids=r.result.artifact_ids,
@@ -66,7 +67,7 @@ def _run_to_response(r: Run) -> RunResponse:
         execution_target=r.execution_target.value,
         resume_mode=r.resume_mode.value,
         state=r.state.value,
-        runtime_ref=r.runtime_ref,
+        runtime_ref=(redact_text(r.runtime_ref, max_length=1024) if r.runtime_ref is not None else None),
         created_at=r.created_at,
         updated_at=r.updated_at,
         events=events,
@@ -234,17 +235,17 @@ async def execute_run(
     except RunNotFoundError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(exc),
+            detail=redact_text(str(exc), fallback="Run not found"),
         )
     except ResourceNotFoundError as exc:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=str(exc),
+            detail=redact_text(str(exc), fallback="Stored resource not found"),
         )
     except ContractViolationError as exc:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=str(exc),
+            detail=redact_text(str(exc), fallback="Run contract violation"),
         )
     except ClaimConflictError as exc:
         # Reload to determine current state for idempotent response
@@ -253,7 +254,11 @@ async def execute_run(
             return _run_to_response(run)
         return JSONResponse(
             status_code=status.HTTP_409_CONFLICT,
-            content=_run_to_response(run).model_dump(mode="json") if run else {"detail": str(exc)},
+            content=(
+                _run_to_response(run).model_dump(mode="json")
+                if run
+                else {"detail": redact_text(str(exc), fallback="Run claim conflict")}
+            ),
         )
 
     # Reload from DB to ensure persisted state

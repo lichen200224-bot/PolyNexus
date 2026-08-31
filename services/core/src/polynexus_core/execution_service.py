@@ -58,6 +58,13 @@ from polynexus_core.runtime.registry import (
     build_default_registry,
 )
 from polynexus_core.runtime.supervisor import RunExecution, RunSupervisor
+from polynexus_core.runtime.redaction import (
+    sanitize_artifact,
+    sanitize_evidence,
+    sanitize_finding,
+    sanitize_run,
+    sanitize_result,
+)
 from polynexus_core.workflows.loader import load_workflow_definition
 from polynexus_core.workflows.models import WorkflowDefinition
 
@@ -204,8 +211,8 @@ class ExecutionService:
             orphan_on_failure=fail_closed_on_factory_error,
         )
         supervisor = RunSupervisor(adapter)
-        execution = await supervisor.execute_claimed_run(
-            run, task, context, workflow
+        execution = self._sanitize_execution(
+            await supervisor.execute_claimed_run(run, task, context, workflow)
         )
 
         self._run_repo.update(execution.run)
@@ -222,6 +229,8 @@ class ExecutionService:
                 workflow, task, execution.run, self._evidence_repo
             )
             gate_ev = persist_gate_report(gate_report, self._evidence_repo)
+            gate_ev = sanitize_evidence(gate_ev)
+            self._evidence_repo.update(gate_ev)
             all_evidence = list(execution.evidence) + [gate_ev]
             new_result = RunResult(
                 run_id=execution.result.run_id,
@@ -242,7 +251,7 @@ class ExecutionService:
             )
 
         self._session.commit()
-        return execution
+        return self._sanitize_execution(execution)
 
     async def execute_task(self, task_id: str) -> RunExecution:
         """Execute a task through RunSupervisor and persist all results.
@@ -329,8 +338,8 @@ class ExecutionService:
         stored_run = self._run_repo.get(run.id)
         assert stored_run is not None
 
-        execution = await supervisor.execute_claimed_run(
-            stored_run, task, context, workflow
+        execution = self._sanitize_execution(
+            await supervisor.execute_claimed_run(stored_run, task, context, workflow)
         )
 
         # 5. Persist runtime outputs. The Run identity was already persisted
@@ -351,6 +360,8 @@ class ExecutionService:
                 workflow, task, execution.run, self._evidence_repo
             )
             gate_ev = persist_gate_report(gate_report, self._evidence_repo)
+            gate_ev = sanitize_evidence(gate_ev)
+            self._evidence_repo.update(gate_ev)
             gate_evidence = [gate_ev]
             all_evidence = list(execution.evidence) + gate_evidence
             new_result = RunResult(
@@ -376,7 +387,7 @@ class ExecutionService:
         # in the binding-first transaction (step 3), before adapter execution.
         self._session.commit()
 
-        return execution
+        return self._sanitize_execution(execution)
 
     async def execute_existing_run(self, run_id: str) -> RunExecution:
         """Execute an existing persisted Run through the full lifecycle.
@@ -485,7 +496,9 @@ class ExecutionService:
         # failures internally, transitions to FAILED with sanitized reason,
         # and returns RunExecution with result=None on failure.
         # Programmer/domain validation errors (ValueError) propagate to caller.
-        execution = await supervisor.execute_claimed_run(run, task, context, workflow)
+        execution = self._sanitize_execution(
+            await supervisor.execute_claimed_run(run, task, context, workflow)
+        )
 
         # --- Phase 4: Persist runtime outputs ---
         # Always persist the Run state and events.
@@ -516,6 +529,8 @@ class ExecutionService:
                 workflow, task, execution.run, self._evidence_repo
             )
             gate_ev = persist_gate_report(gate_report, self._evidence_repo)
+            gate_ev = sanitize_evidence(gate_ev)
+            self._evidence_repo.update(gate_ev)
             # Rebuild RunResult to include gate evidence in evidence_ids.
             gate_evidence = [gate_ev]
             all_evidence = list(execution.evidence) + gate_evidence
@@ -541,7 +556,30 @@ class ExecutionService:
 
         self._session.commit()
 
-        return execution
+        return self._sanitize_execution(execution)
+
+    @staticmethod
+    def _sanitize_execution(execution: RunExecution) -> RunExecution:
+        """Normalize adapter output immediately before any caller sees it.
+
+        The Supervisor already sanitizes its own builders.  This second
+        persistence-service boundary also protects direct/injected
+        ``RunExecution`` values and keeps future adapter paths fail-safe.
+        """
+
+        safe_findings = tuple(sanitize_finding(item) for item in execution.findings)
+        safe_evidence = tuple(sanitize_evidence(item) for item in execution.evidence)
+        safe_artifacts = tuple(sanitize_artifact(item) for item in execution.artifacts)
+        safe_result = sanitize_result(execution.result)
+        execution.run.result = safe_result
+        sanitize_run(execution.run)
+        return RunExecution(
+            run=execution.run,
+            result=execution.run.result,
+            findings=safe_findings,
+            evidence=safe_evidence,
+            artifacts=safe_artifacts,
+        )
 
     def _construct_adapter_or_fail_closed(
         self,
@@ -586,6 +624,7 @@ class ExecutionService:
 
     def _persist_run_update(self, execution: RunExecution) -> None:
         """Persist updated Run, Evidence, Finding, Artifact through repositories."""
+        execution = self._sanitize_execution(execution)
         # Update the Run (state, events, result)
         self._run_repo.update(execution.run)
 
@@ -650,6 +689,7 @@ class ExecutionService:
 
     def _persist_execution(self, execution: RunExecution) -> None:
         """Persist Run, RunEvents, RunResult, Finding, Evidence, Artifact through repositories."""
+        execution = self._sanitize_execution(execution)
         # Persist the Run (includes state and events)
         self._run_repo.add(execution.run)
 
