@@ -54,6 +54,19 @@ from polynexus_core.runtime.reconciliation import (
 from polynexus_core.runtime.registry import RuntimeRegistry, build_reference_profile
 
 
+def _upgrade_to_head(db_path: Path) -> None:
+    """Prepare an application-startup fixture through Alembic only."""
+    from alembic import command as alembic_cmd
+    from alembic.config import Config
+
+    config = Config()
+    config.set_main_option(
+        "script_location", str(Path(__file__).parent.parent / "alembic")
+    )
+    config.set_main_option("sqlalchemy.url", f"sqlite:///{db_path}")
+    alembic_cmd.upgrade(config, "head")
+
+
 class _RestartAdapter:
     def __init__(
         self,
@@ -558,12 +571,12 @@ def test_app_lifespan_unbound_run_stops_and_disposes_engine(monkeypatch, tmp_pat
     from polynexus_core.persistence.database import dispose_engine
 
     db_path = tmp_path / "g14-app-unbound.db"
+    _upgrade_to_head(db_path)
     engine = create_engine(
         f"sqlite:///{db_path}",
         connect_args={"check_same_thread": False},
         future=True,
     )
-    Base.metadata.create_all(engine)
     SessionFactory = sessionmaker(bind=engine, expire_on_commit=False, future=True)
     seed_session = SessionFactory()
     _seed_run(
@@ -601,9 +614,11 @@ def test_app_lifespan_runs_reconciliation_before_serving(monkeypatch, tmp_path: 
         "reconcile_non_terminal_runs",
         _fake_reconcile,
     )
+    db_path = tmp_path / "g14-app.db"
+    _upgrade_to_head(db_path)
     monkeypatch.setenv(
         "POLYNEXUS_DATABASE_URL",
-        f"sqlite:///{tmp_path / 'g14-app.db'}",
+        f"sqlite:///{db_path}",
     )
 
     with TestClient(app_module.create_app()) as client:

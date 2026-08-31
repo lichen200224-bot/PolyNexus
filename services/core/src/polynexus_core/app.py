@@ -18,24 +18,27 @@ from polynexus_core.api.run_outputs import router as run_outputs_router
 async def _lifespan(app: FastAPI):
     """Startup/shutdown lifecycle for the default application.
 
-    On startup: initialise the database engine and create all tables.
+    On startup: initialise the database engine and verify the Alembic head.
     On shutdown: dispose the engine to release connections.
 
     The database URL is read from the POLYNEXUS_DATABASE_URL environment
     variable, falling back to ``sqlite:///poly.db`` (production default).
     """
     from polynexus_core.persistence.database import (
-        create_all,
         dispose_engine,
         get_session,
         init_engine,
+        verify_schema_head,
     )
     from polynexus_core.runtime.reconciliation import reconcile_non_terminal_runs
 
     database_url = os.environ.get("POLYNEXUS_DATABASE_URL", "sqlite:///poly.db")
     init_engine(database_url)
     try:
-        create_all()
+        # Alembic is the only schema authority.  Startup never creates or
+        # upgrades schema implicitly and fails closed on an unknown/non-head
+        # revision.
+        verify_schema_head()
 
         # A restart must never resubmit a durable Run.  Reconcile existing
         # non-terminal Runs only after the schema exists and before serving routes.

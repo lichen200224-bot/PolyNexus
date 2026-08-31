@@ -639,6 +639,9 @@ class TestDefaultAppLifecycle:
 
         db_path = tmp_path / "lifecycle_test.db"
         db_url = f"sqlite:///{db_path}"
+        alembic_dir = Path(__file__).parent.parent / "alembic"
+        ini = _make_alembic_ini(db_path, alembic_dir)
+        alembic_cmd.upgrade(Config(str(ini)), "head")
         import os
         os.environ["POLYNEXUS_DATABASE_URL"] = db_url
         try:
