@@ -38,6 +38,7 @@ from polynexus_core.persistence.repository import (
 from polynexus_core.runtime.contracts import RuntimeAdapter, RuntimeResult
 from polynexus_core.runtime.registry import (
     RuntimeRegistry,
+    _validate_v1_profile,
     build_default_registry,
 )
 
@@ -136,6 +137,7 @@ async def reconcile_non_terminal_runs(
         binding = bindings[run.id]
         try:
             profile = registry.resolve(binding.runtime_profile_ref)
+            _validate_v1_profile(profile)
             if not _profile_matches_snapshot(profile, binding):
                 raise RuntimeError("runtime binding/profile mismatch")
             adapter = registry.create_adapter(profile)

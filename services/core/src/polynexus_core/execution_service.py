@@ -52,7 +52,6 @@ from polynexus_core.persistence.repository import (
     TaskRepository,
 )
 from polynexus_core.runtime.registry import (
-    REFERENCE_PROFILE_REF,
     RuntimeProfile,
     RuntimeRegistry,
     build_default_registry,
@@ -144,7 +143,7 @@ class ExecutionService:
             # Resolve before the CAS claim so an unknown/unavailable profile leaves
             # the CREATED Run untouched. The rollback guard also covers callers
             # that flushed that identity in a larger transaction.
-            profile = self._registry.resolve(REFERENCE_PROFILE_REF)
+            profile = self._registry._resolve_selected_profile()
             if not self._run_repo.claim_for_execution(run.id):
                 raise ClaimConflictError(
                     f"Run {run.id} is not in CREATED state (current: {run.state.value})"
@@ -158,7 +157,7 @@ class ExecutionService:
             self._run_repo.append_event(claim_event)
             self._binding_repo.insert_once(
                 self._registry.bind(
-                    REFERENCE_PROFILE_REF,
+                    profile.runtime_profile_ref,
                     run_id=run.id,
                     resolved_at=claim_event.occurred_at,
                 )
@@ -293,7 +292,7 @@ class ExecutionService:
 
         # 2b. Resolve the RuntimeProfile via the Registry — fail closed before
         # any Run identity or adapter work happens.
-        profile = self._registry.resolve(REFERENCE_PROFILE_REF)
+        profile = self._registry._resolve_selected_profile()
 
         # 3. Binding-first atomic transaction: Run identity + snapshot +
         #    STARTING event committed together BEFORE adapter execution.
@@ -320,7 +319,7 @@ class ExecutionService:
             self._run_repo.append_event(claim_event)
             self._binding_repo.insert_once(
                 self._registry.bind(
-                    REFERENCE_PROFILE_REF,
+                    profile.runtime_profile_ref,
                     run_id=run.id,
                     resolved_at=claim_event.occurred_at,
                 )
@@ -446,7 +445,7 @@ class ExecutionService:
         # --- Phase 1b: Resolve the RuntimeProfile via the Registry ---
         # Fail closed BEFORE any CAS claim or adapter work: an unknown or
         # unavailable profile must leave the Run untouched (still CREATED).
-        profile = self._registry.resolve(REFERENCE_PROFILE_REF)
+        profile = self._registry._resolve_selected_profile()
 
         # --- Phase 2: CAS claim + immutable binding + STARTING event ---
         # All three happen in ONE transaction committed atomically BEFORE the
@@ -473,7 +472,7 @@ class ExecutionService:
             # rejected by insert_once.
             self._binding_repo.insert_once(
                 self._registry.bind(
-                    REFERENCE_PROFILE_REF,
+                    profile.runtime_profile_ref,
                     run_id=run_id,
                     resolved_at=claim_event.occurred_at,
                 )

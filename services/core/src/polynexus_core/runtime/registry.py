@@ -16,6 +16,8 @@ Rules:
 """
 from __future__ import annotations
 
+import os
+from collections.abc import Iterable, Mapping
 from datetime import datetime
 from typing import Callable
 
@@ -33,10 +35,141 @@ from polynexus_core.domain.enums import (
 from polynexus_core.runtime.contracts import RuntimeAdapter
 from polynexus_core.runtime.reference import ReferenceRuntimeAdapter
 
-# The only built-in profile in this gate.
+# G16 V1 selection policy: the only executable profile is the deterministic
+# local reference profile.  The environment variable is intentionally limited
+# to an opaque profile reference; it never carries credentials or endpoints.
 REFERENCE_PROFILE_REF = "reference.local"
+DEFAULT_RUNTIME_PROFILE_REF = REFERENCE_PROFILE_REF
+RUNTIME_PROFILE_ENV = "POLYNEXUS_RUNTIME_PROFILE_REF"
+
+_UNKNOWN_PROFILE_REASON = "Unknown or unavailable runtime profile"
+_INVALID_SELECTION_REASON = "Runtime profile selection is invalid"
+_V1_PROFILE_POLICY_REASON = "Runtime profile is not allowed by V1 local-only policy"
+_CAPABILITY_POLICY_REASON = "Runtime capability compatibility check failed"
+_AUTH_POLICY_REASON = "Runtime authentication ownership is incompatible"
+_CAPABILITY_NAMES = frozenset(
+    {
+        "cancel",
+        "resume",
+        "artifacts",
+        "timeout_cleanup_verified",
+        "usage_visibility",
+        "auth_ownership",
+    }
+)
 
 AdapterFactory = Callable[[], RuntimeAdapter]
+
+
+def _select_profile_ref(
+    *,
+    explicit_request: str | None = None,
+    environment: Mapping[str, str] | None = None,
+) -> str:
+    """Apply the G16 precedence without introducing a public API or schema.
+
+    Precedence is explicit request, then the allowlisted environment source,
+    then the deterministic local default.  A present but invalid higher-
+    precedence value fails closed instead of falling through to a default.
+    """
+    if explicit_request is not None:
+        candidate = explicit_request
+    else:
+        source = os.environ if environment is None else environment
+        try:
+            has_environment_value = RUNTIME_PROFILE_ENV in source
+            candidate = source.get(RUNTIME_PROFILE_ENV) if has_environment_value else None
+        except Exception:
+            raise RuntimeBindingError(_INVALID_SELECTION_REASON) from None
+        if not has_environment_value:
+            return DEFAULT_RUNTIME_PROFILE_REF
+
+    if not isinstance(candidate, str) or not candidate:
+        raise RuntimeBindingError(_INVALID_SELECTION_REASON)
+    # Validate shape without echoing the selected value in any rejection.
+    try:
+        from polynexus_core.domain.runtime_binding import validate_opaque_identifier
+
+        return validate_opaque_identifier(candidate, "runtime_profile_ref")
+    except RuntimeBindingError:
+        raise RuntimeBindingError(_INVALID_SELECTION_REASON) from None
+
+
+def _validate_v1_profile(profile: RuntimeProfile) -> None:
+    """Enforce the Human-approved V1 reference-local-only policy."""
+    try:
+        observed = (
+            profile.provider_id,
+            profile.transport_kind,
+            profile.runtime_id,
+            profile.adapter_id,
+            profile.execution_target,
+            profile.runtime_profile_ref,
+            profile.profile_revision,
+            profile.auth_ownership,
+            profile.secret_ref_id,
+            profile.usage_visibility,
+        ) if isinstance(profile, RuntimeProfile) else None
+        allowed = observed == (
+            "polynexus",
+            TransportKind.LOCAL,
+            "reference",
+            "builtin.reference",
+            ExecutionTarget.LOCAL,
+            REFERENCE_PROFILE_REF,
+            1,
+            AuthOwnership.NONE,
+            None,
+            UsageVisibility.UNAVAILABLE,
+        )
+    except Exception:
+        allowed = False
+    if not allowed:
+        raise RuntimeBindingError(_V1_PROFILE_POLICY_REASON)
+
+
+def _capability_satisfied(capabilities: object, name: str) -> bool:
+    """Return whether a named normalized capability is actually available."""
+    try:
+        value = getattr(capabilities, name)
+        if name in {"cancel", "artifacts", "timeout_cleanup_verified"}:
+            return value is True
+        if name == "resume":
+            from polynexus_core.domain.enums import ResumeMode
+
+            return isinstance(value, ResumeMode) and value is not ResumeMode.NONE
+        if name == "usage_visibility":
+            return (
+                isinstance(value, UsageVisibility)
+                and value is not UsageVisibility.UNAVAILABLE
+            )
+        if name == "auth_ownership":
+            return isinstance(value, AuthOwnership)
+    except Exception:
+        return False
+    return False
+
+
+def _validate_adapter_compatibility(
+    profile: RuntimeProfile,
+    adapter: RuntimeAdapter,
+    required_capabilities: Iterable[str] = (),
+) -> None:
+    """Check auth ownership and requested capabilities without fallback."""
+    try:
+        capabilities = adapter.capabilities()
+        if capabilities.auth_ownership is not profile.auth_ownership:
+            raise RuntimeBindingError(_AUTH_POLICY_REASON)
+        required = tuple(required_capabilities)
+    except RuntimeBindingError:
+        raise
+    except Exception:
+        raise RuntimeBindingError(_CAPABILITY_POLICY_REASON) from None
+
+    if any(not isinstance(name, str) or name not in _CAPABILITY_NAMES for name in required):
+        raise RuntimeBindingError(_CAPABILITY_POLICY_REASON)
+    if not all(_capability_satisfied(capabilities, name) for name in required):
+        raise RuntimeBindingError(_CAPABILITY_POLICY_REASON)
 
 
 def build_reference_profile() -> RuntimeProfile:
@@ -86,21 +219,44 @@ class RuntimeRegistry:
 
         The rejection message never echoes the caller-supplied reference.
         """
-        profile = self._profiles.get(profile_ref)
+        try:
+            profile = self._profiles.get(profile_ref) if isinstance(profile_ref, str) else None
+        except Exception:
+            profile = None
         if profile is None:
-            raise RuntimeBindingError(
-                "Unknown or unavailable runtime profile"
-            )
+            raise RuntimeBindingError(_UNKNOWN_PROFILE_REASON)
         return profile
 
-    def create_adapter(self, profile: RuntimeProfile) -> RuntimeAdapter:
+    def _resolve_selected_profile(
+        self,
+        *,
+        explicit_request: str | None = None,
+        environment: Mapping[str, str] | None = None,
+    ) -> RuntimeProfile:
+        """Resolve the effective V1 selection and enforce its policy."""
+        profile_ref = _select_profile_ref(
+            explicit_request=explicit_request,
+            environment=environment,
+        )
+        profile = self.resolve(profile_ref)
+        _validate_v1_profile(profile)
+        return profile
+
+    def create_adapter(
+        self,
+        profile: RuntimeProfile,
+        *,
+        required_capabilities: Iterable[str] = (),
+    ) -> RuntimeAdapter:
         """Create the adapter for a resolved profile; unregistered fails closed."""
         factory = self._factories.get(profile.adapter_id)
         if factory is None:
             raise RuntimeBindingError(
                 "No adapter factory registered for the resolved profile"
             )
-        return factory()
+        adapter = factory()
+        _validate_adapter_compatibility(profile, adapter, required_capabilities)
+        return adapter
 
     def bind(
         self,
