@@ -14,7 +14,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from polynexus_core.domain.enums import EvidenceType, RunState, WorkMode
-from polynexus_core.domain.models import ContextPackage, Project, Task
+from polynexus_core.domain.models import ContextPackage, Project, Run, Task
+from polynexus_core.domain.runtime_binding import RuntimeBindingError
 from polynexus_core.execution_service import ExecutionService
 from polynexus_core.persistence.models import Base
 from polynexus_core.persistence.repository import (
@@ -23,16 +24,19 @@ from polynexus_core.persistence.repository import (
     SqlProjectRepository,
     SqlRunRepository,
     SqlRunEventRepository,
+    SqlRuntimeBindingSnapshotRepository,
     SqlTaskRepository,
 )
-from polynexus_core.council.models import CouncilSpec, ParticipantOutcome
+from polynexus_core.council.models import CouncilSpec, CouncilStage, ParticipantOutcome
 from polynexus_core.council.orchestrator import (
     CouncilOrchestrator,
     _PLAN_SOURCE,
     _REASON_PARTICIPANT_FAILED,
+    _REASON_UNVERIFIED_CLEANUP,
 )
 from polynexus_core.runtime.contracts import RuntimeStatus
 from polynexus_core.runtime.reference import ReferenceRuntimeAdapter
+from polynexus_core.runtime.registry import RuntimeRegistry, build_reference_profile
 
 _FORBIDDEN_SECRET_FRAGMENTS = ("SECRET_MARKER", "sk-", "token=", "Bearer ")
 
@@ -127,6 +131,40 @@ class _SlowTimeoutAdapter(ReferenceRuntimeAdapter):
         return await super().result(runtime_ref)
 
 
+class _CancellationProbeAdapter(_SlowTimeoutAdapter):
+    def __init__(self, started: asyncio.Event) -> None:
+        super().__init__()
+        self._started = started
+
+    async def result(self, runtime_ref: str):
+        self._started.set()
+        return await super().result(runtime_ref)
+
+
+class _ParentInterruptionAdapter(ReferenceRuntimeAdapter):
+    """Normal child runtime, with a controllable parent boundary."""
+
+    def __init__(self, mode: str, parent_started: asyncio.Event | None = None) -> None:
+        super().__init__()
+        self._mode = mode
+        self._parent_started = parent_started
+        self._status_calls = 0
+
+    async def status(self, runtime_ref: str) -> RuntimeStatus:
+        self._status_calls += 1
+        if self._status_calls >= 6:
+            if self._parent_started is not None:
+                self._parent_started.set()
+            if self._mode == "failed":
+                return RuntimeStatus(state=RunState.FAILED)
+        return await super().status(runtime_ref)
+
+    async def result(self, runtime_ref: str):
+        if self._status_calls >= 6 and self._mode in {"timeout", "cancel"}:
+            await asyncio.sleep(5)
+        return await super().result(runtime_ref)
+
+
 class _FailingOnceAdapter(ReferenceRuntimeAdapter):
     """Adapter that raises a secret-bearing error on its FIRST create_run only.
 
@@ -142,6 +180,18 @@ class _FailingOnceAdapter(ReferenceRuntimeAdapter):
         self._calls += 1
         if self._calls == 1:
             raise RuntimeError("SECRET_MARKER_CRITICAL_LEAK_xyz123")
+        return await super().create_run(context)
+
+
+class _CountingAdapter(ReferenceRuntimeAdapter):
+    """Reference adapter used to prove that invalid synthesis is not invoked."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.create_calls = 0
+
+    async def create_run(self, context):
+        self.create_calls += 1
         return await super().create_run(context)
 
 
@@ -315,20 +365,30 @@ def test_synthesis_has_round_and_participant_correlation(council_session) -> Non
 def test_one_participant_failure_partial_truthful(council_session) -> None:
     session, _ = council_session
     task, context = _seed(session)
+    adapter = _CountingAdapter()
     plan = _run(
         session, task, context,
         _specs([("p1", "analyst-a"), ("p2", "analyst-b")], {"p2": ParticipantOutcome.FAILED}),
+        runtime_adapter=adapter,
     )
     failed = [p for p in plan.participants if p.id == "p2"][0]
     assert failed.outcome is ParticipantOutcome.FAILED
     assert failed.reason == "Participant analysis failed (simulated boundary)"
     assert plan.partial is True
     assert plan.synthesis_run_id is not None
-    assert plan.consensus_ref is not None
-    ev = [e for e in SqlEvidenceRepository(session).list_by_run(plan.synthesis_run_id)
-          if e.source == "council-synthesis"][0]
-    assert "p2" in ev.metadata["summary"]
-    assert ev.metadata["verdict_authority"] == "none"
+    # One completed analysis has no distinct reviewer/target pair.  The
+    # cross-review stage therefore remains incomplete and synthesis must not
+    # invoke a runtime or fabricate a consensus from missing inputs.
+    assert CouncilStage.CROSS_REVIEW not in plan.stages_completed
+    assert plan.consensus_ref is None
+    synthesis_run = SqlRunRepository(session).get(plan.synthesis_run_id)
+    assert synthesis_run is not None
+    assert synthesis_run.state is RunState.FAILED
+    assert adapter.create_calls == 1, "synthesis must not invoke the runtime"
+    assert not [
+        e for e in SqlEvidenceRepository(session).list_by_run(plan.synthesis_run_id)
+        if e.source == "council-synthesis"
+    ]
 
 
 def test_timeout_and_cancel_partial_no_fabrication(council_session) -> None:
@@ -423,6 +483,191 @@ def test_close_reopen_reload(council_session, tmp_path) -> None:
     assert len(reloaded.participants) == 2
     assert all(p.outcome is ParticipantOutcome.COMPLETED for p in reloaded.participants)
     assert "SYNTHESIS" in [s.value for s in reloaded.stages_completed]
+
+
+def test_every_council_run_has_immutable_runtime_binding(council_session) -> None:
+    session, _ = council_session
+    task, context = _seed(session)
+    plan = _run(session, task, context, _specs([("p1", "analyst-a"), ("p2", "analyst-b")]))
+
+    run_ids = [plan.council_run_id, plan.synthesis_run_id]
+    run_ids.extend(p.analysis_run_id for p in plan.participants)
+    run_ids.extend(rid for p in plan.participants for rid in p.cross_review_run_ids)
+    assert all(run_id is not None for run_id in run_ids)
+
+    bindings = SqlRuntimeBindingSnapshotRepository(session)
+    for run_id in run_ids:
+        snapshot = bindings.get_by_run(run_id)
+        assert snapshot is not None
+        assert snapshot.run_id == run_id
+        assert snapshot.runtime_profile_ref == "reference.local"
+        assert snapshot.legacy_backfill is False
+        run = SqlRunRepository(session).get(run_id)
+        assert run is not None
+        assert run.runtime_ref is not None
+        assert any(
+            evidence.type is EvidenceType.RUNTIME_EVIDENCE
+            for evidence in SqlEvidenceRepository(session).list_by_run(run_id)
+        )
+
+    assert len({snapshot.run_id for snapshot in (bindings.get_by_run(rid) for rid in run_ids)}) == len(run_ids)
+
+
+def test_council_factory_failure_after_binding_is_orphaned(
+    council_session,
+) -> None:
+    session, _ = council_session
+    task, context = _seed(session)
+    registry = RuntimeRegistry()
+    factory_calls = 0
+
+    def factory():
+        nonlocal factory_calls
+        factory_calls += 1
+        # Two analysis + two cross-review + one synthesis succeed; parent
+        # construction then fails after its immutable binding is committed.
+        if factory_calls == 6:
+            raise RuntimeError("raw factory secret should not persist")
+        return ReferenceRuntimeAdapter()
+
+    registry.register(build_reference_profile(), factory)
+    specs = _specs([("p1", "analyst-a"), ("p2", "analyst-b")])
+    orchestrator = CouncilOrchestrator(session, runtime_registry=registry)
+
+    with pytest.raises(RuntimeBindingError, match="Runtime adapter construction failed"):
+        asyncio.run(orchestrator.run_council(task, context, specs))
+
+    runs = SqlRunRepository(session).list_by_task(task.id)
+    parent = next(
+        run
+        for run in runs
+        if any(
+            evidence.source == _PLAN_SOURCE
+            for evidence in SqlEvidenceRepository(session).list_by_run(run.id)
+        )
+    )
+    assert parent.state is RunState.ORPHANED
+    assert [event.to_state for event in parent.events[-2:]] == [
+        RunState.CANCEL_REQUESTED,
+        RunState.ORPHANED,
+    ]
+    assert all(
+        "raw factory secret" not in (event.reason or "")
+        for run in runs
+        for event in run.events
+    )
+
+
+def test_child_binding_failure_rolls_back_unbound_run(council_session, monkeypatch) -> None:
+    session, _ = council_session
+    task, context = _seed(session)
+    workflow = CouncilOrchestrator(session)._load_workflow(task)
+    run = Run(
+        task_id=task.id,
+        workflow_id=task.workflow_id,
+        workflow_version=task.workflow_version,
+        context_package_id=context.id,
+    )
+    run_repo = SqlRunRepository(session)
+    run_repo.add(run)
+    session.flush()
+
+    service = ExecutionService(session)
+
+    def fail_binding(_snapshot) -> None:
+        raise RuntimeError("binding insertion failed")
+
+    monkeypatch.setattr(service._binding_repo, "insert_once", fail_binding)
+    with pytest.raises(RuntimeError, match="binding insertion failed"):
+        service.prepare_claimed_run(
+            run, task, context, workflow, commit=False
+        )
+
+    # The child identity, claim event, and snapshot share one transaction. A
+    # binding failure therefore leaves no durable unbound Run behind.
+    assert run_repo.get(run.id) is None
+    assert SqlRuntimeBindingSnapshotRepository(session).get_by_run(run.id) is None
+
+
+def test_profile_resolution_failure_rolls_back_flushed_run(
+    council_session, monkeypatch
+) -> None:
+    session, _ = council_session
+    task, context = _seed(session)
+    workflow = CouncilOrchestrator(session)._load_workflow(task)
+    run = Run(
+        task_id=task.id,
+        workflow_id=task.workflow_id,
+        workflow_version=task.workflow_version,
+        context_package_id=context.id,
+    )
+    run_repo = SqlRunRepository(session)
+    run_repo.add(run)
+    session.flush()
+    service = ExecutionService(session)
+
+    def fail_profile(_profile_ref: str):
+        raise RuntimeError("profile resolution failed")
+
+    monkeypatch.setattr(service._registry, "resolve", fail_profile)
+    with pytest.raises(RuntimeError, match="profile resolution failed"):
+        service.prepare_claimed_run(run, task, context, workflow, commit=False)
+
+    assert run_repo.get(run.id) is None
+    assert SqlRuntimeBindingSnapshotRepository(session).get_by_run(run.id) is None
+
+
+def test_council_profile_resolution_failure_leaves_no_parent_run(
+    council_session, monkeypatch
+) -> None:
+    session, _ = council_session
+    task, context = _seed(session)
+    orchestrator = CouncilOrchestrator(session)
+
+    def fail_profile(_profile_ref: str):
+        raise RuntimeError("profile resolution failed")
+
+    monkeypatch.setattr(orchestrator._registry, "resolve", fail_profile)
+    with pytest.raises(RuntimeError, match="profile resolution failed"):
+        asyncio.run(
+            orchestrator.run_council(
+                task, context, _specs([("p1", "analyst-a"), ("p2", "analyst-b")])
+            )
+        )
+
+    assert SqlRunRepository(session).list_by_task(task.id) == []
+
+
+def test_council_stage_profile_resolution_failure_leaves_no_stage_run(
+    council_session, monkeypatch
+) -> None:
+    session, _ = council_session
+    task, context = _seed(session)
+    orchestrator = CouncilOrchestrator(session)
+    parent = orchestrator._create_council_run(task, context)
+    parent, _ = orchestrator._execution_service.prepare_claimed_run(
+        parent, task, context, orchestrator._load_workflow(task)
+    )
+    monkeypatch.setattr(
+        orchestrator._registry,
+        "resolve",
+        lambda _profile_ref: (_ for _ in ()).throw(
+            RuntimeError("profile resolution failed")
+        ),
+    )
+    stage = Run(
+        task_id=task.id,
+        workflow_id=task.workflow_id,
+        workflow_version=task.workflow_version,
+        context_package_id=context.id,
+    )
+
+    with pytest.raises(RuntimeError, match="profile resolution failed"):
+        orchestrator._prepare_council_stage_run(stage, parent)
+
+    assert SqlRunRepository(session).get(stage.id) is None
+    assert SqlRuntimeBindingSnapshotRepository(session).get_by_run(stage.id) is None
+    assert SqlRuntimeBindingSnapshotRepository(session).get_by_run(parent.id) is not None
 
 
 def test_child_run_terminal_state_reloadable(council_session, tmp_path) -> None:
@@ -754,19 +999,25 @@ def test_participant_timeout_isolated_and_reloadable(council_session) -> None:
             task, context, specs
         )
     )
-    # Both participants are isolated as TIMED_OUT (not a Council-wide crash).
+    # Both participants retain timeout intent while durable cleanup uncertainty
+    # is fail-closed as ORPHANED (not a Council-wide crash).
     assert all(p.outcome is ParticipantOutcome.TIMED_OUT for p in plan.participants)
     for p in plan.participants:
         run = SqlRunRepository(session).get(p.analysis_run_id)
         assert run is not None
-        assert run.state is RunState.TIMED_OUT
-        # Exactly one STARTING event and one legal terminal TIMED_OUT event;
-        # the timeout transition must not repeat STARTING -> STARTING.
+        assert run.state is RunState.ORPHANED
+        # Exactly one STARTING event and one CANCEL_REQUESTED -> ORPHANED
+        # fail-closed lifecycle; the timeout transition must not repeat
+        # STARTING -> STARTING or claim verified cleanup.
         starting = [e for e in run.events if e.to_state == RunState.STARTING]
-        timed_out = [e for e in run.events if e.to_state == RunState.TIMED_OUT]
+        cancel_requested = [
+            e for e in run.events if e.to_state == RunState.CANCEL_REQUESTED
+        ]
+        orphaned = [e for e in run.events if e.to_state == RunState.ORPHANED]
         assert len(starting) == 1
-        assert len(timed_out) == 1
-        assert run.events[-1].to_state is RunState.TIMED_OUT
+        assert len(cancel_requested) == 1
+        assert len(orphaned) == 1
+        assert run.events[-1].to_state is RunState.ORPHANED
         assert run.events[-1].reason == "Participant analysis timed out (simulated boundary)"
     # Council still completes with a truthful (failed) synthesis; no consensus is
     # fabricated when synthesis cannot run (no completed analysis + cross-review).
@@ -776,7 +1027,325 @@ def test_participant_timeout_isolated_and_reloadable(council_session) -> None:
 
 
 # ---------------------------------------------------------------------------
-# 29: participant runtime failure is sanitized; other participants continue
+# 29: outer Council cancellation fails closed for parent and bound children
+# ---------------------------------------------------------------------------
+
+
+def test_outer_cancellation_fail_closed_parent_and_children(council_session) -> None:
+    session, _ = council_session
+    task, context = _seed(session)
+    started = asyncio.Event()
+    adapter = _CancellationProbeAdapter(started)
+    specs = _specs([("p1", "analyst-a"), ("p2", "analyst-b")])
+    orchestrator = CouncilOrchestrator(
+        session, runtime_adapter=adapter, timeout_seconds=30.0
+    )
+
+    async def cancel_after_binding() -> None:
+        operation = asyncio.create_task(
+            orchestrator.run_council(task, context, specs)
+        )
+        await asyncio.wait_for(started.wait(), timeout=1.0)
+        operation.cancel()
+        with pytest.raises(asyncio.CancelledError):
+            await operation
+
+    asyncio.run(cancel_after_binding())
+
+    runs = SqlRunRepository(session).list_by_task(task.id)
+    council_runs = [
+        run
+        for run in runs
+        if any(
+            evidence.source == _PLAN_SOURCE
+            for evidence in SqlEvidenceRepository(session).list_by_run(run.id)
+        )
+    ]
+    assert len(council_runs) == 1
+    council_run = council_runs[0]
+    child_runs = [run for run in runs if run.id != council_run.id]
+    assert len(child_runs) == 2
+    assert council_run.state is RunState.ORPHANED
+    assert all(run.state is RunState.ORPHANED for run in child_runs)
+    assert all(
+        SqlRuntimeBindingSnapshotRepository(session).get_by_run(run.id) is not None
+        for run in [council_run, *child_runs]
+    )
+    assert all(
+        run.events[-1].to_state not in (RunState.STARTING, RunState.CANCEL_REQUESTED)
+        for run in [council_run, *child_runs]
+    )
+    assert all(
+        run.events[-1].reason == _REASON_UNVERIFIED_CLEANUP
+        for run in child_runs
+    )
+
+    reloaded = asyncio.run(
+        CouncilOrchestrator(session).reload_council(council_run.id)
+    )
+    assert all(p.outcome is ParticipantOutcome.TIMED_OUT for p in reloaded.participants)
+
+
+# ---------------------------------------------------------------------------
+# 30: outer stage timeout fail-closes the already-bound parent Council Run
+# ---------------------------------------------------------------------------
+
+
+def test_outer_stage_timeout_fail_closed_parent(council_session, monkeypatch) -> None:
+    session, _ = council_session
+    task, context = _seed(session)
+    specs = _specs([("p1", "analyst-a"), ("p2", "analyst-b")])
+    orchestrator = CouncilOrchestrator(session, timeout_seconds=30.0)
+
+    async def raise_outer_timeout(*args, **kwargs):
+        raise asyncio.TimeoutError()
+
+    monkeypatch.setattr(orchestrator, "_run_analysis_stage", raise_outer_timeout)
+    with pytest.raises(asyncio.TimeoutError):
+        asyncio.run(orchestrator.run_council(task, context, specs))
+
+    runs = SqlRunRepository(session).list_by_task(task.id)
+    council_runs = [
+        run
+        for run in runs
+        if any(
+            evidence.source == _PLAN_SOURCE
+            for evidence in SqlEvidenceRepository(session).list_by_run(run.id)
+        )
+    ]
+    assert len(council_runs) == 1
+    council_run = council_runs[0]
+    assert council_run.state is RunState.ORPHANED
+    assert (
+        council_run.events[-1].reason
+        == "Council execution cleanup could not be verified"
+    )
+    assert (
+        SqlRuntimeBindingSnapshotRepository(session).get_by_run(council_run.id)
+        is not None
+    )
+
+
+def test_parent_runtime_timeout_fails_closed_after_children_complete(council_session) -> None:
+    session, _ = council_session
+    task, context = _seed(session)
+    adapter = _ParentInterruptionAdapter("timeout")
+    specs = _specs([("p1", "analyst-a"), ("p2", "analyst-b")])
+
+    with pytest.raises(asyncio.TimeoutError):
+        asyncio.run(
+            CouncilOrchestrator(
+                session, runtime_adapter=adapter, timeout_seconds=0.1
+            ).run_council(task, context, specs)
+        )
+
+    runs = SqlRunRepository(session).list_by_task(task.id)
+    parent = next(
+        run
+        for run in runs
+        if any(
+            evidence.source == _PLAN_SOURCE
+            for evidence in SqlEvidenceRepository(session).list_by_run(run.id)
+        )
+    )
+    assert parent.state is RunState.ORPHANED
+    assert all(
+        run.events[-1].to_state not in (RunState.STARTING, RunState.CANCEL_REQUESTED)
+        for run in runs
+    )
+    assert all(
+        SqlRuntimeBindingSnapshotRepository(session).get_by_run(run.id) is not None
+        for run in runs
+    )
+
+
+def test_parent_runtime_cancellation_fails_closed_after_children_complete(
+    council_session,
+) -> None:
+    session, _ = council_session
+    task, context = _seed(session)
+    parent_started = asyncio.Event()
+    adapter = _ParentInterruptionAdapter("cancel", parent_started)
+    specs = _specs([("p1", "analyst-a"), ("p2", "analyst-b")])
+    orchestrator = CouncilOrchestrator(
+        session, runtime_adapter=adapter, timeout_seconds=30.0
+    )
+
+    async def cancel_parent() -> None:
+        operation = asyncio.create_task(orchestrator.run_council(task, context, specs))
+        await asyncio.wait_for(parent_started.wait(), timeout=1.0)
+        operation.cancel()
+        with pytest.raises(asyncio.CancelledError):
+            await operation
+
+    asyncio.run(cancel_parent())
+
+    runs = SqlRunRepository(session).list_by_task(task.id)
+    parent = next(
+        run
+        for run in runs
+        if any(
+            evidence.source == _PLAN_SOURCE
+            for evidence in SqlEvidenceRepository(session).list_by_run(run.id)
+        )
+    )
+    assert parent.state is RunState.ORPHANED
+    assert all(
+        run.events[-1].to_state not in (RunState.STARTING, RunState.CANCEL_REQUESTED)
+        for run in runs
+    )
+
+
+def test_parent_noncompleted_runtime_clears_consensus_and_reloads_truthfully(
+    council_session,
+) -> None:
+    session, _ = council_session
+    task, context = _seed(session)
+    adapter = _ParentInterruptionAdapter("failed")
+    specs = _specs([("p1", "analyst-a"), ("p2", "analyst-b")])
+    orchestrator = CouncilOrchestrator(session, runtime_adapter=adapter)
+
+    with pytest.raises(RuntimeError, match="parent runtime did not complete"):
+        asyncio.run(orchestrator.run_council(task, context, specs))
+
+    runs = SqlRunRepository(session).list_by_task(task.id)
+    parent = next(
+        run
+        for run in runs
+        if any(
+            evidence.source == _PLAN_SOURCE
+            for evidence in SqlEvidenceRepository(session).list_by_run(run.id)
+        )
+    )
+    assert parent.state is RunState.FAILED
+    reloaded = asyncio.run(CouncilOrchestrator(session).reload_council(parent.id))
+    assert reloaded.partial is True
+    assert reloaded.consensus_ref is None
+
+
+def test_stage_setup_failure_reconciles_bound_stage_run_and_parent(
+    council_session, monkeypatch
+) -> None:
+    session, _ = council_session
+    task, context = _seed(session)
+    specs = _specs([("p1", "analyst-a"), ("p2", "analyst-b")])
+    orchestrator = CouncilOrchestrator(session, timeout_seconds=30.0)
+    original_prepare = orchestrator._prepare_council_stage_run
+
+    def fail_after_binding(run, council_run, bound_run_ids=None):
+        original_prepare(run, council_run, bound_run_ids)
+        raise RuntimeError("unexpected stage setup failure")
+
+    monkeypatch.setattr(
+        orchestrator, "_prepare_council_stage_run", fail_after_binding
+    )
+    with pytest.raises(RuntimeError, match="unexpected stage setup failure"):
+        asyncio.run(orchestrator.run_council(task, context, specs))
+
+    runs = list(SqlRunRepository(session).list_by_task(task.id))
+    parent = next(
+        run
+        for run in runs
+        if any(
+            evidence.source == _PLAN_SOURCE
+            for evidence in SqlEvidenceRepository(session).list_by_run(run.id)
+        )
+    )
+    analysis_ids = {
+        participant.analysis_run_id
+        for participant in orchestrator._load_plan(parent.id).participants
+        if participant.analysis_run_id is not None
+    }
+    stage_runs = [
+        run for run in runs if run.id != parent.id and run.id not in analysis_ids
+    ]
+    assert len(stage_runs) == 1
+    assert parent.state is RunState.ORPHANED
+    assert stage_runs[0].state is RunState.ORPHANED
+    assert all(
+        run.events[-1].to_state not in (RunState.STARTING, RunState.CANCEL_REQUESTED)
+        for run in runs
+    )
+    bindings = SqlRuntimeBindingSnapshotRepository(session)
+    assert all(bindings.get_by_run(run.id) is not None for run in runs)
+
+    reloaded = asyncio.run(
+        CouncilOrchestrator(session).reload_council(parent.id)
+    )
+    assert reloaded.partial is True
+    assert CouncilStage.CROSS_REVIEW not in reloaded.stages_completed
+
+
+def test_unexpected_child_setup_cancels_and_reconciles_siblings(
+    council_session, monkeypatch
+) -> None:
+    session, _ = council_session
+    task, context = _seed(session)
+    started = asyncio.Event()
+    adapter = _CancellationProbeAdapter(started)
+    specs = _specs([("p1", "analyst-a"), ("p2", "analyst-b")])
+    orchestrator = CouncilOrchestrator(
+        session, runtime_adapter=adapter, timeout_seconds=30.0
+    )
+    original_prepare = ExecutionService.prepare_claimed_run
+    prepare_calls = 0
+
+    def fail_second_child_setup(self, run, task_arg, context_arg, workflow, *, commit=True):
+        nonlocal prepare_calls
+        prepare_calls += 1
+        if prepare_calls == 3:
+            raise RuntimeError("unexpected child setup failure")
+        return original_prepare(
+            self, run, task_arg, context_arg, workflow, commit=commit
+        )
+
+    monkeypatch.setattr(
+        ExecutionService, "prepare_claimed_run", fail_second_child_setup
+    )
+    with pytest.raises(RuntimeError, match="unexpected child setup failure"):
+        asyncio.run(orchestrator.run_council(task, context, specs))
+
+    assert started.is_set()
+    runs = list(SqlRunRepository(session).list_by_task(task.id))
+    assert len(runs) == 2
+    parent = next(
+        run
+        for run in runs
+        if any(
+            evidence.source == _PLAN_SOURCE
+            for evidence in SqlEvidenceRepository(session).list_by_run(run.id)
+        )
+    )
+    child = next(run for run in runs if run.id != parent.id)
+    assert parent.state is RunState.ORPHANED
+    assert child.state is RunState.ORPHANED
+    assert child.events[-1].reason == _REASON_UNVERIFIED_CLEANUP
+    assert all(
+        run.events[-1].to_state not in (RunState.STARTING, RunState.CANCEL_REQUESTED)
+        for run in runs
+    )
+    assert all(
+        SqlRuntimeBindingSnapshotRepository(session).get_by_run(run.id) is not None
+        for run in runs
+    )
+
+    reloaded = asyncio.run(
+        CouncilOrchestrator(session).reload_council(parent.id)
+    )
+    assert reloaded.partial is True
+    assert all(
+        participant.outcome is ParticipantOutcome.TIMED_OUT
+        for participant in reloaded.participants
+        if participant.analysis_run_id is not None
+    )
+    assert any(
+        participant.analysis_run_id is None
+        for participant in reloaded.participants
+    )
+
+
+# ---------------------------------------------------------------------------
+# 31: participant runtime failure is sanitized; other participants continue
 # ---------------------------------------------------------------------------
 
 
@@ -928,6 +1497,7 @@ def _assert_truthful_boundary_failure(
         child = SqlRunRepository(session).get(p.analysis_run_id)
         assert child is not None
         assert child.task_id == task.id
+        assert SqlRuntimeBindingSnapshotRepository(session).get_by_run(p.analysis_run_id) is not None
         # Failed participants must not persist a raw RuntimeResult (no status.error
         # in result.summary, no dangling finding/evidence/artifact references).
         assert child.result is None
@@ -950,6 +1520,7 @@ def _assert_truthful_boundary_failure(
     # analysis, otherwise a truthful partial synthesis.
     synth_run = SqlRunRepository(session).get(plan.synthesis_run_id)
     assert synth_run is not None
+    assert SqlRuntimeBindingSnapshotRepository(session).get_by_run(plan.synthesis_run_id) is not None
     if not completed:
         assert synth_run.state is RunState.FAILED
         assert plan.consensus_ref is None
@@ -1135,3 +1706,64 @@ def test_status_then_version_info_raises_keeps_terminal(
     finally:
         session2.close()
         engine2.dispose()
+
+
+# ---------------------------------------------------------------------------
+# 33: a post-runtime exception must not desynchronise a completed participant
+# ---------------------------------------------------------------------------
+
+
+def test_post_runtime_exception_preserves_completed_participant(
+    council_session, monkeypatch
+) -> None:
+    session, _ = council_session
+    task, context = _seed(session)
+    specs = _specs([("p1", "analyst-a"), ("p2", "analyst-b")])
+    original_execute_claimed_run = ExecutionService.execute_claimed_run
+    raised = False
+
+    async def raise_after_durable_completion(
+        service, run, task_arg, context_arg, workflow, profile, **kwargs
+    ):
+        nonlocal raised
+        execution = await original_execute_claimed_run(
+            service,
+            run,
+            task_arg,
+            context_arg,
+            workflow,
+            profile,
+            **kwargs,
+        )
+        if not raised:
+            raised = True
+            raise RuntimeError("post-runtime bookkeeping failure")
+        return execution
+
+    monkeypatch.setattr(
+        ExecutionService,
+        "execute_claimed_run",
+        raise_after_durable_completion,
+    )
+
+    plan = asyncio.run(
+        CouncilOrchestrator(session, timeout_seconds=30.0).run_council(
+            task, context, specs
+        )
+    )
+
+    assert raised is True
+    participant = plan.participants[0]
+    child = SqlRunRepository(session).get(participant.analysis_run_id)
+    assert child is not None
+    assert child.state is RunState.COMPLETED
+    assert child.result is not None
+    assert participant.outcome is ParticipantOutcome.COMPLETED
+    assert participant.output_ref == child.id
+    assert not any(event.to_state is RunState.FAILED for event in child.events)
+
+    reloaded = asyncio.run(CouncilOrchestrator(session).reload_council(plan.council_run_id))
+    reloaded_participant = next(
+        item for item in reloaded.participants if item.id == participant.id
+    )
+    assert reloaded_participant.outcome is ParticipantOutcome.COMPLETED

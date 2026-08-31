@@ -41,8 +41,12 @@ from polynexus_core.persistence.repository import (
     SqlRunRepository,
     SqlTaskRepository,
 )
-from polynexus_core.runtime.reference import ReferenceRuntimeAdapter
-from polynexus_core.runtime.supervisor import RunSupervisor
+from polynexus_core.runtime.registry import (
+    RuntimeRegistry,
+    RuntimeProfile,
+    build_default_registry,
+    build_reference_profile,
+)
 from polynexus_core.workflows.loader import load_workflow_definition
 
 from polynexus_core.council.models import (
@@ -68,6 +72,8 @@ _OUTCOME_TO_STATE = {
 _REASON_PARTICIPANT_FAILED = "Participant analysis failed (simulated boundary)"
 _REASON_PARTICIPANT_TIMEOUT = "Participant analysis timed out (simulated boundary)"
 _REASON_PARTICIPANT_CANCELLED = "Participant analysis cancelled (simulated boundary)"
+_REASON_UNVERIFIED_CLEANUP = "Participant analysis cleanup could not be verified"
+_REASON_COUNCIL_UNVERIFIED_CLEANUP = "Council execution cleanup could not be verified"
 _REASON_PARTICIPANT_UNAVAILABLE = "Participant unavailable per orchestration policy"
 _REASON_SYNTHESIS_MISSING = "Synthesis cannot run: no completed analysis inputs available"
 _REASON_SYNTHESIS_OK = "Council synthesis completed with truthful partial representation"
@@ -113,12 +119,26 @@ class CouncilOrchestrator:
         max_rounds: int = _DEFAULT_MAX_ROUNDS,
         max_concurrency: int = 4,
         runtime_adapter=None,
+        runtime_registry: RuntimeRegistry | None = None,
     ) -> None:
+        if runtime_adapter is not None and runtime_registry is not None:
+            raise ValueError(
+                "runtime_adapter and runtime_registry are mutually exclusive"
+            )
         self._s = session
         self._timeout = timeout_seconds
         self._max_rounds = max_rounds
         self._max_concurrency = max(1, int(max_concurrency))
-        self._runtime_adapter = runtime_adapter or ReferenceRuntimeAdapter()
+        if runtime_registry is not None:
+            self._registry = runtime_registry
+        elif runtime_adapter is None:
+            self._registry = build_default_registry()
+        else:
+            # Preserve the existing test/composition hook without putting
+            # adapter selection back into the Council execution path.
+            self._registry = RuntimeRegistry()
+            self._registry.register(build_reference_profile(), lambda: runtime_adapter)
+        self._execution_service = ExecutionService(session, registry=self._registry)
         self._run_repo = SqlRunRepository(session)
         self._run_event_repo = SqlRunEventRepository(session)
         self._task_repo = SqlTaskRepository(session)
@@ -186,28 +206,74 @@ class CouncilOrchestrator:
         self._persist_plan(plan)
         self._append_stage_event(council_run, CouncilStage.ANALYSIS, order=0, note="council-created")
 
-        council_run.transition(RunState.STARTING)
-        self._run_repo.update(council_run)
+        # Parent Council Run is a real durable Run under the approved G13
+        # policy: bind it through the shared service before stage execution.
+        council_run, council_profile = self._execution_service.prepare_claimed_run(
+            council_run, task, context, self._load_workflow(task)
+        )
+        bound_run_ids: set[str] = set()
 
-        await self._run_analysis_stage(council_run, task, context, plan, specs)
-        await self._run_cross_review_stage(council_run, plan)
-        await self._run_synthesis_stage(council_run, plan)
+        try:
+            await self._run_analysis_stage(
+                council_run, task, context, plan, specs, bound_run_ids
+            )
+            await self._run_cross_review_stage(council_run, plan, bound_run_ids)
+            await self._run_synthesis_stage(council_run, plan, bound_run_ids)
+
+            if not plan.partial:
+                # The parent Council Run is itself a real execution identity.
+                # Keep this call inside the fail-closed boundary so timeout,
+                # cancellation, setup, and factory errors cannot unwind while the
+                # bound parent remains STARTING/RUNNING.
+                parent_execution = await asyncio.wait_for(
+                    self._execution_service.execute_claimed_run(
+                        council_run,
+                        task,
+                        context,
+                        self._load_workflow(task),
+                        council_profile,
+                        fail_closed_on_factory_error=True,
+                    ),
+                    timeout=self._timeout,
+                )
+                council_run = parent_execution.run
+                if council_run.state is not RunState.COMPLETED:
+                    plan.partial = True
+                    plan.consensus_ref = None
+                    raise RuntimeError("Council parent runtime did not complete")
+
+        except asyncio.TimeoutError:
+            self._fail_closed_council_interruption(
+                council_run, plan, extra_run_ids=bound_run_ids
+            )
+            raise
+        except asyncio.CancelledError:
+            self._fail_closed_council_interruption(
+                council_run, plan, extra_run_ids=bound_run_ids
+            )
+            raise
+        except Exception:
+            # Any post-binding setup failure must fail closed.  Do not leave the
+            # parent Council Run (or already-bound children) durably STARTING.
+            self._fail_closed_council_interruption(
+                council_run, plan, extra_run_ids=bound_run_ids
+            )
+            raise
 
         if plan.partial or any(
             p.outcome not in (ParticipantOutcome.COMPLETED,) for p in plan.participants
         ):
             plan.partial = True
 
-        terminal = (
-            RunState.COMPLETED
-            if plan.synthesis_run_id is not None and not plan.partial
-            else RunState.FAILED
-        )
-        if terminal is RunState.COMPLETED:
-            council_run.transition(RunState.RUNNING)
-            council_run.transition(RunState.COMPLETED, reason=_REASON_SYNTHESIS_OK)
+        if not plan.partial:
+            # The parent was completed by the binding-aware runtime path above.
+            pass
         else:
+            # Partial/invalid input is a truthful Council semantic failure; it
+            # must not be presented as a successful parent runtime execution.
+            council_run.transition(RunState.RUNNING)
             council_run.transition(RunState.FAILED, reason=_REASON_SYNTHESIS_MISSING)
+
         self._run_repo.update(council_run)
         self._persist_plan(plan)
         self._s.commit()
@@ -250,6 +316,9 @@ class CouncilOrchestrator:
                 participant.outcome = ParticipantOutcome.TIMED_OUT
             elif run.state is RunState.CANCELLED:
                 participant.outcome = ParticipantOutcome.CANCELLED
+            elif run.state is RunState.ORPHANED:
+                participant.outcome = ParticipantOutcome.TIMED_OUT
+                participant.reason = _REASON_UNVERIFIED_CLEANUP
         return plan
 
     # ------------------------------------------------------------------
@@ -257,20 +326,25 @@ class CouncilOrchestrator:
     # ------------------------------------------------------------------
 
     @staticmethod
-    def _apply_timeout_transition(run: "Run") -> None:
-        """Complete the legal timeout lifecycle without repeating STARTING.
+    def _apply_timeout_transition(
+        run: "Run", *, reason: str = _REASON_UNVERIFIED_CLEANUP
+    ) -> None:
+        """Fail closed when an outer timeout has unverified cleanup.
 
-        From STARTING: STARTING -> RUNNING -> TIMED_OUT.
-        From RUNNING: RUNNING -> TIMED_OUT directly.
-        From CREATED (defensive): CREATED -> STARTING -> RUNNING -> TIMED_OUT.
+        The outer ``wait_for`` cancellation does not prove that adapter cleanup
+        completed.  Preserve that uncertainty durably instead of claiming a
+        verified timeout: CREATED (defensive) -> STARTING -> CANCEL_REQUESTED
+        -> ORPHANED, or STARTING/RUNNING -> CANCEL_REQUESTED -> ORPHANED.
         Terminal states are left unchanged.
         """
         if run.state is RunState.CREATED:
             run.transition(RunState.STARTING)
-        if run.state is RunState.STARTING:
-            run.transition(RunState.RUNNING)
-        if run.state is RunState.RUNNING:
-            run.transition(RunState.TIMED_OUT, reason=_REASON_PARTICIPANT_TIMEOUT)
+        if run.state in (RunState.STARTING, RunState.RUNNING):
+            run.transition(
+                RunState.CANCEL_REQUESTED, reason=reason
+            )
+        if run.state is RunState.CANCEL_REQUESTED:
+            run.transition(RunState.ORPHANED, reason=reason)
 
     @staticmethod
     def _apply_sanitized_failure(run: "Run", reason: str) -> None:
@@ -285,11 +359,16 @@ class CouncilOrchestrator:
         If RunSupervisor already appended a raw (possibly secret-bearing) FAILED
         event (e.g. with ``str(exc)``), only its reason is replaced with a
         public-safe one, preserving the original event id / occurred_at / ordering.
-        A terminal COMPLETED / TIMED_OUT / CANCELLED Run is NEVER regressed to
-        FAILED.
+        A terminal COMPLETED / TIMED_OUT / CANCELLED / ORPHANED Run is NEVER
+        regressed to FAILED.
         """
         # Never regress an already-terminal non-FAILED run.
-        if run.state in (RunState.COMPLETED, RunState.TIMED_OUT, RunState.CANCELLED):
+        if run.state in (
+            RunState.COMPLETED,
+            RunState.TIMED_OUT,
+            RunState.CANCELLED,
+            RunState.ORPHANED,
+        ):
             return
 
         has_failed_event = any(ev.to_state is RunState.FAILED for ev in run.events)
@@ -327,14 +406,19 @@ class CouncilOrchestrator:
         """Replace the reason on the Run's terminal event with a public-safe one.
 
         Used when RunSupervisor produced a legal terminal event (FAILED /
-        TIMED_OUT / CANCELLED) whose reason came from raw adapter data
+          TIMED_OUT / CANCELLED / ORPHANED) whose reason came from raw adapter data
         (e.g. ``status.error``). The terminal state is preserved; the original
         event id / occurred_at / ordering are kept. No raw exception text, secret,
         token, path, or vendor payload is ever persisted.
         """
         sanitized: list[RunEvent] = []
         for ev in run.events:
-            if ev.to_state in (RunState.FAILED, RunState.TIMED_OUT, RunState.CANCELLED):
+            if ev.to_state in (
+                RunState.FAILED,
+                RunState.TIMED_OUT,
+                RunState.CANCELLED,
+                RunState.ORPHANED,
+            ):
                 sanitized.append(
                     RunEvent(
                         run_id=run.id,
@@ -351,6 +435,67 @@ class CouncilOrchestrator:
         if run.events:
             run.updated_at = run.events[-1].occurred_at
 
+    def _fail_closed_council_interruption(
+        self,
+        council_run: Run,
+        plan: CouncilPlan,
+        *,
+        extra_run_ids: set[str] | None = None,
+    ) -> None:
+        """Persist fail-closed states after outer Council interruption.
+
+        ``asyncio.wait_for`` and explicit task cancellation can interrupt the
+        participant gather without proving adapter cleanup. Every already-bound
+        non-terminal child is therefore durably moved to ORPHANED, and the bound
+        parent Council Run receives the same fail-closed treatment. This helper is
+        synchronous so it can run after catching ``TimeoutError``/``CancelledError``
+        before the owning task is allowed to unwind.
+        """
+        run_ids = {
+            participant.analysis_run_id
+            for participant in plan.participants
+            if participant.analysis_run_id is not None
+        }
+        run_ids.update(extra_run_ids or ())
+        for run_id in run_ids:
+            run = self._run_repo.get(run_id)
+            if run is None:
+                continue
+            self._apply_timeout_transition(run)
+            participant = next(
+                (
+                    participant
+                    for participant in plan.participants
+                    if participant.analysis_run_id == run.id
+                ),
+                None,
+            )
+            if participant is not None:
+                if run.state in (RunState.ORPHANED, RunState.TIMED_OUT):
+                    participant.outcome = ParticipantOutcome.TIMED_OUT
+                    participant.reason = _REASON_UNVERIFIED_CLEANUP
+                elif run.state is RunState.CANCELLED:
+                    participant.outcome = ParticipantOutcome.CANCELLED
+                    participant.reason = _REASON_PARTICIPANT_CANCELLED
+                elif run.state is RunState.FAILED:
+                    participant.outcome = ParticipantOutcome.FAILED
+                    participant.reason = _REASON_PARTICIPANT_FAILED
+                elif run.state is RunState.COMPLETED:
+                    participant.outcome = ParticipantOutcome.COMPLETED
+            self._run_repo.update(run)
+
+            if participant is None:
+                run.result = None
+                self._run_repo.update(run)
+
+        self._apply_timeout_transition(
+            council_run, reason=_REASON_COUNCIL_UNVERIFIED_CLEANUP
+        )
+        self._run_repo.update(council_run)
+        plan.partial = True
+        self._persist_plan(plan)
+        self._s.commit()
+
     async def _run_analysis_stage(
         self,
         council_run: Run,
@@ -358,6 +503,7 @@ class CouncilOrchestrator:
         context: ContextPackage,
         plan: CouncilPlan,
         specs: Sequence[CouncilSpec],
+        bound_run_ids: set[str] | None = None,
     ) -> None:
         workflow = self._load_workflow(task)
         # Release parent session before spawning isolated per-participant sessions.
@@ -367,6 +513,7 @@ class CouncilOrchestrator:
         sem = asyncio.Semaphore(self._max_concurrency)
         db_lock = asyncio.Lock()
         tracker = _ConcurrencyTracker()
+        tracked_run_ids = bound_run_ids if bound_run_ids is not None else set()
 
         async def _execute_participant(spec: CouncilSpec) -> None:
             async with sem:
@@ -378,12 +525,10 @@ class CouncilOrchestrator:
                     participant.reason = _REASON_PARTICIPANT_UNAVAILABLE
                     return
 
-                # --- Parallel in-memory analysis (no DB access) ---------------
-                # Each participant owns its own in-memory Run object, so the shared
-                # parent session is never touched concurrently. The runtime-adapter
-                # execution (real async I/O for production adapters, or the
-                # deterministic sleep injected by contract tests) overlaps across
-                # participants, bounded by ``sem``.
+                # --- Parallel analysis with isolated binding-aware sessions ---
+                # Each participant owns a separate DB session. Creation and the
+                # binding-first claim are serialized for SQLite, while the
+                # adapter execution remains concurrent and bounded by ``sem``.
                 tracker.enter()
                 run = Run(
                     task_id=task.id,
@@ -391,120 +536,169 @@ class CouncilOrchestrator:
                     workflow_version=task.workflow_version,
                     context_package_id=context.id,
                 )
-                evidence_to_persist: tuple = ()
-                if outcome in _OUTCOME_TO_STATE:
-                    reason = {
-                        ParticipantOutcome.FAILED: _REASON_PARTICIPANT_FAILED,
-                        ParticipantOutcome.TIMED_OUT: _REASON_PARTICIPANT_TIMEOUT,
-                        ParticipantOutcome.CANCELLED: _REASON_PARTICIPANT_CANCELLED,
-                    }[outcome]
-                    run.transition(RunState.STARTING)
-                    if outcome is ParticipantOutcome.FAILED:
-                        run.transition(RunState.FAILED, reason=reason)
-                    elif outcome is ParticipantOutcome.TIMED_OUT:
-                        run.transition(RunState.RUNNING)
-                        run.transition(RunState.TIMED_OUT, reason=reason)
-                    elif outcome is ParticipantOutcome.CANCELLED:
-                        run.transition(RunState.CANCEL_REQUESTED)
-                        run.transition(RunState.CANCELLED, reason=reason)
-                    participant.outcome = outcome
-                    participant.reason = run.events[-1].reason
-                else:
-                    supervisor = RunSupervisor(self._runtime_adapter)
-                    try:
-                        execution = await asyncio.wait_for(
-                            supervisor.execute_run(run, task, context, workflow),
-                            timeout=self._timeout,
-                        )
-                    except asyncio.TimeoutError:
-                        # Legal timeout lifecycle (no repeated STARTING -> STARTING).
-                        # From STARTING: STARTING -> RUNNING -> TIMED_OUT.
-                        # From RUNNING: RUNNING -> TIMED_OUT directly.
-                        self._apply_timeout_transition(run)
-                        participant.outcome = ParticipantOutcome.TIMED_OUT
-                        participant.reason = _REASON_PARTICIPANT_TIMEOUT
-                    except Exception:
-                        # A runtime-adapter boundary raised. Map the participant
-                        # outcome to the Run's ACTUAL terminal state so they stay
-                        # consistent: a Run that already reached TIMED_OUT or
-                        # CANCELLED is never rewritten to FAILED (e.g. a later
-                        # version_info() exception after status() returned
-                        # TIMED_OUT/CANCELLED). No raw exception / secret / token /
-                        # path / vendor payload is persisted; other participants
-                        # keep executing (the exception is contained to this coroutine).
-                        run.result = None
-                        if run.state is RunState.TIMED_OUT:
-                            participant.outcome = ParticipantOutcome.TIMED_OUT
-                            participant.reason = _REASON_PARTICIPANT_TIMEOUT
-                            self._sanitize_terminal_reason(run, _REASON_PARTICIPANT_TIMEOUT)
-                        elif run.state is RunState.CANCELLED:
-                            participant.outcome = ParticipantOutcome.CANCELLED
-                            participant.reason = _REASON_PARTICIPANT_CANCELLED
-                            self._sanitize_terminal_reason(run, _REASON_PARTICIPANT_CANCELLED)
-                        elif run.state is RunState.FAILED:
-                            participant.outcome = ParticipantOutcome.FAILED
-                            participant.reason = _REASON_PARTICIPANT_FAILED
-                            self._sanitize_terminal_reason(run, _REASON_PARTICIPANT_FAILED)
-                        else:
-                            # CREATED / STARTING / RUNNING: apply the legal lifecycle
-                            # to exactly one FAILED terminal event.
-                            self._apply_sanitized_failure(run, _REASON_PARTICIPANT_FAILED)
-                            participant.outcome = ParticipantOutcome.FAILED
-                            participant.reason = _REASON_PARTICIPANT_FAILED
-                    else:
-                        exec_state = execution.run.state
-                        if exec_state is RunState.COMPLETED:
-                            participant.outcome = ParticipantOutcome.COMPLETED
-                            participant.output_ref = run.id
-                            evidence_to_persist = execution.evidence
-                        elif exec_state is RunState.FAILED:
-                            participant.outcome = ParticipantOutcome.FAILED
-                            participant.reason = _REASON_PARTICIPANT_FAILED
-                            self._sanitize_terminal_reason(run, _REASON_PARTICIPANT_FAILED)
-                            run.result = None
-                        elif exec_state is RunState.TIMED_OUT:
-                            participant.outcome = ParticipantOutcome.TIMED_OUT
-                            participant.reason = _REASON_PARTICIPANT_TIMEOUT
-                            self._sanitize_terminal_reason(run, _REASON_PARTICIPANT_TIMEOUT)
-                            run.result = None
-                        elif exec_state is RunState.CANCELLED:
-                            participant.outcome = ParticipantOutcome.CANCELLED
-                            participant.reason = _REASON_PARTICIPANT_CANCELLED
-                            self._sanitize_terminal_reason(run, _REASON_PARTICIPANT_CANCELLED)
-                            run.result = None
-                        else:
-                            participant.outcome = ParticipantOutcome.FAILED
-                            participant.reason = _REASON_PARTICIPANT_FAILED
-                            self._apply_sanitized_failure(run, _REASON_PARTICIPANT_FAILED)
-                            run.result = None
-                tracker.exit()
+                session = session_factory()
+                binding_committed = False
+                try:
+                    execution_service = ExecutionService(
+                        session, registry=self._registry
+                    )
+                    run_repo = SqlRunRepository(session)
 
-                # --- Serialized persistence (no concurrent SQLite writes) ------
-                # DB commits are guarded by ``db_lock`` so SQLite's single-writer
-                # lock is never contended. This keeps persistence safe while the
-                # analysis phase above runs in bounded parallel.
-                async with db_lock:
-                    session = session_factory()
+                    # Persist the CREATED identity, then use the shared
+                    # binding-aware claim boundary before any adapter call.
+                    async with db_lock:
+                        try:
+                            run_repo.add(run)
+                            session.flush()
+                            run, profile = execution_service.prepare_claimed_run(
+                                run, task, context, workflow, commit=False
+                            )
+                            participant.analysis_run_id = run.id
+                            tracked_run_ids.add(run.id)
+                            session.commit()
+                            binding_committed = True
+                        except Exception:
+                            session.rollback()
+                            raise
+
+                    if outcome in _OUTCOME_TO_STATE:
+                        reason = {
+                            ParticipantOutcome.FAILED: _REASON_PARTICIPANT_FAILED,
+                            ParticipantOutcome.TIMED_OUT: _REASON_PARTICIPANT_TIMEOUT,
+                            ParticipantOutcome.CANCELLED: _REASON_PARTICIPANT_CANCELLED,
+                        }[outcome]
+                        if outcome is ParticipantOutcome.FAILED:
+                            run.transition(RunState.FAILED, reason=reason)
+                        elif outcome is ParticipantOutcome.TIMED_OUT:
+                            run.transition(RunState.RUNNING)
+                            run.transition(RunState.TIMED_OUT, reason=reason)
+                        elif outcome is ParticipantOutcome.CANCELLED:
+                            run.transition(RunState.CANCEL_REQUESTED)
+                            run.transition(RunState.CANCELLED, reason=reason)
+                        participant.outcome = outcome
+                        participant.reason = run.events[-1].reason
+                        async with db_lock:
+                            run_repo.update(run)
+                            session.commit()
+                    else:
+                        try:
+                            execution = await asyncio.wait_for(
+                                execution_service.execute_claimed_run(
+                                    run, task, context, workflow, profile
+                                ),
+                                timeout=self._timeout,
+                            )
+                        except asyncio.TimeoutError:
+                            # Cleanup is not verified at this outer boundary;
+                            # preserve that uncertainty as a durable ORPHANED Run.
+                            self._apply_timeout_transition(
+                                run, reason=_REASON_PARTICIPANT_TIMEOUT
+                            )
+                            participant.outcome = ParticipantOutcome.TIMED_OUT
+                            participant.reason = _REASON_PARTICIPANT_TIMEOUT
+                            run_repo.update(run)
+                            session.commit()
+                        except Exception:
+                            # The shared service may have already persisted a
+                            # sanitized factory failure. Reload before mapping the
+                            # participant outcome so Run and Council stay aligned.
+                            run = run_repo.get(run.id) or run
+                            # The shared service may have durably committed a
+                            # COMPLETED Run before a post-runtime boundary
+                            # failure reaches this handler. Preserve that
+                            # terminal result and keep the Council participant
+                            # aligned; never relabel a completed Run as failed.
+                            if run.state is RunState.COMPLETED:
+                                participant.outcome = ParticipantOutcome.COMPLETED
+                                participant.output_ref = run.id
+                            else:
+                                run.result = None
+                                if run.state is RunState.TIMED_OUT:
+                                    participant.outcome = ParticipantOutcome.TIMED_OUT
+                                    participant.reason = _REASON_PARTICIPANT_TIMEOUT
+                                    self._sanitize_terminal_reason(run, _REASON_PARTICIPANT_TIMEOUT)
+                                elif run.state is RunState.ORPHANED:
+                                    participant.outcome = ParticipantOutcome.TIMED_OUT
+                                    participant.reason = _REASON_PARTICIPANT_TIMEOUT
+                                    self._sanitize_terminal_reason(run, _REASON_PARTICIPANT_TIMEOUT)
+                                elif run.state is RunState.CANCELLED:
+                                    participant.outcome = ParticipantOutcome.CANCELLED
+                                    participant.reason = _REASON_PARTICIPANT_CANCELLED
+                                    self._sanitize_terminal_reason(run, _REASON_PARTICIPANT_CANCELLED)
+                                elif run.state is RunState.FAILED:
+                                    participant.outcome = ParticipantOutcome.FAILED
+                                    participant.reason = _REASON_PARTICIPANT_FAILED
+                                    self._sanitize_terminal_reason(run, _REASON_PARTICIPANT_FAILED)
+                                else:
+                                    self._apply_sanitized_failure(run, _REASON_PARTICIPANT_FAILED)
+                                    participant.outcome = ParticipantOutcome.FAILED
+                                    participant.reason = _REASON_PARTICIPANT_FAILED
+                            run_repo.update(run)
+                            session.commit()
+                        else:
+                            run = execution.run
+                            exec_state = run.state
+                            if exec_state is RunState.COMPLETED:
+                                participant.outcome = ParticipantOutcome.COMPLETED
+                                participant.output_ref = run.id
+                            elif exec_state is RunState.FAILED:
+                                participant.outcome = ParticipantOutcome.FAILED
+                                participant.reason = _REASON_PARTICIPANT_FAILED
+                            elif exec_state is RunState.TIMED_OUT:
+                                participant.outcome = ParticipantOutcome.TIMED_OUT
+                                participant.reason = _REASON_PARTICIPANT_TIMEOUT
+                            elif exec_state is RunState.CANCELLED:
+                                participant.outcome = ParticipantOutcome.CANCELLED
+                                participant.reason = _REASON_PARTICIPANT_CANCELLED
+                            elif exec_state is RunState.ORPHANED:
+                                participant.outcome = ParticipantOutcome.TIMED_OUT
+                                participant.reason = _REASON_UNVERIFIED_CLEANUP
+                            else:
+                                participant.outcome = ParticipantOutcome.FAILED
+                                participant.reason = _REASON_PARTICIPANT_FAILED
+                            # The shared service already persisted the execution;
+                            # this update is only defensive for the Council view.
+                            run_repo.update(run)
+                            session.commit()
+                except asyncio.CancelledError:
+                    if not binding_committed:
+                        session.rollback()
+                        raise
                     try:
-                        run_repo = SqlRunRepository(session)
-                        evidence_repo = SqlEvidenceRepository(session)
-                        run_repo.add(run)
-                        session.flush()
-                        participant.analysis_run_id = run.id
-                        for evidence in evidence_to_persist:
-                            evidence_repo.add(evidence)
+                        run = run_repo.get(run.id) or run
+                        self._apply_timeout_transition(run)
+                        run.result = None
+                        participant.outcome = ParticipantOutcome.TIMED_OUT
+                        participant.reason = _REASON_UNVERIFIED_CLEANUP
                         run_repo.update(run)
                         session.commit()
-                    finally:
-                        session.close()
+                    except Exception:
+                        session.rollback()
+                        raise
+                    raise
+                finally:
+                    session.close()
+                    tracker.exit()
 
         # Bounded parallel execution of independent analysis. Genuine concurrent
         # scheduling (limited by ``sem``); runtime-adapter work overlaps for async
         # adapters. Persistence is serialized via ``db_lock`` for SQLite safety.
-        await asyncio.wait_for(
-            asyncio.gather(*(_execute_participant(s) for s in specs)),
-            timeout=self._timeout * len(specs) + 10,
-        )
+        participant_tasks = [
+            asyncio.create_task(_execute_participant(spec)) for spec in specs
+        ]
+        try:
+            await asyncio.wait_for(
+                asyncio.gather(*participant_tasks),
+                timeout=self._timeout * len(specs) + 10,
+            )
+        except BaseException:
+            # A setup error in one participant must not leave sibling adapter
+            # tasks or already-bound Runs active while gather unwinds.
+            for participant_task in participant_tasks:
+                if not participant_task.done():
+                    participant_task.cancel()
+            await asyncio.gather(*participant_tasks, return_exceptions=True)
+            raise
         plan.max_concurrency_observed = max(plan.max_concurrency_observed, tracker.max)
 
         # Record order in stage events (post-execution, deterministic spec order)
@@ -525,8 +719,27 @@ class CouncilOrchestrator:
     # Stage: cross review (reviewer ≠ target)
     # ------------------------------------------------------------------
 
-    async def _run_cross_review_stage(self, council_run: Run, plan: CouncilPlan) -> None:
+    async def _run_cross_review_stage(
+        self,
+        council_run: Run,
+        plan: CouncilPlan,
+        bound_run_ids: set[str] | None = None,
+    ) -> None:
         completed = [p for p in plan.participants if p.outcome is ParticipantOutcome.COMPLETED and p.analysis_run_id is not None]
+        if len(completed) < 2:
+            # Cross-review requires a distinct reviewer and target.  Do not mark
+            # the stage complete when a partial Council has no valid review pair;
+            # synthesis must then take its deterministic missing-input path.
+            plan.partial = True
+            self._persist_plan(plan)
+            return
+        task = self._task_repo.get(council_run.task_id)
+        if task is None:
+            raise ValueError("Council Task not found during cross-review execution")
+        context = self._cp_repo.get(council_run.context_package_id)
+        if context is None:
+            raise ValueError("Council ContextPackage not found during cross-review execution")
+        workflow = self._load_workflow(task)
         order = 0
         for reviewer in completed:
             targets = [t for t in completed if t.id != reviewer.id]
@@ -538,11 +751,23 @@ class CouncilOrchestrator:
                     workflow_version=council_run.workflow_version,
                     context_package_id=council_run.context_package_id,
                 )
-                self._run_repo.add(review_run)
-                review_run.transition(RunState.STARTING)
-                review_run.transition(RunState.RUNNING)
-                review_run.transition(RunState.COMPLETED, reason=_REASON_CROSS_REVIEW)
-                self._run_repo.update(review_run)
+                review_run, profile = self._prepare_council_stage_run(
+                    review_run, council_run, bound_run_ids
+                )
+                review_execution = await asyncio.wait_for(
+                    self._execution_service.execute_claimed_run(
+                        review_run,
+                        task,
+                        context,
+                        workflow,
+                        profile,
+                        fail_closed_on_factory_error=True,
+                    ),
+                    timeout=self._timeout,
+                )
+                review_run = review_execution.run
+                if review_run.state is not RunState.COMPLETED:
+                    raise RuntimeError("Council cross-review runtime did not complete")
 
                 self._evidence_repo.add(
                     Evidence(
@@ -582,6 +807,13 @@ class CouncilOrchestrator:
                         )
                         break
 
+        if not any(p.cross_review_run_ids for p in completed):
+            # Defensive invariant: a completed cross-review stage must contain at
+            # least one durable review Run, otherwise it is not valid synthesis
+            # input and must remain incomplete.
+            plan.partial = True
+            self._persist_plan(plan)
+            return
         plan.stages_completed = plan.stages_completed + (CouncilStage.CROSS_REVIEW,)
         self._persist_plan(plan)
 
@@ -589,9 +821,21 @@ class CouncilOrchestrator:
     # Stage: synthesis (references actual evidence, truthful partial)
     # ------------------------------------------------------------------
 
-    async def _run_synthesis_stage(self, council_run: Run, plan: CouncilPlan) -> None:
+    async def _run_synthesis_stage(
+        self,
+        council_run: Run,
+        plan: CouncilPlan,
+        bound_run_ids: set[str] | None = None,
+    ) -> None:
         completed = [p for p in plan.participants if p.outcome is ParticipantOutcome.COMPLETED]
-        has_cross_review = CouncilStage.CROSS_REVIEW in plan.stages_completed
+        has_cross_review = any(p.cross_review_run_ids for p in plan.participants)
+        task = self._task_repo.get(council_run.task_id)
+        if task is None:
+            raise ValueError("Council Task not found during synthesis execution")
+        context = self._cp_repo.get(council_run.context_package_id)
+        if context is None:
+            raise ValueError("Council ContextPackage not found during synthesis execution")
+        workflow = self._load_workflow(task)
 
         synthesis_run = Run(
             task_id=council_run.task_id,
@@ -599,10 +843,14 @@ class CouncilOrchestrator:
             workflow_version=council_run.workflow_version,
             context_package_id=council_run.context_package_id,
         )
-        self._run_repo.add(synthesis_run)
+        synthesis_run, profile = self._prepare_council_stage_run(
+            synthesis_run, council_run, bound_run_ids
+        )
 
         if not completed or not has_cross_review:
-            synthesis_run.transition(RunState.STARTING)
+            # No valid synthesis inputs exist.  This is a deterministic semantic
+            # rejection, not a runtime execution claim; keep the existing truthful
+            # FAILED stage result and do not invoke an adapter without inputs.
             synthesis_run.transition(RunState.FAILED, reason=_REASON_SYNTHESIS_MISSING)
             self._run_repo.update(synthesis_run)
             plan.synthesis_run_id = synthesis_run.id
@@ -616,10 +864,20 @@ class CouncilOrchestrator:
             self._persist_plan(plan)
             return
 
-        synthesis_run.transition(RunState.STARTING)
-        synthesis_run.transition(RunState.RUNNING)
-        synthesis_run.transition(RunState.COMPLETED, reason=_REASON_SYNTHESIS_OK)
-        self._run_repo.update(synthesis_run)
+        synthesis_execution = await asyncio.wait_for(
+            self._execution_service.execute_claimed_run(
+                synthesis_run,
+                task,
+                context,
+                workflow,
+                profile,
+                fail_closed_on_factory_error=True,
+            ),
+            timeout=self._timeout,
+        )
+        synthesis_run = synthesis_execution.run
+        if synthesis_run.state is not RunState.COMPLETED:
+            raise RuntimeError("Council synthesis runtime did not complete")
 
         partial = any(p.outcome is not ParticipantOutcome.COMPLETED for p in plan.participants)
 
@@ -700,6 +958,35 @@ class CouncilOrchestrator:
     # ------------------------------------------------------------------
     # Persistence helpers
     # ------------------------------------------------------------------
+
+    def _prepare_council_stage_run(
+        self,
+        run: Run,
+        council_run: Run,
+        bound_run_ids: set[str] | None = None,
+    ) -> tuple[Run, RuntimeProfile]:
+        """Persist and bind a Council-owned stage Run before its transitions."""
+        task = self._task_repo.get(council_run.task_id)
+        if task is None:
+            raise ValueError("Council Task not found while preparing a stage Run")
+        context = self._cp_repo.get(council_run.context_package_id)
+        if context is None:
+            raise ValueError(
+                "Council ContextPackage not found while preparing a stage Run"
+            )
+        workflow = self._load_workflow(task)
+        self._run_repo.add(run)
+        self._s.flush()
+        if bound_run_ids is not None:
+            # Track from the point the durable identity exists. If binding then
+            # fails, rollback removes the Run and cleanup safely ignores it; if
+            # setup fails after binding, cleanup can reconcile this child even
+            # before the plan receives its stage-specific reference.
+            bound_run_ids.add(run.id)
+        prepared, profile = self._execution_service.prepare_claimed_run(
+            run, task, context, workflow
+        )
+        return prepared, profile
 
     def _create_council_run(self, task: Task, context: ContextPackage) -> Run:
         run = Run(

@@ -93,6 +93,157 @@ class ExecutionService:
         # Composition-root injectable; default registers only reference.local.
         self._registry: RuntimeRegistry = registry or build_default_registry()
 
+    def prepare_claimed_run(
+        self,
+        run: Run,
+        task: Task,
+        context: ContextPackage,
+        workflow: WorkflowDefinition,
+        *,
+        commit: bool = True,
+    ) -> tuple[Run, RuntimeProfile]:
+        """Claim and bind a persisted Run before any adapter invocation.
+
+        This is the shared binding-aware boundary used by Council-created Runs.
+        The caller must persist the CREATED Run first. Validation, the CAS
+        claim, the CREATED->STARTING event, and the immutable snapshot are
+        committed atomically before the caller can invoke a runtime adapter.
+        Callers that already own a larger transaction may pass ``commit=False``;
+        the claim and immutable binding remain in that transaction and the
+        caller must commit before invoking an adapter.
+        """
+        from polynexus_core.domain.enums import RunState
+        from polynexus_core.domain.models import RunEvent
+
+        if task.project_id != context.project_id:
+            raise ContractViolationError(
+                "Task and ContextPackage must belong to the same project"
+            )
+        if task.workflow_id != workflow.id or task.workflow_version != workflow.version:
+            raise ContractViolationError(
+                "Task workflow reference must match the WorkflowDefinition"
+            )
+        if (
+            run.task_id != task.id
+            or run.context_package_id != context.id
+            or run.workflow_id != workflow.id
+            or run.workflow_version != workflow.version
+        ):
+            raise ContractViolationError(
+                "Run references do not match the Task, ContextPackage, and WorkflowDefinition"
+            )
+
+        try:
+            # Resolve before the CAS claim so an unknown/unavailable profile leaves
+            # the CREATED Run untouched. The rollback guard also covers callers
+            # that flushed that identity in a larger transaction.
+            profile = self._registry.resolve(REFERENCE_PROFILE_REF)
+            if not self._run_repo.claim_for_execution(run.id):
+                raise ClaimConflictError(
+                    f"Run {run.id} is not in CREATED state (current: {run.state.value})"
+                )
+
+            claim_event = RunEvent(
+                run_id=run.id,
+                from_state=RunState.CREATED,
+                to_state=RunState.STARTING,
+            )
+            self._run_repo.append_event(claim_event)
+            self._binding_repo.insert_once(
+                self._registry.bind(
+                    REFERENCE_PROFILE_REF,
+                    run_id=run.id,
+                    resolved_at=claim_event.occurred_at,
+                )
+            )
+        except Exception:
+            self._session.rollback()
+            raise
+        if commit:
+            self._session.commit()
+
+        stored = self._run_repo.get(run.id)
+        assert stored is not None
+        return stored, profile
+
+    async def execute_claimed_run(
+        self,
+        run: Run,
+        task: Task,
+        context: ContextPackage,
+        workflow: WorkflowDefinition,
+        profile: RuntimeProfile,
+        *,
+        fail_closed_on_factory_error: bool = False,
+    ) -> RunExecution:
+        """Execute a Run prepared by :meth:`prepare_claimed_run`.
+
+        The binding snapshot must already exist. This method is deliberately
+        separate from preparation so deterministic Council outcomes can bind a
+        Run without invoking an adapter, while real analysis stages use the
+        same Registry -> Adapter -> Supervisor path as normal execution.
+        """
+        from polynexus_core.domain.enums import RunState
+        from polynexus_core.workflows.gates import (
+            evaluate_workflow_gates,
+            persist_gate_report,
+        )
+
+        if run.state is not RunState.STARTING:
+            raise ClaimConflictError(
+                "Claimed Run must be in STARTING state before adapter execution"
+            )
+        if self._binding_repo.get_by_run(run.id) is None:
+            raise RuntimeBindingError(
+                "Claimed Run has no immutable runtime binding"
+            )
+
+        adapter = self._construct_adapter_or_fail_closed(
+            run.id,
+            profile,
+            orphan_on_failure=fail_closed_on_factory_error,
+        )
+        supervisor = RunSupervisor(adapter)
+        execution = await supervisor.execute_claimed_run(
+            run, task, context, workflow
+        )
+
+        self._run_repo.update(execution.run)
+        if execution.result is not None:
+            for finding in execution.findings:
+                self._finding_repo.add(finding)
+            for evidence in execution.evidence:
+                self._evidence_repo.add(evidence)
+            for artifact in execution.artifacts:
+                self._artifact_repo.add(artifact)
+
+        if execution.run.state is RunState.COMPLETED:
+            gate_report = evaluate_workflow_gates(
+                workflow, task, execution.run, self._evidence_repo
+            )
+            gate_ev = persist_gate_report(gate_report, self._evidence_repo)
+            all_evidence = list(execution.evidence) + [gate_ev]
+            new_result = RunResult(
+                run_id=execution.result.run_id,
+                status=execution.result.status,
+                summary=execution.result.summary,
+                finding_ids=execution.result.finding_ids,
+                evidence_ids=tuple(e.id for e in all_evidence),
+                artifact_ids=execution.result.artifact_ids,
+            ) if execution.result is not None else None
+            execution.run.result = new_result
+            self._run_repo.update(execution.run)
+            execution = RunExecution(
+                run=execution.run,
+                result=new_result,
+                findings=execution.findings,
+                evidence=tuple(all_evidence),
+                artifacts=execution.artifacts,
+            )
+
+        self._session.commit()
+        return execution
+
     async def execute_task(self, task_id: str) -> RunExecution:
         """Execute a task through RunSupervisor and persist all results.
 
@@ -393,16 +544,19 @@ class ExecutionService:
         return execution
 
     def _construct_adapter_or_fail_closed(
-        self, run_id: str, profile: RuntimeProfile
+        self,
+        run_id: str,
+        profile: RuntimeProfile,
+        *,
+        orphan_on_failure: bool = False,
     ) -> object:
         """Construct the adapter for a claimed Run; fail closed on factory error.
 
         The binding-first transaction is already committed at this point, so a
-        factory construction failure must NOT leave the Run stuck in STARTING:
-        the Run is legally transitioned STARTING -> FAILED through the existing
-        lifecycle with a sanitized reason/event, the terminal state is
-        committed, and a sanitized RuntimeBindingError (never the raw
-        exception) propagates to the caller.
+        factory construction failure must NOT leave the Run stuck in STARTING.
+        Council-owned Runs can request STARTING -> CANCEL_REQUESTED -> ORPHANED
+        because adapter cleanup is unverified; the established normal execution
+        path retains its sanitized FAILED mapping.
         """
         from polynexus_core.domain.enums import RunState
 
@@ -411,9 +565,19 @@ class ExecutionService:
         except Exception:
             stored = self._run_repo.get(run_id)
             assert stored is not None
-            stored.transition(
-                RunState.FAILED, reason=_ADAPTER_CONSTRUCTION_FAILURE_REASON
-            )
+            if orphan_on_failure:
+                stored.transition(
+                    RunState.CANCEL_REQUESTED,
+                    reason=_ADAPTER_CONSTRUCTION_FAILURE_REASON,
+                )
+                stored.transition(
+                    RunState.ORPHANED,
+                    reason=_ADAPTER_CONSTRUCTION_FAILURE_REASON,
+                )
+            else:
+                stored.transition(
+                    RunState.FAILED, reason=_ADAPTER_CONSTRUCTION_FAILURE_REASON
+                )
             self._run_repo.update(stored)
             self._session.commit()
             raise RuntimeBindingError(

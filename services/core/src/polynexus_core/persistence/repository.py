@@ -36,6 +36,7 @@ from polynexus_core.domain.runtime_binding import (
     RuntimeBindingError,
     RuntimeBindingSnapshot,
 )
+from polynexus_core.domain.run_lifecycle import TERMINAL_STATES
 from polynexus_core.persistence.models import (
     ArtifactRow,
     Base,
@@ -391,6 +392,10 @@ class RunRepository(ABC):
     def list_by_task(self, task_id: str) -> Sequence[Run]: ...
 
     @abstractmethod
+    def list_non_terminal(self) -> Sequence[Run]:
+        """List durable Runs that require startup reconciliation."""
+
+    @abstractmethod
     def update(self, run: Run) -> None: ...
 
     @abstractmethod
@@ -577,6 +582,28 @@ class SqlRunRepository(RunRepository):
             self._s.query(RunRow)
             .filter_by(task_id=task_id)
             .order_by(RunRow.created_at)
+            .all()
+        )
+        runs = []
+        for r in rows:
+            run = _row_to_run(r)
+            event_rows = (
+                self._s.query(RunEventRow)
+                .filter_by(run_id=r.id)
+                .order_by(RunEventRow.occurred_at, RunEventRow.id)
+                .all()
+            )
+            run.events = [_row_to_event(er) for er in event_rows]
+            runs.append(run)
+        return runs
+
+    def list_non_terminal(self) -> Sequence[Run]:
+        """Load all non-terminal Runs in deterministic creation order."""
+        terminal_values = [state.value for state in TERMINAL_STATES]
+        rows = (
+            self._s.query(RunRow)
+            .filter(RunRow.state.notin_(terminal_values))
+            .order_by(RunRow.created_at, RunRow.id)
             .all()
         )
         runs = []

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import os
 from contextlib import asynccontextmanager
 
@@ -23,15 +24,43 @@ async def _lifespan(app: FastAPI):
     The database URL is read from the POLYNEXUS_DATABASE_URL environment
     variable, falling back to ``sqlite:///poly.db`` (production default).
     """
-    from polynexus_core.persistence.database import create_all, dispose_engine, init_engine
+    from polynexus_core.persistence.database import (
+        create_all,
+        dispose_engine,
+        get_session,
+        init_engine,
+    )
+    from polynexus_core.runtime.reconciliation import reconcile_non_terminal_runs
 
     database_url = os.environ.get("POLYNEXUS_DATABASE_URL", "sqlite:///poly.db")
     init_engine(database_url)
-    create_all()
+    try:
+        create_all()
 
-    yield
+        # A restart must never resubmit a durable Run.  Reconcile existing
+        # non-terminal Runs only after the schema exists and before serving routes.
+        # The generator is closed explicitly so the startup transaction is owned
+        # here rather than relying on request-scoped dependency cleanup.
+        startup_session_generator = get_session()
+        startup_session = next(startup_session_generator)
+        try:
+            await reconcile_non_terminal_runs(startup_session)
+            startup_session.commit()
+        except asyncio.CancelledError:
+            # Persist the reconciler's fail-closed current Run before the
+            # startup task unwinds; synchronous commit cannot be interrupted.
+            startup_session.commit()
+            raise
+        except Exception:
+            startup_session.rollback()
+            raise
+        finally:
+            startup_session_generator.close()
 
-    dispose_engine()
+        yield
+    finally:
+        # Startup failures are fail-closed, but must not leak the engine.
+        dispose_engine()
 
 
 def create_app() -> FastAPI:
