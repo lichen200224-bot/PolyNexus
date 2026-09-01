@@ -9,12 +9,13 @@ override this section.
 - Candidate branch: `feature/first-vertical-slice`
 - Reconciliation base HEAD: `b42abc5abd344747378fdf076e333d6b832e1ec9`
 - Code evidence checkpoint: `8fa13882bc8aa4805bac2f3ab0c5105b2a300fc6`
-- Current status: `G13–G18 COMPLETE / CP04 WP17–WP20 COMPLETE / CP04 WP21 DEFERRED-UNVERIFIED / CP05 COMPLETE / CP06 WP28–WP32 NONBROWSER COMPLETE / CP06-RC NEED_ACTION`
+- Current status: `G13–G18 COMPLETE / CP04 WP17–WP20 COMPLETE / CP04 WP21 DEFERRED-UNVERIFIED / CP05 COMPLETE / CP06 WP28–WP32 NONBROWSER COMPLETE / CP06-RC PROVISIONALLY-ACCEPTED-WITH-LIMITATIONS`
+- Human decision: `ACCEPT_RC_WITH_WP21_DEFERRED_UNVERIFIED`; this is provisional acceptance only and does not certify browser/vendor compatibility.
 - Candidate working tree: clean before this documentation task; primary workspace is protected and not modified.
 - Current evidence date: `2026-09-01`; full Core, targeted CP06/Core, baseline, governance, and extension checks are recorded in `docs/12_HANDOFF_CURRENT.md` with actual commands and exit codes.
 - WP21 boundary: real Chrome/browser failure-path acceptance is intentionally deferred; no vendor/browser support or `SUPPORTED`/`CERTIFIED` claim is made.
-- RC boundary: CP06/RC remains `NEED_ACTION` until a separately authorized WP21 decision/evidence path and final RC review are complete.
-- Next route: reconcile current evidence and limitations, then perform independent CP06/RC review; resume WP21 only when an operator is available and a fresh browser authorization is issued.
+- RC boundary: CP06/RC is `PROVISIONALLY_ACCEPTED_WITH_LIMITATIONS`; WP21 remains `DEFERRED / UNVERIFIED`, and no browser/vendor `SUPPORTED` or `CERTIFIED` claim is made.
+- Next route: retain the disclosed limitations; resume WP21 only if an operator is available and a fresh browser authorization is issued.
 
 ## Historical Baseline Reference
 

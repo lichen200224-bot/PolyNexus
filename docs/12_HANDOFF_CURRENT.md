@@ -1,18 +1,18 @@
 # Current Handoff
 
 ## Task
-`CP06-RC-CURRENT-STATE-RECONCILIATION` — synchronize current CP06 evidence, deferred WP21 status, and RC routing
+`CP06-RC-PROVISIONAL-ACCEPTANCE-HANDOFF-SYNC` — record provisional RC acceptance with deferred WP21
 
 ## Status
-Current operational status: `G13–G18_COMPLETE / CP04_WP17–WP20_COMPLETE / CP04_WP21_DEFERRED_UNVERIFIED / CP05_COMPLETE / CP06_WP28–WP32_NONBROWSER_COMPLETE / CP06_RC_NEED_ACTION`.
+Current operational status: `G13–G18_COMPLETE / CP04_WP17–WP20_COMPLETE / CP04_WP21_DEFERRED_UNVERIFIED / CP05_COMPLETE / CP06_WP28–WP32_NONBROWSER_COMPLETE / CP06_RC_PROVISIONALLY_ACCEPTED_WITH_LIMITATIONS`.
 
-- `TASK_ID`: `CP06-RC-CURRENT-STATE-RECONCILIATION`
+- `TASK_ID`: `CP06-RC-PROVISIONAL-ACCEPTANCE-HANDOFF-SYNC`
 - Branch: `feature/first-vertical-slice`
 - Base/code checkpoint: `b42abc5abd344747378fdf076e333d6b832e1ec9` / `8fa13882bc8aa4805bac2f3ab0c5105b2a300fc6`
 - Writer: Codex — candidate-only current-state documentation reconciliation
-- Reviewer: Codex deterministic documentation/scope verification; Human RC decision remains pending
+- Reviewer: Codex deterministic RC verification; Human decision `ACCEPT_RC_WITH_WP21_DEFERRED_UNVERIFIED` recorded
 - Antigravity: `DEFERRED` for WP21 because the operator is unavailable; real browser journey remains `UNVERIFIED`
-- Next owner: Codex/Human for independent CP06/RC review; Human/Antigravity for WP21 only after fresh authorization
+- Next owner: Human/Antigravity only if WP21 browser evidence is later required; provisional RC is accepted with disclosed limitations
 - Git authorization: only the four exact documents below may be staged/committed; push/merge/rebase/reset/clean and primary mutation remain prohibited
 
 ## Current Goal and Delta
@@ -21,7 +21,8 @@ Current operational status: `G13–G18_COMPLETE / CP04_WP17–WP20_COMPLETE / CP
 - CP06 WP32 extension redaction is checkpointed at `8fa13882bc8aa4805bac2f3ab0c5105b2a300fc6`; it covers POSIX absolute paths and `file://` URI redaction with deterministic regression coverage.
 - Non-browser CP06/Core revalidation is current and source-bound: full Core, targeted G15–G18/CP04–CP06 tests, baseline, and governance validation all completed with exit code `0`.
 - CP04 WP21 is explicitly deferred, not failed or accepted: no current browser evidence is available, and no browser/vendor maturity claim is made.
-- CP06/RC remains `NEED_ACTION`; the deferral does not block Core/workflow/document development but does block final browser-integrated RC closure.
+- Human has approved `ACCEPT_RC_WITH_WP21_DEFERRED_UNVERIFIED`; CP06/RC is now `PROVISIONALLY_ACCEPTED_WITH_LIMITATIONS`, not final browser-integrated certification.
+- The WP21 deferral does not block Core/workflow/document development; it only leaves real browser/vendor compatibility `UNVERIFIED`.
 - No production dependency, public API, schema, migration, primary workspace, external/cloud egress, push, merge, rebase, reset, or clean operation was performed.
 
 ## Changed files
@@ -49,6 +50,10 @@ Scope deviation: `NONE`.
 - Baseline command `python -B scripts/validate_baseline.py`: exit code `0`.
 - Governance command `powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tools\validate-polynexus-governance.ps1 -RepoRoot (Get-Location).Path`: exit code `0`; UTC `2026-09-01T11:38:18.4803438Z`–`2026-09-01T11:38:21.2800138Z`.
 - Extension Node tests: `9 passed`, `0 failed`, exit code `0`.
+- Fresh full Core revalidation at UTC `2026-09-01T13:05:19.6151652Z`: `python -B -m pytest -q -rA -p no:cacheprovider services/core` exit code `0`; one Windows symlink-policy test `SKIPPED`; no test failure. The executable path is intentionally omitted from this evidence record.
+- Fresh extension static tests at UTC `2026-09-01T13:05:19.6151652Z`: `node --test extensions/browser-companion/tests/test_websurface_drivers.mjs` reported `9 passed, 0 failed, 0 skipped`, exit code `0`.
+- Fresh baseline validation at UTC `2026-09-01T13:09:47.0847841Z`–`2026-09-01T13:09:49.2506307Z`: `python -B scripts/validate_baseline.py` exit code `0`; `11` required files, workflows valid, and MV3 manifest valid.
+- Fresh governance validation at UTC `2026-09-01T13:09:47.6602657Z`–`2026-09-01T13:09:56.0387139Z`: `powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tools\validate-polynexus-governance.ps1 -RepoRoot (Get-Location).Path` exit code `0`; required governance files, manifest, JSON, and protected-path exclusions valid.
 - Pre-edit candidate status: clean and ahead `19` of its remote-tracking branch; `git status --short --branch` exit code `0`.
 - Pre-edit candidate HEAD: `b42abc5abd344747378fdf076e333d6b832e1ec9`; `git rev-parse HEAD` exit code `0`.
 - Documentation validation at UTC `2026-09-01T12:44:23.9724288Z`: exact-file scope scan exit `0` (`4` expected, `0` unexpected, `0` missing, `0` staged); `git diff --check` exit `0`; added-line secret/path redaction scan exit `0` (`55` added lines, `0` forbidden matches); current-state marker scan exit `0` (`4/4` present).
@@ -56,16 +61,16 @@ Scope deviation: `NONE`.
 
 ## Known issues / unverified
 
-- CP04 WP21 real browser failure-path acceptance is `DEFERRED / UNVERIFIED` after prior Chrome/CDP startup failures; no browser retry is authorized by this documentation task.
+- CP04 WP21 real browser failure-path acceptance is `DEFERRED / UNVERIFIED` after prior Chrome/CDP startup failures; no browser retry is authorized by this task.
 - Real vendor browser journeys are not certified; do not claim `SUPPORTED` or `CERTIFIED`.
 - The Windows symlink-policy test remains an explicit host-policy skip; true concurrent HTTP duplicate-command execution remains unverified where documented.
-- CP06/RC therefore remains `NEED_ACTION` until current WP21 evidence and the final RC decision exist.
+- CP06/RC is `PROVISIONALLY_ACCEPTED_WITH_LIMITATIONS` by Human decision; it is not browser/vendor certification.
 
 ## Next Routing
 
-`NEXT_OWNER: Codex/Human -> Human/Antigravity when operator is available`
+`NEXT_OWNER: Human/Antigravity only if WP21 browser evidence is later required`
 
-`NEXT_ACTION: Keep WP21 deferred. First perform the independent CP06/RC review using current non-browser evidence; later, when an operator is available and fresh authorization is issued, execute WP21 browser failure-path evidence for launch, detect, fill, explicit user-confirmed-send, capture, normalize, driver failure, and clipboard/manual fallback. Until a final decision exists, keep CP06/RC at NEED_ACTION.`
+`NEXT_ACTION: Keep WP21 deferred and retain the disclosed limitations. If browser evidence is later required, obtain fresh authorization before executing launch, detect, fill, explicit user-confirmed-send, capture, normalize, driver failure, and clipboard/manual fallback. Do not upgrade provisional RC or browser/vendor maturity without new evidence.`
 
 ### Do Not Change
 

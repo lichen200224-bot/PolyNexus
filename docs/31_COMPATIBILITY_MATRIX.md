@@ -10,8 +10,9 @@ browser compatibility.
 - Current non-browser CP06 evidence is recorded in `docs/12_HANDOFF_CURRENT.md`.
 - CP04 WP21 is `DEFERRED / UNVERIFIED` because the real browser failure-path
   journey is not currently executable; this is not a browser or vendor PASS.
-- CP06/RC remains `NEED_ACTION` until the independent RC review and final Human
-  decision are complete.
+- Human decision `ACCEPT_RC_WITH_WP21_DEFERRED_UNVERIFIED` is recorded; CP06/RC
+  is `PROVISIONALLY_ACCEPTED_WITH_LIMITATIONS` and is not browser/vendor
+  certification.
 
 | Surface | Current maturity | Current evidence source | Boundary / limitation |
 |---|---|---|---|
