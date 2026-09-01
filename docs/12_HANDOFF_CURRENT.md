@@ -1,5 +1,56 @@
 # Current Handoff
 
+## Current Task — G20 reproducible Web dependency/test/build gate (2026-09-02)
+
+**Result:** `PASS`
+
+- `TASK_ID`: `G20-WEB-REPRODUCIBLE-DEPENDENCY-TEST-BUILD-GATE`
+- `ATTEMPT`: 1
+- `MODE`: `IMPLEMENT_AND_VERIFY` — no Web source defect was exposed; no product source fix was made
+- `WRITER`: Codex (sole active writer)
+- `REVIEWER`: `NOT_APPLICABLE` — bounded dependency/test/build acceptance; no independent product review was required
+- `ANTIGRAVITY_STATUS`: `NOT_REQUIRED` — no browser, UI, E2E, vendor, or WP21 execution was authorized
+- `BRANCH`: `feature/g20-web-reproducible-dependency-test-build-gate`
+- `PREDECESSOR_SHA`: `1799994514fc5dc46aef752ab61a3d96583ea3ad` (exact G19 HEAD at start)
+- `OUTPUT_SHA`: exact final checkpoint is published in the G20 completion result; it is not duplicated inside this self-referential commit
+- `REMOTE_REF`: `origin/feature/g20-web-reproducible-dependency-test-build-gate` on `D:\GitBackup\PolyNexus_Backup.git`; requested `backup` alias/path was not present and was not reconfigured
+- `WORKTREE_STATE`: clean; staged state empty after checkpoint
+- `NEXT_GOAL_READY`: `G21` (G21 remains separately gated; do not start it in this task)
+- `TASK_DOC`: `docs/tasks/G19-G23-FIVE-GOAL-EXECUTION-ROUTING.md`
+- `HANDOFF_DOC`: `docs/12_HANDOFF_CURRENT.md`
+- `NEXT_OWNER`: Codex, G21 only after verifying this exact G20 output on the approved remote
+
+### G20 deterministic evidence
+
+- Package manager: npm; `apps/web/package-lock.json` lockfileVersion `3`; SHA-256 `56E94B5AD96E3B66C6AFBEB6A09F9DA58CDFF3D582199DE080C6D8B7117BDF5F`.
+- Versions: `node --version` → `v22.22.3`; `npm --version` → `10.9.8`; registry read-only query → `https://registry.npmjs.org/`.
+- Canonical lane command `npm ci` from `apps/web`: exit `0`; 90 packages added, 91 audited, 0 vulnerabilities.
+- Canonical lane command `npm test` from `apps/web`: exit `0`; Vitest `v4.1.10`, 1 test file, 80/80 tests passed.
+- Canonical lane command `npm run build` from `apps/web`: exit `0`; TypeScript/Vite production build, 23 modules transformed, `dist` emitted.
+- Second clean clone: `C:\Users\hikar\.codex\visualizations\2026\09\01\01a05d88-562b-7063-ab5b-7922fbcbb235\pn-g20-web-reproducible-clean-20260901`; exact HEAD `1799994514fc5dc46aef752ab61a3d96583ea3ad`, branch `feature/g19-canonical-workspace-provenance`, clean before install.
+- Clean clone `apps/web` commands: `npm ci` exit `0` (90 packages, 91 audited, 0 vulnerabilities); `npm test` exit `0` (1 file, 80/80 passed); `npm run build` exit `0` (23 modules transformed, same production asset sizes/hashes).
+- Baseline validator: `C:/temp_pn_venv2/Scripts/python.exe scripts/validate_baseline.py` initially failed to create process in sandbox (exit `1`); rerun with bundled Python runtime `C:/Users/hikar/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe scripts/validate_baseline.py` was missing `jsonschema` (exit `1`); final rerun with the controlled launcher under approved elevation passed (exit `0`): 11 required files, workflows valid, MV3 valid.
+- Governance validator: `powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\validate-polynexus-governance.ps1 .` → exit `0`.
+- Scope/protected-path validation: exact four-file documentation allowlist only; no `apps/web/src`, Core, Domain, workflow, migration, secret, vendor, ADR-001–010, or Product Scope path changed; final command/evidence recorded below.
+
+### G20 changed files and boundaries
+
+- Exact checkpoint allowlist: `docs/11_PROJECT_STATE.md`, `docs/12_HANDOFF_CURRENT.md`, `docs/GOAL_COMPLETION_CONTROL_PANEL.md`, `docs/GOAL_COMPLETION_CONTROL_PANEL.html`.
+- No bounded Web defect was exposed, so `apps/web/src/`, package manifests, and lockfile were not modified.
+- Generated `apps/web/node_modules/`, `apps/web/dist/`, and `apps/web/tsconfig.tsbuildinfo` are local ignored verification outputs and are excluded from the checkpoint.
+- Protected primary checkout `D:\AI學習教材\PolyNexus` remained dirty and was not modified; an initial mistaken repo-root `npm ci` attempt there exited `1` before install because no root lockfile was present, and no tracked/untracked primary state changed.
+- ADR impact: `NONE`; ADR-001–010 remain frozen and ADR-011 is unchanged.
+- Scope deviation: `NONE` for product scope; remote naming/path discrepancy is disclosed, with existing remote configuration preserved.
+- Known limitations: browser DOM/Playwright E2E, WP21, vendor acceptance, and external send/login remain `DEFERRED / UNVERIFIED`; baseline launcher failure and bundled-runtime missing `jsonschema` are superseded environment attempts, not product evidence; no final Human acceptance is claimed.
+
+### G20 next exact step
+
+Verify the exact G20 output SHA on the existing approved local backup remote, then a later G21 task may perform real-browser WP21 evidence. Do not start G21, vendor acceptance, browser acceptance, or WP21 from this task.
+
+### G20 Do Not Change
+
+Do not modify the protected primary lane; do not absorb its dirty paths; do not change Core contracts, Domain models, workflow semantics, Product Scope, vendor boundaries, or ADR-001–010; do not reconfigure remotes, force-push, reset, clean, merge, rebase, or use bulk staging.
+
 ## Current Task — G19 canonical workspace and provenance consolidation (2026-09-01)
 
 **Result:** `PASS`

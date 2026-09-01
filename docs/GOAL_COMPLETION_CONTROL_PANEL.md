@@ -2,6 +2,24 @@
 
 Browser-readable companion: [GOAL_COMPLETION_CONTROL_PANEL.html](GOAL_COMPLETION_CONTROL_PANEL.html).
 
+## G20 reproducible Web checkpoint — 2026-09-02
+
+`RESULT: PASS`
+
+- `OUTPUT_BRANCH`: `feature/g20-web-reproducible-dependency-test-build-gate`
+- `PREDECESSOR_SHA`: `1799994514fc5dc46aef752ab61a3d96583ea3ad`
+- `OUTPUT_SHA`: exact final checkpoint is published in the G20 handoff/result and is not duplicated inside this self-referential commit
+- `REMOTE_REF`: `origin/feature/g20-web-reproducible-dependency-test-build-gate` on `D:\GitBackup\PolyNexus_Backup.git`
+- `WORKTREE_STATE`: clean; staged state empty after checkpoint
+- `WEB_EVIDENCE`: canonical lane and second clean clone each passed `npm ci`, Vitest `80/80`, and production build with exit `0`
+- `VALIDATORS`: baseline, governance, and exact scope/protected-path checks passed with exit `0`
+- `NEXT_GOAL_READY`: `G21` (gated; not started here)
+
+The requested `backup` alias/path was not present; the existing configured local
+backup remote was preserved without reconfiguration. Browser/WP21/vendor
+acceptance remains `DEFERRED / UNVERIFIED`, and formal project progress remains
+`30/100`.
+
 ## G19 canonical checkpoint — 2026-09-01
 
 `RESULT: PASS`
@@ -26,7 +44,7 @@ rebased, overwritten, staged, or otherwise mutated.
 | Goal | Status | Evidence / next action |
 |---|---|---|
 | G19 | `PASS / COMPLETE` | This canonical branch and exact checkpoint; G20 may verify and continue |
-| G20 | `GATED / NOT STARTED` | Requires exact G19 output SHA; Web dependency, Vitest, and build gate |
+| G20 | `PASS / COMPLETE` | Canonical and second clean clone restore, Vitest, build, validators, and checkpoint |
 | G21 | `GATED / NOT STARTED` | Requires G20 terminal result; real-browser WP21 evidence |
 | G22 | `GATED / NOT STARTED` | Requires G19 for pre-audit and G20/G21 for finalization |
 | G23 | `GATED / NOT STARTED` | Requires G19–G22 terminal evidence; Human decides final acceptance |

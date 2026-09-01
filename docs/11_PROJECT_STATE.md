@@ -1,5 +1,33 @@
 # Project State
 
+## Current Operational State — 2026-09-02 (G20 Web reproducibility)
+
+This is the authoritative current-state block for G20. Retained material below
+is historical reference and must not override this block.
+
+- **G20 result:** `PASS` after current dependency restore, Web Vitest, production
+  build, second clean-clone reproducibility, baseline, governance, and
+  scope/protected-path gates.
+- **Output branch:** `feature/g20-web-reproducible-dependency-test-build-gate`
+- **Predecessor:** exact G19 HEAD `1799994514fc5dc46aef752ab61a3d96583ea3ad`
+- **Output SHA:** exact final checkpoint is published in the G20 handoff/result;
+  it is not duplicated inside this self-referential commit.
+- **Approved backup:** existing `origin` remote at
+  `D:\GitBackup\PolyNexus_Backup.git`; requested `backup` alias/path
+  `D:\GitBackup\PolyNexus\_Backup.git` was absent and was not reconfigured.
+- **Web evidence:** `apps/web` npm ci, Vitest `80/80`, and production build
+  passed with exit `0` in the canonical lane and a second clean clone.
+- **Lock/tool evidence:** npm lockfileVersion `3`, lockfile SHA-256
+  `56E94B5AD96E3B66C6AFBEB6A09F9DA58CDFF3D582199DE080C6D8B7117BDF5F`, Node
+  `v22.22.3`, npm `10.9.8`.
+- **Validators:** baseline and governance passed with exit `0`; exact
+  scope/protected-path allowlist passed with exit `0`.
+- **Program state:** G20 is complete; G21 remains gated and is not started.
+- **Evidence boundary:** browser/WP21/vendor acceptance remains
+  `DEFERRED / UNVERIFIED`; no final Human acceptance is claimed.
+- **Formal project progress:** remains `30/100`; G20 dependency/test/build
+  evidence does not itself award product points or final Human acceptance.
+
 ## Current Operational State — 2026-09-01 (G19 canonical workspace)
 
 This is the authoritative current-state block for G19. Retained material below
