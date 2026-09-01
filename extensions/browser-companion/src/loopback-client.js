@@ -40,6 +40,7 @@ export function validateLoopbackBaseUrl(value) {
     parsed.password ||
     parsed.search ||
     parsed.hash
+    || value.includes('..')
     || parsed.pathname.includes('..')
     || parsed.pathname.includes('\\')
     || parsed.pathname.includes('//')

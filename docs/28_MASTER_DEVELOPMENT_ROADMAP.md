@@ -50,6 +50,17 @@ The project uses a 100-point checkpoint-weighted progress model. Only `ACCEPTED`
 
 ### Current baseline snapshot — 2026-08-25
 
+### G21 current checkpoint snapshot — 2026-09-02
+
+- G21 WP-21 has a bounded `PASS` from a fresh Chrome/CDP synthetic-host
+  fixture: 3/3 golden journeys and 22/22 failure paths passed, with screenshots,
+  CDP trace, and cleanup evidence. A narrow loopback URL traversal validation
+  fix and regression test were included.
+- Live vendor login/DOM/send compatibility remains `DEFERRED / UNVERIFIED`; no
+  vendor certification, automatic send, or final Human acceptance is claimed.
+- Formal project progress remains **30/100**. The G21 checkpoint does not add
+  product points or change frozen ADRs, Core contracts, or Product Scope.
+
 - `CP-00` Baseline/Governance: **8/8 points accepted**.
 - `CP-02` First Vertical Slice: **22/22 points accepted** for WP-01–WP-10.
 - WP-08A is `ACCEPTED` after current deterministic evidence, Codex review PASS, and Human approval; it earns **2/2 points**.
@@ -147,7 +158,7 @@ WP-01–WP-07, WP-08A, WP-08B, WP-09B, WP-09C, WP-09D, and WP-10 are accepted. C
 | WP-18 | Classification, routing, LOCAL_ONLY, egress decision and audit evidence | Codex/OpenCode / Codex | 2 days | 2026-09-26 | No downgrade or silent cloud fallback |
 | WP-19 | WebSurface contract and thin MV3 companion boundary | OpenCode / Codex | 2 days | 2026-09-29 | Manual/clipboard fallback, authenticated loopback, driver isolation |
 | WP-20 | ChatGPT/Claude/Gemini Level 3A assisted flow and fallback | Antigravity/OpenCode / Codex | 3 days | 2026-10-02 | Launch/fill/user-confirmed send/capture/normalize evidence |
-| WP-21 | Browser E2E rerun after development completion | Antigravity / Codex | 2 days | 2026-10-04 | Real browser DOM journey, failure paths, screenshot/video artifacts |
+| WP-21 | Browser E2E rerun after development completion | Antigravity / Codex | 2 days | 2026-10-04 | Bounded PASS: Chrome/CDP synthetic-host DOM journey, 22 failure paths, screenshots/trace; live vendor compatibility remains unverified |
 
 ### CP-05 — Product completion and feature freeze
 

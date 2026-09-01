@@ -27,13 +27,17 @@
         <p class="muted">狀態快照：2026-09-02（Asia/Taipei）。Repository、exact SHA 與本輪 deterministic evidence 才是正式依據。</p>
         <div class="meta">
           <div class="metric"><span class="muted">正式進度</span><strong>30 / 100</strong></div>
-          <div class="metric"><span class="muted">G20 output branch</span><strong class="ready">REPRODUCIBLE · PASS</strong></div>
-          <div class="metric"><span class="muted">後續 Goal</span><strong class="gated">G21–G23 GATED</strong></div>
+          <div class="metric"><span class="muted">G21 output branch</span><strong class="ready">BOUNDED BROWSER · PASS</strong></div>
+          <div class="metric"><span class="muted">後續 Goal</span><strong class="gated">G22 CHECKPOINT-GATED</strong></div>
           <div class="metric"><span class="muted">最終驗收者</span><strong>Human · G23</strong></div>
         </div>
       </header>
 
       <section>
+        <h2>G21 bounded real-browser WP21 checkpoint</h2>
+        <div class="callout"><strong>RESULT: PASS · BOUNDED</strong><br />Output branch: <code>feature/g21-wp21-real-browser-journey-failure-path</code><br />Predecessor SHA: <code>48062f1cae608785a39539e1a7bfca5d6726a92e</code><br />Browser evidence: <strong>Chrome/CDP · 3/3 golden journeys · 22/22 failure paths · screenshots · CDP trace</strong><br />Vendor certification: <strong>NOT CLAIMED</strong> · live vendor login/DOM/send remains <strong>DEFERRED / UNVERIFIED</strong><br />NEXT_GOAL_READY: <strong>G22 after independent review and exact remote checkpoint verification</strong></div>
+        <p class="muted" style="margin-top:16px;">The fixture used vendor-shaped local pages mapped to the vendor hostnames. No live vendor traffic, credentials, cookies, tokens, external send, or retained browser profile was used.</p>
+
         <h2>G20 reproducible Web checkpoint</h2>
         <div class="callout"><strong>RESULT: PASS</strong><br />Output branch: <code>feature/g20-web-reproducible-dependency-test-build-gate</code><br />Predecessor SHA: <code>1799994514fc5dc46aef752ab61a3d96583ea3ad</code><br />Remote ref: <code>origin/feature/g20-web-reproducible-dependency-test-build-gate</code><br />Web evidence: <strong>npm ci · Vitest 80/80 · production build</strong> passed in canonical lane and second clean clone<br />NEXT_GOAL_READY: <strong>G21</strong> · G21 remains gated and is not started here</div>
         <p class="muted" style="margin-top:16px;">Exact final output SHA is published in the G20 handoff/result and not duplicated inside this self-referential checkpoint. The requested <code>backup</code> alias/path was absent; the existing local backup remote was preserved without reconfiguration.</p>
@@ -51,7 +55,7 @@
         <div class="goal-flow">
           <article class="goal"><span class="badge ready">PASS · COMPLETE</span><h3>G19 · Canonical workspace</h3><p>Exact promoted base, provenance reconciliation, validators, checkpoint.</p></article>
           <article class="goal"><span class="badge ready">PASS · COMPLETE</span><h3>G20 · Reproducible Web</h3><p>Restore dependencies, run Vitest, build, and reproduce in a clean clone.</p></article>
-          <article class="goal"><span class="badge gated">GATED · NOT STARTED</span><h3>G21 · WP21 browser</h3><p>Real-browser golden flow and failure-path evidence.</p></article>
+          <article class="goal"><span class="badge ready">PASS · BOUNDED</span><h3>G21 · WP21 browser</h3><p>Chrome/CDP synthetic-host golden flow, failure paths, screenshots, trace, and bounded loopback validation fix.</p></article>
           <article class="goal"><span class="badge gated">GATED · NOT STARTED</span><h3>G22 · RC closeout</h3><p>Hardening, delivery package, and cross-machine proof.</p></article>
           <article class="goal"><span class="badge gated">GATED · NOT STARTED</span><h3>G23 · Human decision</h3><p>Final reconciliation and Human ACCEPT / REJECT / NEED_ACTION.</p></article>
         </div>
@@ -62,12 +66,12 @@
         <ul>
           <li>Primary dirty lane is unchanged; no reset, clean, merge, rebase, overwrite, bulk stage, or blind absorption occurred.</li>
           <li><code>docs/31_COMPATIBILITY_MATRIX.md</code> remains the promoted file; primary <code>docs/31_PROJECT_CONTENT_MAP.md</code> was excluded without overwrite.</li>
-          <li>Web, browser, WP21, vendor, and external acceptance were not run in G19. WP21 remains <strong class="warning">DEFERRED / UNVERIFIED</strong>.</li>
+          <li>G21 verifies only a controlled synthetic-host browser fixture. Live vendor login, DOM compatibility, and external send remain <strong class="warning">DEFERRED / UNVERIFIED</strong>.</li>
           <li>ADR-001–010 remain frozen; ADR-011 is unchanged; formal project progress remains 30/100.</li>
         </ul>
       </section>
 
-      <footer>G19 only. Do not start G20 from any SHA other than the exact output published by the G19 handoff.</footer>
+      <footer>G21 bounded checkpoint. Do not claim vendor certification or start G22 until the exact G21 output is independently reviewed and published.</footer>
     </main>
   </body>
 </html>

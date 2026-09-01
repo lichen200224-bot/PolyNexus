@@ -1,5 +1,36 @@
 # Project State
 
+## Current Operational State — 2026-09-02 (G21 real-browser WP21)
+
+This is the authoritative current-state block for G21. Retained material below
+is historical reference and must not override this block.
+
+- **G21 result:** `PASS` for the bounded real-browser synthetic-vendor fixture;
+  no live vendor certification or final Human acceptance is claimed.
+- **Output branch:** `feature/g21-wp21-real-browser-journey-failure-path`
+- **Predecessor:** exact G20 SHA
+  `48062f1cae608785a39539e1a7bfca5d6726a92e`
+- **Output SHA:** exact final checkpoint is published in the G21 handoff/result;
+  it is not duplicated inside this self-referential commit.
+- **Approved backup:** existing `origin` remote at
+  `D:\GitBackup\PolyNexus_Backup.git`; requested `backup` alias/path
+  `D:\GitBackup\PolyNexus\_Backup.git` was absent and was not reconfigured.
+- **Browser evidence:** fresh Chrome `152.0.7977.65` with MV3 companion
+  `0.1.0`; three vendor-shaped golden journeys passed, 22/22 negative/failure
+  paths passed, screenshots and CDP trace were retained, and all browser page
+  targets were closed during cleanup.
+- **Bounded fix:** loopback base URL validation now rejects traversal-shaped
+  input after URL normalization; the regression test passed.
+- **Web/regression evidence:** browser driver tests `9/9`, Web Vitest `80/80`,
+  production build, baseline, and governance validation passed with exit `0`.
+- **Program state:** G21 is complete for its bounded fixture scope; G22 is
+  unlockable only after this checkpoint is independently reviewed and pushed.
+- **Evidence boundary:** live ChatGPT/Claude/Gemini login, vendor DOM
+  compatibility, credentials, and external send remain `DEFERRED / UNVERIFIED`;
+  `VENDOR_CERTIFICATION` is `NOT_CLAIMED` and automatic send remains prohibited.
+- **Formal project progress:** remains `30/100`; this bounded browser evidence
+  does not itself award product points or final Human acceptance.
+
 ## Current Operational State — 2026-09-02 (G20 Web reproducibility)
 
 This is the authoritative current-state block for G20. Retained material below

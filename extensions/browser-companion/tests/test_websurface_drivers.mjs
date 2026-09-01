@@ -149,6 +149,7 @@ test('loopback client is local-only, session-memory, bounded, and no redirect', 
     'http://localhost:4312',
     'http://127.0.0.1:4312/?token=bad',
     'http://user:pass@127.0.0.1:4312',
+    'http://127.0.0.1:4312/../escape',
   ]) {
     assert.throws(() => validateLoopbackBaseUrl(value), LoopbackClientError)
   }

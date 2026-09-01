@@ -1,5 +1,79 @@
 # Current Handoff
 
+## Current Task — G21 real-browser WP21 journey and failure paths (2026-09-02)
+
+**Result:** `PASS` — bounded synthetic-vendor real-browser fixture only
+
+- `TASK_ID`: `G21-WP21-REAL-BROWSER-JOURNEY-AND-FAILURE-PATH`
+- `ATTEMPT`: 1
+- `MODE`: `BROWSER_E2E_VERIFY_AND_BOUNDED_FIX`
+- `WRITER`: Codex (sole active writer for the bounded source, docs, and evidence)
+- `REVIEWER`: Codex independent read-only acceptance review required because a
+  source fix was made; review result must be recorded before final checkpoint
+- `ANTIGRAVITY_STATUS`: `REQUIRED / COMPLETED` — real Chrome/CDP browser lane
+  completed on the Codex host; no separate Antigravity runtime was available
+- `BRANCH`: `feature/g21-wp21-real-browser-journey-failure-path`
+- `PREDECESSOR_SHA`: `48062f1cae608785a39539e1a7bfca5d6726a92e`
+- `OUTPUT_SHA`: exact final checkpoint is published in the G21 completion result;
+  it is not duplicated inside this self-referential commit
+- `REMOTE_REF`: `origin/feature/g21-wp21-real-browser-journey-failure-path` on
+  `D:\GitBackup\PolyNexus_Backup.git` after explicit non-force push
+- `WORKTREE_STATE`: must be clean and staged state empty after checkpoint
+- `NEXT_GOAL_READY`: `G22` only after independent review, commit, push, and
+  exact remote SHA verification
+- `TASK_DOC`: `docs/tasks/G21-WP21-REAL-BROWSER-JOURNEY-AND-FAILURE-PATH.md`
+- `HANDOFF_DOC`: `docs/12_HANDOFF_CURRENT.md`
+- `NEXT_OWNER`: Codex for independent review and checkpoint closure; later G22
+  owner only after exact G21 remote SHA verification
+
+### G21 deterministic evidence
+
+- Fresh Chrome `152.0.7977.65`, MV3 companion `0.1.0`, synthetic HTTPS fixture
+  mapped to the ChatGPT/Claude/Gemini hostnames; no live vendor traffic, login,
+  credentials, cookies, tokens, or external send.
+- Golden journeys: `3/3` passed with exit `0`; each covered health, fill,
+  confirmation boundary, confirmed fixture send, capture, and normalization.
+- Failure paths: `22/22` passed with exit `0`, including malformed messages,
+  unknown actions, unsupported hosts, invalid tab IDs, missing confirmation,
+  loopback URL rejection, bounded request failures, and cleanup.
+- Evidence bundle: `artifacts/verification/g21-browser-20260902/` contains
+  environment, journey/failure matrices, CDP trace, screenshots, summary,
+  harness source, and command/exit-code record. Result JSON and CDP trace scans
+  found no raw-response or sensitive markers; temporary profiles/certificates
+  were removed.
+- `node --test extensions/browser-companion/tests/test_websurface_drivers.mjs`:
+  `9/9` passed, exit `0`; Web `npm test`: `80/80` passed, exit `0`; Web
+  production build: exit `0`; baseline and governance validators: exit `0`.
+- Two `npm ci` attempts were environment failures (exit `1`: shared-cache
+  permissions and registry/installer access). Web tests/build passed using the
+  dependency tree restored from the exact G20 clean clone; this limitation is
+  disclosed and is not represented as a fresh G21 install PASS.
+
+### G21 bounded change and boundaries
+
+- Source change: loopback base URL validation rejects traversal-shaped input
+  after URL normalization; the existing browser-driver test covers the case.
+- No Core, Domain, workflow, persistence, migration, Runtime Contract, Product
+  Scope, frozen ADR, or vendor-certification claim changed.
+- ADR impact: `NONE`; ADR-001–010 remain frozen and ADR-011 is unchanged.
+- Scope deviation: `NONE`; browser evidence is explicitly synthetic and bounded.
+- Live vendor profiles, authenticated DOM compatibility, and real external send:
+  `DEFERRED / UNVERIFIED`; automatic send was not used and remains prohibited.
+- Protected primary checkout `D:\AI學習教材\PolyNexus` remained untouched.
+
+### G21 next exact step
+
+Run the independent read-only review, verify the exact allowlist and clean
+checkpoint, commit, push with the explicit non-force refspec, and verify the
+remote SHA. Do not claim live vendor certification or final Human acceptance.
+
+### G21 Do Not Change
+
+Do not modify the protected primary lane; do not reconfigure remotes, force-push,
+reset, clean, merge, rebase, bulk-stage, add automatic send, claim live vendor
+compatibility, or alter Core contracts, workflow semantics, Product Scope, or
+frozen ADR text.
+
 ## Current Task — G20 reproducible Web dependency/test/build gate (2026-09-02)
 
 **Result:** `PASS`

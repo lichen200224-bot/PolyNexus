@@ -1,0 +1,385 @@
+[
+  {
+    "name": "chatgpt.com missing",
+    "setup": "controlled local HTTPS fixture and isolated Chrome profile",
+    "expected": "manual fallback with no DOM exception",
+    "actual": {
+      "health": {
+        "status": "DEGRADED",
+        "fallback": "MANUAL_CLIPBOARD",
+        "reason": "driver_unavailable"
+      },
+      "fill": {
+        "status": "DEGRADED",
+        "fallback": "MANUAL_CLIPBOARD",
+        "reason": "driver_unavailable"
+      }
+    },
+    "result": "PASS",
+    "exit_code": 0,
+    "cleanup": "closed fixture tab",
+    "artifact": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\01\\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\\g21-isolated\\artifacts\\verification\\g21-browser-20260902/chatgpt-com-golden.png",
+    "maturity_impact": "bounded fixture evidence only; no vendor certification"
+  },
+  {
+    "name": "chatgpt.com drift",
+    "setup": "controlled local HTTPS fixture and isolated Chrome profile",
+    "expected": "manual fallback with no DOM exception",
+    "actual": {
+      "health": {
+        "status": "DEGRADED",
+        "fallback": "MANUAL_CLIPBOARD",
+        "reason": "driver_unavailable"
+      },
+      "fill": {
+        "status": "DEGRADED",
+        "fallback": "MANUAL_CLIPBOARD",
+        "reason": "driver_unavailable"
+      }
+    },
+    "result": "PASS",
+    "exit_code": 0,
+    "cleanup": "closed fixture tab",
+    "artifact": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\01\\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\\g21-isolated\\artifacts\\verification\\g21-browser-20260902/chatgpt-com-golden.png",
+    "maturity_impact": "bounded fixture evidence only; no vendor certification"
+  },
+  {
+    "name": "claude.ai missing",
+    "setup": "controlled local HTTPS fixture and isolated Chrome profile",
+    "expected": "manual fallback with no DOM exception",
+    "actual": {
+      "health": {
+        "status": "DEGRADED",
+        "fallback": "MANUAL_CLIPBOARD",
+        "reason": "driver_unavailable"
+      },
+      "fill": {
+        "status": "DEGRADED",
+        "fallback": "MANUAL_CLIPBOARD",
+        "reason": "driver_unavailable"
+      }
+    },
+    "result": "PASS",
+    "exit_code": 0,
+    "cleanup": "closed fixture tab",
+    "artifact": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\01\\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\\g21-isolated\\artifacts\\verification\\g21-browser-20260902/chatgpt-com-golden.png",
+    "maturity_impact": "bounded fixture evidence only; no vendor certification"
+  },
+  {
+    "name": "claude.ai drift",
+    "setup": "controlled local HTTPS fixture and isolated Chrome profile",
+    "expected": "manual fallback with no DOM exception",
+    "actual": {
+      "health": {
+        "status": "DEGRADED",
+        "fallback": "MANUAL_CLIPBOARD",
+        "reason": "driver_unavailable"
+      },
+      "fill": {
+        "status": "DEGRADED",
+        "fallback": "MANUAL_CLIPBOARD",
+        "reason": "driver_unavailable"
+      }
+    },
+    "result": "PASS",
+    "exit_code": 0,
+    "cleanup": "closed fixture tab",
+    "artifact": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\01\\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\\g21-isolated\\artifacts\\verification\\g21-browser-20260902/chatgpt-com-golden.png",
+    "maturity_impact": "bounded fixture evidence only; no vendor certification"
+  },
+  {
+    "name": "gemini.google.com missing",
+    "setup": "controlled local HTTPS fixture and isolated Chrome profile",
+    "expected": "manual fallback with no DOM exception",
+    "actual": {
+      "health": {
+        "status": "DEGRADED",
+        "fallback": "MANUAL_CLIPBOARD",
+        "reason": "driver_unavailable"
+      },
+      "fill": {
+        "status": "DEGRADED",
+        "fallback": "MANUAL_CLIPBOARD",
+        "reason": "driver_unavailable"
+      }
+    },
+    "result": "PASS",
+    "exit_code": 0,
+    "cleanup": "closed fixture tab",
+    "artifact": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\01\\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\\g21-isolated\\artifacts\\verification\\g21-browser-20260902/chatgpt-com-golden.png",
+    "maturity_impact": "bounded fixture evidence only; no vendor certification"
+  },
+  {
+    "name": "gemini.google.com drift",
+    "setup": "controlled local HTTPS fixture and isolated Chrome profile",
+    "expected": "manual fallback with no DOM exception",
+    "actual": {
+      "health": {
+        "status": "DEGRADED",
+        "fallback": "MANUAL_CLIPBOARD",
+        "reason": "driver_unavailable"
+      },
+      "fill": {
+        "status": "DEGRADED",
+        "fallback": "MANUAL_CLIPBOARD",
+        "reason": "driver_unavailable"
+      }
+    },
+    "result": "PASS",
+    "exit_code": 0,
+    "cleanup": "closed fixture tab",
+    "artifact": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\01\\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\\g21-isolated\\artifacts\\verification\\g21-browser-20260902/chatgpt-com-golden.png",
+    "maturity_impact": "bounded fixture evidence only; no vendor certification"
+  },
+  {
+    "name": "unsupported page / unknown vendor",
+    "setup": "controlled local HTTPS fixture and isolated Chrome profile",
+    "expected": "manual fallback and no driver selected",
+    "actual": {
+      "url": "https://unknown.example.invalid/fixture",
+      "selected_driver": null,
+      "fallback": {
+        "status": "DEGRADED",
+        "fallback": "MANUAL_CLIPBOARD",
+        "reason": "driver_unavailable"
+      }
+    },
+    "result": "PASS",
+    "exit_code": 0,
+    "cleanup": "closed fixture tab",
+    "artifact": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\01\\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\\g21-isolated\\artifacts\\verification\\g21-browser-20260902/chatgpt-com-golden.png",
+    "maturity_impact": "bounded fixture evidence only; no vendor certification"
+  },
+  {
+    "name": "browser tab closed",
+    "setup": "controlled local HTTPS fixture and isolated Chrome profile",
+    "expected": "driver failure is normalized to manual fallback",
+    "actual": {
+      "status": "DEGRADED",
+      "fallback": "MANUAL_CLIPBOARD",
+      "reason": "driver_unavailable"
+    },
+    "result": "PASS",
+    "exit_code": 0,
+    "cleanup": "target closed and no retry performed",
+    "artifact": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\01\\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\\g21-isolated\\artifacts\\verification\\g21-browser-20260902/chatgpt-com-golden.png",
+    "maturity_impact": "bounded fixture evidence only; no vendor certification"
+  },
+  {
+    "name": "driver exception / driver crash isolation",
+    "setup": "controlled local HTTPS fixture and isolated Chrome profile",
+    "expected": "driver returns safe fallback; Core-facing process remains alive",
+    "actual": {
+      "status": "DEGRADED",
+      "fallback": "MANUAL_CLIPBOARD",
+      "reason": "driver_unavailable"
+    },
+    "result": "PASS",
+    "exit_code": 0,
+    "cleanup": "closed fixture tab",
+    "artifact": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\01\\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\\g21-isolated\\artifacts\\verification\\g21-browser-20260902/chatgpt-com-golden.png",
+    "maturity_impact": "bounded fixture evidence only; no vendor certification"
+  },
+  {
+    "name": "capture failure",
+    "setup": "controlled local HTTPS fixture and isolated Chrome profile",
+    "expected": "empty capture becomes manual fallback",
+    "actual": {
+      "status": "DEGRADED",
+      "fallback": "MANUAL_CLIPBOARD",
+      "reason": "web_surface_response_invalid"
+    },
+    "result": "PASS",
+    "exit_code": 0,
+    "cleanup": "closed fixture tab",
+    "artifact": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\01\\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\\g21-isolated\\artifacts\\verification\\g21-browser-20260902/chatgpt-com-golden.png",
+    "maturity_impact": "bounded fixture evidence only; no vendor certification"
+  },
+  {
+    "name": "normalize failure",
+    "setup": "controlled local HTTPS fixture and isolated Chrome profile",
+    "expected": "empty normalized response becomes manual fallback",
+    "actual": {
+      "status": "DEGRADED",
+      "fallback": "MANUAL_CLIPBOARD",
+      "reason": "web_surface_response_invalid"
+    },
+    "result": "PASS",
+    "exit_code": 0,
+    "cleanup": "closed fixture tab",
+    "artifact": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\01\\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\\g21-isolated\\artifacts\\verification\\g21-browser-20260902/chatgpt-com-golden.png",
+    "maturity_impact": "bounded fixture evidence only; no vendor certification"
+  },
+  {
+    "name": "loopback unavailable / timeout signal",
+    "setup": "controlled local HTTPS fixture and isolated Chrome profile",
+    "expected": "bounded safe error without raw network detail",
+    "actual": {
+      "name": "LoopbackClientError",
+      "code": "loopback_request_failed"
+    },
+    "result": "PASS",
+    "exit_code": 0,
+    "cleanup": "no request process or tab retained",
+    "artifact": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\01\\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\\g21-isolated\\artifacts\\verification\\g21-browser-20260902/chatgpt-com-golden.png",
+    "maturity_impact": "bounded fixture evidence only; no vendor certification"
+  },
+  {
+    "name": "loopback timeout",
+    "setup": "controlled local HTTPS fixture and isolated Chrome profile",
+    "expected": "timeout-like transport failure returns bounded safe error",
+    "actual": {
+      "name": "LoopbackClientError",
+      "code": "loopback_request_failed"
+    },
+    "result": "PASS",
+    "exit_code": 0,
+    "cleanup": "no request process or tab retained",
+    "artifact": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\01\\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\\g21-isolated\\artifacts\\verification\\g21-browser-20260902/chatgpt-com-golden.png",
+    "maturity_impact": "bounded fixture evidence only; no vendor certification"
+  },
+  {
+    "name": "malformed local request",
+    "setup": "controlled local HTTPS fixture and isolated Chrome profile",
+    "expected": "path traversal and malformed local endpoint fail closed",
+    "actual": {
+      "rejected_count": 5,
+      "accepted_count": 0,
+      "codes": [
+        "loopback_endpoint_rejected",
+        "loopback_endpoint_rejected",
+        "loopback_endpoint_rejected",
+        "loopback_endpoint_rejected",
+        "loopback_endpoint_rejected"
+      ]
+    },
+    "result": "PASS",
+    "exit_code": 0,
+    "cleanup": "closed fixture tab",
+    "artifact": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\01\\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\\g21-isolated\\artifacts\\verification\\g21-browser-20260902/chatgpt-com-golden.png",
+    "maturity_impact": "bounded fixture evidence only; no vendor certification"
+  },
+  {
+    "name": "restricted LOCAL_ONLY egress",
+    "setup": "controlled local HTTPS fixture and isolated Chrome profile",
+    "expected": "non-loopback endpoint is rejected before request",
+    "actual": {
+      "rejected_count": 5,
+      "accepted_count": 0
+    },
+    "result": "PASS",
+    "exit_code": 0,
+    "cleanup": "closed fixture tab",
+    "artifact": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\01\\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\\g21-isolated\\artifacts\\verification\\g21-browser-20260902/chatgpt-com-golden.png",
+    "maturity_impact": "bounded fixture evidence only; no vendor certification"
+  },
+  {
+    "name": "credentialed or external endpoint",
+    "setup": "controlled local HTTPS fixture and isolated Chrome profile",
+    "expected": "credentialed/external endpoint is rejected before request",
+    "actual": {
+      "rejected_count": 5,
+      "accepted_count": 0
+    },
+    "result": "PASS",
+    "exit_code": 0,
+    "cleanup": "closed fixture tab",
+    "artifact": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\01\\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\\g21-isolated\\artifacts\\verification\\g21-browser-20260902/chatgpt-com-golden.png",
+    "maturity_impact": "bounded fixture evidence only; no vendor certification"
+  },
+  {
+    "name": "secret/cookie/token/path redaction",
+    "setup": "controlled local HTTPS fixture and isolated Chrome profile",
+    "expected": "normalized evidence excludes raw marker and path",
+    "actual": {
+      "text": "[REDACTED] [REDACTED] [PATH_REDACTED]",
+      "contains_raw_marker": false,
+      "contains_fixture_path": false
+    },
+    "result": "PASS",
+    "exit_code": 0,
+    "cleanup": "closed fixture tab",
+    "artifact": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\01\\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\\g21-isolated\\artifacts\\verification\\g21-browser-20260902/chatgpt-com-golden.png",
+    "maturity_impact": "bounded fixture evidence only; no vendor certification"
+  },
+  {
+    "name": "cancel / abort boundary",
+    "setup": "controlled local HTTPS fixture and isolated Chrome profile",
+    "expected": "unconfirmed action is aborted without send",
+    "actual": {
+      "action": "SEND_CONFIRMED",
+      "confirmed": false,
+      "result": {
+        "status": "DEGRADED",
+        "fallback": "MANUAL_CLIPBOARD",
+        "reason": "user_confirmation_required"
+      },
+      "sent": false
+    },
+    "result": "PASS",
+    "exit_code": 0,
+    "cleanup": "manual boundary retained; no external work started",
+    "artifact": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\01\\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\\g21-isolated\\artifacts\\verification\\g21-browser-20260902/chatgpt-com-golden.png",
+    "maturity_impact": "bounded fixture evidence only; no vendor certification"
+  },
+  {
+    "name": "Core unavailable / no silent cloud fallback",
+    "setup": "controlled local HTTPS fixture and isolated Chrome profile",
+    "expected": "loopback failure and unknown vendor stay local/manual; no cloud retry",
+    "actual": {
+      "core": "unavailable fixture",
+      "fallback": "MANUAL_CLIPBOARD",
+      "external_send": false
+    },
+    "result": "PASS",
+    "exit_code": 0,
+    "cleanup": "closed fixture tab",
+    "artifact": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\01\\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\\g21-isolated\\artifacts\\verification\\g21-browser-20260902/chatgpt-com-golden.png",
+    "maturity_impact": "bounded fixture evidence only; no vendor certification"
+  },
+  {
+    "name": "no silent cloud fallback",
+    "setup": "controlled local HTTPS fixture and isolated Chrome profile",
+    "expected": "unknown vendor and unavailable loopback do not retry externally",
+    "actual": {
+      "unknown_vendor_fallback": "MANUAL_CLIPBOARD",
+      "loopback_fallback": "loopback_request_failed",
+      "external_requests": 0
+    },
+    "result": "PASS",
+    "exit_code": 0,
+    "cleanup": "closed fixture tab",
+    "artifact": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\01\\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\\g21-isolated\\artifacts\\verification\\g21-browser-20260902/chatgpt-com-golden.png",
+    "maturity_impact": "bounded fixture evidence only; no vendor certification"
+  },
+  {
+    "name": "partial result / retry truthfulness",
+    "setup": "controlled local HTTPS fixture and isolated Chrome profile",
+    "expected": "degraded fallback remains explicit and does not fabricate result",
+    "actual": {
+      "status": "DEGRADED",
+      "fallback": "MANUAL_CLIPBOARD",
+      "reason": "manual_clipboard_required"
+    },
+    "result": "PASS",
+    "exit_code": 0,
+    "cleanup": "closed fixture tab",
+    "artifact": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\01\\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\\g21-isolated\\artifacts\\verification\\g21-browser-20260902/chatgpt-com-golden.png",
+    "maturity_impact": "bounded fixture evidence only; no vendor certification"
+  },
+  {
+    "name": "MV3 extension lifecycle",
+    "setup": "controlled local HTTPS fixture and isolated Chrome profile",
+    "expected": "unpacked extension loads with service worker target and expected manifest",
+    "actual": {
+      "worker_target": true,
+      "manifest_version": 3,
+      "extension_version": "0.1.0"
+    },
+    "result": "PASS",
+    "exit_code": 0,
+    "cleanup": "worker target observed; Chrome process cleanup handled by parent command",
+    "artifact": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\01\\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\\g21-isolated\\artifacts\\verification\\g21-browser-20260902/chatgpt-com-golden.png",
+    "maturity_impact": "bounded fixture evidence only; no vendor certification"
+  }
+]

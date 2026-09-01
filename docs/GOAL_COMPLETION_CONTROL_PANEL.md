@@ -2,6 +2,25 @@
 
 Browser-readable companion: [GOAL_COMPLETION_CONTROL_PANEL.html](GOAL_COMPLETION_CONTROL_PANEL.html).
 
+## G21 bounded real-browser WP21 checkpoint — 2026-09-02
+
+`RESULT: PASS` — controlled synthetic-vendor fixture only
+
+- `OUTPUT_BRANCH`: `feature/g21-wp21-real-browser-journey-failure-path`
+- `PREDECESSOR_SHA`: `48062f1cae608785a39539e1a7bfca5d6726a92e`
+- `OUTPUT_SHA`: exact final checkpoint is published in the G21 handoff/result and is not duplicated inside this self-referential commit
+- `REMOTE_REF`: `origin/feature/g21-wp21-real-browser-journey-failure-path` on `D:\GitBackup\PolyNexus_Backup.git`
+- `BROWSER_EVIDENCE`: fresh Chrome/CDP, 3/3 golden journeys, 22/22 failure paths, screenshots, CDP trace, cleanup verified
+- `BOUNDED_FIX`: loopback URL traversal-shaped input rejected after normalization; regression test passed
+- `VALIDATORS`: browser-driver tests 9/9, Web Vitest 80/80, production build, baseline, and governance passed with exit `0`
+- `VENDOR_CERTIFICATION`: `NOT_CLAIMED`; live vendor login/DOM/send remains `DEFERRED / UNVERIFIED`
+- `FORMAL_PROJECT_PROGRESS`: `30/100`; no final Human acceptance claimed
+- `NEXT_GOAL_READY`: `G22` only after independent review and exact remote checkpoint verification
+
+The requested `backup` alias/path was absent; the existing configured local backup
+remote was preserved without reconfiguration. No live vendor traffic, credentials,
+cookies, tokens, external send, or retained browser profile was used.
+
 ## G20 reproducible Web checkpoint — 2026-09-02
 
 `RESULT: PASS`
@@ -45,8 +64,8 @@ rebased, overwritten, staged, or otherwise mutated.
 |---|---|---|
 | G19 | `PASS / COMPLETE` | This canonical branch and exact checkpoint; G20 may verify and continue |
 | G20 | `PASS / COMPLETE` | Canonical and second clean clone restore, Vitest, build, validators, and checkpoint |
-| G21 | `GATED / NOT STARTED` | Requires G20 terminal result; real-browser WP21 evidence |
-| G22 | `GATED / NOT STARTED` | Requires G19 for pre-audit and G20/G21 for finalization |
+| G21 | `PASS / COMPLETE (bounded)` | Synthetic-host Chrome/CDP WP21 journey, 22 failure paths, screenshots, trace, and bounded URL-validation fix |
+| G22 | `READY AFTER G21 CHECKPOINT` | Requires exact G21 remote SHA and independent review; finalization remains gated |
 | G23 | `GATED / NOT STARTED` | Requires G19–G22 terminal evidence; Human decides final acceptance |
 
 ## G19 imported-file provenance

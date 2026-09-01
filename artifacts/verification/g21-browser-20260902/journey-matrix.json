@@ -1,0 +1,131 @@
+[
+  {
+    "route": "https://chatgpt.com:61672/golden",
+    "fixture": "controlled synthetic golden",
+    "driver": "chatgpt-web",
+    "health": {
+      "status": "READY",
+      "driver_id": "chatgpt-web"
+    },
+    "filled": {
+      "status": "READY",
+      "action": "FILLED",
+      "requires_user_confirmation": true
+    },
+    "before_fill_state": {
+      "sent": 0,
+      "text_length": 38
+    },
+    "confirmation": {
+      "status": "READY",
+      "action": "READY_TO_SEND",
+      "automatic_send": false,
+      "requires_user_confirmation": true
+    },
+    "rejected_confirmation": {
+      "status": "DEGRADED",
+      "reason": "user_confirmation_required"
+    },
+    "sent_before_confirm": 0,
+    "sent_after_confirm": 1,
+    "sent": {
+      "status": "READY",
+      "user_confirmed": true
+    },
+    "captured": {
+      "kind": "AI_OPINION",
+      "status": "NORMALIZED",
+      "text": "SAFE SYNTHETIC RESPONSE [REDACTED]",
+      "contains_raw_marker": false
+    },
+    "screenshot": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\01\\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\\g21-isolated\\artifacts\\verification\\g21-browser-20260902/chatgpt-com-golden.png",
+    "result": "PASS",
+    "exit_code": 0
+  },
+  {
+    "route": "https://claude.ai:61672/golden",
+    "fixture": "controlled synthetic golden",
+    "driver": "claude-web",
+    "health": {
+      "status": "READY",
+      "driver_id": "claude-web"
+    },
+    "filled": {
+      "status": "READY",
+      "action": "FILLED",
+      "requires_user_confirmation": true
+    },
+    "before_fill_state": {
+      "sent": 0,
+      "text_length": 38
+    },
+    "confirmation": {
+      "status": "READY",
+      "action": "READY_TO_SEND",
+      "automatic_send": false,
+      "requires_user_confirmation": true
+    },
+    "rejected_confirmation": {
+      "status": "DEGRADED",
+      "reason": "user_confirmation_required"
+    },
+    "sent_before_confirm": 0,
+    "sent_after_confirm": 1,
+    "sent": {
+      "status": "READY",
+      "user_confirmed": true
+    },
+    "captured": {
+      "kind": "AI_OPINION",
+      "status": "NORMALIZED",
+      "text": "SAFE SYNTHETIC RESPONSE [REDACTED]",
+      "contains_raw_marker": false
+    },
+    "screenshot": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\01\\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\\g21-isolated\\artifacts\\verification\\g21-browser-20260902/claude-ai-golden.png",
+    "result": "PASS",
+    "exit_code": 0
+  },
+  {
+    "route": "https://gemini.google.com:61672/golden",
+    "fixture": "controlled synthetic golden",
+    "driver": "gemini-web",
+    "health": {
+      "status": "READY",
+      "driver_id": "gemini-web"
+    },
+    "filled": {
+      "status": "READY",
+      "action": "FILLED",
+      "requires_user_confirmation": true
+    },
+    "before_fill_state": {
+      "sent": 0,
+      "text_length": 38
+    },
+    "confirmation": {
+      "status": "READY",
+      "action": "READY_TO_SEND",
+      "automatic_send": false,
+      "requires_user_confirmation": true
+    },
+    "rejected_confirmation": {
+      "status": "DEGRADED",
+      "reason": "user_confirmation_required"
+    },
+    "sent_before_confirm": 0,
+    "sent_after_confirm": 1,
+    "sent": {
+      "status": "READY",
+      "user_confirmed": true
+    },
+    "captured": {
+      "kind": "AI_OPINION",
+      "status": "NORMALIZED",
+      "text": "SAFE SYNTHETIC RESPONSE [REDACTED]",
+      "contains_raw_marker": false
+    },
+    "screenshot": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\01\\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\\g21-isolated\\artifacts\\verification\\g21-browser-20260902/gemini-google-com-golden.png",
+    "result": "PASS",
+    "exit_code": 0
+  }
+]
