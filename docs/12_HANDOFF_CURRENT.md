@@ -15,6 +15,7 @@
 - `OUTPUT_SHA`: exact final commit is the branch HEAD published in the G19 result; the SHA is intentionally not duplicated inside a self-referential commit
 - `REMOTE_REF`: `backup/feature/g19-canonical-workspace-provenance`
 - `WORKTREE_STATE`: clean; staged state empty after checkpoint
+- `NEXT_GOAL_READY`: `G20`
 - `TASK_DOC`: `docs/tasks/G19-G23-FIVE-GOAL-EXECUTION-ROUTING.md`
 - `HANDOFF_DOC`: `docs/12_HANDOFF_CURRENT.md`
 - `NEXT_OWNER`: Codex, G20
