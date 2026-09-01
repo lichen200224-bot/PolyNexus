@@ -1,5 +1,28 @@
 # Project State
 
+## Current Operational State — 2026-09-01
+
+This section is the authoritative current-state summary for the CP06 release-candidate
+reconciliation. The retained material below is historical reference and must not
+override this section.
+
+- Candidate branch: `feature/first-vertical-slice`
+- Current candidate HEAD: `b42abc5abd344747378fdf076e333d6b832e1ec9`
+- Code evidence checkpoint: `8fa13882bc8aa4805bac2f3ab0c5105b2a300fc6`
+- Current status: `G13–G18 COMPLETE / CP04 WP17–WP20 COMPLETE / CP04 WP21 DEFERRED-UNVERIFIED / CP05 COMPLETE / CP06 WP28–WP32 NONBROWSER COMPLETE / CP06-RC NEED_ACTION`
+- Candidate working tree: clean before this documentation task; primary workspace is protected and not modified.
+- Current evidence date: `2026-09-01`; full Core, targeted CP06/Core, baseline, governance, and extension checks are recorded in `docs/12_HANDOFF_CURRENT.md` with actual commands and exit codes.
+- WP21 boundary: real Chrome/browser failure-path acceptance is intentionally deferred; no vendor/browser support or `SUPPORTED`/`CERTIFIED` claim is made.
+- RC boundary: CP06/RC remains `NEED_ACTION` until a separately authorized WP21 decision/evidence path and final RC review are complete.
+- Next route: reconcile current evidence and limitations, then perform independent CP06/RC review; resume WP21 only when an operator is available and a fresh browser authorization is issued.
+
+## Historical Baseline Reference
+
+The following sections retain earlier project-state snapshots for traceability only.
+Their dates, progress values, next gates, and historical test counts are not current
+acceptance evidence unless explicitly cited by the current operational section or
+the current handoff.
+
 Date: 2026-08-27
 Version: Development Baseline v1.0 + Dev Preparation Profile v1.0.2
 Milestone: First Vertical Slice — WP-08A/WP-08B/WP-09B/WP-09C/WP-09D/WP-10/WP-12/WP-13 ACCEPTED; CP-02 complete; CP-03 in progress; PRE-WP14-A HUMAN_ACCEPTED / IMPLEMENTATION_ACCEPTED at `28196c9`; PRE-WP14-B HUMAN_ACCEPTED / IMPLEMENTATION_ACCEPTED (Human decision 2026-08-26; checkpointed at `c615733`) on baseline `934a219`

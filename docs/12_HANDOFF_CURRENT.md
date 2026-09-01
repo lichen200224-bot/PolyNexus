@@ -1,32 +1,37 @@
 # Current Handoff
 
 ## Task
-`CP06-WP32-HANDOFF-CURRENT-SYNC` — synchronize the current CP06 RC handoff after extension redaction and non-browser revalidation
+`CP06-RC-CURRENT-STATE-RECONCILIATION` — synchronize current CP06 evidence, deferred WP21 status, and RC routing
 
 ## Status
-Current operational status: `WP28_COMPLETE / WP29_COMPLETE / WP30_COMPLETE / WP31_COMPLETE / WP32_NONBROWSER_REVALIDATED / WP32_RC_NEED_ACTION`.
+Current operational status: `G13–G18_COMPLETE / CP04_WP17–WP20_COMPLETE / CP04_WP21_DEFERRED_UNVERIFIED / CP05_COMPLETE / CP06_WP28–WP32_NONBROWSER_COMPLETE / CP06_RC_NEED_ACTION`.
 
-- `TASK_ID`: `CP06-WP32-HANDOFF-CURRENT-SYNC`
+- `TASK_ID`: `CP06-RC-CURRENT-STATE-RECONCILIATION`
 - Branch: `feature/first-vertical-slice`
-- Code checkpoint: `8fa13882bc8aa4805bac2f3ab0c5105b2a300fc6`
-- Writer: Codex — candidate-only handoff synchronization
-- Reviewer: Codex deterministic local verification; Human RC decision remains pending
-- Antigravity: `NOT_REQUIRED` for the non-browser Core/migration/package evidence slice; real browser journey remains `UNVERIFIED`
-- Next owner: Human/Antigravity for CP04 WP21 browser failure-path evidence, then Codex/Human for final RC review
-- Git authorization: this task permits only the exact handoff file plus exact stage/commit; push/merge/rebase/reset/clean and primary mutation remain prohibited
+- Base/code checkpoint: `b42abc5abd344747378fdf076e333d6b832e1ec9` / `8fa13882bc8aa4805bac2f3ab0c5105b2a300fc6`
+- Writer: Codex — candidate-only current-state documentation reconciliation
+- Reviewer: Codex deterministic documentation/scope verification; Human RC decision remains pending
+- Antigravity: `DEFERRED` for WP21 because the operator is unavailable; real browser journey remains `UNVERIFIED`
+- Next owner: Codex/Human for independent CP06/RC review; Human/Antigravity for WP21 only after fresh authorization
+- Git authorization: only the four exact documents below may be staged/committed; push/merge/rebase/reset/clean and primary mutation remain prohibited
 
 ## Current Goal and Delta
 
 - WP28–WP31 remain complete under the existing runtime, security, migration, packaging, and compatibility contracts.
 - CP06 WP32 extension redaction is checkpointed at `8fa13882bc8aa4805bac2f3ab0c5105b2a300fc6`; it covers POSIX absolute paths and `file://` URI redaction with deterministic regression coverage.
 - Non-browser CP06/Core revalidation is current and source-bound: full Core, targeted G15–G18/CP04–CP06 tests, baseline, and governance validation all completed with exit code `0`.
+- CP04 WP21 is explicitly deferred, not failed or accepted: no current browser evidence is available, and no browser/vendor maturity claim is made.
+- CP06/RC remains `NEED_ACTION`; the deferral does not block Core/workflow/document development but does block final browser-integrated RC closure.
 - No production dependency, public API, schema, migration, primary workspace, external/cloud egress, push, merge, rebase, reset, or clean operation was performed.
 
 ## Changed files
 
 Current task exact allowlist:
 
+- `docs/11_PROJECT_STATE.md` — current operational state and historical-reference boundary
 - `docs/12_HANDOFF_CURRENT.md` — current operational block only
+- `docs/31_COMPATIBILITY_MATRIX.md` — current maturity and WP21 boundary
+- `docs/32_KNOWN_LIMITATIONS.md` — current limitations and RC status
 
 Latest CP06 WP32 code delta already present at the code checkpoint:
 
@@ -44,21 +49,23 @@ Scope deviation: `NONE`.
 - Baseline command `python -B scripts/validate_baseline.py`: exit code `0`.
 - Governance command `powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tools\validate-polynexus-governance.ps1 -RepoRoot (Get-Location).Path`: exit code `0`; UTC `2026-09-01T11:38:18.4803438Z`–`2026-09-01T11:38:21.2800138Z`.
 - Extension Node tests: `9 passed`, `0 failed`, exit code `0`.
-- `git diff --check`: exit code `0`; candidate status is clean and ahead `18` of its remote-tracking branch.
+- Pre-edit candidate status: clean and ahead `19` of its remote-tracking branch; `git status --short --branch` exit code `0`.
+- Pre-edit candidate HEAD: `b42abc5abd344747378fdf076e333d6b832e1ec9`; `git rev-parse HEAD` exit code `0`.
+- Documentation validation at UTC `2026-09-01T12:44:23.9724288Z`: exact-file scope scan exit `0` (`4` expected, `0` unexpected, `0` missing, `0` staged); `git diff --check` exit `0`; added-line secret/path redaction scan exit `0` (`55` added lines, `0` forbidden matches); current-state marker scan exit `0` (`4/4` present).
 - Current evidence was generated on `2026-09-01`; pytest emitted a non-fatal Windows temporary cleanup warning after successful runs.
 
 ## Known issues / unverified
 
-- CP04 WP21 real browser failure-path acceptance remains `UNVERIFIED` after prior Chrome/CDP startup failures; no browser retry is authorized by this task.
+- CP04 WP21 real browser failure-path acceptance is `DEFERRED / UNVERIFIED` after prior Chrome/CDP startup failures; no browser retry is authorized by this documentation task.
 - Real vendor browser journeys are not certified; do not claim `SUPPORTED` or `CERTIFIED`.
 - The Windows symlink-policy test remains an explicit host-policy skip; true concurrent HTTP duplicate-command execution remains unverified where documented.
 - CP06/RC therefore remains `NEED_ACTION` until current WP21 evidence and the final RC decision exist.
 
 ## Next Routing
 
-`NEXT_OWNER: Human/Antigravity -> Human`
+`NEXT_OWNER: Codex/Human -> Human/Antigravity when operator is available`
 
-`NEXT_ACTION: When an operator is available, execute CP04 WP21 browser failure-path evidence for launch, detect, fill, explicit user-confirmed-send, capture, normalize, driver failure, and clipboard/manual fallback. Then run the independent final CP06/RC review. Until that evidence exists, keep CP06/RC at NEED_ACTION.`
+`NEXT_ACTION: Keep WP21 deferred. First perform the independent CP06/RC review using current non-browser evidence; later, when an operator is available and fresh authorization is issued, execute WP21 browser failure-path evidence for launch, detect, fill, explicit user-confirmed-send, capture, normalize, driver failure, and clipboard/manual fallback. Until a final decision exists, keep CP06/RC at NEED_ACTION.`
 
 ### Do Not Change
 

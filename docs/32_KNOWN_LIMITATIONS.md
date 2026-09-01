@@ -3,6 +3,17 @@
 These limitations are intentional boundaries, not hidden compatibility
 claims.
 
+## Current RC status — 2026-09-01
+
+- CP04 WP21 is intentionally `DEFERRED / UNVERIFIED` while the operator is
+  unavailable for the real browser failure-path check.
+- CP06/RC is `NEED_ACTION`; current non-browser evidence does not close the
+  browser-integrated release gate and must not be upgraded to `SUPPORTED` or
+  `CERTIFIED`.
+- The next allowed route is an independent RC review using current local
+  evidence, followed by a separately authorized WP21 browser acceptance when
+  an operator is available.
+
 - Real ChatGPT, Claude, Gemini, and other vendor browser journeys are
   `UNVERIFIED`; vendor DOM behavior is not certified.
 - Browser failure-path acceptance remains dependent on a real browser
