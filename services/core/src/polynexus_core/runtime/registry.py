@@ -258,6 +258,29 @@ class RuntimeRegistry:
         _validate_adapter_compatibility(profile, adapter, required_capabilities)
         return adapter
 
+    def inspect_selected_profile(
+        self,
+        *,
+        explicit_request: str | None = None,
+        environment: Mapping[str, str] | None = None,
+        required_capabilities: Iterable[str] = (),
+    ) -> tuple[RuntimeProfile, RuntimeAdapter]:
+        """Return a policy-validated profile and adapter for internal Doctor use.
+
+        This deliberately reuses the normal G16 selection and compatibility
+        path.  Doctor must never inspect an unvalidated profile or silently
+        replace an unavailable runtime with the reference adapter.
+        """
+        profile = self._resolve_selected_profile(
+            explicit_request=explicit_request,
+            environment=environment,
+        )
+        adapter = self.create_adapter(
+            profile,
+            required_capabilities=required_capabilities,
+        )
+        return profile, adapter
+
     def bind(
         self,
         profile_ref: str,

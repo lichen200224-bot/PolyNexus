@@ -80,6 +80,20 @@ def verify_schema_head() -> None:
         raise RuntimeError(_SCHEMA_VERSION_UNAVAILABLE) from None
 
 
+def schema_head_status() -> bool:
+    """Return only a safe schema-head result for internal diagnostics.
+
+    The detailed startup gate remains ``verify_schema_head``.  This probe is
+    intentionally boolean so Doctor cannot expose database URLs, filesystem
+    paths, Alembic internals, or driver errors in its bounded report.
+    """
+    try:
+        verify_schema_head()
+    except Exception:
+        return False
+    return True
+
+
 def drop_all() -> None:
     if _engine is None:
         raise RuntimeError("Engine not initialized. Call init_engine() first.")
