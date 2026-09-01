@@ -1,0 +1,17 @@
+id: document-review
+version: 1
+assurance: FLEXIBLE
+parameters:
+  primary_role: document-reviewer
+steps:
+  - id: prepare-context
+    type: CONTEXT
+  - id: review-document
+    type: AI_TASK
+    role: document-reviewer
+    depends_on:
+      - prepare-context
+  - id: synthesize
+    type: SYNTHESIS
+    depends_on:
+      - review-document

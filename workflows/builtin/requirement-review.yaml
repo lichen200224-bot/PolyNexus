@@ -1,0 +1,17 @@
+id: requirement-review
+version: 1
+assurance: STANDARD
+parameters:
+  primary_role: requirement-analyst
+steps:
+  - id: prepare-context
+    type: CONTEXT
+  - id: trace-requirements
+    type: AI_TASK
+    role: requirement-analyst
+    depends_on:
+      - prepare-context
+  - id: synthesize
+    type: SYNTHESIS
+    depends_on:
+      - trace-requirements

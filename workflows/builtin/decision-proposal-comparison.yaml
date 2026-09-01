@@ -1,0 +1,23 @@
+id: decision-proposal-comparison
+version: 1
+assurance: STANDARD
+parameters:
+  primary_role: decision-analyst
+steps:
+  - id: prepare-context
+    type: CONTEXT
+  - id: compare-options
+    type: PARALLEL_AI
+    roles:
+      - decision-analyst
+      - risk-reviewer
+    depends_on:
+      - prepare-context
+  - id: cross-review
+    type: CROSS_REVIEW
+    depends_on:
+      - compare-options
+  - id: synthesize
+    type: SYNTHESIS
+    depends_on:
+      - cross-review

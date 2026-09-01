@@ -1,0 +1,17 @@
+id: sop-review
+version: 1
+assurance: STANDARD
+parameters:
+  primary_role: sop-reviewer
+steps:
+  - id: prepare-context
+    type: CONTEXT
+  - id: review-procedure
+    type: AI_TASK
+    role: sop-reviewer
+    depends_on:
+      - prepare-context
+  - id: synthesize
+    type: SYNTHESIS
+    depends_on:
+      - review-procedure

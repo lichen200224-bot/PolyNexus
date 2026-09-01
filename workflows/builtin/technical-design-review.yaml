@@ -1,0 +1,23 @@
+id: technical-design-review
+version: 1
+assurance: STANDARD
+parameters:
+  primary_role: technical-architect
+steps:
+  - id: prepare-context
+    type: CONTEXT
+  - id: independent-analysis
+    type: PARALLEL_AI
+    roles:
+      - technical-architect
+      - risk-reviewer
+    depends_on:
+      - prepare-context
+  - id: cross-review
+    type: CROSS_REVIEW
+    depends_on:
+      - independent-analysis
+  - id: synthesize
+    type: SYNTHESIS
+    depends_on:
+      - cross-review
