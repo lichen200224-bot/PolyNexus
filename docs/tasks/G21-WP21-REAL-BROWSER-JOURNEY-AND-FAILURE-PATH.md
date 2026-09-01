@@ -46,14 +46,14 @@ The current contract has no independent browser `CANCEL` action; the abort bound
 
 ## Evidence
 
-- [environment.json](../../verification/g21-browser-20260902/environment.json)
-- [journey-matrix.json](../../verification/g21-browser-20260902/journey-matrix.json)
-- [failure-path-matrix.json](../../verification/g21-browser-20260902/failure-path-matrix.json)
-- [summary.json](../../verification/g21-browser-20260902/summary.json)
-- [commands-and-exit-codes.md](../../verification/g21-browser-20260902/commands-and-exit-codes.md)
-- [SHA256SUMS.txt](../../verification/g21-browser-20260902/SHA256SUMS.txt)
+- [environment.json](../../artifacts/verification/g21-browser-20260902/environment.json)
+- [journey-matrix.json](../../artifacts/verification/g21-browser-20260902/journey-matrix.json)
+- [failure-path-matrix.json](../../artifacts/verification/g21-browser-20260902/failure-path-matrix.json)
+- [summary.json](../../artifacts/verification/g21-browser-20260902/summary.json)
+- [commands-and-exit-codes.md](../../artifacts/verification/g21-browser-20260902/commands-and-exit-codes.md)
+- [SHA256SUMS.txt](../../artifacts/verification/g21-browser-20260902/SHA256SUMS.txt)
 - screenshots: `chatgpt-com-golden.png`, `claude-ai-golden.png`, `gemini-google-com-golden.png`
-- [cdp-trace.json](../../verification/g21-browser-20260902/cdp-trace.json), 1,028 trace events, no network bodies/cookies/headers
+- [cdp-trace.json](../../artifacts/verification/g21-browser-20260902/cdp-trace.json), 1,028 trace events, no network bodies/cookies/headers
 
 All result JSON and trace scans found no raw synthetic marker, token, cookie, authorization, password, or path. Browser profiles and temporary certificates were not retained.
 
