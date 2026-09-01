@@ -21,8 +21,9 @@ native browser-loaded service-worker dispatch and live vendor certification rema
 - `REMOTE_REF`: `origin/feature/g21-wp21-real-browser-journey-failure-path`
   after the authorized non-force push
 - `WORKTREE_STATE`: clean after the authorized checkpoint; staged state empty
-- `NEXT_GOAL_READY`: `NO` — native browser service-worker dispatch and live vendor
-  certification remain separate gates before G22
+- `NEXT_GOAL_READY`: `G22` — G21 deterministic result, exact remote SHA, and
+  disclosed limitations are recorded; native browser service-worker dispatch
+  and live vendor certification remain explicitly unverified boundaries
 - `TASK_DOC`: `docs/tasks/G21-WP21-REAL-BROWSER-JOURNEY-AND-FAILURE-PATH.md`
 - `HANDOFF_DOC`: `docs/12_HANDOFF_CURRENT.md`
 - `NEXT_OWNER`: Codex for independent review and checkpoint closure; later G22
@@ -69,10 +70,10 @@ native browser-loaded service-worker dispatch and live vendor certification rema
 
 ### G21 next exact step
 
-Keep the evidence result bounded to the loopback fixture and equivalent
-service-worker dispatch shim. A later task may verify native browser-loaded
-service-worker dispatch and live vendor compatibility. Do not claim live vendor
-certification or final Human acceptance, and do not start G22.
+Start G22 from exact G21 SHA `7bdef0a62c78fc5a21a49ace2553642f9eaa2537`
+in a new isolated lane. Preserve the bounded fixture claim and the explicit
+native browser-worker/live-vendor limitations; do not claim final Human
+acceptance.
 
 ### G21 Do Not Change
 

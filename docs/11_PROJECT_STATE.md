@@ -29,7 +29,7 @@ is historical reference and must not override this block.
   production build, baseline, and governance validation passed with exit `0`.
 - **Program state:** G21 deterministic work is complete for its bounded fixture
   scope; the Human-authorized checkpoint commit and push are recorded in the
-  completion result, and G22 remains gated.
+  completion result, and G22 is now ready for its isolated RC pre-audit.
 - **Evidence boundary:** live ChatGPT/Claude/Gemini login, vendor DOM
   compatibility, credentials, and external send remain `DEFERRED / UNVERIFIED`;
   `VENDOR_CERTIFICATION` is `NOT_CLAIMED` and automatic send remains prohibited.
