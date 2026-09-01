@@ -2,14 +2,16 @@
 
 ## Current Task — G21 real-browser WP21 journey and failure paths (2026-09-02)
 
-**Result:** `PASS` — bounded synthetic-vendor real-browser fixture only
+**Result:** `NEED_ACTION` — deterministic bounded fixture passed; independent
+reviewer conclusion is still missing
 
 - `TASK_ID`: `G21-WP21-REAL-BROWSER-JOURNEY-AND-FAILURE-PATH`
 - `ATTEMPT`: 1
 - `MODE`: `BROWSER_E2E_VERIFY_AND_BOUNDED_FIX`
 - `WRITER`: Codex (sole active writer for the bounded source, docs, and evidence)
-- `REVIEWER`: Codex independent read-only acceptance review required because a
-  source fix was made; review result must be recorded before final checkpoint
+- `REVIEWER`: Codex independent read-only acceptance review is pending; fork
+  `01a05de5-4bdf-7520-a8e3-c25672a693c4` remained active without returning a
+  conclusion, so this gap is not treated as PASS
 - `ANTIGRAVITY_STATUS`: `REQUIRED / COMPLETED` — real Chrome/CDP browser lane
   completed on the Codex host; no separate Antigravity runtime was available
 - `BRANCH`: `feature/g21-wp21-real-browser-journey-failure-path`
@@ -19,8 +21,7 @@
 - `REMOTE_REF`: `origin/feature/g21-wp21-real-browser-journey-failure-path` on
   `D:\GitBackup\PolyNexus_Backup.git` after explicit non-force push
 - `WORKTREE_STATE`: must be clean and staged state empty after checkpoint
-- `NEXT_GOAL_READY`: `G22` only after independent review, commit, push, and
-  exact remote SHA verification
+- `NEXT_GOAL_READY`: `NO` — independent review must conclude before G22
 - `TASK_DOC`: `docs/tasks/G21-WP21-REAL-BROWSER-JOURNEY-AND-FAILURE-PATH.md`
 - `HANDOFF_DOC`: `docs/12_HANDOFF_CURRENT.md`
 - `NEXT_OWNER`: Codex for independent review and checkpoint closure; later G22
@@ -63,9 +64,9 @@
 
 ### G21 next exact step
 
-Run the independent read-only review, verify the exact allowlist and clean
-checkpoint, commit, push with the explicit non-force refspec, and verify the
-remote SHA. Do not claim live vendor certification or final Human acceptance.
+Complete the independent read-only review, then update/push the review result
+and re-verify the exact remote SHA. Do not claim live vendor certification or
+final Human acceptance, and do not start G22.
 
 ### G21 Do Not Change
 

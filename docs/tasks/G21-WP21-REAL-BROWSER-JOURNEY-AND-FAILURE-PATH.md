@@ -2,7 +2,10 @@
 
 ## Result
 
-`PASS` within the bounded `REAL_BROWSER_LOCAL_FIXTURE` claim only.
+`NEED_ACTION` for final checkpoint closure: deterministic bounded fixture gates
+passed, but the required independent review has not returned a conclusion.
+The bounded evidence itself is `PASS` within the `REAL_BROWSER_LOCAL_FIXTURE`
+claim only.
 
 - `TASK_ID`: `G21-WP21-REAL-BROWSER-JOURNEY-AND-FAILURE-PATH`
 - `ATTEMPT`: 1
@@ -12,6 +15,8 @@
 - `ANTIGRAVITY_STATUS`: `REQUIRED / COMPLETED` by the available real Chrome/CDP browser lane; no live-vendor journey was attempted
 - `ADR_IMPACT`: `NONE`; ADR-001–010 remain frozen and ADR-011 is unchanged
 - `SCOPE_DEVIATION`: `NONE`; one fail-closed browser-companion traversal guard was fixed
+- `REVIEW_STATUS`: `PENDING`; independent review fork was invoked but remained
+  active without a result, so no independent PASS is claimed
 
 ## Real-browser environment and golden journey
 

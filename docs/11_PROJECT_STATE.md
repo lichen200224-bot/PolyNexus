@@ -5,8 +5,10 @@
 This is the authoritative current-state block for G21. Retained material below
 is historical reference and must not override this block.
 
-- **G21 result:** `PASS` for the bounded real-browser synthetic-vendor fixture;
-  no live vendor certification or final Human acceptance is claimed.
+- **G21 result:** `NEED_ACTION` for checkpoint closure: the bounded
+  real-browser synthetic-vendor fixture passed, but the required independent
+  reviewer tool did not return a conclusion; no live vendor certification or
+  final Human acceptance is claimed.
 - **Output branch:** `feature/g21-wp21-real-browser-journey-failure-path`
 - **Predecessor:** exact G20 SHA
   `48062f1cae608785a39539e1a7bfca5d6726a92e`
@@ -23,8 +25,8 @@ is historical reference and must not override this block.
   input after URL normalization; the regression test passed.
 - **Web/regression evidence:** browser driver tests `9/9`, Web Vitest `80/80`,
   production build, baseline, and governance validation passed with exit `0`.
-- **Program state:** G21 is complete for its bounded fixture scope; G22 is
-  unlockable only after this checkpoint is independently reviewed and pushed.
+- **Program state:** G21 deterministic work is complete for its bounded fixture
+  scope, but checkpoint review is pending; G22 remains gated.
 - **Evidence boundary:** live ChatGPT/Claude/Gemini login, vendor DOM
   compatibility, credentials, and external send remain `DEFERRED / UNVERIFIED`;
   `VENDOR_CERTIFICATION` is `NOT_CLAIMED` and automatic send remains prohibited.
