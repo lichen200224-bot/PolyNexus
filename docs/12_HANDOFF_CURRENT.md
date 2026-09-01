@@ -4,15 +4,16 @@
 `CP06-WP29-WP32-RC` — hardening, compatibility evidence, and V1 RC preparation
 
 ## Status
-Current operational status: `WP28_COMPLETE / WP29_COMPLETE / WP30_COMPLETE / WP31_COMPLETE / WP32_RC_REVIEW_PENDING`.
+Current operational status: `WP28_COMPLETE / WP29_COMPLETE / WP30_COMPLETE / WP31_COMPLETE / WP32_RC_NEED_ACTION`.
 
 - `TASK_ID`: `CP06-WP29-WP32-RC`
 - Branch: `feature/first-vertical-slice`
 - Code checkpoint: `175f7b328b2ed68b6bed61487dd3cfda09063574`
+- Handoff checkpoint: `0db96b110666f28362edbc0964b22f62c68e2472`
 - Writer: Codex — candidate-only CP06 tests and compatibility/limitation documents
 - Reviewer: Codex deterministic local verification; Human RC decision remains pending
 - Antigravity: `NOT_REQUIRED` for this Core/migration/package evidence slice; real browser journey remains `UNVERIFIED`
-- Next owner: Codex for final RC evidence, then Human for RC acceptance decision
+- Next owner: Human/Antigravity for the outstanding browser failure-path acceptance, then Human for RC acceptance decision
 - Git authorization: candidate stage/commit allowed; push/merge/rebase/reset/clean and primary mutation remain prohibited
 
 ## Current Goal and Delta
@@ -41,15 +42,18 @@ Scope deviation: `NONE`.
 - Full Core pytest suite: exit code `0`; one pre-existing Windows symlink-policy test is `SKIPPED`.
 - Existing WP28/runtime/resource regression: `25 passed`, exit code `0`.
 - Baseline validator executed from candidate package test: exit code `0`.
+- Final RC command set at `2026-09-01T05:53:49.6814360Z`: Python `3.13.14`, pytest `9.0.2`, Git `2.45.0.windows.1`; each version command exit code `0`.
+- Final full Core suite at the current checkpoint: exit code `0`; one pre-existing Windows symlink-policy test is `SKIPPED`.
+- Final baseline validator: exit code `0`; final governance validator: exit code `0`.
 - `git diff --check` and staged diff checks: exit code `0` after exact allowlist review.
 - Current evidence was generated on 2026-09-01; pytest emitted a non-fatal Windows temporary cleanup `PermissionError` warning after successful runs.
 - Known unverified items remain explicit in `docs/32_KNOWN_LIMITATIONS.md`; no `SUPPORTED` or `CERTIFIED` claim was introduced.
 
 ## Next Routing
 
-`NEXT_OWNER: Codex -> Human`
+`NEXT_OWNER: Human/Antigravity -> Human`
 
-`NEXT_ACTION: Run final RC evidence bundle and independent review; Human decides whether CP06/RC may be accepted. Browser E2E remains separately unverified.`
+`NEXT_ACTION: Execute current browser failure-path evidence for CP04 WP21 (launch, detect, fill, user-confirmed-send, capture, normalize, and fallback), then perform independent RC review. Until that evidence exists, CP06/RC remains NEED_ACTION.`
 
 ### Do Not Change
 
