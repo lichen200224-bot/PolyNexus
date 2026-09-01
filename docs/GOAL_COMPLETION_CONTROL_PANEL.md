@@ -2,6 +2,24 @@
 
 Browser-readable companion: [GOAL_COMPLETION_CONTROL_PANEL.html](GOAL_COMPLETION_CONTROL_PANEL.html).
 
+## G22 RC hardening and delivery closeout — 2026-09-02
+
+`RESULT: IMPLEMENTING / NEED_ACTION_PENDING_GATES`
+
+- `BRANCH`: `feature/g22-rc-hardening-cross-machine-delivery-closeout`
+- `PREDECESSOR_SHA`: `ada5e9c8b4873aad4c53c74198171740d376d926`
+- `G21_REVIEW`: `FAIL` with `BLOCKER=0`, `MAJOR=2`; encoded-loopback
+  traversal is remediated in G22 and stale provenance/evidence counts are being
+  reconciled.
+- `CURRENT_GATES`: Core full suite, 21 targeted RC tests, browser-companion
+  `9/9`, Web `npm ci`/Vitest `80/80`/build, baseline, and governance have exit
+  `0`. Fresh G22 browser rerun is `NEED_ACTION` after CDP `ECONNREFUSED` exit `1`.
+- `BROWSER_BOUNDARY`: G21 HTTPS predecessor artifact is `3/3` golden and
+  `28/28` failure paths with observed external requests `0` and cleanup PASS;
+  native MV3 worker and live vendor behavior remain `UNVERIFIED`.
+- `NEXT_GOAL_READY`: `NO` — G22 re-review, checkpoint, push, and clean-clone
+  verification are pending.
+
 ## G21 bounded real-browser WP21 checkpoint — 2026-09-02
 
 `RESULT: NEED_ACTION` — bounded fixture passed; independent review pending
@@ -10,12 +28,12 @@ Browser-readable companion: [GOAL_COMPLETION_CONTROL_PANEL.html](GOAL_COMPLETION
 - `PREDECESSOR_SHA`: `48062f1cae608785a39539e1a7bfca5d6726a92e`
 - `OUTPUT_SHA`: exact final checkpoint is published in the G21 handoff/result and is not duplicated inside this self-referential commit
 - `REMOTE_REF`: `origin/feature/g21-wp21-real-browser-journey-failure-path` on `D:\GitBackup\PolyNexus_Backup.git`
-- `BROWSER_EVIDENCE`: fresh Chrome/CDP, 3/3 golden journeys, 22/22 failure paths, screenshots, CDP trace, cleanup verified
-- `BOUNDED_FIX`: loopback URL traversal-shaped input rejected after normalization; regression test passed
+- `BROWSER_EVIDENCE`: fresh Chrome/CDP HTTPS fixture, 3/3 golden journeys, 28/28 failure paths, screenshots, CDP trace, cleanup verified
+- `BOUNDED_FIX`: raw and percent-encoded loopback traversal-shaped input is rejected before URL normalization; G22 regression test passed
 - `VALIDATORS`: browser-driver tests 9/9, Web Vitest 80/80, production build, baseline, and governance passed with exit `0`
 - `VENDOR_CERTIFICATION`: `NOT_CLAIMED`; live vendor login/DOM/send remains `DEFERRED / UNVERIFIED`
 - `FORMAL_PROJECT_PROGRESS`: `30/100`; no final Human acceptance claimed
-- `NEXT_GOAL_READY`: `NO` — independent review and follow-up checkpoint required
+- `NEXT_GOAL_READY`: `G22` after independent review finding remediation and exact predecessor verification
 
 The requested `backup` alias/path was absent; the existing configured local backup
 remote was preserved without reconfiguration. No live vendor traffic, credentials,
@@ -64,8 +82,8 @@ rebased, overwritten, staged, or otherwise mutated.
 |---|---|---|
 | G19 | `PASS / COMPLETE` | This canonical branch and exact checkpoint; G20 may verify and continue |
 | G20 | `PASS / COMPLETE` | Canonical and second clean clone restore, Vitest, build, validators, and checkpoint |
-| G21 | `NEED_ACTION / REVIEW PENDING` | Synthetic-host Chrome/CDP WP21 journey passed, but independent review has not returned |
-| G22 | `GATED / NOT STARTED` | Requires independent G21 review and follow-up checkpoint |
+| G21 | `FAIL / REMEDIATED IN G22` | Independent review found two MAJOR findings; bounded fixture evidence remains 3/3 and 28/28 |
+| G22 | `IMPLEMENTING / NEED_ACTION_PENDING_GATES` | Encoded traversal fixed; re-review, checkpoint, push, and clean-clone proof pending |
 | G23 | `GATED / NOT STARTED` | Requires G19–G22 terminal evidence; Human decides final acceptance |
 
 ## G19 imported-file provenance

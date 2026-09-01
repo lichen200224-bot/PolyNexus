@@ -1,0 +1,11 @@
+{
+  "evidence_scope": "G21 predecessor evidence referenced by G22; no fresh G22 browser PASS claimed",
+  "source_artifact": "artifacts/verification/g21-browser-20260902/journey-matrix.json",
+  "aggregate_process_exit_code": 0,
+  "rows": [
+    {"vendor_fixture": "chatgpt.com", "result": "PASS", "row_exit_code": "N/A", "evidence_status": "INHERITED_CURRENT_PREDECESSOR"},
+    {"vendor_fixture": "claude.ai", "result": "PASS", "row_exit_code": "N/A", "evidence_status": "INHERITED_CURRENT_PREDECESSOR"},
+    {"vendor_fixture": "gemini.google.com", "result": "PASS", "row_exit_code": "N/A", "evidence_status": "INHERITED_CURRENT_PREDECESSOR"}
+  ],
+  "fresh_g22_browser_rerun": {"result": "NEED_ACTION", "exit_code": 1, "reason": "CDP listener unavailable"}
+}

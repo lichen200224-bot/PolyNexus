@@ -53,13 +53,25 @@ The project uses a 100-point checkpoint-weighted progress model. Only `ACCEPTED`
 ### G21 current checkpoint snapshot — 2026-09-02
 
 - G21 WP-21 has a bounded `PASS` from a fresh Chrome/CDP synthetic-host
-  fixture: 3/3 golden journeys and 22/22 failure paths passed, with screenshots,
+  fixture: 3/3 golden journeys and 28/28 failure paths passed, with screenshots,
   CDP trace, and cleanup evidence. A narrow loopback URL traversal validation
   fix and regression test were included.
 - Live vendor login/DOM/send compatibility remains `DEFERRED / UNVERIFIED`; no
   vendor certification, automatic send, or final Human acceptance is claimed.
 - Formal project progress remains **30/100**. The G21 checkpoint does not add
   product points or change frozen ADRs, Core contracts, or Product Scope.
+
+### G22 current RC hardening snapshot — 2026-09-02
+
+- G22 continues from exact G21 SHA
+  `ada5e9c8b4873aad4c53c74198171740d376d926` in an isolated lane.
+- The encoded-loopback traversal review finding is remediated with raw
+  percent-encoded dot/slash/backslash rejection and regression coverage.
+- Core, targeted RC, browser-companion, Web install/test/build, baseline, and
+  governance checks have current exit-code evidence. Cross-machine checkpoint
+  and clean-clone verification remain pending until the final G22 checkpoint.
+- Browser live-vendor, native MV3 worker, and a fresh CDP rerun without a
+  listener remain `UNVERIFIED`/`NEED_ACTION`; no certification is claimed.
 
 - `CP-00` Baseline/Governance: **8/8 points accepted**.
 - `CP-02` First Vertical Slice: **22/22 points accepted** for WP-01–WP-10.
@@ -221,7 +233,9 @@ An implementation that is merely `READY_FOR_CODEX_REVIEW` is not counted as acce
 - **R1 — Single-writer throughput**: the forecast is tight. If a checkpoint slips by more than two calendar days, stop scope expansion and request a Human trade-off.
 - **R2 — Execution contract protection**: WP-09A and WP-09B are accepted. WP-09C/D/10 must not change ADR-004, ADR-007, ADR-008, existing Run-create behavior, or the accepted execution command semantics without a new gate.
 - **R3 — Unicode workspace launcher**: Core test execution may require the validated alternate Windows route. Mark environment failures separately from product failures.
-- **R4 — Browser environment**: Browser E2E remains deferred until a browser-capable environment exists; do not report a false PASS.
+- **R4 — Browser boundary**: bounded synthetic-host browser evidence has a
+  current G21 result, while native worker dispatch and live vendor journeys
+  remain deferred/unverified; do not report a false broad compatibility PASS.
 - **R5 — Competition deadline**: COMP-01/02/03 must not silently change V1 product claims or divert a source Writer without a recorded decision.
 
 ## 9. Roadmap change control

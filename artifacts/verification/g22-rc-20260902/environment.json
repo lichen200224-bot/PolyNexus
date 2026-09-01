@@ -1,0 +1,15 @@
+{
+  "generated_at": "2026-09-01T23:35:55.8975168Z",
+  "os": "Windows",
+  "node": "v22.22.3",
+  "npm": "10.9.8",
+  "python_launcher": "C:/temp_pn_venv2/Scripts/python.exe",
+  "branch": "feature/g22-rc-hardening-cross-machine-delivery-closeout",
+  "predecessor_sha": "ada5e9c8b4873aad4c53c74198171740d376d926",
+  "web_lockfile_version": 3,
+  "browser_predecessor": "Chrome/152.0.7977.65 via G21 HTTPS fixture artifact",
+  "browser_rerun": {"status": "NEED_ACTION", "exit_code": 1, "reason": "isolated Chrome did not expose CDP listener"},
+  "egress_boundary": "LOCAL_ONLY; no cloud/vendor/credentialed request is authorized",
+  "secrets": "no credential, cookie, token, browser profile, or raw vendor response retained",
+  "cleanup": "G21 predecessor cleanup PASS; G22 failed browser attempt produced no retained browser trace"
+}

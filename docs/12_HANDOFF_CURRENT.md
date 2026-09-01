@@ -1,5 +1,84 @@
 # Current Handoff
 
+## Current Task — G22 RC hardening and cross-machine delivery closeout (2026-09-02)
+
+**Status:** `IMPLEMENTING / NEED_ACTION_PENDING_GATES`
+
+- `TASK_ID`: `G22-RC-HARDENING-CROSS-MACHINE-AND-DELIVERY-CLOSEOUT`
+- `ATTEMPT`: 1
+- `MODE`: `RC_HARDENING_AND_DELIVERY_VERIFICATION`
+- `WRITER`: Codex (sole active writer in the isolated G22 lane)
+- `REVIEWER`: Independent G21 reviewer returned `FAIL` with `BLOCKER=0`,
+  `MAJOR=2`; encoded-loopback traversal is remediated here and provenance /
+  evidence reconciliation is in progress. G22 final review is pending.
+- `ANTIGRAVITY_STATUS`: `REQUIRED / NEED_ACTION` for a fresh browser rerun;
+  the isolated Chrome process did not expose CDP. The authoritative G21
+  predecessor artifact remains the completed HTTPS fixture evidence.
+- `BRANCH`: `feature/g22-rc-hardening-cross-machine-delivery-closeout`
+- `PREDECESSOR_SHA`: `ada5e9c8b4873aad4c53c74198171740d376d926`
+- `REMOTE_REF`: `origin/feature/g21-wp21-real-browser-journey-failure-path`
+  resolves to the predecessor SHA; no G22 remote ref exists yet.
+- `WORKTREE_STATE`: dirty only from the explicit G22 source/test/docs/artifact
+  delta; staged state empty.
+- `ADR_IMPACT`: `NONE`; ADR-001–010 and ADR-011 are unchanged.
+- `SCOPE_DEVIATION`: `NONE`; no Core contract, Domain, workflow, persistence,
+  Product Scope, vendor boundary, credential, cloud, or automatic-send change.
+- `CHANGED_FILES`: `artifacts/verification/g21-browser-20260902/SHA256SUMS.txt`,
+  `artifacts/verification/g22-rc-20260902/{summary,journey-matrix,failure-path-matrix,commands-and-exit-codes,environment,cdp-trace,SHA256SUMS}.(json|md|txt)`,
+  `docs/11_PROJECT_STATE.md`, `docs/12_HANDOFF_CURRENT.md`,
+  `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`, `docs/31_COMPATIBILITY_MATRIX.md`,
+  `docs/32_KNOWN_LIMITATIONS.md`, both control panels,
+  `docs/tasks/G22-RC-HARDENING-CROSS-MACHINE-DELIVERY-CLOSEOUT.md`,
+  `extensions/browser-companion/src/loopback-client.js`, and
+  `extensions/browser-companion/tests/test_websurface_drivers.mjs`.
+- `ARTIFACTS`: `artifacts/verification/g22-rc-20260902/` contains the current
+  command/evidence summary, journey and failure matrices, environment, CDP
+  NEED_ACTION trace, and SHA-256 manifest; G21 predecessor evidence remains in
+  `artifacts/verification/g21-browser-20260902/`.
+- `NEXT_GOAL_READY`: `NO`; G22 must finish targeted re-review, all validators,
+  checkpoint, push, and clean-clone verification first.
+
+### G22 current deterministic evidence
+
+- `C:\temp_pn_venv2\Scripts\python.exe -m pytest -q services/core` under
+  approved elevation: full Core suite exit `0`; the sandbox attempt was an
+  environment process-creation failure, exit `101`.
+- G22 targeted RC Core tests (`WP28`, `WP29`, `WP30`, `WP31`, `G17`, `WP23`):
+  `21 passed`, exit `0`.
+- `node --test extensions/browser-companion/tests/test_websurface_drivers.mjs`:
+  `9/9` passed, exit `0`, including encoded-dot and encoded-separator URL cases.
+- In `apps/web`, elevated `npm ci`: exit `0`; `npm test`: Vitest `80/80`, exit
+  `0`; `npm run build`: production build, exit `0`. Sandbox `npm ci` returned
+  the actual npm EPERM exit `-4048`.
+- Baseline validator under approved elevation: exit `0`; governance validator:
+  exit `0`.
+- G21 predecessor browser artifact remains current and traceable:
+  HTTPS loopback fixture, Chrome `152.0.7977.65`, `3/3` golden, `28/28`
+  failure assertions, observed external requests `0`, cleanup PASS, aggregate
+  harness exit `0`; in-process rows use `exit_code: "N/A"`.
+- Fresh G22 harness attempt against an isolated Chrome CDP port returned exit
+  `1` with `ECONNREFUSED`; this is recorded as `NEED_ACTION`, not PASS.
+
+### G22 bounded remediation
+
+- `extensions/browser-companion/src/loopback-client.js` now rejects raw
+  percent-encoded dot/slash/backslash separators before URL normalization.
+- `extensions/browser-companion/tests/test_websurface_drivers.mjs` covers the
+  five encoded-dot review examples, encoded slash/backslash variants, raw
+  traversal, credentialed/HTTPS/localhost rejection, and valid loopback use.
+- G21 evidence/status claims are being reconciled from `22/22` to the actual
+  `28/28`; the live vendor, native browser-loaded MV3 worker, and credentialed
+  external-send boundaries remain `UNVERIFIED`.
+
+### G22 protected boundaries and next action
+
+- Protected primary checkout `D:\AI學習教材\PolyNexus` was not modified.
+- No commit, push, reset, clean, merge, rebase, force push, bulk stage, or
+  remote reconfiguration has been performed for G22.
+- Next exact action: finish current-state/task/control-panel/artifact
+  reconciliation, run the fresh encoded-traversal matrix and all G22 gates,
+  then obtain independent read-only re-review before explicit staging.
+
 ## Current Task — G21 real-browser WP21 journey and failure paths (2026-09-02)
 
 **Result:** `PASS` for the current deterministic bounded evidence-harness gates;
@@ -16,8 +95,7 @@ native browser-loaded service-worker dispatch and live vendor certification rema
   completed on the Codex host; no separate Antigravity runtime was available
 - `BRANCH`: `feature/g21-wp21-real-browser-journey-failure-path`
 - `PREDECESSOR_SHA`: `48062f1cae608785a39539e1a7bfca5d6726a92e`
-- `OUTPUT_SHA`: exact authorized checkpoint SHA is recorded in the completion
-  result after commit
+- `OUTPUT_SHA`: `ada5e9c8b4873aad4c53c74198171740d376d926`
 - `REMOTE_REF`: `origin/feature/g21-wp21-real-browser-journey-failure-path`
   after the authorized non-force push
 - `WORKTREE_STATE`: clean after the authorized checkpoint; staged state empty
@@ -70,10 +148,9 @@ native browser-loaded service-worker dispatch and live vendor certification rema
 
 ### G21 next exact step
 
-Start G22 from exact G21 SHA `7bdef0a62c78fc5a21a49ace2553642f9eaa2537`
-in a new isolated lane. Preserve the bounded fixture claim and the explicit
-native browser-worker/live-vendor limitations; do not claim final Human
-acceptance.
+G22 is running from exact G21 SHA `ada5e9c8b4873aad4c53c74198171740d376d926`
+in an isolated lane. Preserve the bounded fixture claim and the explicit native
+browser-worker/live-vendor limitations; do not claim final Human acceptance.
 
 ### G21 Do Not Change
 

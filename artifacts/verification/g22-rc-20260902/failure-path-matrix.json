@@ -1,0 +1,25 @@
+{
+  "evidence_scope": "G21 predecessor failure-path evidence plus G22 encoded-loopback remediation",
+  "source_artifact": "artifacts/verification/g21-browser-20260902/failure-path-matrix.json",
+  "g21_predecessor": {"result": "PASS", "count": 28, "aggregate_process_exit_code": 0, "row_exit_code": "N/A", "observed_external_requests": 0},
+  "g22_remediation": {
+    "result": "PASS",
+    "exit_code": 0,
+    "cases": [
+      "raw ../ traversal",
+      "%2e%2e and %2E%2E traversal",
+      "%2e. and .%2e traversal",
+      "/api/%2e%2e/escape",
+      "encoded slash separators",
+      "encoded backslash separators",
+      "encoded dot/slash and dot/backslash separators",
+      "HTTPS rejection",
+      "localhost rejection",
+      "credentialed endpoint rejection",
+      "valid http://127.0.0.1 loopback positive"
+    ],
+    "supplementary_matrix_rejected_cases": 15,
+    "supplementary_matrix_valid_cases": 2
+  },
+  "fresh_g22_browser_rerun": {"result": "NEED_ACTION", "exit_code": 1, "reason": "CDP listener unavailable"}
+}

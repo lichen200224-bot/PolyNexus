@@ -1,5 +1,35 @@
 # Project State
 
+## Current Operational State — 2026-09-02 (G22 RC hardening and delivery closeout)
+
+This is the authoritative current-state block for G22. Retained material below
+is historical reference and must not override this block.
+
+- **G22 status:** `IMPLEMENTING`; the independent G21 review found no BLOCKER
+  and two MAJOR findings. The encoded-loopback-traversal finding is remediated
+  in this lane; current G22 checkpoint and cross-machine gates remain pending.
+- **Branch / predecessor:**
+  `feature/g22-rc-hardening-cross-machine-delivery-closeout` from exact G21
+  SHA `ada5e9c8b4873aad4c53c74198171740d376d926`.
+- **Current source hardening:** raw percent-encoded dot, slash, and backslash
+  separators are rejected before URL normalization; the browser-companion
+  regression suite covers encoded-dot and encoded-separator variants.
+- **Current evidence:** Core full suite exit `0`; G22 RC targeted Core tests
+  are `21 passed`, exit `0`; browser-companion tests are `9/9`, exit `0`; Web
+  `npm ci`, Vitest `80/80`, and production build each exit `0`; baseline and
+  governance validators exit `0`.
+- **Browser boundary:** the G21 HTTPS fixture artifact remains the authoritative
+  predecessor evidence (`3/3` golden, `28/28` failure paths, observed external
+  requests `0`, cleanup PASS). A fresh G22 rerun could not connect to CDP and
+  returned exit `1`; native browser-loaded MV3 service-worker dispatch and live
+  vendor certification remain `UNVERIFIED`.
+- **Scope / architecture:** only browser-companion loopback validation,
+  regression tests, G22 evidence, and status/delivery documents are in scope;
+  Core contracts, Domain/workflow semantics, persistence, Product Scope, and
+  ADR-001–010 remain unchanged. ADR impact `NONE`.
+- **Formal project progress:** remains `30/100`; G22 is not final Human
+  acceptance.
+
 ## Current Operational State — 2026-09-02 (G21 real-browser WP21)
 
 This is the authoritative current-state block for G21. Retained material below
@@ -16,7 +46,7 @@ is historical reference and must not override this block.
 - **Approved backup:** existing `origin` remote at
   `D:\GitBackup\PolyNexus_Backup.git`; requested `backup` alias/path
   `D:\GitBackup\PolyNexus\_Backup.git` was absent and was not reconfigured.
-- **Browser evidence:** fresh Chrome `152.0.7977.65` with loopback HTTP
+- **Browser evidence:** fresh Chrome `152.0.7977.65` with loopback HTTPS
   synthetic fixtures selected by explicit vendor selector; three golden
   journeys passed, 28/28 failure assertions passed, request-spy external count
   was observed as `0`, and page/fixture cleanup passed with `0` remaining pages.

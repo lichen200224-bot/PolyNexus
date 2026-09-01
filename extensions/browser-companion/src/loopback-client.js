@@ -41,6 +41,7 @@ export function validateLoopbackBaseUrl(value) {
     parsed.search ||
     parsed.hash
     || value.includes('..')
+    || /%(?:2e|2f|5c)/i.test(value)
     || parsed.pathname.includes('..')
     || parsed.pathname.includes('\\')
     || parsed.pathname.includes('//')

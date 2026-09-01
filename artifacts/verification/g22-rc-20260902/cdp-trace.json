@@ -1,0 +1,10 @@
+{
+  "trace_status": "NEED_ACTION",
+  "source": "G22 fresh browser rerun attempt",
+  "cdp_port": 9262,
+  "events": [],
+  "exit_code": 1,
+  "error": "connect ECONNREFUSED 127.0.0.1:9262",
+  "privacy": "No network bodies, cookies, headers, credentials, or vendor data captured.",
+  "predecessor_trace": "artifacts/verification/g21-browser-20260902/cdp-trace.json"
+}

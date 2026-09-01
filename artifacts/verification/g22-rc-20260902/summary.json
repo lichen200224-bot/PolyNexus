@@ -1,0 +1,49 @@
+{
+  "task_id": "G22-RC-HARDENING-CROSS-MACHINE-AND-DELIVERY-CLOSEOUT",
+  "status": "IMPLEMENTING / NEED_ACTION_PENDING_GATES",
+  "generated_at": "2026-09-01T23:35:55.8975168Z",
+  "branch": "feature/g22-rc-hardening-cross-machine-delivery-closeout",
+  "predecessor_sha": "ada5e9c8b4873aad4c53c74198171740d376d926",
+  "independent_g21_review": {"result": "FAIL", "blocker": 0, "major": 2},
+  "remediation": {
+    "encoded_loopback_traversal": "PASS",
+    "coverage": "raw ../, five encoded-dot review cases, encoded slash/backslash variants, HTTPS, localhost, credentialed endpoint rejection, valid loopback positive"
+  },
+  "current_checks": {
+    "core_full_suite": {"result": "PASS", "exit_code": 0, "environment_note": "approved controlled Python launcher"},
+    "core_rc_targeted": {"result": "PASS", "passed": 21, "exit_code": 0},
+    "browser_companion": {"result": "PASS", "passed": 9, "exit_code": 0},
+    "web_npm_ci": {"result": "PASS", "exit_code": 0},
+    "web_vitest": {"result": "PASS", "passed": 80, "exit_code": 0},
+    "web_build": {"result": "PASS", "exit_code": 0},
+    "baseline": {"result": "PASS", "exit_code": 0},
+    "governance": {"result": "PASS", "exit_code": 0},
+    "encoded_traversal_supplementary": {"result": "PASS", "rejected_cases": 15, "valid_loopback_cases": 2, "exit_code": 0}
+  },
+  "g21_predecessor_browser_evidence": {
+    "artifact": "artifacts/verification/g21-browser-20260902/summary.json",
+    "fixture": "controlled local HTTPS synthetic fixture",
+    "browser": "Chrome/152.0.7977.65",
+    "golden": "3/3 PASS",
+    "failure_paths": "28/28 PASS",
+    "aggregate_process_exit_code": 0,
+    "in_process_row_exit_code": "N/A",
+    "observed_external_requests": 0,
+    "cleanup": "PASS",
+    "native_browser_loaded_service_worker": "UNVERIFIED",
+    "live_vendor_certification": "NOT_CLAIMED"
+  },
+  "fresh_g22_browser_rerun": {
+    "result": "NEED_ACTION",
+    "exit_code": 1,
+    "error": "connect ECONNREFUSED 127.0.0.1:9262",
+    "claim": "not a browser PASS; no CDP trace events were observed"
+  },
+  "cross_machine": "PENDING_FINAL_CHECKPOINT",
+  "next_goal_ready": "NO",
+  "limitations": [
+    "native browser-loaded MV3 service-worker dispatch remains UNVERIFIED",
+    "live ChatGPT/Claude/Gemini login, DOM compatibility, credentials, and external send remain DEFERRED / UNVERIFIED",
+    "G22 checkpoint and clean-clone verification are pending"
+  ]
+}
