@@ -1,20 +1,62 @@
 # Current Handoff
 
 ## Task
-`G02-COMP-01-CONTENT-CONFIDENCE` — Cyber4.0 2026 initial-review proposal/deck content-confidence gate
+`CP06-WP29-WP32-RC` — hardening, compatibility evidence, and V1 RC preparation
 
 ## Status
-Current operational status: `G02_HUMAN_APPROVED / G03_DECISION_REQUIRED / DOCX_STRUCTURAL_AND_PAGECOUNT / RENDERED_VISUAL_QA_PASS_FALLBACK / OFFICIAL_PARTIAL_CONFLICT_PENDING`.
+Current operational status: `WP28_COMPLETE / WP29_COMPLETE / WP30_COMPLETE / WP31_COMPLETE / WP32_RC_REVIEW_PENDING`.
 
+- `TASK_ID`: `CP06-WP29-WP32-RC`
 - Branch: `feature/first-vertical-slice`
-- HEAD at G02 start and current content base: `77b1b4b4d36e855dc24f0da07b6f69da2cee03d6`
-- Writer: Codex — G02 competition documents and existing proposal DOCX only
-- Independent Reviewer: fresh G02-only reviewer `01a04366-9b2b-7560-8135-bf0509a79c38` returned `NEED_ACTION` with `FINDINGS: NO BLOCKER`; the action is official-source/Human work, not a writer defect, and is not product or Git acceptance
-- Antigravity: `NOT_REQUIRED` — no product UI/browser journey was changed; official-source retrieval produced no browser artifact
-- Next owner: Human to decide whether to route G03; G03 has not started
-- G01 prerequisite: G01 state and its recorded clean-clone checkpoint remain documented in `docs/11_PROJECT_STATE.md` and the baseline context below; G02 does not create a new G01 acceptance
-- Git authorization: `LOCAL_COMMIT_ONLY`; G02 content checkpoint `382f2831aee39a8ed9330ff8062caae532fb8d26` was created from the exact seven-path allowlist; remote push remains `NONE`
-- Existing WP-12/WP-14/runtime dirty paths remain preserved and outside G02 ownership
+- Code checkpoint: `175f7b328b2ed68b6bed61487dd3cfda09063574`
+- Writer: Codex — candidate-only CP06 tests and compatibility/limitation documents
+- Reviewer: Codex deterministic local verification; Human RC decision remains pending
+- Antigravity: `NOT_REQUIRED` for this Core/migration/package evidence slice; real browser journey remains `UNVERIFIED`
+- Next owner: Codex for final RC evidence, then Human for RC acceptance decision
+- Git authorization: candidate stage/commit allowed; push/merge/rebase/reset/clean and primary mutation remain prohibited
+
+## Current Goal and Delta
+
+- WP28 is checkpointed at `4040b45157e1aed26ca6ea4ae56e5464a5636ed3`: adapter crash isolation, child cleanup, timeout/cancel cleanup, and fail-closed orphan handling.
+- WP29 added deterministic security, local-only egress, policy/capability, and evidence-provenance tests.
+- WP30 added isolated SQLite backup/restore, downgrade/re-upgrade, history preservation, and startup schema-gate tests.
+- WP31 added bounded package metadata/baseline checks plus compatibility and known-limitations documents.
+- No production dependency, public API, schema, migration, primary workspace, push, merge, rebase, reset, or clean operation was performed.
+
+## Changed files
+
+- `services/core/tests/test_cp06_wp29_security_policy.py`
+- `services/core/tests/test_cp06_wp30_clean_install.py`
+- `services/core/tests/test_cp06_wp31_packaging_compatibility.py`
+- `docs/31_COMPATIBILITY_MATRIX.md`
+- `docs/32_KNOWN_LIMITATIONS.md`
+- `docs/12_HANDOFF_CURRENT.md` current operational block only
+
+ADR impact: `NONE`; existing runtime, Alembic, local-only, and maturity contracts were tested/documented without changing them.
+Scope deviation: `NONE`.
+
+## Verification evidence
+
+- WP29–WP31 targeted tests: `10 passed`, exit code `0`.
+- Full Core pytest suite: exit code `0`; one pre-existing Windows symlink-policy test is `SKIPPED`.
+- Existing WP28/runtime/resource regression: `25 passed`, exit code `0`.
+- Baseline validator executed from candidate package test: exit code `0`.
+- `git diff --check` and staged diff checks: exit code `0` after exact allowlist review.
+- Current evidence was generated on 2026-09-01; pytest emitted a non-fatal Windows temporary cleanup `PermissionError` warning after successful runs.
+- Known unverified items remain explicit in `docs/32_KNOWN_LIMITATIONS.md`; no `SUPPORTED` or `CERTIFIED` claim was introduced.
+
+## Next Routing
+
+`NEXT_OWNER: Codex -> Human`
+
+`NEXT_ACTION: Run final RC evidence bundle and independent review; Human decides whether CP06/RC may be accepted. Browser E2E remains separately unverified.`
+
+### Do Not Change
+
+- Do not modify primary workspace or protected dirty paths.
+- Do not add public API/schema/migration/dependency or introduce cloud/external egress.
+- Do not claim browser/vendor support, `SUPPORTED`, or `CERTIFIED` without current evidence.
+- Do not push, merge, rebase, reset, clean, or stage files outside the explicit CP06 allowlist.
 
 ## Baseline context retained
 
@@ -24,7 +66,7 @@ Current operational status: `G02_HUMAN_APPROVED / G03_DECISION_REQUIRED / DOCX_S
 - G01 current-state details and evidence remain in `docs/11_PROJECT_STATE.md`; this pass does not mark any component, runtime integration, or cross-machine state as newly accepted.
 - The prior project-content organization pass created `docs/31_PROJECT_CONTENT_MAP.md` and updated `README.md`; both remain outside the G02 allowlist and are preserved without reclassification.
 
-## Current Goal and Delta
+## Legacy History — Previous G02 Current Goal and Delta
 
 1. Added the complete G02 source-to-claim matrix with 20 product rows (`IMPLEMENTED 8 / IN_DEVELOPMENT 3 / PLANNED_V1 5 / FUTURE 4`) and 6 official-requirement rows, each retaining evidence, limitations, and corrections.
 2. Updated `competition/PROPOSAL_SOURCE.md`, `docs/13_COMPETITION_SUBMISSION_PLAN.md`, and `docs/14_COMPETITION_SLIDE_OUTLINE.md` so bounded capability is separated from vendor/browser/local integration, roadmap targets, Future scope, and internal historical dates.
