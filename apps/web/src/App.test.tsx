@@ -89,6 +89,18 @@ describe('App', () => {
     expect(el.textContent).toContain('Development Baseline')
     el.remove()
   })
+
+  it('keeps secondary work-mode guidance behind a disclosure', async () => {
+    mockJson({ projects: [] })
+    const el = await mount()
+    const disclosure = el.querySelector('.disclosure-card') as HTMLDetailsElement
+
+    expect(disclosure).not.toBeNull()
+    expect(disclosure.open).toBe(false)
+    disclosure.querySelector('summary')!.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    expect(disclosure.open).toBe(true)
+    el.remove()
+  })
 })
 
 // ---------------------------------------------------------------------------
@@ -1579,6 +1591,32 @@ describe('WP-09D run detail', () => {
     el.remove()
   })
 
+  it('keeps secondary run data collapsed while preserving result focus', async () => {
+    globalThis.fetch = vi.fn(async (input: string | URL | Request) => {
+      const url = typeof input === 'string' ? input : input.toString()
+      if (url.includes('/result')) return new Response(JSON.stringify({ result: resultObj }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/findings')) return new Response(JSON.stringify({ findings: [f1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/evidence')) return new Response(JSON.stringify({ evidence: [ev1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/artifacts')) return new Response(JSON.stringify({ artifacts: [art1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/history')) return new Response(JSON.stringify({ events: [hist1, hist2] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs/run_1') && !url.includes('/result')) return new Response(JSON.stringify(runA), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/runs')) return new Response(JSON.stringify({ runs: [runA] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      if (url.includes('/tasks')) return new Response(JSON.stringify({ tasks: [t1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      return new Response(JSON.stringify({ projects: [p1] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }) as typeof fetch
+
+    const el = await openDetailWithMocks(globalThis.fetch)
+    const taskInfoDisclosure = el.querySelector('.task-info .detail-disclosure') as HTMLDetailsElement
+    const evidenceDisclosure = el.querySelector('[aria-labelledby="evidence-heading"] .detail-disclosure') as HTMLDetailsElement
+
+    expect(taskInfoDisclosure.open).toBe(false)
+    expect(evidenceDisclosure.open).toBe(false)
+    expect(el.textContent).toContain('done')
+    evidenceDisclosure.querySelector('summary')!.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    expect(evidenceDisclosure.open).toBe(true)
+    el.remove()
+  })
+
   it('calls five query URLs with encoded runId and wrappers', async () => {
     const specialId = 'run 1/2'
     const runSpecial = { ...runA, id: specialId }
@@ -1752,6 +1790,7 @@ describe('WP-09D run detail', () => {
     }) as typeof fetch
     const el = await openDetailWithMocks(globalThis.fetch)
     expect(el.textContent).toContain('Validation error')
+    expect(el.textContent).not.toContain('mismatch')
     el.remove()
   })
 

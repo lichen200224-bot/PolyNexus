@@ -104,16 +104,21 @@ export function App() {
         </>
       )}
 
-      <section className="modes-section">
-        <h2>What do you want to do?</h2>
-        <div className="mode-grid">
-          {workModes.map(([name, description]) => (
-            <article className="mode-card" key={name}>
-              <h3>{name}</h3>
-              <p>{description}</p>
-            </article>
-          ))}
-        </div>
+      <section className="modes-section" aria-labelledby="modes-heading">
+        <details className="disclosure-card">
+          <summary id="modes-heading">
+            <span>Choose a work mode</span>
+            <span className="summary-hint">Discuss · Review · Validate</span>
+          </summary>
+          <div className="mode-grid">
+            {workModes.map(([name, description]) => (
+              <article className="mode-card" key={name}>
+                <h3>{name}</h3>
+                <p>{description}</p>
+              </article>
+            ))}
+          </div>
+        </details>
       </section>
     </main>
   )

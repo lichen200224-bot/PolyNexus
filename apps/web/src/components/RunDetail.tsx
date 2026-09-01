@@ -12,10 +12,10 @@ function toUserMessage(err: unknown): string {
   if (err instanceof AuthError) return 'Authentication required. Set LOOPBACK_TOKEN on the Core server.'
   if (err instanceof NotFoundError) return 'Run not found.'
   if (err instanceof ApiError) {
-    if (err.status === 422) return typeof err.body === 'string' && err.body ? `Validation error: ${err.body}` : 'Validation error: stored ownership or contract is invalid.'
-    return err.message || 'Failed to load data'
+    if (err.status === 422) return 'Validation error: stored ownership or contract is invalid.'
+    return 'Unable to load run data.'
   }
-  return err instanceof Error ? err.message : 'Failed to load data'
+  return 'Unable to load run data.'
 }
 
 export function RunDetail({ config, runId, onBack }: RunDetailProps) {
@@ -76,13 +76,19 @@ export function RunDetail({ config, runId, onBack }: RunDetailProps) {
       {!loading && !error && run && (
         <>
           <section aria-labelledby="run-meta-heading" className="task-info">
-            <h3 id="run-meta-heading">Run</h3>
-            <p><strong>ID:</strong> {run.id}</p>
+            <div className="section-header">
+              <h3 id="run-meta-heading">Run overview</h3>
+              <span className="section-count">{run.state}</span>
+            </div>
             <p><strong>State:</strong> {run.state}</p>
-            <p><strong>Workflow:</strong> {run.workflow_id} v{run.workflow_version}</p>
-            <p><strong>Target:</strong> {run.execution_target}</p>
-            <p><strong>Resume:</strong> {run.resume_mode}</p>
-            <p><strong>Created:</strong> {run.created_at}</p>
+            <details className="detail-disclosure">
+              <summary>Show run identity and execution metadata</summary>
+              <p><strong>ID:</strong> {run.id}</p>
+              <p><strong>Workflow:</strong> {run.workflow_id} v{run.workflow_version}</p>
+              <p><strong>Target:</strong> {run.execution_target}</p>
+              <p><strong>Resume:</strong> {run.resume_mode}</p>
+              <p><strong>Created:</strong> {run.created_at}</p>
+            </details>
           </section>
 
           <section aria-labelledby="result-heading" className="detail-section">
@@ -102,55 +108,79 @@ export function RunDetail({ config, runId, onBack }: RunDetailProps) {
           </section>
 
           <section aria-labelledby="findings-heading" className="detail-section">
-            <h3 id="findings-heading">Findings</h3>
-            {findings === null ? null : findings.length === 0 ? (
-              <p className="status-message">No findings.</p>
-            ) : (
-              <ul>
-                {findings.map(f => (
-                  <li key={f.id}>{f.id} — task:{f.task_id} — run:{f.run_id} — {f.title} — {f.description} — {f.severity} — {f.status} — evidence: {f.evidence_refs.length ? f.evidence_refs.join(', ') : '—'} — {f.created_at}</li>
-                ))}
-              </ul>
-            )}
+            <div className="section-header">
+              <h3 id="findings-heading">Findings</h3>
+              <span className="section-count">{findings?.length ?? 0}</span>
+            </div>
+            <details className="detail-disclosure" open={Boolean(findings?.length)}>
+              <summary>{findings?.length ? 'Review findings' : 'Show findings'}</summary>
+              {findings === null ? null : findings.length === 0 ? (
+                <p className="status-message">No findings.</p>
+              ) : (
+                <ul>
+                  {findings.map(f => (
+                    <li key={f.id}>{f.id} — task:{f.task_id} — run:{f.run_id} — {f.title} — {f.description} — {f.severity} — {f.status} — evidence: {f.evidence_refs.length ? f.evidence_refs.join(', ') : '—'} — {f.created_at}</li>
+                  ))}
+                </ul>
+              )}
+            </details>
           </section>
 
           <section aria-labelledby="evidence-heading" className="detail-section">
-            <h3 id="evidence-heading">Evidence</h3>
-            {evidence === null ? null : evidence.length === 0 ? (
-              <p className="status-message">No evidence.</p>
-            ) : (
-              <ul>
-                {evidence.map(e => (
-                  <li key={e.id}>{e.id} — task:{e.task_id} — run:{e.run_id} — {e.actor_id} — {e.source} — {e.type} — {e.status} — artifacts: {e.artifact_refs.length ? e.artifact_refs.join(', ') : '—'} — meta: {Object.keys(e.metadata).length ? JSON.stringify(e.metadata) : '—'} — {e.observed_at}</li>
-                ))}
-              </ul>
-            )}
+            <div className="section-header">
+              <h3 id="evidence-heading">Evidence</h3>
+              <span className="section-count">{evidence?.length ?? 0}</span>
+            </div>
+            <details className="detail-disclosure">
+              <summary>{evidence?.length ? 'Inspect evidence' : 'Show evidence'}</summary>
+              {evidence === null ? null : evidence.length === 0 ? (
+                <p className="status-message">No evidence.</p>
+              ) : (
+                <ul>
+                  {evidence.map(e => (
+                    <li key={e.id}>{e.id} — task:{e.task_id} — run:{e.run_id} — {e.actor_id} — {e.source} — {e.type} — {e.status} — artifacts: {e.artifact_refs.length ? e.artifact_refs.join(', ') : '—'} — meta: {Object.keys(e.metadata).length ? JSON.stringify(e.metadata) : '—'} — {e.observed_at}</li>
+                  ))}
+                </ul>
+              )}
+            </details>
           </section>
 
           <section aria-labelledby="artifacts-heading" className="detail-section">
-            <h3 id="artifacts-heading">Artifacts</h3>
-            {artifacts === null ? null : artifacts.length === 0 ? (
-              <p className="status-message">No artifacts.</p>
-            ) : (
-              <ul>
-                {artifacts.map(a => (
-                  <li key={a.id}>{a.id} — project:{a.project_id} — task:{a.task_id ?? '—'} — run:{a.run_id ?? '—'} — {a.artifact_type} — {a.mime_type} — {a.source_type} — {a.storage_ref} — {a.sha256} — {a.size} bytes</li>
-                ))}
-              </ul>
-            )}
+            <div className="section-header">
+              <h3 id="artifacts-heading">Artifacts</h3>
+              <span className="section-count">{artifacts?.length ?? 0}</span>
+            </div>
+            <details className="detail-disclosure">
+              <summary>{artifacts?.length ? 'Inspect artifacts' : 'Show artifacts'}</summary>
+              {artifacts === null ? null : artifacts.length === 0 ? (
+                <p className="status-message">No artifacts.</p>
+              ) : (
+                <ul>
+                  {artifacts.map(a => (
+                    <li key={a.id}>{a.id} — project:{a.project_id} — task:{a.task_id ?? '—'} — run:{a.run_id ?? '—'} — {a.artifact_type} — {a.mime_type} — {a.source_type} — {a.storage_ref} — {a.sha256} — {a.size} bytes</li>
+                  ))}
+                </ul>
+              )}
+            </details>
           </section>
 
           <section aria-labelledby="history-heading" className="detail-section">
-            <h3 id="history-heading">History</h3>
-            {history === null ? null : history.length === 0 ? (
-              <p className="status-message">No history events.</p>
-            ) : (
-              <ul>
-                {history.map(ev => (
-                  <li key={ev.id}>{ev.id} — run:{ev.run_id} — {ev.from_state} → {ev.to_state} at {ev.occurred_at}{ev.reason ? ` — ${ev.reason}` : ''}</li>
-                ))}
-              </ul>
-            )}
+            <div className="section-header">
+              <h3 id="history-heading">History</h3>
+              <span className="section-count">{history?.length ?? 0}</span>
+            </div>
+            <details className="detail-disclosure">
+              <summary>{history?.length ? 'Inspect history' : 'Show history'}</summary>
+              {history === null ? null : history.length === 0 ? (
+                <p className="status-message">No history events.</p>
+              ) : (
+                <ul>
+                  {history.map(ev => (
+                    <li key={ev.id}>{ev.id} — run:{ev.run_id} — {ev.from_state} → {ev.to_state} at {ev.occurred_at}{ev.reason ? ` — ${ev.reason}` : ''}</li>
+                  ))}
+                </ul>
+              )}
+            </details>
           </section>
         </>
       )}
