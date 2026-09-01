@@ -1,66 +1,72 @@
 # Current Handoff
 
 ## Task
-`CP06-WP29-WP32-RC` — hardening, compatibility evidence, and V1 RC preparation
+`CP06-WP32-HANDOFF-CURRENT-SYNC` — synchronize the current CP06 RC handoff after extension redaction and non-browser revalidation
 
 ## Status
-Current operational status: `WP28_COMPLETE / WP29_COMPLETE / WP30_COMPLETE / WP31_COMPLETE / WP32_RC_NEED_ACTION`.
+Current operational status: `WP28_COMPLETE / WP29_COMPLETE / WP30_COMPLETE / WP31_COMPLETE / WP32_NONBROWSER_REVALIDATED / WP32_RC_NEED_ACTION`.
 
-- `TASK_ID`: `CP06-WP29-WP32-RC`
+- `TASK_ID`: `CP06-WP32-HANDOFF-CURRENT-SYNC`
 - Branch: `feature/first-vertical-slice`
-- Code checkpoint: `175f7b328b2ed68b6bed61487dd3cfda09063574`
-- Handoff checkpoint: `0db96b110666f28362edbc0964b22f62c68e2472`
-- Writer: Codex — candidate-only CP06 tests and compatibility/limitation documents
+- Code checkpoint: `8fa13882bc8aa4805bac2f3ab0c5105b2a300fc6`
+- Writer: Codex — candidate-only handoff synchronization
 - Reviewer: Codex deterministic local verification; Human RC decision remains pending
-- Antigravity: `NOT_REQUIRED` for this Core/migration/package evidence slice; real browser journey remains `UNVERIFIED`
-- Next owner: Human/Antigravity for the outstanding browser failure-path acceptance, then Human for RC acceptance decision
-- Git authorization: candidate stage/commit allowed; push/merge/rebase/reset/clean and primary mutation remain prohibited
+- Antigravity: `NOT_REQUIRED` for the non-browser Core/migration/package evidence slice; real browser journey remains `UNVERIFIED`
+- Next owner: Human/Antigravity for CP04 WP21 browser failure-path evidence, then Codex/Human for final RC review
+- Git authorization: this task permits only the exact handoff file plus exact stage/commit; push/merge/rebase/reset/clean and primary mutation remain prohibited
 
 ## Current Goal and Delta
 
-- WP28 is checkpointed at `4040b45157e1aed26ca6ea4ae56e5464a5636ed3`: adapter crash isolation, child cleanup, timeout/cancel cleanup, and fail-closed orphan handling.
-- WP29 added deterministic security, local-only egress, policy/capability, and evidence-provenance tests.
-- WP30 added isolated SQLite backup/restore, downgrade/re-upgrade, history preservation, and startup schema-gate tests.
-- WP31 added bounded package metadata/baseline checks plus compatibility and known-limitations documents.
-- No production dependency, public API, schema, migration, primary workspace, push, merge, rebase, reset, or clean operation was performed.
+- WP28–WP31 remain complete under the existing runtime, security, migration, packaging, and compatibility contracts.
+- CP06 WP32 extension redaction is checkpointed at `8fa13882bc8aa4805bac2f3ab0c5105b2a300fc6`; it covers POSIX absolute paths and `file://` URI redaction with deterministic regression coverage.
+- Non-browser CP06/Core revalidation is current and source-bound: full Core, targeted G15–G18/CP04–CP06 tests, baseline, and governance validation all completed with exit code `0`.
+- No production dependency, public API, schema, migration, primary workspace, external/cloud egress, push, merge, rebase, reset, or clean operation was performed.
 
 ## Changed files
 
-- `services/core/tests/test_cp06_wp29_security_policy.py`
-- `services/core/tests/test_cp06_wp30_clean_install.py`
-- `services/core/tests/test_cp06_wp31_packaging_compatibility.py`
-- `docs/31_COMPATIBILITY_MATRIX.md`
-- `docs/32_KNOWN_LIMITATIONS.md`
-- `docs/12_HANDOFF_CURRENT.md` current operational block only
+Current task exact allowlist:
 
-ADR impact: `NONE`; existing runtime, Alembic, local-only, and maturity contracts were tested/documented without changing them.
+- `docs/12_HANDOFF_CURRENT.md` — current operational block only
+
+Latest CP06 WP32 code delta already present at the code checkpoint:
+
+- `extensions/browser-companion/src/driver-contract.js`
+- `extensions/browser-companion/tests/test_websurface_drivers.mjs`
+
+ADR impact: `NONE`; this synchronization records existing decisions and evidence without changing architecture, API, schema, migration, or maturity policy.
 Scope deviation: `NONE`.
 
 ## Verification evidence
 
-- WP29–WP31 targeted tests: `10 passed`, exit code `0`.
-- Full Core pytest suite: exit code `0`; one pre-existing Windows symlink-policy test is `SKIPPED`.
-- Existing WP28/runtime/resource regression: `25 passed`, exit code `0`.
-- Baseline validator executed from candidate package test: exit code `0`.
-- Final RC command set at `2026-09-01T05:53:49.6814360Z`: Python `3.13.14`, pytest `9.0.2`, Git `2.45.0.windows.1`; each version command exit code `0`.
-- Final full Core suite at the current checkpoint: exit code `0`; one pre-existing Windows symlink-policy test is `SKIPPED`.
-- Final baseline validator: exit code `0`; final governance validator: exit code `0`.
-- `git diff --check` and staged diff checks: exit code `0` after exact allowlist review.
-- Current evidence was generated on 2026-09-01; pytest emitted a non-fatal Windows temporary cleanup `PermissionError` warning after successful runs.
-- Known unverified items remain explicit in `docs/32_KNOWN_LIMITATIONS.md`; no `SUPPORTED` or `CERTIFIED` claim was introduced.
+- Python environment check: Python `3.13.14`, pytest `9.0.2`, FastAPI `0.128.2`, SQLAlchemy `2.0.50`, Alembic `1.18.4`, and httpx `0.28.1`; each check exit code `0`.
+- Full Core command `python -m pytest -q -rA -p no:cacheprovider services/core`: exit code `0`; one pre-existing Windows symlink-policy test is `SKIPPED`.
+- Current G15–G18/CP04–CP06 targeted pytest command set: exit code `0`; no test failure.
+- Baseline command `python -B scripts/validate_baseline.py`: exit code `0`.
+- Governance command `powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tools\validate-polynexus-governance.ps1 -RepoRoot (Get-Location).Path`: exit code `0`; UTC `2026-09-01T11:38:18.4803438Z`–`2026-09-01T11:38:21.2800138Z`.
+- Extension Node tests: `9 passed`, `0 failed`, exit code `0`.
+- `git diff --check`: exit code `0`; candidate status is clean and ahead `18` of its remote-tracking branch.
+- Current evidence was generated on `2026-09-01`; pytest emitted a non-fatal Windows temporary cleanup warning after successful runs.
+
+## Known issues / unverified
+
+- CP04 WP21 real browser failure-path acceptance remains `UNVERIFIED` after prior Chrome/CDP startup failures; no browser retry is authorized by this task.
+- Real vendor browser journeys are not certified; do not claim `SUPPORTED` or `CERTIFIED`.
+- The Windows symlink-policy test remains an explicit host-policy skip; true concurrent HTTP duplicate-command execution remains unverified where documented.
+- CP06/RC therefore remains `NEED_ACTION` until current WP21 evidence and the final RC decision exist.
 
 ## Next Routing
 
 `NEXT_OWNER: Human/Antigravity -> Human`
 
-`NEXT_ACTION: Execute current browser failure-path evidence for CP04 WP21 (launch, detect, fill, user-confirmed-send, capture, normalize, and fallback), then perform independent RC review. Until that evidence exists, CP06/RC remains NEED_ACTION.`
+`NEXT_ACTION: When an operator is available, execute CP04 WP21 browser failure-path evidence for launch, detect, fill, explicit user-confirmed-send, capture, normalize, driver failure, and clipboard/manual fallback. Then run the independent final CP06/RC review. Until that evidence exists, keep CP06/RC at NEED_ACTION.`
 
 ### Do Not Change
 
-- Do not modify primary workspace or protected dirty paths.
+- Do not modify the primary workspace or protected dirty paths.
 - Do not add public API/schema/migration/dependency or introduce cloud/external egress.
 - Do not claim browser/vendor support, `SUPPORTED`, or `CERTIFIED` without current evidence.
-- Do not push, merge, rebase, reset, clean, or stage files outside the explicit CP06 allowlist.
+- Do not retry browser acceptance without a fresh task authorization.
+- Do not push, merge, rebase, reset, clean, or stage files outside the explicit task allowlist.
 
 ## Baseline context retained
 
