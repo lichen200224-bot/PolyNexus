@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PolyNexus 專案控制面板 — G19–G23</title>
+    <style>
+      :root { color-scheme: dark; --bg:#09111f; --panel:#111d30; --line:#2a3c58; --text:#edf4ff; --muted:#9fb0c9; --accent:#65d6c5; --ready:#68dda7; --gated:#ffc66d; --warn:#ff8f8f; }
+      * { box-sizing: border-box; }
+      body { margin:0; background:radial-gradient(circle at 12% 0%,#173457 0,var(--bg) 36rem); color:var(--text); font-family:Inter,"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif; line-height:1.55; }
+      main { width:min(1180px,calc(100% - 32px)); margin:0 auto; padding:40px 0 64px; }
+      h1,h2,h3,p { margin-top:0; } h1 { margin-bottom:8px; font-size:clamp(2rem,5vw,3.5rem); line-height:1.08; } h2 { margin-bottom:18px; font-size:1.35rem; } a { color:var(--accent); } code { color:#cfe6ff; overflow-wrap:anywhere; }
+      .eyebrow { margin-bottom:10px; color:var(--accent); font-weight:750; letter-spacing:.08em; text-transform:uppercase; }
+      .hero,section { margin-bottom:22px; border:1px solid var(--line); border-radius:18px; background:rgba(17,29,48,.94); box-shadow:0 20px 70px rgba(0,0,0,.24); } .hero { padding:clamp(24px,5vw,48px); } section { padding:24px; }
+      .meta,.goal-flow { display:grid; gap:14px; } .meta { grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); margin-top:26px; } .goal-flow { grid-template-columns:repeat(5,1fr); align-items:stretch; }
+      .metric,.goal { border:1px solid var(--line); border-radius:14px; background:#16243a; padding:16px; } .metric strong { display:block; margin-top:3px; font-size:1.35rem; } .goal { position:relative; min-height:170px; } .goal:not(:last-child)::after { content:"→"; position:absolute; z-index:2; top:50%; right:-18px; color:var(--muted); font-size:1.25rem; }
+      .goal h3 { margin:10px 0 8px; font-size:1.05rem; } .goal p { margin-bottom:0; color:var(--muted); font-size:.92rem; } .muted { color:var(--muted); } .ready { color:var(--ready); } .gated { color:var(--gated); } .warning { color:var(--warn); } .badge { display:inline-flex; padding:4px 9px; border:1px solid currentColor; border-radius:999px; font-size:.73rem; font-weight:800; letter-spacing:.04em; }
+      .callout { border-left:4px solid var(--accent); border-radius:8px; background:#0c1728; padding:16px 18px; } .callout.warning { border-color:var(--warn); } table { width:100%; border-collapse:collapse; } th,td { padding:12px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; } th { color:var(--muted); font-size:.78rem; letter-spacing:.06em; text-transform:uppercase; } footer { color:var(--muted); font-size:.86rem; }
+      @media (max-width:900px) { .goal-flow { grid-template-columns:1fr; } .goal { min-height:auto; } .goal:not(:last-child)::after { content:"↓"; top:auto; right:50%; bottom:-22px; } .table-wrap { overflow-x:auto; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header class="hero">
+        <p class="eyebrow">PolyNexus · execution control</p>
+        <h1>五階段專案收尾控制面板</h1>
+        <p class="muted">狀態快照：2026-09-01（Asia/Taipei）。Repository、exact SHA 與本輪 deterministic evidence 才是正式依據。</p>
+        <div class="meta">
+          <div class="metric"><span class="muted">正式進度</span><strong>30 / 100</strong></div>
+          <div class="metric"><span class="muted">G19 output branch</span><strong class="ready">CANONICAL · PASS</strong></div>
+          <div class="metric"><span class="muted">後續 Goal</span><strong class="gated">G20–G23 GATED</strong></div>
+          <div class="metric"><span class="muted">最終驗收者</span><strong>Human · G23</strong></div>
+        </div>
+      </header>
+
+      <section>
+        <h2>G19 canonical checkpoint</h2>
+        <div class="callout"><strong>RESULT: PASS</strong><br />Canonical branch: <code>feature/g19-canonical-workspace-provenance</code><br />Base SHA: <code>730912b5a3e19449c355975485f1fe77350a458a</code><br />Remote ref: <code>backup/feature/g19-canonical-workspace-provenance</code><br />WORKTREE_STATE: <strong>clean</strong> · NEXT_GOAL_READY: <strong>G20</strong></div>
+        <p class="muted" style="margin-top:16px;">Exact final output SHA is published in the handoff and G19 result. The primary lane remains protected and unchanged at <code>b87a0dc780e5d9a3bba083dbaf9552ca52508f9a</code>.</p>
+        <p><a href="11_PROJECT_STATE.md">Project State</a> · <a href="12_HANDOFF_CURRENT.md">Current Handoff</a> · <a href="tasks/G19-G23-FIVE-GOAL-EXECUTION-ROUTING.md">Routing package</a> · <a href="31_COMPATIBILITY_MATRIX.md">Compatibility Matrix</a> · <a href="32_KNOWN_LIMITATIONS.md">Known Limitations</a></p>
+      </section>
+
+      <section>
+        <h2>Goal flow</h2>
+        <div class="goal-flow">
+          <article class="goal"><span class="badge ready">PASS · COMPLETE</span><h3>G19 · Canonical workspace</h3><p>Exact promoted base, provenance reconciliation, validators, checkpoint.</p></article>
+          <article class="goal"><span class="badge gated">GATED · NOT STARTED</span><h3>G20 · Reproducible Web</h3><p>Restore dependencies, run Vitest, and build reproducibly.</p></article>
+          <article class="goal"><span class="badge gated">GATED · NOT STARTED</span><h3>G21 · WP21 browser</h3><p>Real-browser golden flow and failure-path evidence.</p></article>
+          <article class="goal"><span class="badge gated">GATED · NOT STARTED</span><h3>G22 · RC closeout</h3><p>Hardening, delivery package, and cross-machine proof.</p></article>
+          <article class="goal"><span class="badge gated">GATED · NOT STARTED</span><h3>G23 · Human decision</h3><p>Final reconciliation and Human ACCEPT / REJECT / NEED_ACTION.</p></article>
+        </div>
+      </section>
+
+      <section>
+        <h2>Protected boundaries</h2>
+        <ul>
+          <li>Primary dirty lane is unchanged; no reset, clean, merge, rebase, overwrite, bulk stage, or blind absorption occurred.</li>
+          <li><code>docs/31_COMPATIBILITY_MATRIX.md</code> remains the promoted file; primary <code>docs/31_PROJECT_CONTENT_MAP.md</code> was excluded without overwrite.</li>
+          <li>Web, browser, WP21, vendor, and external acceptance were not run in G19. WP21 remains <strong class="warning">DEFERRED / UNVERIFIED</strong>.</li>
+          <li>ADR-001–010 remain frozen; ADR-011 is unchanged; formal project progress remains 30/100.</li>
+        </ul>
+      </section>
+
+      <footer>G19 only. Do not start G20 from any SHA other than the exact output published by the G19 handoff.</footer>
+    </main>
+  </body>
+</html>

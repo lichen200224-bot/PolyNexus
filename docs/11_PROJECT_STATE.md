@@ -1,21 +1,35 @@
 # Project State
 
-## Current Operational State — 2026-09-01
+## Current Operational State — 2026-09-01 (G19 canonical workspace)
 
-This section is the authoritative current-state summary for the CP06 release-candidate
-reconciliation. The retained material below is historical reference and must not
-override this section.
+This is the authoritative current-state block for G19. Retained material below
+is historical reference and must not override this block.
 
-- Candidate branch: `feature/first-vertical-slice`
-- Reconciliation base HEAD: `b42abc5abd344747378fdf076e333d6b832e1ec9`
-- Code evidence checkpoint: `8fa13882bc8aa4805bac2f3ab0c5105b2a300fc6`
-- Current status: `G13–G18 COMPLETE / CP04 WP17–WP20 COMPLETE / CP04 WP21 DEFERRED-UNVERIFIED / CP05 COMPLETE / CP06 WP28–WP32 NONBROWSER COMPLETE / CP06-RC PROVISIONALLY-ACCEPTED-WITH-LIMITATIONS`
-- Human decision: `ACCEPT_RC_WITH_WP21_DEFERRED_UNVERIFIED`; this is provisional acceptance only and does not certify browser/vendor compatibility.
-- Candidate working tree: clean before this documentation task; primary workspace is protected and not modified.
-- Current evidence date: `2026-09-01`; full Core, targeted CP06/Core, baseline, governance, and extension checks are recorded in `docs/12_HANDOFF_CURRENT.md` with actual commands and exit codes.
-- WP21 boundary: real Chrome/browser failure-path acceptance is intentionally deferred; no vendor/browser support or `SUPPORTED`/`CERTIFIED` claim is made.
-- RC boundary: CP06/RC is `PROVISIONALLY_ACCEPTED_WITH_LIMITATIONS`; WP21 remains `DEFERRED / UNVERIFIED`, and no browser/vendor `SUPPORTED` or `CERTIFIED` claim is made.
-- Next route: retain the disclosed limitations; resume WP21 only if an operator is available and a fresh browser authorization is issued.
+- **G19 result:** `PASS` after exact-SHA, provenance, scope, baseline, governance,
+  and clean-checkpoint gates.
+- **Canonical branch:** `feature/g19-canonical-workspace-provenance`
+- **Canonical base:** `730912b5a3e19449c355975485f1fe77350a458a`
+- **Canonical output:** exact committed HEAD is published in the G19 handoff and
+  final result; this document intentionally records the immutable base SHA rather
+  than a self-referential commit hash.
+- **Approved remote source/target:** local approved `backup` remote at
+  `D:\GitBackup\PolyNexus_Backup.git`; fresh `git ls-remote` resolves
+  `feature/first-vertical-slice` exactly to the canonical base before G19 work.
+- **Canonical worktree:** `artifacts/worktrees/g19-canonical-workspace-provenance`;
+  clean after checkpointing, with no staged changes.
+- **Primary protected lane:** `feature/first-vertical-slice@b87a0dc780e5d9a3bba083dbaf9552ca52508f9a`;
+  dirty, mixed tracked/untracked ownership, unchanged by G19.
+- **Provenance result:** only the routing task plus the four G19 current-state /
+  handoff / control-panel files were allowlisted. No primary product, runtime,
+  test, competition, `docs/31_PROJECT_CONTENT_MAP.md`, or Playwright paths were
+  absorbed.
+- **Program state:** G19 is complete; G20 is the next dispatchable goal. G21 and
+  G22/G23 remain gated by the routing contract and later evidence.
+- **Evidence boundary:** G13–G18 and CP04–CP06 claims remain promotion-backed
+  nonbrowser/provisional claims. WP21 real-browser/vendor evidence remains
+  `DEFERRED / UNVERIFIED`; no browser, Web, WP21, or vendor acceptance is claimed.
+- **Formal project progress:** remains `30/100`; G19 provenance consolidation
+  does not itself award product points or final Human acceptance.
 
 ## Historical Baseline Reference
 

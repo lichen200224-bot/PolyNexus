@@ -1,84 +1,139 @@
 # Current Handoff
 
-## Task
-`CP06-RC-PROVISIONAL-ACCEPTANCE-HANDOFF-SYNC` — record provisional RC acceptance with deferred WP21
+## Current Task — G19 canonical workspace and provenance consolidation (2026-09-01)
 
-## Status
-Current operational status: `G13–G18_COMPLETE / CP04_WP17–WP20_COMPLETE / CP04_WP21_DEFERRED_UNVERIFIED / CP05_COMPLETE / CP06_WP28–WP32_NONBROWSER_COMPLETE / CP06_RC_PROVISIONALLY_ACCEPTED_WITH_LIMITATIONS`.
+**Result:** `PASS`
 
-- `TASK_ID`: `CP06-RC-PROVISIONAL-ACCEPTANCE-HANDOFF-SYNC`
-- Branch: `feature/first-vertical-slice`
-- Base/code checkpoint: `b42abc5abd344747378fdf076e333d6b832e1ec9` / `8fa13882bc8aa4805bac2f3ab0c5105b2a300fc6`
-- Writer: Codex — candidate-only current-state documentation reconciliation
-- Reviewer: Codex deterministic RC verification; Human decision `ACCEPT_RC_WITH_WP21_DEFERRED_UNVERIFIED` recorded
-- Antigravity: `DEFERRED` for WP21 because the operator is unavailable; real browser journey remains `UNVERIFIED`
-- Next owner: Human/Antigravity only if WP21 browser evidence is later required; provisional RC is accepted with disclosed limitations
-- Git authorization: only the four exact documents below may be staged/committed; push/merge/rebase/reset/clean and primary mutation remain prohibited
+- `TASK_ID`: `G19-CANONICAL-WORKSPACE-AND-PROVENANCE-CONSOLIDATION`
+- `ATTEMPT`: 1
+- `MODE`: `IMPLEMENT_AND_VERIFY`
+- `WRITER`: Codex (sole active writer)
+- `REVIEWER`: `NOT_APPLICABLE` — bounded documentation/routing reconciliation; no independent reviewer was invoked or self-claimed
+- `ANTIGRAVITY_STATUS`: `NOT_REQUIRED` — no browser/UI/E2E execution was authorized or performed
+- `BRANCH`: `feature/g19-canonical-workspace-provenance`
+- `CANONICAL_BASE_SHA`: `730912b5a3e19449c355975485f1fe77350a458a`
+- `OUTPUT_SHA`: exact final commit is the branch HEAD published in the G19 result; the SHA is intentionally not duplicated inside a self-referential commit
+- `REMOTE_REF`: `backup/feature/g19-canonical-workspace-provenance`
+- `WORKTREE_STATE`: clean; staged state empty after checkpoint
+- `TASK_DOC`: `docs/tasks/G19-G23-FIVE-GOAL-EXECUTION-ROUTING.md`
+- `HANDOFF_DOC`: `docs/12_HANDOFF_CURRENT.md`
+- `NEXT_OWNER`: Codex, G20
+- `NEXT_ACTION`: verify this exact G19 output SHA on approved backup, then begin G20 Web dependency/test/build gate; do not start G20 in this task
 
-## Current Goal and Delta
+### Provenance and allowlist reconciliation
 
-- WP28–WP31 remain complete under the existing runtime, security, migration, packaging, and compatibility contracts.
-- CP06 WP32 extension redaction is checkpointed at `8fa13882bc8aa4805bac2f3ab0c5105b2a300fc6`; it covers POSIX absolute paths and `file://` URI redaction with deterministic regression coverage.
-- Non-browser CP06/Core revalidation is current and source-bound: full Core, targeted G15–G18/CP04–CP06 tests, baseline, and governance validation all completed with exit code `0`.
-- CP04 WP21 is explicitly deferred, not failed or accepted: no current browser evidence is available, and no browser/vendor maturity claim is made.
-- Human has approved `ACCEPT_RC_WITH_WP21_DEFERRED_UNVERIFIED`; CP06/RC is now `PROVISIONALLY_ACCEPTED_WITH_LIMITATIONS`, not final browser-integrated certification.
-- The WP21 deferral does not block Core/workflow/document development; it only leaves real browser/vendor compatibility `UNVERIFIED`.
-- No production dependency, public API, schema, migration, primary workspace, external/cloud egress, push, merge, rebase, reset, or clean operation was performed.
+The isolated lane was cloned directly from approved `backup` remote ref
+`feature/first-vertical-slice`, which fresh `git ls-remote` resolved to the exact
+base SHA above. The protected primary lane stayed at
+`feature/first-vertical-slice@b87a0dc780e5d9a3bba083dbaf9552ca52508f9a`, dirty,
+with staged state empty. No reset, clean, merge, rebase, overwrite, bulk stage,
+or primary checkout mutation was performed.
 
-## Changed files
+Imported files (source → ownership → reason):
 
-Current task exact allowlist:
+- `docs/tasks/G19-G23-FIVE-GOAL-EXECUTION-ROUTING.md` (primary untracked copy,
+  SHA-256 `EE37AEE23C2C72B35400683399F9EE2592720520F9DF38B6D23409DB8BAE5E7B`
+  → G19–G23 governance-owned → durable routing prompts and predecessor gates).
+- `docs/11_PROJECT_STATE.md` (primary tracked current-state delta → G19
+  governance-owned → canonical branch/base/provenance/evidence state).
+- `docs/12_HANDOFF_CURRENT.md` (primary tracked current-task delta → G19
+  governance-owned → exact handoff, allowlist, limitations, and next owner).
+- `docs/GOAL_COMPLETION_CONTROL_PANEL.md` (primary untracked panel,
+  SHA-256 `C101F089BE0881CA3C2DB661D7347B6969FC0ABFF1FA63CADD78401D163A02AB`
+  → G19 governance-owned → human-readable goal status control panel).
+- `docs/GOAL_COMPLETION_CONTROL_PANEL.html` (primary untracked panel,
+  SHA-256 `B006D3FE8F9A829A0ED468E047239AD67BB22B2C7999D714D56CC59BB1AF0379`
+  → G19 governance-owned → browser-readable companion with local links).
 
-- `docs/11_PROJECT_STATE.md` — current operational state and historical-reference boundary
-- `docs/12_HANDOFF_CURRENT.md` — current operational block only
-- `docs/31_COMPATIBILITY_MATRIX.md` — current maturity and WP21 boundary
-- `docs/32_KNOWN_LIMITATIONS.md` — current limitations and RC status
+The panel files were then reconciled to the canonical G19 result; their source
+hashes above identify the imported primary artifacts, not the final checkpoint
+blob hashes.
 
-Latest CP06 WP32 code delta already present at the code checkpoint:
+### Primary dirty-path classification (complete inventory)
 
-- `extensions/browser-companion/src/driver-contract.js`
-- `extensions/browser-companion/tests/test_websurface_drivers.mjs`
+`ALREADY_PRESENT_IN_PROMOTED_HISTORY` (path exists in the 730912b5 tree; dirty
+delta was not imported): `README.md`, `docs/10_DECISION_LOG.md`,
+`docs/11_PROJECT_STATE.md` (only bounded G19 block imported),
+`docs/12_HANDOFF_CURRENT.md` (only bounded G19 block imported),
+`docs/15_DOCUMENT_INDEX.md`, `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`,
+`docs/tasks/WP-12.md`, `services/core/src/polynexus_core/runtime/contracts.py`,
+`services/core/src/polynexus_core/runtime/registry.py`.
 
-ADR impact: `NONE`; this synchronization records existing decisions and evidence without changing architecture, API, schema, migration, or maturity policy.
-Scope deviation: `NONE`.
+`G19_G23_REQUIRED_ROUTING_OR_GOVERNANCE_DELTA` (explicitly imported/reconciled):
+`docs/tasks/G19-G23-FIVE-GOAL-EXECUTION-ROUTING.md`,
+`docs/11_PROJECT_STATE.md`, `docs/12_HANDOFF_CURRENT.md`,
+`docs/GOAL_COMPLETION_CONTROL_PANEL.md`,
+`docs/GOAL_COMPLETION_CONTROL_PANEL.html`.
 
-## Verification evidence
+`USER_OWNED_OR_UNRELATED` (preserved only in protected primary):
+`competition/G03_SUBMISSION_REQUIREMENTS_AND_CHECKLIST.md`,
+`competition/PolyNexus_預期功能簡報_v1.pptx`,
+`competition/PolyNexus_預期功能簡報說明_v1.md`, `docs.zip`,
+`docs/tasks/G03-COMP-02-03-INITIAL-REVIEW-READINESS.md`,
+`docs/tasks/G12-DOC-PROVENANCE-RECONCILIATION.md`,
+`docs/tasks/G13-COUNCIL-RUN-BINDING-SAFETY-GATE.md`,
+`docs/tasks/G14-RUNTIME-CANCELLATION-CLEANUP-GATE.md`, `docs/tasks/WP-14.md`,
+`output/playwright/.playwright-cli/Cyber4-0-AI-Innovation-Challenge-2026-簡章.docx`,
+`output/playwright/.playwright-cli/page-2026-08-27T14-01-14-532Z.yml`,
+`output/playwright/.playwright-cli/page-2026-08-27T14-01-45-528Z.png`,
+`output/playwright/.playwright-cli/page-2026-08-27T14-03-48-235Z.yml`,
+`output/playwright/.playwright-cli/page-2026-08-27T14-04-21-362Z.png`,
+`output/playwright/.playwright-cli/page-2026-08-27T14-05-39-644Z.yml`,
+`output/playwright/.playwright-cli/page-2026-08-27T14-08-04-474Z.png`,
+`output/playwright/.playwright-cli/page-2026-08-27T14-08-25-039Z.png`,
+`output/playwright/.playwright-cli/page-2026-08-27T14-09-14-453Z.png`,
+`output/playwright/.playwright-cli/page-2026-08-27T14-10-08-836Z.png`,
+`scripts/gen_expected_ppt.py`, `services/core/src/polynexus_core/runtime/codex.py`,
+`services/core/tests/test_runtime_registry_conformance.py`,
+`services/core/tests/test_wp14_codex_runtime.py`.
 
-- Python environment check: Python `3.13.14`, pytest `9.0.2`, FastAPI `0.128.2`, SQLAlchemy `2.0.50`, Alembic `1.18.4`, and httpx `0.28.1`; each check exit code `0`.
-- Full Core command `python -m pytest -q -rA -p no:cacheprovider services/core`: exit code `0`; one pre-existing Windows symlink-policy test is `SKIPPED`.
-- Current G15–G18/CP04–CP06 targeted pytest command set: exit code `0`; no test failure.
-- Baseline command `python -B scripts/validate_baseline.py`: exit code `0`.
-- Governance command `powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tools\validate-polynexus-governance.ps1 -RepoRoot (Get-Location).Path`: exit code `0`; UTC `2026-09-01T11:38:18.4803438Z`–`2026-09-01T11:38:21.2800138Z`.
-- Extension Node tests: `9 passed`, `0 failed`, exit code `0`.
-- Fresh full Core revalidation at UTC `2026-09-01T13:05:19.6151652Z`: `python -B -m pytest -q -rA -p no:cacheprovider services/core` exit code `0`; one Windows symlink-policy test `SKIPPED`; no test failure. The executable path is intentionally omitted from this evidence record.
-- Fresh extension static tests at UTC `2026-09-01T13:05:19.6151652Z`: `node --test extensions/browser-companion/tests/test_websurface_drivers.mjs` reported `9 passed, 0 failed, 0 skipped`, exit code `0`.
-- Fresh baseline validation at UTC `2026-09-01T13:09:47.0847841Z`–`2026-09-01T13:09:49.2506307Z`: `python -B scripts/validate_baseline.py` exit code `0`; `11` required files, workflows valid, and MV3 manifest valid.
-- Fresh governance validation at UTC `2026-09-01T13:09:47.6602657Z`–`2026-09-01T13:09:56.0387139Z`: `powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tools\validate-polynexus-governance.ps1 -RepoRoot (Get-Location).Path` exit code `0`; required governance files, manifest, JSON, and protected-path exclusions valid.
-- Pre-edit candidate status: clean and ahead `19` of its remote-tracking branch; `git status --short --branch` exit code `0`.
-- Pre-edit candidate HEAD: `b42abc5abd344747378fdf076e333d6b832e1ec9`; `git rev-parse HEAD` exit code `0`.
-- Documentation validation at UTC `2026-09-01T12:44:23.9724288Z`: exact-file scope scan exit `0` (`4` expected, `0` unexpected, `0` missing, `0` staged); `git diff --check` exit `0`; added-line secret/path redaction scan exit `0` (`55` added lines, `0` forbidden matches); current-state marker scan exit `0` (`4/4` present).
-- Current evidence was generated on `2026-09-01`; pytest emitted a non-fatal Windows temporary cleanup warning after successful runs.
+`UNSAFE_EXCLUDED`: `output/playwright/.playwright-cli/console-2026-08-27T14-01-12-297Z.log`
+was not inspected/imported because browser console artifacts can contain
+credential, cookie, token, or other sensitive fragments.
 
-## Known issues / unverified
+`LATER_BOUNDED_IMPORT`: none for G19. Product/runtime/test deltas remain owned by
+their original task gates and are not silently promoted; a future goal may import
+them only with its own explicit allowlist and predecessor evidence.
 
-- CP04 WP21 real browser failure-path acceptance is `DEFERRED / UNVERIFIED` after prior Chrome/CDP startup failures; no browser retry is authorized by this task.
-- Real vendor browser journeys are not certified; do not claim `SUPPORTED` or `CERTIFIED`.
-- The Windows symlink-policy test remains an explicit host-policy skip; true concurrent HTTP duplicate-command execution remains unverified where documented.
-- CP06/RC is `PROVISIONALLY_ACCEPTED_WITH_LIMITATIONS` by Human decision; it is not browser/vendor certification.
+The `docs/31` collision is resolved by retaining promoted
+`docs/31_COMPATIBILITY_MATRIX.md` and excluding primary untracked
+`docs/31_PROJECT_CONTENT_MAP.md`; neither was overwritten or deleted.
 
-## Next Routing
+### Verification (this G19 run)
 
-`NEXT_OWNER: Human/Antigravity only if WP21 browser evidence is later required`
+- Fresh primary status/HEAD/remote/diff/untracked inventory: exit `0`; primary
+  remained dirty at `b87a0dc`, staged state empty.
+- Fresh approved-backup `git ls-remote backup refs/heads/feature/first-vertical-slice`:
+  exact `730912b5a3e19449c355975485f1fe77350a458a`, exit `0`.
+- Isolated clone/switch: canonical base HEAD exact, exit `0`; initial worktree
+  clean, staged state empty.
+- Routing/panel import hashes matched their primary sources before reconciliation.
+- `git diff --check`: PASS, exit `0`.
+- Baseline validator: PASS, exit `0`.
+- Governance validator: PASS, exit `0`.
+- Scope/protected-path check: PASS, exit `0`; only the five G19 governance files
+  are in the checkpoint allowlist.
+- Independent review: `NOT_APPLICABLE`; no product source or frozen contract was
+  changed, and no independent reviewer was self-claimed.
 
-`NEXT_ACTION: Keep WP21 deferred and retain the disclosed limitations. If browser evidence is later required, obtain fresh authorization before executing launch, detect, fill, explicit user-confirmed-send, capture, normalize, driver failure, and clipboard/manual fallback. Do not upgrade provisional RC or browser/vendor maturity without new evidence.`
+### Limitations and protected boundaries
+
+- This goal did not run Web Vitest/build, browser, WP21, vendor, or external
+  acceptance; all remain `UNVERIFIED`, deferred, or gated as specified by routing.
+- Existing promoted nonbrowser evidence remains provisional where documented;
+  formal project progress remains `30/100` and G23 Human acceptance is pending.
+- `docs/31_PROJECT_CONTENT_MAP.md` and every other excluded primary path remain
+  outside this lane and were not copied.
+- ADR impact: `NONE`; ADR-001–010 remain frozen and ADR-011 remains unchanged.
+- Scope deviation: `NONE`; no product feature, architecture, scope, schema,
+  migration, dependency, secret, or vendor logic was changed.
 
 ### Do Not Change
 
-- Do not modify the primary workspace or protected dirty paths.
-- Do not add public API/schema/migration/dependency or introduce cloud/external egress.
-- Do not claim browser/vendor support, `SUPPORTED`, or `CERTIFIED` without current evidence.
-- Do not retry browser acceptance without a fresh task authorization.
-- Do not push, merge, rebase, reset, clean, or stage files outside the explicit task allowlist.
+Do not modify the protected primary lane; do not start G20 from any SHA other
+than this branch's exact output; do not claim Web/browser/WP21/vendor acceptance;
+do not alter frozen ADR/Product Scope; do not force-push, rewrite history, reset,
+clean, merge, rebase, reconfigure remotes, or start G20 in this task.
 
 ## Baseline context retained
 
