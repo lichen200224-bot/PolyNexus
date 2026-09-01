@@ -1,7 +1,8 @@
 [
   {
-    "route": "https://chatgpt.com:61672/golden",
-    "fixture": "controlled synthetic golden",
+    "route": "https://127.0.0.1:60508/golden?vendor=chatgpt.com",
+    "fixture": "controlled local HTTPS synthetic golden",
+    "fixture_vendor_selector": "chatgpt.com",
     "driver": "chatgpt-web",
     "health": {
       "status": "READY",
@@ -40,11 +41,13 @@
     },
     "screenshot": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\01\\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\\g21-isolated\\artifacts\\verification\\g21-browser-20260902/chatgpt-com-golden.png",
     "result": "PASS",
-    "exit_code": 0
+    "exit_code": "N/A",
+    "evidence_type": "in-process assertion"
   },
   {
-    "route": "https://claude.ai:61672/golden",
-    "fixture": "controlled synthetic golden",
+    "route": "https://127.0.0.1:60508/golden?vendor=claude.ai",
+    "fixture": "controlled local HTTPS synthetic golden",
+    "fixture_vendor_selector": "claude.ai",
     "driver": "claude-web",
     "health": {
       "status": "READY",
@@ -83,11 +86,13 @@
     },
     "screenshot": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\01\\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\\g21-isolated\\artifacts\\verification\\g21-browser-20260902/claude-ai-golden.png",
     "result": "PASS",
-    "exit_code": 0
+    "exit_code": "N/A",
+    "evidence_type": "in-process assertion"
   },
   {
-    "route": "https://gemini.google.com:61672/golden",
-    "fixture": "controlled synthetic golden",
+    "route": "https://127.0.0.1:60508/golden?vendor=gemini.google.com",
+    "fixture": "controlled local HTTPS synthetic golden",
+    "fixture_vendor_selector": "gemini.google.com",
     "driver": "gemini-web",
     "health": {
       "status": "READY",
@@ -126,6 +131,7 @@
     },
     "screenshot": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\01\\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\\g21-isolated\\artifacts\\verification\\g21-browser-20260902/gemini-google-com-golden.png",
     "result": "PASS",
-    "exit_code": 0
+    "exit_code": "N/A",
+    "evidence_type": "in-process assertion"
   }
 ]

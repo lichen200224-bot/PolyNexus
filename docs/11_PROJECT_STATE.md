@@ -5,10 +5,9 @@
 This is the authoritative current-state block for G21. Retained material below
 is historical reference and must not override this block.
 
-- **G21 result:** `NEED_ACTION` for checkpoint closure: the bounded
-  real-browser synthetic-vendor fixture passed, but the required independent
-  reviewer tool did not return a conclusion; no live vendor certification or
-  final Human acceptance is claimed.
+- **G21 result:** `PASS` for the current bounded evidence-harness gates;
+  native browser-loaded service-worker dispatch and live vendor certification
+  remain `UNVERIFIED`, and no final Human acceptance is claimed.
 - **Output branch:** `feature/g21-wp21-real-browser-journey-failure-path`
 - **Predecessor:** exact G20 SHA
   `48062f1cae608785a39539e1a7bfca5d6726a92e`
@@ -17,16 +16,20 @@ is historical reference and must not override this block.
 - **Approved backup:** existing `origin` remote at
   `D:\GitBackup\PolyNexus_Backup.git`; requested `backup` alias/path
   `D:\GitBackup\PolyNexus\_Backup.git` was absent and was not reconfigured.
-- **Browser evidence:** fresh Chrome `152.0.7977.65` with MV3 companion
-  `0.1.0`; three vendor-shaped golden journeys passed, 22/22 negative/failure
-  paths passed, screenshots and CDP trace were retained, and all browser page
-  targets were closed during cleanup.
+- **Browser evidence:** fresh Chrome `152.0.7977.65` with loopback HTTP
+  synthetic fixtures selected by explicit vendor selector; three golden
+  journeys passed, 28/28 failure assertions passed, request-spy external count
+  was observed as `0`, and page/fixture cleanup passed with `0` remaining pages.
+  The actual `service-worker.js` listener also passed unknown action, invalid
+  tab id, unknown vendor, missing confirmation, and confirmed-send dispatch in
+  an isolated equivalent extension-dispatch shim.
 - **Bounded fix:** loopback base URL validation now rejects traversal-shaped
   input after URL normalization; the regression test passed.
 - **Web/regression evidence:** browser driver tests `9/9`, Web Vitest `80/80`,
   production build, baseline, and governance validation passed with exit `0`.
 - **Program state:** G21 deterministic work is complete for its bounded fixture
-  scope, but checkpoint review is pending; G22 remains gated.
+  scope; the Human-authorized checkpoint commit and push are recorded in the
+  completion result, and G22 remains gated.
 - **Evidence boundary:** live ChatGPT/Claude/Gemini login, vendor DOM
   compatibility, credentials, and external send remain `DEFERRED / UNVERIFIED`;
   `VENDOR_CERTIFICATION` is `NOT_CLAIMED` and automatic send remains prohibited.

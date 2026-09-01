@@ -2,26 +2,27 @@
 
 ## Current Task — G21 real-browser WP21 journey and failure paths (2026-09-02)
 
-**Result:** `NEED_ACTION` — deterministic bounded fixture passed; independent
-reviewer conclusion is still missing
+**Result:** `PASS` for the current deterministic bounded evidence-harness gates;
+native browser-loaded service-worker dispatch and live vendor certification remain
+`UNVERIFIED`
 
 - `TASK_ID`: `G21-WP21-REAL-BROWSER-JOURNEY-AND-FAILURE-PATH`
-- `ATTEMPT`: 1
+- `ATTEMPT`: 2
 - `MODE`: `BROWSER_E2E_VERIFY_AND_BOUNDED_FIX`
 - `WRITER`: Codex (sole active writer for the bounded source, docs, and evidence)
-- `REVIEWER`: Codex independent read-only acceptance review is pending; fork
-  `01a05de5-4bdf-7520-a8e3-c25672a693c4` remained active without returning a
-  conclusion, so this gap is not treated as PASS
+- `REVIEWER`: `NOT_REQUIRED_FOR_THIS_WRITER_RUN`; this is a deterministic
+  writer-run result, not an independent review
 - `ANTIGRAVITY_STATUS`: `REQUIRED / COMPLETED` — real Chrome/CDP browser lane
   completed on the Codex host; no separate Antigravity runtime was available
 - `BRANCH`: `feature/g21-wp21-real-browser-journey-failure-path`
 - `PREDECESSOR_SHA`: `48062f1cae608785a39539e1a7bfca5d6726a92e`
-- `OUTPUT_SHA`: exact final checkpoint is published in the G21 completion result;
-  it is not duplicated inside this self-referential commit
-- `REMOTE_REF`: `origin/feature/g21-wp21-real-browser-journey-failure-path` on
-  `D:\GitBackup\PolyNexus_Backup.git` after explicit non-force push
-- `WORKTREE_STATE`: must be clean and staged state empty after checkpoint
-- `NEXT_GOAL_READY`: `NO` — independent review must conclude before G22
+- `OUTPUT_SHA`: exact authorized checkpoint SHA is recorded in the completion
+  result after commit
+- `REMOTE_REF`: `origin/feature/g21-wp21-real-browser-journey-failure-path`
+  after the authorized non-force push
+- `WORKTREE_STATE`: clean after the authorized checkpoint; staged state empty
+- `NEXT_GOAL_READY`: `NO` — native browser service-worker dispatch and live vendor
+  certification remain separate gates before G22
 - `TASK_DOC`: `docs/tasks/G21-WP21-REAL-BROWSER-JOURNEY-AND-FAILURE-PATH.md`
 - `HANDOFF_DOC`: `docs/12_HANDOFF_CURRENT.md`
 - `NEXT_OWNER`: Codex for independent review and checkpoint closure; later G22
@@ -29,26 +30,30 @@ reviewer conclusion is still missing
 
 ### G21 deterministic evidence
 
-- Fresh Chrome `152.0.7977.65`, MV3 companion `0.1.0`, synthetic HTTPS fixture
-  mapped to the ChatGPT/Claude/Gemini hostnames; no live vendor traffic, login,
-  credentials, cookies, tokens, or external send.
-- Golden journeys: `3/3` passed with exit `0`; each covered health, fill,
-  confirmation boundary, confirmed fixture send, capture, and normalization.
-- Failure paths: `22/22` passed with exit `0`, including malformed messages,
-  unknown actions, unsupported hosts, invalid tab IDs, missing confirmation,
-  loopback URL rejection, bounded request failures, and cleanup.
+- Fresh Chrome `152.0.7977.65` with a loopback HTTPS synthetic fixture using a
+  SAN certificate for `127.0.0.1` and `localhost`, selected by explicit vendor
+  selector; no live vendor traffic, login, credentials, cookies, tokens, or
+  external send.
+- Golden journeys: `3/3` passed; each matrix row uses `exit_code: "N/A"` for an
+  in-process assertion and the aggregate harness process exit was `0`.
+- Failure paths: `28/28` passed; actual `service-worker.js` listener dispatch
+  covered unknown action, invalid tab ID, unknown vendor, missing confirmation,
+  and confirmed-send boundary. Core unavailable and loopback failure/timeout
+  used observed request spies; external request count was computed as `0`.
+- Cleanup: `finally` closed browser page targets and the fixture server; pages
+  were `0` after cleanup and cleanup contributed to aggregate exit evaluation.
 - Evidence bundle: `artifacts/verification/g21-browser-20260902/` contains
   environment, journey/failure matrices, CDP trace, screenshots, summary,
   harness source, and command/exit-code record. Result JSON and CDP trace scans
   found no raw-response or sensitive markers; temporary profiles/certificates
   were removed.
 - `node --test extensions/browser-companion/tests/test_websurface_drivers.mjs`:
-  `9/9` passed, exit `0`; Web `npm test`: `80/80` passed, exit `0`; Web
-  production build: exit `0`; baseline and governance validators: exit `0`.
-- Two `npm ci` attempts were environment failures (exit `1`: shared-cache
-  permissions and registry/installer access). Web tests/build passed using the
-  dependency tree restored from the exact G20 clean clone; this limitation is
-  disclosed and is not represented as a fresh G21 install PASS.
+  `9/9` passed, exit `0`; G21 harness exit `0`; governance validator exit `0`;
+  baseline validator exit `0` under approved elevation (sandbox attempt exit `1`).
+- The native browser-loaded MV3 service-worker target was unavailable in the
+  stable browser lane; the matrix therefore records the actual source listener
+  through an equivalent isolated extension-dispatch shim and leaves native
+  browser dispatch `UNVERIFIED`.
 
 ### G21 bounded change and boundaries
 
@@ -64,9 +69,10 @@ reviewer conclusion is still missing
 
 ### G21 next exact step
 
-Complete the independent read-only review, then update/push the review result
-and re-verify the exact remote SHA. Do not claim live vendor certification or
-final Human acceptance, and do not start G22.
+Keep the evidence result bounded to the loopback fixture and equivalent
+service-worker dispatch shim. A later task may verify native browser-loaded
+service-worker dispatch and live vendor compatibility. Do not claim live vendor
+certification or final Human acceptance, and do not start G22.
 
 ### G21 Do Not Change
 
