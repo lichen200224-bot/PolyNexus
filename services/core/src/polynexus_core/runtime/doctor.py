@@ -445,6 +445,64 @@ async def collect_doctor_report(
                     ),
                 )
             )
+        try:
+            route_probe = getattr(adapter, "route_evidence", None)
+            if not callable(route_probe):
+                route_probe = None
+            if route_probe is None:
+                raise LookupError
+            route_evidence = route_probe()
+            timeout_seconds = float(route_evidence.timeout_seconds)
+            timeout_value: int | str | None = (
+                int(timeout_seconds)
+                if timeout_seconds.is_integer()
+                else format(timeout_seconds, ".3f").rstrip("0").rstrip(".")
+            )
+            route_values = {
+                "route.endpoint": route_evidence.endpoint_identity,
+                "route.model": route_evidence.model_identity,
+                "route.policy": route_evidence.route,
+                "route.timeout_seconds": timeout_value,
+                "route.safe_error": route_evidence.safe_error or None,
+            }
+            for name, value in route_values.items():
+                claims.append(
+                    DoctorClaim(
+                        name=name,
+                        value=_safe_value(value),
+                        maturity=_claim_maturity(
+                            freshness,
+                            observed=True,
+                            compatible=True,
+                        ),
+                        evidence=_base_provenance(
+                            source="runtime.routing",
+                            exact_commit=exact_commit,
+                            generated_at=observed_at,
+                            command=DOCTOR_COMMAND,
+                            exit_code=exit_code,
+                            freshness=freshness,
+                        ),
+                    )
+                )
+        except LookupError:
+            pass
+        except Exception:
+            claims.append(
+                DoctorClaim(
+                    name="route.policy",
+                    value=None,
+                    maturity=MaturityState.UNVERIFIED,
+                    evidence=_base_provenance(
+                        source="runtime.routing",
+                        exact_commit=exact_commit,
+                        generated_at=observed_at,
+                        command=DOCTOR_COMMAND,
+                        exit_code=1,
+                        freshness=EvidenceFreshness.UNVERIFIED,
+                    ),
+                )
+            )
         for name, probe in (("health", adapter.health), ("readiness", adapter.readiness)):
             try:
                 value = await probe()

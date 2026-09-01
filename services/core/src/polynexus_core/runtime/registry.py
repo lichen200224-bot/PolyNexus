@@ -96,7 +96,7 @@ def _select_profile_ref(
 
 
 def _validate_v1_profile(profile: RuntimeProfile) -> None:
-    """Enforce the Human-approved V1 reference-local-only policy."""
+    """Enforce the V1 local-only policy for reference and opt-in profiles."""
     try:
         observed = (
             profile.provider_id,
@@ -110,7 +110,7 @@ def _validate_v1_profile(profile: RuntimeProfile) -> None:
             profile.secret_ref_id,
             profile.usage_visibility,
         ) if isinstance(profile, RuntimeProfile) else None
-        allowed = observed == (
+        reference_allowed = observed == (
             "polynexus",
             TransportKind.LOCAL,
             "reference",
@@ -122,6 +122,17 @@ def _validate_v1_profile(profile: RuntimeProfile) -> None:
             None,
             UsageVisibility.UNAVAILABLE,
         )
+        # CP-04 adds explicitly registered in-memory local endpoint profiles.
+        # The profile still carries no endpoint or credential and remains
+        # LOCAL/NONE; endpoint loopback validation belongs to the adapter.
+        local_endpoint_allowed = (
+            profile.transport_kind is TransportKind.LOCAL
+            and profile.execution_target is ExecutionTarget.LOCAL
+            and profile.auth_ownership is AuthOwnership.NONE
+            and profile.secret_ref_id is None
+            and profile.usage_visibility is UsageVisibility.UNAVAILABLE
+        )
+        allowed = reference_allowed or local_endpoint_allowed
     except Exception:
         allowed = False
     if not allowed:
@@ -297,3 +308,29 @@ def build_default_registry() -> RuntimeRegistry:
     registry = RuntimeRegistry()
     registry.register(build_reference_profile(), ReferenceRuntimeAdapter)
     return registry
+
+
+def register_local_endpoint_profile(
+    registry: RuntimeRegistry,
+    profile: RuntimeProfile,
+    factory: AdapterFactory,
+) -> None:
+    """Register a caller-selected LOCAL/NONE endpoint profile explicitly.
+
+    This composition helper does not inspect or persist an endpoint URL.  The
+    factory must construct an adapter that enforces the loopback policy.
+    """
+
+    try:
+        allowed = (
+            profile.transport_kind is TransportKind.LOCAL
+            and profile.execution_target is ExecutionTarget.LOCAL
+            and profile.auth_ownership is AuthOwnership.NONE
+            and profile.secret_ref_id is None
+            and profile.usage_visibility is UsageVisibility.UNAVAILABLE
+        )
+    except Exception:
+        allowed = False
+    if not allowed:
+        raise RuntimeBindingError(_V1_PROFILE_POLICY_REASON)
+    registry.register(profile, factory)
