@@ -69,6 +69,14 @@ test('sanitizes bounded web text and context', () => {
   assert.equal(sanitizeContext({ instructions: ['Keep it short'], constraints: ['No secrets'] }), 'Keep it short\nNo secrets')
 })
 
+test('redacts POSIX paths and file URIs without corrupting ordinary URLs', () => {
+  const value = sanitizeWebText('/home/user/secret.txt file:///var/lib/app/state.json')
+  assert.equal(value.includes('/home/user/secret.txt'), false)
+  assert.equal(value.includes('file:///var/lib/app/state.json'), false)
+  assert.equal(value.includes('[PATH_REDACTED]'), true)
+  assert.equal(sanitizeWebText('https://example.test/api/v1'), 'https://example.test/api/v1')
+})
+
 test('driver URL matching is exact and launch is fixed to approved vendor origin', async () => {
   assert.equal(chatgptDriver.matches('https://chatgpt.com/c/1'), true)
   assert.equal(chatgptDriver.matches('https://evil-chatgpt.com/c/1'), false)

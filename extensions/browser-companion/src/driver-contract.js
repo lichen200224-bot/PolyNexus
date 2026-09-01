@@ -45,8 +45,10 @@ export function sanitizeWebText(value, maxLength = MAX_WEB_TEXT_LENGTH) {
     .replace(/\b(?:api[_ -]?key|access[_ -]?token|authorization|bearer|cookie|credential|password|secret|token)\s*[:=]\s*[^\s,;]+/gi, REDACTED)
     .replace(/\bBearer\s+[^\s,;]+/gi, `Bearer ${REDACTED}`)
     .replace(/\b(?:secret|token|password|credential|api[_-]?key)[_-][A-Za-z0-9][A-Za-z0-9._-]*\b/gi, REDACTED)
+    .replace(/\bfile:\/\/[^\s,;]+/gi, '[PATH_REDACTED]')
     .replace(/(?<![A-Za-z0-9_])[A-Za-z]:[\\/][^\s,;]+/g, '[PATH_REDACTED]')
     .replace(/(?<![A-Za-z0-9_])\\\\[^\s,;]+/g, '[PATH_REDACTED]')
+    .replace(/(?<![A-Za-z0-9_:/])\/(?:[A-Za-z0-9._~-]+\/)+[A-Za-z0-9._~-]+/g, '[PATH_REDACTED]')
   if (maxLength < 1) return ''
   if (text.length <= maxLength) return text
   return `${text.slice(0, Math.max(0, maxLength - TRUNCATED.length - 1))} ${TRUNCATED}`
