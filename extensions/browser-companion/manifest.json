@@ -3,7 +3,7 @@
   "name": "PolyNexus Browser Companion",
   "version": "0.1.0",
   "description": "Thin browser companion for assisted Web AI workflows.",
-  "permissions": ["storage", "tabs", "scripting"],
+  "permissions": ["storage", "tabs", "scripting", "clipboardRead"],
   "host_permissions": [
     "http://127.0.0.1/*",
     "https://chatgpt.com/*",
