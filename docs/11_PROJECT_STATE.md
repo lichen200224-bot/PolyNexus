@@ -7,7 +7,7 @@ reconciliation. The retained material below is historical reference and must not
 override this section.
 
 - Candidate branch: `feature/first-vertical-slice`
-- Current candidate HEAD: `b42abc5abd344747378fdf076e333d6b832e1ec9`
+- Reconciliation base HEAD: `b42abc5abd344747378fdf076e333d6b832e1ec9`
 - Code evidence checkpoint: `8fa13882bc8aa4805bac2f3ab0c5105b2a300fc6`
 - Current status: `G13–G18 COMPLETE / CP04 WP17–WP20 COMPLETE / CP04 WP21 DEFERRED-UNVERIFIED / CP05 COMPLETE / CP06 WP28–WP32 NONBROWSER COMPLETE / CP06-RC NEED_ACTION`
 - Candidate working tree: clean before this documentation task; primary workspace is protected and not modified.
