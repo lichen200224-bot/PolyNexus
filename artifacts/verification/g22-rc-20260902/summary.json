@@ -1,6 +1,6 @@
 {
   "task_id": "G22-RC-HARDENING-CROSS-MACHINE-AND-DELIVERY-CLOSEOUT",
-  "status": "IMPLEMENTING / NEED_ACTION_PENDING_GATES",
+  "status": "PASS / CHECKPOINTED",
   "generated_at": "2026-09-01T23:35:55.8975168Z",
   "branch": "feature/g22-rc-hardening-cross-machine-delivery-closeout",
   "predecessor_sha": "ada5e9c8b4873aad4c53c74198171740d376d926",
@@ -39,8 +39,18 @@
     "error": "connect ECONNREFUSED 127.0.0.1:9262",
     "claim": "not a browser PASS; no CDP trace events were observed"
   },
-  "cross_machine": "PENDING_FINAL_CHECKPOINT",
-  "next_goal_ready": "NO",
+  "cross_machine": {
+    "verdict": "CROSS_MACHINE_CONTINUATION_READY",
+    "checkpoint_sha": "532ce8f1c479a3c593c990ede89b5b75e810762f",
+    "clean_clone": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\01\\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\\g22-clean-20260902",
+    "clean_clone_baseline_exit_code": 0,
+    "clean_clone_targeted_core_exit_code": 0,
+    "clean_clone_browser_exit_code": 0,
+    "clean_clone_web_npm_ci_exit_code": 0,
+    "clean_clone_web_test_exit_code": 0,
+    "clean_clone_web_build_exit_code": 0
+  },
+  "next_goal_ready": "G23",
   "limitations": [
     "native browser-loaded MV3 service-worker dispatch remains UNVERIFIED",
     "live ChatGPT/Claude/Gemini login, DOM compatibility, credentials, and external send remain DEFERRED / UNVERIFIED",

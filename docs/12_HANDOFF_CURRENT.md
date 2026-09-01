@@ -2,24 +2,26 @@
 
 ## Current Task — G22 RC hardening and cross-machine delivery closeout (2026-09-02)
 
-**Status:** `IMPLEMENTING / NEED_ACTION_PENDING_GATES`
+**Status:** `CHECKPOINTED / PASS` for bounded G22 RC hardening and delivery
+closeout; final Human acceptance remains G23.
 
 - `TASK_ID`: `G22-RC-HARDENING-CROSS-MACHINE-AND-DELIVERY-CLOSEOUT`
 - `ATTEMPT`: 1
 - `MODE`: `RC_HARDENING_AND_DELIVERY_VERIFICATION`
 - `WRITER`: Codex (sole active writer in the isolated G22 lane)
-- `REVIEWER`: Independent G21 reviewer returned `FAIL` with `BLOCKER=0`,
-  `MAJOR=2`; encoded-loopback traversal is remediated here and provenance /
-  evidence reconciliation is in progress. G22 final review is pending.
+- `REVIEWER`: Independent G21 remediation review returned `VERIFIED_PASS` with
+  `BLOCKER=0`, `MAJOR=0`, `MINOR=0`; final artifact spot re-review also returned
+  `VERIFIED_PASS`.
 - `ANTIGRAVITY_STATUS`: `REQUIRED / NEED_ACTION` for a fresh browser rerun;
   the isolated Chrome process did not expose CDP. The authoritative G21
   predecessor artifact remains the completed HTTPS fixture evidence.
 - `BRANCH`: `feature/g22-rc-hardening-cross-machine-delivery-closeout`
 - `PREDECESSOR_SHA`: `ada5e9c8b4873aad4c53c74198171740d376d926`
-- `REMOTE_REF`: `origin/feature/g21-wp21-real-browser-journey-failure-path`
-  resolves to the predecessor SHA; no G22 remote ref exists yet.
-- `WORKTREE_STATE`: dirty only from the explicit G22 source/test/docs/artifact
-  delta; staged state empty.
+- `REMOTE_REF`: `origin/feature/g22-rc-hardening-cross-machine-delivery-closeout`
+  is pushed and verified at the exact final output SHA published in the
+  completion result.
+- `WORKTREE_STATE`: clean; staged state empty after the G22 checkpoint/state
+  update.
 - `ADR_IMPACT`: `NONE`; ADR-001–010 and ADR-011 are unchanged.
 - `SCOPE_DEVIATION`: `NONE`; no Core contract, Domain, workflow, persistence,
   Product Scope, vendor boundary, credential, cloud, or automatic-send change.
@@ -35,8 +37,8 @@
   command/evidence summary, journey and failure matrices, environment, CDP
   NEED_ACTION trace, and SHA-256 manifest; G21 predecessor evidence remains in
   `artifacts/verification/g21-browser-20260902/`.
-- `NEXT_GOAL_READY`: `NO`; G22 must finish targeted re-review, all validators,
-  checkpoint, push, and clean-clone verification first.
+- `NEXT_GOAL_READY`: `G23`; G22 bounded acceptance, checkpoint push, and
+  cross-machine verification are complete.
 
 ### G22 current deterministic evidence
 
@@ -57,7 +59,13 @@
   failure assertions, observed external requests `0`, cleanup PASS, aggregate
   harness exit `0`; in-process rows use `exit_code: "N/A"`.
 - Fresh G22 harness attempt against an isolated Chrome CDP port returned exit
-  `1` with `ECONNREFUSED`; this is recorded as `NEED_ACTION`, not PASS.
+  `1` with `ECONNREFUSED`; this remains an explicit `NEED_ACTION` limitation,
+  not a browser PASS. The G21 predecessor HTTPS artifact is the current
+  bounded browser evidence and no broad vendor claim is made.
+- Clean clone `C:\Users\hikar\.codex\visualizations\2026\09\01\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\g22-clean-20260902` resolved the pushed checkpoint,
+  remained clean, contained required paths, passed baseline, targeted Core,
+  browser, Web install/test/build checks, and established
+  `CROSS_MACHINE_CONTINUATION_READY`.
 
 ### G22 bounded remediation
 
@@ -73,11 +81,11 @@
 ### G22 protected boundaries and next action
 
 - Protected primary checkout `D:\AI學習教材\PolyNexus` was not modified.
-- No commit, push, reset, clean, merge, rebase, force push, bulk stage, or
-  remote reconfiguration has been performed for G22.
-- Next exact action: finish current-state/task/control-panel/artifact
-  reconciliation, run the fresh encoded-traversal matrix and all G22 gates,
-  then obtain independent read-only re-review before explicit staging.
+- No reset, clean, merge, rebase, force push, bulk stage, or remote
+  reconfiguration was performed for G22. The exact-allowlist checkpoint was
+  committed and non-force pushed after independent re-review.
+- Next exact action: G23 performs final reconciliation and presents the Human
+  acceptance decision; no broad vendor or final-project acceptance is implied.
 
 ## Current Task — G21 real-browser WP21 journey and failure paths (2026-09-02)
 

@@ -4,25 +4,27 @@ Browser-readable companion: [GOAL_COMPLETION_CONTROL_PANEL.html](GOAL_COMPLETION
 
 ## G22 RC hardening and delivery closeout — 2026-09-02
 
-`RESULT: IMPLEMENTING / NEED_ACTION_PENDING_GATES`
+`RESULT: PASS / CHECKPOINTED` for bounded G22 RC hardening and delivery closeout
 
 - `BRANCH`: `feature/g22-rc-hardening-cross-machine-delivery-closeout`
 - `PREDECESSOR_SHA`: `ada5e9c8b4873aad4c53c74198171740d376d926`
-- `G21_REVIEW`: `FAIL` with `BLOCKER=0`, `MAJOR=2`; encoded-loopback
-  traversal is remediated in G22 and stale provenance/evidence counts are being
-  reconciled.
+- `G21_REVIEW`: prior `FAIL` with `BLOCKER=0`, `MAJOR=2` is closed by an
+  independent `VERIFIED_PASS`; encoded-loopback traversal is remediated and
+  stale provenance/evidence counts are reconciled.
 - `CURRENT_GATES`: Core full suite, 21 targeted RC tests, browser-companion
   `9/9`, Web `npm ci`/Vitest `80/80`/build, baseline, and governance have exit
   `0`. Fresh G22 browser rerun is `NEED_ACTION` after CDP `ECONNREFUSED` exit `1`.
 - `BROWSER_BOUNDARY`: G21 HTTPS predecessor artifact is `3/3` golden and
   `28/28` failure paths with observed external requests `0` and cleanup PASS;
   native MV3 worker and live vendor behavior remain `UNVERIFIED`.
-- `NEXT_GOAL_READY`: `NO` — G22 re-review, checkpoint, push, and clean-clone
-  verification are pending.
+- `CROSS_MACHINE`: `CROSS_MACHINE_CONTINUATION_READY`; clean clone at
+  `g22-clean-20260902` matched checkpoint `532ce8f1…` and passed required gates.
+- `NEXT_GOAL_READY`: `G23` — final reconciliation and Human acceptance packet.
 
 ## G21 bounded real-browser WP21 checkpoint — 2026-09-02
 
-`RESULT: NEED_ACTION` — bounded fixture passed; independent review pending
+`RESULT: PASS` for the bounded fixture evidence; the independent review found
+and G22 remediated the encoded-loopback issue.
 
 - `OUTPUT_BRANCH`: `feature/g21-wp21-real-browser-journey-failure-path`
 - `PREDECESSOR_SHA`: `48062f1cae608785a39539e1a7bfca5d6726a92e`
@@ -82,8 +84,8 @@ rebased, overwritten, staged, or otherwise mutated.
 |---|---|---|
 | G19 | `PASS / COMPLETE` | This canonical branch and exact checkpoint; G20 may verify and continue |
 | G20 | `PASS / COMPLETE` | Canonical and second clean clone restore, Vitest, build, validators, and checkpoint |
-| G21 | `FAIL / REMEDIATED IN G22` | Independent review found two MAJOR findings; bounded fixture evidence remains 3/3 and 28/28 |
-| G22 | `IMPLEMENTING / NEED_ACTION_PENDING_GATES` | Encoded traversal fixed; re-review, checkpoint, push, and clean-clone proof pending |
+| G21 | `PASS / REMEDIATED IN G22` | Independent review findings closed; bounded fixture evidence remains 3/3 and 28/28 |
+| G22 | `PASS / CHECKPOINTED` | Encoded traversal fixed; checkpoint pushed and clean-clone proof passed |
 | G23 | `GATED / NOT STARTED` | Requires G19–G22 terminal evidence; Human decides final acceptance |
 
 ## G19 imported-file provenance

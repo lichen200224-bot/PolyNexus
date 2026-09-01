@@ -2,14 +2,14 @@
 
 ## Current result
 
-`IMPLEMENTING / NEED_ACTION_PENDING_GATES`
+`PASS / CHECKPOINTED` for bounded RC hardening and delivery closeout.
 
 G22 continues from the approved G21 checkpoint
 `ada5e9c8b4873aad4c53c74198171740d376d926` on branch
 `feature/g22-rc-hardening-cross-machine-delivery-closeout`. The independent G21
 review reported `BLOCKER=0`, `MAJOR=2`. The encoded-loopback traversal finding is
-remediated in this lane; provenance and evidence documents are synchronized. A
-fresh G22 checkpoint, independent re-review, and clean-clone proof remain open.
+remediated in this lane; provenance and evidence documents are synchronized;
+independent re-review and clean-clone proof passed for the bounded scope.
 
 ## Bounded scope
 
@@ -66,12 +66,13 @@ check found a line-ending hash mismatch.
 ## Delivery and cross-machine gate
 
 The G22 artifact index records current commands and inherited G21 evidence. The
-final delivery gate must still verify an exact-allowlist G22 checkpoint on the
-approved remote, a clean clone at that SHA, required paths, clean Git state, and
-baseline validation in the clean clone. Until then:
+exact-allowlist checkpoint was pushed to the approved remote; a clean clone at
+that checkpoint contains the required paths, has clean Git state, and passed
+baseline, targeted Core, browser-companion, and Web install/test/build checks.
+Therefore:
 
-- `CROSS_MACHINE_CONTINUATION_READY` is not claimed.
-- `NEXT_GOAL_READY=G23` is not claimed.
+- `CROSS_MACHINE_CONTINUATION_READY` is claimed for the bounded delivery scope.
+- `NEXT_GOAL_READY=G23` is recorded.
 - Live ChatGPT/Claude/Gemini behavior, native browser-loaded MV3 worker
   dispatch, credentials, cookies, tokens, and external send remain
   `UNVERIFIED` or prohibited.
@@ -103,11 +104,11 @@ credentials, cloud access, or an external connector.
 
 ```yaml
 TASK_ID: G22-RC-HARDENING-CROSS-MACHINE-AND-DELIVERY-CLOSEOUT
-STATUS: IMPLEMENTING / NEED_ACTION_PENDING_GATES
-RESULT: NEED_ACTION_PENDING_GATES
-NEXT_ACTION: Run fresh current G22 gates, obtain independent re-review, then checkpoint and clean-clone verify.
-NEXT_OWNER: Codex G22 lane
-BLOCKERS: Fresh CDP browser rerun unavailable; final checkpoint and cross-machine proof pending.
+STATUS: CHECKPOINTED
+RESULT: PASS (bounded RC hardening and delivery closeout)
+NEXT_ACTION: G23 final reconciliation and Human acceptance packet.
+NEXT_OWNER: Codex G23 lane
+BLOCKERS: Fresh G22 CDP browser rerun remains NEED_ACTION; no broad vendor claim is made.
 HUMAN_ACTION_REQUIRED: NO for bounded remediation; final Human acceptance remains G23.
 ADR_IMPACT: NONE
 SCOPE_DEVIATION: NONE

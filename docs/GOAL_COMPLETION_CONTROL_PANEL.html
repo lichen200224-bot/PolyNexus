@@ -28,18 +28,18 @@
         <div class="meta">
           <div class="metric"><span class="muted">正式進度</span><strong>30 / 100</strong></div>
           <div class="metric"><span class="muted">G21 output branch</span><strong class="ready">BOUNDED BROWSER · PASS</strong></div>
-          <div class="metric"><span class="muted">後續 Goal</span><strong class="gated">G22 GATED · REVIEW PENDING</strong></div>
+          <div class="metric"><span class="muted">後續 Goal</span><strong class="ready">G23 READY · HUMAN DECISION</strong></div>
           <div class="metric"><span class="muted">最終驗收者</span><strong>Human · G23</strong></div>
         </div>
       </header>
 
       <section>
         <h2>G22 RC hardening and delivery closeout</h2>
-        <div class="callout"><strong>RESULT: IMPLEMENTING · NEED_ACTION_PENDING_GATES</strong><br />Branch: <code>feature/g22-rc-hardening-cross-machine-delivery-closeout</code><br />Predecessor SHA: <code>ada5e9c8b4873aad4c53c74198171740d376d926</code><br />Independent G21 review: <strong>FAIL · BLOCKER 0 · MAJOR 2</strong>; encoded-loopback traversal is remediated and stale provenance/evidence counts are being reconciled<br />Current gates: <strong>Core, 21 targeted RC tests, browser tests 9/9, Web npm ci/Vitest 80/80/build, baseline, governance all exit 0</strong>; fresh browser rerun is <strong>NEED_ACTION</strong> after CDP ECONNREFUSED exit 1<br />NEXT_GOAL_READY: <strong>NO — G22 re-review, checkpoint, push, and clean-clone verification pending</strong></div>
+        <div class="callout"><strong>RESULT: PASS · CHECKPOINTED</strong><br />Branch: <code>feature/g22-rc-hardening-cross-machine-delivery-closeout</code><br />Predecessor SHA: <code>ada5e9c8b4873aad4c53c74198171740d376d926</code><br />Independent G21 review: <strong>VERIFIED_PASS · BLOCKER 0 · MAJOR 0 · MINOR 0</strong>; encoded-loopback traversal is remediated and stale provenance/evidence counts are reconciled<br />Current gates: <strong>Core, 21 targeted RC tests, browser tests 9/9, Web npm ci/Vitest 80/80/build, baseline, governance all exit 0</strong>; clean clone matched checkpoint <code>532ce8f1…</code> and reproduced required gates<br />CROSS_MACHINE_CONTINUATION_READY: <strong>YES</strong> · NEXT_GOAL_READY: <strong>G23</strong></div>
         <p class="muted" style="margin-top:16px;">The G21 HTTPS predecessor artifact remains the bounded browser evidence: 3/3 golden journeys, 28/28 failure paths, observed external requests 0, and cleanup PASS. Native MV3 worker dispatch and live vendor behavior remain <strong class="warning">UNVERIFIED</strong>.</p>
 
         <h2>G21 bounded real-browser WP21 checkpoint</h2>
-        <div class="callout"><strong>RESULT: FAIL · REMEDIATED IN G22</strong><br />Output branch: <code>feature/g21-wp21-real-browser-journey-failure-path</code><br />Predecessor SHA: <code>48062f1cae608785a39539e1a7bfca5d6726a92e</code><br />Browser evidence: <strong>Chrome/CDP HTTPS · 3/3 golden journeys · 28/28 failure paths · screenshots · CDP trace</strong><br />Independent review: <strong>two MAJOR findings</strong>; G22 remediates encoded loopback traversal and stale provenance<br />Vendor certification: <strong>NOT CLAIMED</strong> · live vendor login/DOM/send remains <strong>DEFERRED / UNVERIFIED</strong><br />NEXT_GOAL_READY: <strong>G22 after re-review and checkpoint</strong></div>
+        <div class="callout"><strong>RESULT: PASS · BOUNDED EVIDENCE</strong><br />Output branch: <code>feature/g21-wp21-real-browser-journey-failure-path</code><br />Predecessor SHA: <code>48062f1cae608785a39539e1a7bfca5d6726a92e</code><br />Browser evidence: <strong>Chrome/CDP HTTPS · 3/3 golden journeys · 28/28 failure paths · screenshots · CDP trace</strong><br />Independent review findings: <strong>closed by G22 remediation</strong><br />Vendor certification: <strong>NOT CLAIMED</strong> · live vendor login/DOM/send remains <strong>DEFERRED / UNVERIFIED</strong><br />NEXT_GOAL_READY: <strong>G22</strong></div>
         <p class="muted" style="margin-top:16px;">The fixture used vendor-shaped local pages mapped to the vendor hostnames. No live vendor traffic, credentials, cookies, tokens, external send, or retained browser profile was used.</p>
 
         <h2>G20 reproducible Web checkpoint</h2>
@@ -59,8 +59,8 @@
         <div class="goal-flow">
           <article class="goal"><span class="badge ready">PASS · COMPLETE</span><h3>G19 · Canonical workspace</h3><p>Exact promoted base, provenance reconciliation, validators, checkpoint.</p></article>
           <article class="goal"><span class="badge ready">PASS · COMPLETE</span><h3>G20 · Reproducible Web</h3><p>Restore dependencies, run Vitest, build, and reproduce in a clean clone.</p></article>
-          <article class="goal"><span class="badge gated">FAIL · REMEDIATED IN G22</span><h3>G21 · WP21 browser</h3><p>Bounded Chrome/CDP evidence passed; independent review found two MAJOR findings now addressed in G22.</p></article>
-          <article class="goal"><span class="badge gated">IMPLEMENTING · NEED_ACTION</span><h3>G22 · RC closeout</h3><p>Hardening, delivery package, and cross-machine proof are in progress.</p></article>
+          <article class="goal"><span class="badge ready">PASS · BOUNDED</span><h3>G21 · WP21 browser</h3><p>Bounded Chrome/CDP evidence passed; independent review findings were closed in G22.</p></article>
+          <article class="goal"><span class="badge ready">PASS · CHECKPOINTED</span><h3>G22 · RC closeout</h3><p>Hardening, delivery package, and cross-machine proof passed within the disclosed boundaries.</p></article>
           <article class="goal"><span class="badge gated">GATED · NOT STARTED</span><h3>G23 · Human decision</h3><p>Final reconciliation and Human ACCEPT / REJECT / NEED_ACTION.</p></article>
         </div>
       </section>

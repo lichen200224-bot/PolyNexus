@@ -5,9 +5,11 @@
 This is the authoritative current-state block for G22. Retained material below
 is historical reference and must not override this block.
 
-- **G22 status:** `IMPLEMENTING`; the independent G21 review found no BLOCKER
+- **G22 status:** `CHECKPOINTED / PASS` for the bounded RC hardening and delivery
+  scope; the independent G21 review found no BLOCKER
   and two MAJOR findings. The encoded-loopback-traversal finding is remediated
-  in this lane; current G22 checkpoint and cross-machine gates remain pending.
+  in this lane. The exact final output SHA is published in the completion result
+  and the approved remote ref is verified by clean-clone evidence.
 - **Branch / predecessor:**
   `feature/g22-rc-hardening-cross-machine-delivery-closeout` from exact G21
   SHA `ada5e9c8b4873aad4c53c74198171740d376d926`.
@@ -17,18 +19,22 @@ is historical reference and must not override this block.
 - **Current evidence:** Core full suite exit `0`; G22 RC targeted Core tests
   are `21 passed`, exit `0`; browser-companion tests are `9/9`, exit `0`; Web
   `npm ci`, Vitest `80/80`, and production build each exit `0`; baseline and
-  governance validators exit `0`.
+  governance validators exit `0`; the clean clone reproduced baseline, targeted
+  Core, browser-companion, Web install/test/build evidence with exit `0`.
 - **Browser boundary:** the G21 HTTPS fixture artifact remains the authoritative
   predecessor evidence (`3/3` golden, `28/28` failure paths, observed external
   requests `0`, cleanup PASS). A fresh G22 rerun could not connect to CDP and
   returned exit `1`; native browser-loaded MV3 service-worker dispatch and live
   vendor certification remain `UNVERIFIED`.
+- **Cross-machine:** `CROSS_MACHINE_CONTINUATION_READY` for checkpoint
+  `532ce8f1c479a3c593c990ede89b5b75e810762f`; clean clone is
+  `C:\Users\hikar\.codex\visualizations\2026\09\01\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\g22-clean-20260902`.
 - **Scope / architecture:** only browser-companion loopback validation,
   regression tests, G22 evidence, and status/delivery documents are in scope;
   Core contracts, Domain/workflow semantics, persistence, Product Scope, and
   ADR-001–010 remain unchanged. ADR impact `NONE`.
 - **Formal project progress:** remains `30/100`; G22 is not final Human
-  acceptance.
+  acceptance. `NEXT_GOAL_READY=G23` is recorded for the next gated task.
 
 ## Current Operational State — 2026-09-02 (G21 real-browser WP21)
 
