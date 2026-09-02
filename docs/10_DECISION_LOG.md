@@ -57,6 +57,17 @@ authenticated principal mapping（Option A）或 attestation/provenance contract
 ### Cross-cutting — CONFIRMED
 V1 補足最小必要：Compatibility/Migration、Evaluation/Quality、Cost/Resource Control、Context Lifecycle、Artifact Lifecycle、UX Complexity Control。
 
+### Cross-cutting — Development progress and G24–G30 execution — HUMAN CONFIRMED (2026-09-02)
+
+- 正式專案開發進度採 development-only 100-point ledger；競賽文件、報名與人工交付改列 `NOTE_ONLY_NON_SCORING`，不進入開發分母或扣分。
+- G23 接受後的正式分數是 `59/100`。權重固定為 CP-00 `8`、CP-02 `22`、CP-03 `27`、CP-04 `20`、CP-05 `13`、CP-06 `10`；細分 WP 權重與狀態以 `docs/33_DEVELOPMENT_PROGRESS_AND_GOAL_EXECUTION_STANDARD.md` 為準。
+- 後續順序固定為 `G24 → G25 → G26 → G27 → G28 → G29 → G30`。外部／真人操作比例最高的 authenticated vendor 驗證延後到 G29；在此之前不得宣稱 live-vendor support 或 certification。
+- 每個 Goal 由新的 Codex task 執行，目標模型為 `gpt-5.6-luna`、reasoning effort `high`。模型或推理層級不符時必須在寫入前停止並回報，禁止靜默替換。
+- Human 授權 Codex 在單一 Goal 已核准 scope 內自行選擇實作細節、執行測試、修正 findings、重新 review，以及持續處理至最終驗收 Gate。此授權不擴張 Product Scope、ADR、外部送出、秘密資料處理或 Git 權限。
+- 每個 Goal 的 Human 介入點原則上只有最後的 `ACCEPT_AND_COMMIT_PUSH`。該語句只授權當輪已揭露的 exact allowlist、branch、commit message 與 approved remote ref；不授權 force push、remote reconfiguration、額外檔案、下一 Goal 或外部傳送。
+- Planning package 必須先獨立 checkpoint 並記錄 immutable `G24_START_SHA`；該 SHA 未建立以前 G24 維持 `WAIT`。
+- 本決策是治理、進度與 routing 更新，`ADR_IMPACT=NONE`、`SCOPE_DEVIATION=NONE`，不修改 ADR-001～011 或 Core contract。
+
 ## Architecture Decisions
 
 ADR-001～010 全部 CONFIRMED；詳見 `18_ARCHITECTURE_DECISIONS.md`。

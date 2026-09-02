@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>PolyNexus 專案控制面板 — G19–G23</title>
+    <title>PolyNexus 專案控制面板 — G24–G30 Development Completion</title>
     <style>
       :root { color-scheme: dark; --bg:#09111f; --panel:#111d30; --line:#2a3c58; --text:#edf4ff; --muted:#9fb0c9; --accent:#65d6c5; --ready:#68dda7; --gated:#ffc66d; --warn:#ff8f8f; }
       * { box-sizing: border-box; }
@@ -12,7 +12,7 @@
       h1,h2,h3,p { margin-top:0; } h1 { margin-bottom:8px; font-size:clamp(2rem,5vw,3.5rem); line-height:1.08; } h2 { margin-bottom:18px; font-size:1.35rem; } a { color:var(--accent); } code { color:#cfe6ff; overflow-wrap:anywhere; }
       .eyebrow { margin-bottom:10px; color:var(--accent); font-weight:750; letter-spacing:.08em; text-transform:uppercase; }
       .hero,section { margin-bottom:22px; border:1px solid var(--line); border-radius:18px; background:rgba(17,29,48,.94); box-shadow:0 20px 70px rgba(0,0,0,.24); } .hero { padding:clamp(24px,5vw,48px); } section { padding:24px; }
-      .meta,.goal-flow { display:grid; gap:14px; } .meta { grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); margin-top:26px; } .goal-flow { grid-template-columns:repeat(5,1fr); align-items:stretch; }
+      .meta,.goal-flow { display:grid; gap:14px; } .meta { grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); margin-top:26px; } .goal-flow { grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); align-items:stretch; }
       .metric,.goal { border:1px solid var(--line); border-radius:14px; background:#16243a; padding:16px; } .metric strong { display:block; margin-top:3px; font-size:1.35rem; } .goal { position:relative; min-height:170px; } .goal:not(:last-child)::after { content:"→"; position:absolute; z-index:2; top:50%; right:-18px; color:var(--muted); font-size:1.25rem; }
       .goal h3 { margin:10px 0 8px; font-size:1.05rem; } .goal p { margin-bottom:0; color:var(--muted); font-size:.92rem; } .muted { color:var(--muted); } .ready { color:var(--ready); } .gated { color:var(--gated); } .warning { color:var(--warn); } .badge { display:inline-flex; padding:4px 9px; border:1px solid currentColor; border-radius:999px; font-size:.73rem; font-weight:800; letter-spacing:.04em; }
       .callout { border-left:4px solid var(--accent); border-radius:8px; background:#0c1728; padding:16px 18px; } .callout.warning { border-color:var(--warn); } table { width:100%; border-collapse:collapse; } th,td { padding:12px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; } th { color:var(--muted); font-size:.78rem; letter-spacing:.06em; text-transform:uppercase; } footer { color:var(--muted); font-size:.86rem; }
@@ -23,19 +23,71 @@
     <main>
       <header class="hero">
         <p class="eyebrow">PolyNexus · execution control</p>
-        <h1>五階段專案收尾控制面板</h1>
-        <p class="muted">狀態快照：2026-09-02（Asia/Taipei）。Repository、exact SHA 與本輪 deterministic evidence 才是正式依據。</p>
+        <h1>G24–G30 已核准 · 開發完成路線</h1>
+        <p class="muted">狀態快照：2026-09-02（Asia/Taipei）。開發專用 100 分制；競賽為人工備註軌，不納入進度。每個 Goal 在新的 Codex task 以 GPT-5.6 Luna / High 執行。</p>
         <div class="meta">
-          <div class="metric"><span class="muted">正式進度</span><strong>30 / 100</strong></div>
-          <div class="metric"><span class="muted">G21 output branch</span><strong class="ready">BOUNDED BROWSER · PASS</strong></div>
-          <div class="metric"><span class="muted">後續 Goal</span><strong class="ready">G23 READY · HUMAN DECISION</strong></div>
-          <div class="metric"><span class="muted">最終驗收者</span><strong>Human · G23</strong></div>
+          <div class="metric"><span class="muted">正式進度</span><strong>59 / 100</strong></div>
+          <div class="metric"><span class="muted">G24–G30 plan</span><strong class="ready">HUMAN CONFIRMED</strong></div>
+          <div class="metric"><span class="muted">G24 start gate</span><strong class="gated">WAIT FOR SHA</strong></div>
+          <div class="metric"><span class="muted">外部驗證</span><strong class="gated">G29 · LATE</strong></div>
         </div>
       </header>
 
       <section>
+        <h2>目前正式狀態</h2>
+        <div class="callout"><strong>PLAN: HUMAN_CONFIRMED · PLANNING CHECKPOINT PENDING</strong><br />Accepted baseline: <code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code><br />Development score: <strong>59/100</strong><br />Competition: <strong>NOTE_ONLY_NON_SCORING · HUMAN OWNED</strong><br />Goal order: <strong>G24 → G25 → G26 → G27 → G28 → G29 → G30</strong><br />Execution profile: <strong>new Codex task · gpt-5.6-luna · high</strong><br />G24_START_SHA: <strong class="gated">PENDING_PLANNING_CHECKPOINT</strong></div>
+        <p class="muted" style="margin-top:16px;">Codex 可在單一 Goal 核准範圍內實作、測試、修正、重驗與更新所有進度資料；Human 的一般介入點只有最後的 <code>&lt;GOAL&gt;_DECISION=ACCEPT_AND_COMMIT_PUSH</code>。這不授權 scope/ADR 變更、秘密資料、外部自動送出、force push、remote reconfiguration 或下一 Goal。</p>
+        <p><a href="33_DEVELOPMENT_PROGRESS_AND_GOAL_EXECUTION_STANDARD.md">Execution standard</a> · <a href="tasks/G24-G30-DEVELOPMENT-COMPLETION-ROUTING.md">G24–G30 copy-ready prompts</a> · <a href="11_PROJECT_STATE.md">Project State</a> · <a href="12_HANDOFF_CURRENT.md">Current Handoff</a></p>
+      </section>
+
+      <section>
+        <h2>Independent WP ledger</h2>
+        <div class="table-wrap"><table><thead><tr><th>WP</th><th>Weight</th><th>Status</th><th>Goal</th><th>Checkpoint SHA</th></tr></thead><tbody>
+          <tr><td>WP-11</td><td>4</td><td>HUMAN_ACCEPTED</td><td>G23 predecessor</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
+          <tr><td>WP-12</td><td>5</td><td>HUMAN_ACCEPTED</td><td>G23 predecessor</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
+          <tr><td>WP-13</td><td>5</td><td>HUMAN_ACCEPTED</td><td>G23 predecessor</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
+          <tr><td>WP-14</td><td>5</td><td>PLANNED</td><td>G25</td><td><code>PENDING</code></td></tr>
+          <tr><td>WP-15</td><td>5</td><td>PLANNED</td><td>G25</td><td><code>PENDING</code></td></tr>
+          <tr><td>WP-16</td><td>3</td><td>PLANNED</td><td>G25</td><td><code>PENDING</code></td></tr>
+          <tr><td>WP-17</td><td>4</td><td>PLANNED</td><td>G26</td><td><code>PENDING</code></td></tr>
+          <tr><td>WP-18</td><td>4</td><td>PLANNED</td><td>G26</td><td><code>PENDING</code></td></tr>
+          <tr><td>WP-19</td><td>4</td><td>PLANNED</td><td>G26</td><td><code>PENDING</code></td></tr>
+          <tr><td>WP-20</td><td>5</td><td>PLANNED / EXTERNAL_LATE</td><td>G29</td><td><code>PENDING</code></td></tr>
+          <tr><td>WP-21</td><td>3</td><td>HUMAN_ACCEPTED / BOUNDED</td><td>G23 predecessor</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
+          <tr><td>WP-22</td><td>3</td><td>PLANNED</td><td>G27</td><td><code>PENDING</code></td></tr>
+          <tr><td>WP-23</td><td>2</td><td>HUMAN_ACCEPTED</td><td>G23 predecessor</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
+          <tr><td>WP-24</td><td>2</td><td>PLANNED</td><td>G27</td><td><code>PENDING</code></td></tr>
+          <tr><td>WP-25</td><td>1</td><td>PLANNED</td><td>G27</td><td><code>PENDING</code></td></tr>
+          <tr><td>WP-26</td><td>2</td><td>PLANNED</td><td>G28</td><td><code>PENDING</code></td></tr>
+          <tr><td>WP-27</td><td>3</td><td>PLANNED</td><td>G28</td><td><code>PENDING</code></td></tr>
+          <tr><td>WP-28</td><td>2</td><td>HUMAN_ACCEPTED / BOUNDED</td><td>G23 predecessor</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
+          <tr><td>WP-29</td><td>2</td><td>HUMAN_ACCEPTED / BOUNDED</td><td>G23 predecessor</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
+          <tr><td>WP-30</td><td>2</td><td>HUMAN_ACCEPTED / BOUNDED</td><td>G23 predecessor</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
+          <tr><td>WP-31</td><td>1</td><td>HUMAN_ACCEPTED / BOUNDED</td><td>G23 predecessor</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
+          <tr><td>WP-32</td><td>3</td><td>HUMAN_ACCEPTED / BOUNDED</td><td>G23 predecessor</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
+        </tbody></table></div>
+      </section>
+
+      <section>
+        <h2>Goal provenance ledger</h2>
+        <div class="table-wrap"><table><thead><tr><th>Goal</th><th>Predecessor SHA</th><th>Output SHA</th><th>Start gate</th><th>Delta</th><th>Status</th></tr></thead><tbody>
+          <tr><td>G24</td><td><code>G24_START_SHA (PENDING_PLANNING_CHECKPOINT)</code></td><td><code>PENDING</code></td><td>Approved planning-package remote SHA becomes G24 predecessor</td><td>0</td><td>WAIT</td></tr>
+          <tr><td>G25</td><td><code>G24_OUTPUT_SHA</code></td><td><code>PENDING</code></td><td>Approved G24</td><td>+13</td><td>GATED</td></tr>
+          <tr><td>G26</td><td><code>G25_OUTPUT_SHA</code></td><td><code>PENDING</code></td><td>Approved G25</td><td>+12</td><td>GATED</td></tr>
+          <tr><td>G27</td><td><code>G26_OUTPUT_SHA</code></td><td><code>PENDING</code></td><td>Approved G26</td><td>+6</td><td>GATED</td></tr>
+          <tr><td>G28</td><td><code>G27_OUTPUT_SHA</code></td><td><code>PENDING</code></td><td>Approved G27</td><td>+5</td><td>GATED</td></tr>
+          <tr><td>G29</td><td><code>G28_OUTPUT_SHA</code></td><td><code>PENDING</code></td><td>Approved G28 + Human operator</td><td>+5</td><td>GATED / EXTERNAL_LATE</td></tr>
+          <tr><td>G30</td><td><code>G29_OUTPUT_SHA</code></td><td><code>PENDING</code></td><td>Approved G29</td><td>0</td><td>GATED</td></tr>
+        </tbody></table></div>
+      </section>
+
+      <section>
+        <h2>G23 final reconciliation and Human acceptance</h2>
+        <div class="callout"><strong>RESULT: HUMAN_ACCEPTED · PASS · COMPLETE</strong><br />Human decision: <code>G23_DECISION=ACCEPT</code><br />Final SHA: <code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code><br />Approved remote: <code>origin/feature/g22-rc-hardening-cross-machine-delivery-closeout</code><br />Acceptance clean clone: <code>g23-g22-clean-20260902</code> · exact SHA matched · Git clean · staged empty<br />Formal accepted progress: <strong>59/100</strong> · CROSS_MACHINE_CONTINUATION_READY: <strong>YES</strong></div>
+        <p class="muted" style="margin-top:16px;">Accepted scope is repository-backed G19–G22 terminal evidence, bounded RC hardening, delivery package, and cross-machine continuation. Fresh CDP remains <strong class="warning">NEED_ACTION</strong>; native MV3 and authenticated live-vendor journeys remain <strong class="warning">UNVERIFIED</strong>; vendor certification is not claimed.</p>
+
         <h2>G22 RC hardening and delivery closeout</h2>
-        <div class="callout"><strong>RESULT: PASS · CHECKPOINTED</strong><br />Branch: <code>feature/g22-rc-hardening-cross-machine-delivery-closeout</code><br />Predecessor SHA: <code>ada5e9c8b4873aad4c53c74198171740d376d926</code><br />Independent G21 review: <strong>VERIFIED_PASS · BLOCKER 0 · MAJOR 0 · MINOR 0</strong>; encoded-loopback traversal is remediated and stale provenance/evidence counts are reconciled<br />Current gates: <strong>Core, 21 targeted RC tests, browser tests 9/9, Web npm ci/Vitest 80/80/build, baseline, governance all exit 0</strong>; validated product checkpoint <code>532ce8f1…</code> matched <code>g22-clean-20260902</code>, and later evidence-state tip <code>9a17716f…</code> matched <code>g22-clean-final-20260902</code><br />CROSS_MACHINE_CONTINUATION_READY: <strong>YES</strong> · NEXT_GOAL_READY: <strong>G23</strong></div>
+        <div class="callout"><strong>RESULT: PASS · CHECKPOINTED</strong><br />Branch: <code>feature/g22-rc-hardening-cross-machine-delivery-closeout</code><br />Predecessor SHA: <code>ada5e9c8b4873aad4c53c74198171740d376d926</code><br />Final checkpoint: <code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code><br />Independent G21 review: <strong>VERIFIED_PASS · BLOCKER 0 · MAJOR 0 · MINOR 0</strong>; encoded-loopback traversal is remediated and stale provenance/evidence counts are reconciled<br />Current gates: <strong>Core, 21 targeted RC tests, browser tests 9/9, Web npm ci/Vitest 80/80/build, baseline, governance all exit 0</strong><br />CROSS_MACHINE_CONTINUATION_READY: <strong>YES</strong> · G23: <strong>HUMAN ACCEPTED</strong></div>
         <p class="muted" style="margin-top:16px;">The G21 HTTPS predecessor artifact remains the bounded browser evidence: 3/3 golden journeys, 28/28 failure paths, observed external requests 0, and cleanup PASS. Native MV3 worker dispatch and live vendor behavior remain <strong class="warning">UNVERIFIED</strong>.</p>
 
         <h2>G21 bounded real-browser WP21 checkpoint</h2>
@@ -51,17 +103,38 @@
         <h2>G19 canonical checkpoint</h2>
         <div class="callout"><strong>RESULT: PASS</strong><br />Canonical branch: <code>feature/g19-canonical-workspace-provenance</code><br />Base SHA: <code>730912b5a3e19449c355975485f1fe77350a458a</code><br />Remote ref: <code>backup/feature/g19-canonical-workspace-provenance</code><br />WORKTREE_STATE: <strong>clean</strong> · NEXT_GOAL_READY: <strong>G20</strong></div>
         <p class="muted" style="margin-top:16px;">Exact final output SHA is published in the handoff and G19 result. The primary lane remains protected and unchanged at <code>b87a0dc780e5d9a3bba083dbaf9552ca52508f9a</code>.</p>
-        <p><a href="11_PROJECT_STATE.md">Project State</a> · <a href="12_HANDOFF_CURRENT.md">Current Handoff</a> · <a href="tasks/G19-G23-FIVE-GOAL-EXECUTION-ROUTING.md">Routing package</a> · <a href="31_COMPATIBILITY_MATRIX.md">Compatibility Matrix</a> · <a href="32_KNOWN_LIMITATIONS.md">Known Limitations</a></p>
+        <p><a href="tasks/G19-G23-FIVE-GOAL-EXECUTION-ROUTING.md">Historical G19–G23 routing</a> · <a href="31_COMPATIBILITY_MATRIX.md">Compatibility Matrix</a> · <a href="32_KNOWN_LIMITATIONS.md">Known Limitations</a></p>
       </section>
 
       <section>
-        <h2>Goal flow</h2>
+        <h2>G24–G30 ordered Goal flow</h2>
         <div class="goal-flow">
-          <article class="goal"><span class="badge ready">PASS · COMPLETE</span><h3>G19 · Canonical workspace</h3><p>Exact promoted base, provenance reconciliation, validators, checkpoint.</p></article>
-          <article class="goal"><span class="badge ready">PASS · COMPLETE</span><h3>G20 · Reproducible Web</h3><p>Restore dependencies, run Vitest, build, and reproduce in a clean clone.</p></article>
-          <article class="goal"><span class="badge ready">PASS · BOUNDED</span><h3>G21 · WP21 browser</h3><p>Bounded Chrome/CDP evidence passed; independent review findings were closed in G22.</p></article>
-          <article class="goal"><span class="badge ready">PASS · CHECKPOINTED</span><h3>G22 · RC closeout</h3><p>Hardening, delivery package, and cross-machine proof passed within the disclosed boundaries.</p></article>
-          <article class="goal"><span class="badge gated">GATED · NOT STARTED</span><h3>G23 · Human decision</h3><p>Final reconciliation and Human ACCEPT / REJECT / NEED_ACTION.</p></article>
+          <article class="goal"><span class="badge gated">WAIT FOR SHA</span><h3>G24 · Ledger</h3><p>Reconcile independent WP score/evidence ledger. Score stays 59.</p></article>
+          <article class="goal"><span class="badge gated">GATED</span><h3>G25 · Runtime</h3><p>WP-14/15/16 adapters and Doctor. Target 72.</p></article>
+          <article class="goal"><span class="badge gated">GATED</span><h3>G26 · Internal integration</h3><p>WP-17/18/19 local, policy, WebSurface. Target 84.</p></article>
+          <article class="goal"><span class="badge gated">GATED</span><h3>G27 · Product breadth</h3><p>WP-22/24/25 workflows, guards, metrics. Target 90.</p></article>
+          <article class="goal"><span class="badge gated">GATED</span><h3>G28 · Feature freeze</h3><p>WP-26/27 UX and Golden Workflow evidence. Target 95.</p></article>
+          <article class="goal"><span class="badge warning">EXTERNAL · LATE</span><h3>G29 · Vendor</h3><p>WP-20 Human-operated authenticated journeys. Target 100.</p></article>
+          <article class="goal"><span class="badge gated">GATED</span><h3>G30 · Final</h3><p>Final score/provenance reconciliation. Confirm 100.</p></article>
+        </div>
+      </section>
+
+      <section>
+        <h2>Development-only checkpoint score map</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Checkpoint</th><th>Earned</th><th>Basis</th></tr></thead>
+            <tbody>
+              <tr><td>CP-00</td><td>8 / 8</td><td>Baseline and governance accepted</td></tr>
+              <tr><td>CP-02</td><td>22 / 22</td><td>First Vertical Slice accepted</td></tr>
+              <tr><td>CP-03</td><td>14 / 27</td><td>WP-11/12/13 accepted; G25 remainder 13</td></tr>
+              <tr><td>CP-04</td><td>3 / 20</td><td>WP-21 bounded fixture accepted; G26 +12, G29 +5</td></tr>
+              <tr><td>CP-05</td><td>2 / 13</td><td>WP-23 accepted; G27 +6, G28 +5</td></tr>
+              <tr><td>CP-06</td><td>10 / 10</td><td>G19 provenance, G20 reproducibility, G22 hardening/delivery, G23 Human acceptance</td></tr>
+              <tr><td><strong>Total</strong></td><td><strong>59 / 100</strong></td><td>Remaining 41 points are unaccepted and visible</td></tr>
+              <tr><td>Competition</td><td>—</td><td>NOTE_ONLY_NON_SCORING; Human-owned delivery</td></tr>
+            </tbody>
+          </table>
         </div>
       </section>
 
@@ -70,12 +143,13 @@
         <ul>
           <li>Primary dirty lane is unchanged; no reset, clean, merge, rebase, overwrite, bulk stage, or blind absorption occurred.</li>
           <li><code>docs/31_COMPATIBILITY_MATRIX.md</code> remains the promoted file; primary <code>docs/31_PROJECT_CONTENT_MAP.md</code> was excluded without overwrite.</li>
-          <li>G21 verifies only a controlled synthetic-host browser fixture. Live vendor login, DOM compatibility, and external send remain <strong class="warning">DEFERRED / UNVERIFIED</strong>.</li>
-          <li>ADR-001–010 remain frozen; ADR-011 is unchanged; formal project progress remains 30/100.</li>
+          <li>G21 verifies only a controlled synthetic-host browser fixture. Live vendor login, DOM compatibility, and external send remain <strong class="warning">DEFERRED / UNVERIFIED</strong> until G29.</li>
+          <li>Credential, cookie, token, and automatic external send remain prohibited. Human confirms every send in G29.</li>
+          <li>ADR-001–010 remain frozen; ADR-011 is unchanged; formal development progress is 59/100.</li>
         </ul>
       </section>
 
-      <footer>G22 current closeout. Do not claim vendor certification or final Human acceptance; native MV3 worker and live vendor boundaries remain unverified.</footer>
+      <footer>G24 cannot start until this planning package has an approved remote SHA and clean-clone proof. External verification is deliberately deferred to G29. Do not claim vendor certification before current evidence.</footer>
     </main>
   </body>
 </html>

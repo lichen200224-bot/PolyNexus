@@ -1,5 +1,10 @@
 # G22 — RC hardening, cross-machine verification, and delivery closeout
 
+> **Post-task terminal note (2026-09-02):** G23 subsequently reconciled this
+> checkpoint at exact SHA `0eb56a986e97a45854bd6ddd419c114845ce51f4`,
+> and the Human explicitly returned `G23_DECISION=ACCEPT`. G22 remains
+> `PASS / CHECKPOINTED`; its residual limitations remain active and unchanged.
+
 ## Current result
 
 `PASS / CHECKPOINTED` for bounded RC hardening and delivery closeout.

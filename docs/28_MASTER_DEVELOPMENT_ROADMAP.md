@@ -28,7 +28,9 @@ This document is the project-level monitoring baseline. It defines sequence, sco
 - CORE: Project/Task/Run/History, Discuss/Review/Validate, ContextPackage, Workflow, Run Supervisor, Finding/Evidence/Decision, Artifact metadata, Event Ledger, Codex/OpenCode runtime contracts, Doctor/Conformance, migration and backup foundations.
 - BASELINE: local AI profiles, data classification/routing, assurance/governance, timeout/concurrency guard, minimal evaluation/usage metrics, Context and Artifact lifecycle, progressive disclosure UX.
 - COMPATIBILITY: real detection or integration evidence for additional runtimes, marked `SUPPORTED`, `PREVIEW`, or `EXPERIMENTAL` according to actual maturity.
-- Competition: proposal/deck truthfulness, actual upload-form checks, and required demo materials.
+- Competition note track: proposal/deck truthfulness, actual upload-form checks,
+  and required demo materials are Human-owned delivery notes and are explicitly
+  excluded from required development progress.
 
 ### Explicitly excluded from this roadmap
 
@@ -38,6 +40,114 @@ This document is the project-level monitoring baseline. It defines sequence, sco
 ## 3. Progress model
 
 The project uses a 100-point checkpoint-weighted progress model. Only `ACCEPTED` or `CHECKPOINTED` work earns project progress. `IMPLEMENTING`, `READY_FOR_CODEX_REVIEW`, `NEED_ACTION`, and `UNVERIFIED` are reported as status but earn zero points until the acceptance condition is met.
+
+### G24–G30 Human-confirmed development completion program — 2026-09-02
+
+- G23 remains accepted at exact SHA
+  `0eb56a986e97a45854bd6ddd419c114845ce51f4`; the accepted total remains
+  **59/100**.
+- The current denominator contains development work only. Competition is
+  `NOTE_ONLY_NON_SCORING`, Human-owned, and cannot add, subtract, or block
+  development points.
+- Current weights are CP-00 `8`, CP-02 `22`, CP-03 `27`, CP-04 `20`, CP-05
+  `13`, and CP-06 `10`; detailed WP weights are in
+  `docs/33_DEVELOPMENT_PROGRESS_AND_GOAL_EXECUTION_STANDARD.md`.
+- Goal order is `G24 → G25 → G26 → G27 → G28 → G29 → G30`. G29 intentionally
+  holds authenticated external-vendor validation until after deterministic and
+  internal product work. Every Goal uses a new Codex task with
+  `gpt-5.6-luna`, reasoning effort `high`.
+- Planning documents and prompts must first be committed, non-force pushed to
+  the approved remote, and clean-clone verified. Until that immutable SHA is
+  recorded, `G24_START_SHA=PENDING_PLANNING_CHECKPOINT` and `G24_STATUS=WAIT`.
+
+#### Current development-only allocation and remaining routing
+
+| Checkpoint / WP | Weight | Earned | Goal / state |
+|---|---:|---:|---|
+| CP-00 baseline/governance | 8 | 8 | Accepted |
+| CP-02 First Vertical Slice | 22 | 22 | Accepted |
+| WP-11 work modes | 4 | 4 | Accepted |
+| WP-12 Council | 5 | 5 | Accepted |
+| WP-13 workflow gates | 5 | 5 | Accepted with disclosed limitation |
+| WP-14 Codex Runtime adapter | 5 | 0 | G25 |
+| WP-15 OpenCode Runtime adapter | 5 | 0 | G25 |
+| WP-16 Doctor/conformance | 3 | 0 | G25 |
+| WP-17 local endpoint profiles | 4 | 0 | G26 |
+| WP-18 classification/routing | 4 | 0 | G26 |
+| WP-19 WebSurface/MV3 boundary | 4 | 0 | G26 |
+| WP-20 authenticated Level 3A vendor flow | 5 | 0 | G29, external/Human-operated |
+| WP-21 bounded browser fixture | 3 | 3 | Accepted through G21–G23 |
+| WP-22 workflow templates | 3 | 0 | G27 |
+| WP-23 backup/restore/migration | 2 | 2 | Accepted through G17/G22/G23 |
+| WP-24 resource guards | 2 | 0 | G27 |
+| WP-25 evaluation/usage metrics | 1 | 0 | G27 |
+| WP-26 UX progressive disclosure | 2 | 0 | G28 |
+| WP-27 Golden Workflow regression | 3 | 0 | G28 |
+| CP-06 bounded RC hardening/closeout | 10 | 10 | Accepted through G19/G20/G22/G23 |
+| **Development total** | **100** | **59** | **41 points remain** |
+| Competition | **—** | **—** | `NOTE_ONLY_NON_SCORING` |
+
+#### Ordered Goal forecast
+
+| Goal | Scope | Score delta | Project score after acceptance | Start condition |
+|---|---|---:|---:|---|
+| G24 | Ledger/evidence reconciliation | 0 | 59 | Planning remote SHA and clean clone |
+| G25 | WP-14/15/16 runtime adapters and Doctor | +13 | 72 | Approved G24 checkpoint |
+| G26 | WP-17/18/19 local/policy/WebSurface internal work | +12 | 84 | Approved G25 checkpoint |
+| G27 | WP-22/24/25 workflows, guards, metrics | +6 | 90 | Approved G26 checkpoint |
+| G28 | WP-26/27 UX and Golden Workflow feature-freeze evidence | +5 | 95 | Approved G27 checkpoint |
+| G29 | WP-20 authenticated vendor external verification | +5 | 100 | Approved G28 checkpoint + Human-operated environment |
+| G30 | Final 100-point reconciliation | 0 | 100 confirmed | Approved G29 checkpoint |
+
+### Historical G23 final acceptance snapshot — 2026-09-02
+
+- The Human explicitly recorded `G23_DECISION=ACCEPT` for the final G19–G22
+  reconciliation packet.
+- Accepted exact SHA:
+  `0eb56a986e97a45854bd6ddd419c114845ce51f4` on
+  `origin/feature/g22-rc-hardening-cross-machine-delivery-closeout`; acceptance
+  clean clone matched this SHA and was Git clean with staged state empty.
+- G19, G20, G21, and G22 are terminal `PASS`; G22 is `CHECKPOINTED`; G23 is
+  `HUMAN_ACCEPTED / PASS / COMPLETE` for repository-backed terminal evidence,
+  bounded RC hardening, the delivery package, and cross-machine continuation.
+- Human-directed reconciliation recognized **59/100** accepted progress. The
+  later development-only model keeps the same total while removing Competition
+  from the denominator and expanding CP-03/04/05 weights.
+- Fresh CDP remains `NEED_ACTION`; native MV3 and authenticated vendor journeys
+  remain `UNVERIFIED`; vendor certification remains `NOT_CLAIMED`.
+- No next goal is automatically started. A new routing decision is required.
+
+#### Accepted-score allocation after G23
+
+| Checkpoint contribution | Allocation | Earned | Acceptance basis |
+|---|---:|---:|---|
+| CP-00 baseline/governance | 8 | 8 | Existing accepted checkpoint |
+| CP-02 First Vertical Slice | 22 | 22 | Existing accepted checkpoint |
+| CP-03 WP-11 work modes | 4 | 4 | Human accepted with deterministic evidence |
+| CP-03 WP-12 Council | 5 | 5 | Human accepted with deterministic evidence |
+| CP-03 WP-13 workflow gates | 5 | 5 | Human accepted with disclosed integrity limitation |
+| CP-03 WP-14 / WP-15 / WP-16 remainder | 13 | 0 | G25 component acceptance/promotion |
+| CP-04 WP-21 bounded browser E2E | 3 | 3 | G21 PASS, G22 remediation, G23 Human acceptance |
+| CP-04 WP-17–WP-20 remainder | 17 | 0 | G26 internal work and G29 external vendor work |
+| CP-05 WP-23 backup/restore/migration | 2 | 2 | G17/G22 deterministic evidence accepted by G23 |
+| CP-05 WP-22 / WP-24–WP-27 remainder | 11 | 0 | G27/G28 feature-freeze work |
+| CP-06 bounded RC hardening and closeout | 10 | 10 | G19 provenance/clean continuation, G20 reproducible Web, G22 WP-28–WP-31 hardening/delivery, and G23 final Human acceptance |
+| **Total** | **100** | **59** | **59/100 accepted progress** |
+
+Allocation rules:
+
+1. Goal completion contributes through its mapped checkpoint and is not counted
+   again as a separate bonus. G19 and G22 therefore earn recognized value inside
+   CP-06 rather than remaining invisible or being double-counted.
+2. Partial checkpoint points require a separately identifiable roadmap item,
+   deterministic evidence, and the required acceptance decision.
+3. G21 earns only the bounded WP-21 allocation; live vendor/login/send and native
+   MV3 remain unverified and earn no additional CP-04 points.
+4. CP-06 is accepted as a **bounded RC checkpoint**, not as certification that
+   every CP-03–CP-05 feature is complete. The remaining 41 points make those
+   incomplete product areas visible.
+5. Competition is outside the development denominator and is retained only as
+   a Human-owned note/delivery track.
 
 | Work state | Earned progress | Meaning |
 |---|---:|---|
@@ -110,12 +220,12 @@ The project uses a 100-point checkpoint-weighted progress model. Only `ACCEPTED`
 | Checkpoint | Scope | Weight | Baseline target | Entry / exit condition | Current status |
 |---|---|---:|---|---|---|
 | CP-00 | Baseline, governance, environment, frozen ADRs | 8% | 2026-08-19 | Baseline validation, branch/Git rules, source-of-truth docs, tool roles | ACCEPTED |
-| CP-01 | Competition content and submission readiness | 5% | 2026-09-07 | Content truthfulness, actual form/field check, required package, evidence of submission readiness | PLANNED |
 | CP-02 | First Vertical Slice runnable path | 22% | 2026-09-06 | Project → ContextPackage → Task → Run execution → Finding/Evidence → Result → History, fresh DB repeat, actual exit codes | ACCEPTED |
-| CP-03 | Core product baseline | 25% | 2026-09-20 | Work modes, Council, hard gates, deep runtime adapters, Doctor/Conformance evidence | IN_PROGRESS |
-| CP-04 | Web, Local, Policy integration baseline | 18% | 2026-10-04 | Local profiles, routing/classification, WebSurface/companion fallback, Browser E2E evidence | PLANNED |
-| CP-05 | Product completion and feature freeze | 12% | 2026-10-18 | Workflow breadth, backup/restore, resource guards, metrics, UX pass, Golden Workflow regression | PLANNED |
-| CP-06 | Hardening and V1 RC acceptance | 10% | 2026-10-31 | Failure injection, security/egress, migration/restore, clean install, compatibility, RC acceptance | PLANNED |
+| CP-03 | Core product baseline | 27% | 2026-09-20 | Work modes, Council, hard gates, deep runtime adapters, Doctor/Conformance evidence | IN_PROGRESS — 14/27 accepted |
+| CP-04 | Web, Local, Policy integration baseline | 20% | 2026-10-04 | Local profiles, routing/classification, WebSurface/companion fallback, Browser E2E evidence | IN_PROGRESS — 3/20 accepted |
+| CP-05 | Product completion and feature freeze | 13% | 2026-10-18 | Workflow breadth, backup/restore, resource guards, metrics, UX pass, Golden Workflow regression | IN_PROGRESS — 2/13 accepted |
+| CP-06 | Hardening and V1 RC acceptance | 10% | 2026-10-31 | Failure injection, security/egress, migration/restore, clean install, compatibility, RC acceptance | ACCEPTED — 10/10 bounded RC |
+| COMP-NOTE | Competition content and submission | — | Human schedule | Human-owned material preparation and delivery; never changes development score | NOTE_ONLY_NON_SCORING |
 
 ## 5. Ordered work breakdown and forecast
 
@@ -128,9 +238,11 @@ The project uses a 100-point checkpoint-weighted progress model. Only `ACCEPTED`
 | BASE-03 | Git, handoff, Writer/Reviewer/Antigravity governance | Codex / Human | 1 day | 2026-08-19 | `AGENTS.md`, workflow, acceptance, handoff rules |
 | BASE-04 | FVS WP-01–WP-07 implementation and acceptance baseline | OpenCode/Codex | historical | 2026-08-19 | WP-07 checkpoint `d7060c4`, governance commit `eaf847c` |
 
-### CP-01 — Competition gate
+### Competition note track — non-scoring
 
-Competition work may proceed as a documentation track, but it must not change product scope or turn planned capabilities into implemented claims.
+Competition work may proceed as a Human-owned documentation/delivery track, but
+it is not a required development checkpoint, has no score, must not change
+product scope, and must not turn planned capabilities into implemented claims.
 
 | Item | Scope | Owner / reviewer | Estimate | Target | Evidence / checkpoint |
 |---|---|---|---:|---|---|

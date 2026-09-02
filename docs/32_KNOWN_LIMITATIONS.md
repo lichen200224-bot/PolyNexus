@@ -3,7 +3,30 @@
 These limitations are intentional boundaries, not hidden compatibility
 claims.
 
-## Current RC status — 2026-09-02 (G22 RC hardening; G21 bounded browser evidence)
+## Planned limitation-resolution routing — 2026-09-02
+
+- The Human-confirmed G24–G30 plan does not itself remove any limitation.
+- Deterministic/internal gaps are addressed before external work: G25 covers
+  Runtime adapters/Doctor; G26 local/policy/WebSurface; G27 workflows/guards/
+  metrics; G28 UX/Golden Workflow regression.
+- Authenticated ChatGPT/Claude/Gemini verification is intentionally delayed to
+  G29 because it requires Human operation. The external operator plan forbids
+  credential/cookie/token capture and automatic send, and requires a structured
+  result for each vendor and failure path.
+- Formal development progress is `59/100`. Competition work is
+  `NOTE_ONLY_NON_SCORING` and does not create a product limitation or reduce the
+  development score.
+
+## Current RC status — 2026-09-02 (G23 Human-accepted bounded closeout)
+
+G23 is `HUMAN_ACCEPTED / PASS / COMPLETE` at exact SHA
+`0eb56a986e97a45854bd6ddd419c114845ce51f4`. The Human accepted the disclosed
+bounded G19–G22 evidence and cross-machine delivery checkpoint; this does not
+remove or waive any limitation below. Formal project progress is `59/100` under
+the Human-directed G23 checkpoint allocation; the remaining 41 points retain the
+unaccepted product and live-integration gaps.
+
+### Active residual limitations
 
 - CP04 WP21 is `PASS` only for the controlled synthetic-host real Chrome/CDP
   fixture: 3/3 golden journeys and 28/28 failure paths passed. This does not

@@ -1,5 +1,254 @@
 # Current Handoff
 
+## Current Task — G24–G30 planning package and execution standard (2026-09-02)
+
+### Identity and routing
+
+- `TASK_ID`: `G24-G30-DEVELOPMENT-COMPLETION-PLANNING-PACKAGE`
+- `ATTEMPT`: `1`
+- `TASK_DOC`: `docs/tasks/G24-G30-DEVELOPMENT-COMPLETION-ROUTING.md`
+- `HANDOFF_DOC`: `docs/12_HANDOFF_CURRENT.md`
+- `SOURCE_SHA`: `0eb56a986e97a45854bd6ddd419c114845ce51f4`
+- `CURRENT_BRANCH`: `feature/g22-rc-hardening-cross-machine-delivery-closeout`
+- `PROPOSED_OUTPUT_BRANCH`: `feature/g24-g30-development-completion-routing`
+- `APPROVED_PUSH_TARGET`: direct non-force push to
+  `D:/GitBackup/PolyNexus_Backup.git` at
+  `refs/heads/feature/g24-g30-development-completion-routing`; no remote
+  configuration change is proposed
+- `G24_START_SHA`: `PENDING_PLANNING_CHECKPOINT`
+- `WRITER`: `Codex` — isolated-lane governance/status synchronization only
+- `REVIEWER`: `independent context required before final Human Gate`
+- `ANTIGRAVITY_STATUS`: `NOT_REQUIRED` — this package changes only governance,
+  plans, reports, and control panels; G29 contains the later external/browser
+  operator plan
+- `NEXT_OWNER`: `Human` for planning package acceptance + exact-allowlist
+  commit/push authorization; after verified checkpoint, new Codex Luna High task
+  for G24
+- `MODEL_PROFILE`: `gpt-5.6-luna / high` for each new G24–G30 task
+
+### Human-confirmed outcome
+
+- `PLAN_STATUS`: `HUMAN_CONFIRMED / READY_FOR_VERIFICATION`
+- `PROJECT_PROGRESS`: `59/100` development-only points
+- `COMPETITION_TRACK`: `NOTE_ONLY_NON_SCORING / HUMAN_OWNED_DELIVERY`
+- `GOAL_ORDER`: `G24 → G25 → G26 → G27 → G28 → G29 → G30`
+- `EXTERNAL_VERIFICATION`: delayed to G29; detailed operator prompt and report
+  schema are included in the routing package
+- `HUMAN_INTERVENTION`: normally only each Goal's final
+  `ACCEPT_AND_COMMIT_PUSH` decision after exact files, branch, remote, evidence,
+  review, limitations, and proposed commit are disclosed
+- `G24_STATUS`: `WAIT_FOR_PLANNING_CHECKPOINT`
+
+### Development-only score map
+
+| Checkpoint | Accepted | Total | Remaining routing |
+|---|---:|---:|---|
+| CP-00 | 8 | 8 | Complete |
+| CP-02 | 22 | 22 | Complete |
+| CP-03 | 14 | 27 | G25: WP-14/15/16, +13 |
+| CP-04 | 3 | 20 | G26: WP-17/18/19, +12; G29: WP-20, +5 |
+| CP-05 | 2 | 13 | G27: WP-22/24/25, +6; G28: WP-26/27, +5 |
+| CP-06 | 10 | 10 | Complete through G19/G20/G22/G23 |
+| **Total** | **59** | **100** | **41 points remain** |
+
+G24 and G30 are reconciliation Goals with zero score delta. Competition has no
+checkpoint weight and cannot add, subtract, or block development points.
+
+### Current planning-package changed files
+
+- `docs/05_GIT_WORKFLOW.md`
+- `docs/06_AI_TOOL_COLLABORATION.md`
+- `docs/08_ACCEPTANCE_STRATEGY.md`
+- `docs/10_DECISION_LOG.md`
+- `docs/11_PROJECT_STATE.md`
+- `docs/12_HANDOFF_CURRENT.md`
+- `docs/15_DOCUMENT_INDEX.md`
+- `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`
+- `docs/31_COMPATIBILITY_MATRIX.md`
+- `docs/32_KNOWN_LIMITATIONS.md`
+- `docs/33_DEVELOPMENT_PROGRESS_AND_GOAL_EXECUTION_STANDARD.md`
+- `docs/GOAL_COMPLETION_CONTROL_PANEL.md`
+- `docs/GOAL_COMPLETION_CONTROL_PANEL.html`
+- `docs/tasks/G19-G23-FIVE-GOAL-EXECUTION-ROUTING.md`
+- `docs/tasks/G22-RC-HARDENING-CROSS-MACHINE-DELIVERY-CLOSEOUT.md`
+- `docs/tasks/G23-FINAL-PROJECT-RECONCILIATION-AND-HUMAN-ACCEPTANCE.md`
+- `docs/tasks/G24-G30-DEVELOPMENT-COMPLETION-ROUTING.md`
+
+The list includes the preceding uncommitted G23 acceptance synchronization and
+the current planning delta. The ignored G23 verification summary remains an
+evidence artifact and is not silently staged; its inclusion, if any, must be
+explicit at the final Git Gate.
+
+### Protected areas and boundaries
+
+- `D:\AI學習教材\PolyNexus` remains the protected dirty primary lane and was
+  not modified, reset, cleaned, staged, merged, or rebased.
+- No Core source, Domain model, Runtime contract, workflow/persistence schema,
+  migration, Product Scope, ADR-001–011 text, credentials, cookies, tokens, or
+  vendor account data is changed by this package.
+- `ADR_IMPACT`: `NONE`
+- `SCOPE_DEVIATION`: `NONE`
+- `KNOWN_LIMITATIONS`: fresh CDP remains `NEED_ACTION`; native MV3 and live
+  authenticated vendor journeys remain `UNVERIFIED`; vendor certification is
+  `NOT_CLAIMED` until current G29 evidence supports a narrower label
+- `UNVERIFIED`: planning package independent review, commit, push, remote SHA,
+  clean-clone verification, and all G24–G30 product work
+- The isolated writer clone's local `origin` points to the G23 clean clone, not
+  directly to the approved bare backup. Final push, if authorized, must use the
+  exact direct URL above and must not rename/add/change a remote.
+
+### Current planning-package verification
+
+- Development-score assertion: weights `100`, earned `59`; interactive app and
+  snapshot each passed, exit `0`.
+- HTML control-panel assertions: `59/100`, full G24–G30 order, Luna profile,
+  Competition non-scoring, pending G24 SHA, and final Human Gate were all found;
+  `6/6`, exit `0`.
+- Current-state cross-file assertions: seven authoritative state/roadmap/panel/
+  routing documents contained `59/100`, G29, and Competition non-scoring;
+  exit `0`.
+- Prompt-schema assertion: all seven Goal headings, output-SHA fields, model/start
+  guards, next-Goal stop guards, external-action/redaction fields, and final
+  cross-machine field were present; exit `0`. A preceding whitespace-sensitive
+  detector returned exit `1` only because `Do not start G30` crossed a Markdown
+  line break; normalization corrected the detector without changing the prompt.
+- Governance validator: PASS, exit `0`.
+- Baseline validator using `C:\temp_pn_venv2\Scripts\python.exe -B
+  scripts\validate_baseline.py`: PASS — 11 required files, workflows valid, MV3
+  manifest valid; exit `0`. The preceding sandboxed process-creation attempt
+  returned exit `1` and is recorded as an environment result, not a product
+  failure or PASS.
+- Interactive report build: PASS, exit `0`; output
+  `C:\Users\hikar\.codex\visualizations\2026\09\01\01a05d1b-755c-7d60-abeb-6f2c8aa57967\polynexus-progress-report-20260902\dist\index.html`.
+- `git diff --check`: exit `0`.
+- Independent governance review attempt 1 returned `NEED_ACTION /
+  REVIEWER_USAGE_LIMIT` before producing findings. Retry 2 returned
+  `NEED_FIX`, with two MAJOR documentation findings: panels lacked complete
+  per-WP/per-Goal provenance fields, and the G29 external report schemas lacked
+  explicit `EXIT_CODE: N/A`. Both fixes are now applied in this same bounded
+  planning scope; independent re-review is required before the final Human Git
+  Gate.
+- Review-2 MAJOR fixes have been applied. Review-3 found one MAJOR G24
+  self-referential predecessor/output-SHA contradiction; the protocol was
+  corrected so the post-push planning SHA becomes `G24_START_SHA` (G24
+  predecessor) while `G24_OUTPUT_SHA` remains `PENDING`. Review-4 found one
+  remaining MAJOR because the copy-ready G24 prompt still said to read the SHA
+  only from the handoff; that exception is now explicit. Review-5 returned
+  `VERIFIED_PASS` with BLOCKER `0`, MAJOR `0`, MINOR `0`; score/panel/prompt/
+  protocol/scope-security checks all passed. `PLANNING_PACKAGE_REVIEW=VERIFIED_PASS`
+  and `HUMAN_GIT_GATE=READY_FOR_DECISION`.
+
+### Stop condition and next exact action
+
+Run current diff/scope, score, baseline, governance, HTML/report, and independent
+review gates. If they pass, present the Human with the exact stage allowlist,
+branch, remote ref, commit message, and the single planning-package authorization
+phrase. Do not create a branch, stage, commit, push, or start G24 before that
+authorization.
+
+`NEXT_PROMPT_FOR_HUMAN`:
+
+```text
+PLANNING_PACKAGE_DECISION=ACCEPT_AND_COMMIT_PUSH
+```
+
+This phrase is valid only for the exact proposal disclosed with the final review;
+it does not authorize force push, remote changes, additional files, G24 execution,
+external send, or secret access.
+
+## Current Task — G23 final reconciliation and Human acceptance (2026-09-02)
+
+**Status:** `HUMAN_ACCEPTED / PASS / COMPLETE`
+
+- `TASK_ID`: `G23-FINAL-PROJECT-RECONCILIATION-AND-HUMAN-ACCEPTANCE`
+- `ATTEMPT`: `1`
+- `TASK_DOC`: `docs/tasks/G23-FINAL-PROJECT-RECONCILIATION-AND-HUMAN-ACCEPTANCE.md`
+- `HANDOFF_DOC`: `docs/12_HANDOFF_CURRENT.md`
+- `BRANCH`: `feature/g22-rc-hardening-cross-machine-delivery-closeout`
+- `ACCEPTED_SHA`: `0eb56a986e97a45854bd6ddd419c114845ce51f4`
+- `APPROVED_REMOTE_REF`: `origin/feature/g22-rc-hardening-cross-machine-delivery-closeout`
+- `WRITER`: `Codex` (G23 status synchronization only, in an isolated lane)
+- `REVIEWER`: `Codex` read-only reconciliation plus the Human's final decision;
+  this status-only sync does not relabel itself as a new independent product review
+- `ANTIGRAVITY_STATUS`: `NOT_REQUIRED` for the G23 document synchronization;
+  bounded G21 browser artifacts remain the accepted browser evidence
+- `NEXT_OWNER`: `Human` for selection of a separately routed next development
+  program; no next task is started by this handoff
+
+### Goal and decision
+
+Reconcile the exact G19–G22 terminal evidence and present one Human decision.
+The Human explicitly returned `G23_DECISION=ACCEPT` on 2026-09-02. G23 is
+therefore closed as `HUMAN_ACCEPTED / PASS / COMPLETE` within its declared
+bounded scope.
+
+### Accepted provenance and evidence
+
+- G19 `PASS`: `1799994514fc5dc46aef752ab61a3d96583ea3ad`.
+- G20 `PASS`: `48062f1cae608785a39539e1a7bfca5d6726a92e`.
+- G21 bounded browser-fixture `PASS`:
+  `ada5e9c8b4873aad4c53c74198171740d376d926`.
+- G22 `PASS / CHECKPOINTED` and G23 accepted final SHA:
+  `0eb56a986e97a45854bd6ddd419c114845ce51f4`.
+- Acceptance clean clone:
+  `C:\Users\hikar\.codex\visualizations\2026\09\01\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\g23-g22-clean-20260902`;
+  exact SHA matched, Git clean, staged empty.
+- Evidence timestamp: `2026-09-02T03:50:35.528Z`.
+- Fresh results: exact-SHA reconciliation, baseline, governance, manifest
+  `6/6`, provenance/maturity scans, protected scope, and `git diff --check`
+  exit `0`; browser-companion `9/9`, exit `0`; G22 targeted Core `21 passed`,
+  exit `0`.
+
+### G23 state-synchronization verification
+
+- Fresh `git ls-remote` against `D:\GitBackup\PolyNexus_Backup.git` resolved
+  G19, G20, G21, and G22 refs to the four exact terminal SHAs, exit `0`.
+- Initial `python -B scripts/validate_baseline.py` could not find a `python`
+  command, exit `1`; the first controlled-launcher sandbox attempt could not
+  create the process, exit `1`. These are retained environment attempts.
+- Approved controlled launcher
+  `C:\temp_pn_venv2\Scripts\python.exe -B scripts\validate_baseline.py` passed:
+  11 required files, workflows valid, MV3 manifest valid, exit `0`.
+- Governance validator passed, exit `0`.
+- Score reconciliation assertion passed `59/100`, exit `0`.
+- HTML control-panel assertions passed `4/4`, exit `0`.
+- Interactive project report authored-content build passed, exit `0`.
+- `git diff --check` passed, exit `0`.
+
+### Changed files for this uncommitted G23 state-sync delta
+
+- `artifacts/verification/g23-final-20260902/summary.md`
+- `docs/11_PROJECT_STATE.md`
+- `docs/12_HANDOFF_CURRENT.md`
+- `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`
+- `docs/31_COMPATIBILITY_MATRIX.md`
+- `docs/32_KNOWN_LIMITATIONS.md`
+- `docs/GOAL_COMPLETION_CONTROL_PANEL.md`
+- `docs/GOAL_COMPLETION_CONTROL_PANEL.html`
+- `docs/tasks/G19-G23-FIVE-GOAL-EXECUTION-ROUTING.md`
+- `docs/tasks/G22-RC-HARDENING-CROSS-MACHINE-DELIVERY-CLOSEOUT.md`
+- `docs/tasks/G23-FINAL-PROJECT-RECONCILIATION-AND-HUMAN-ACCEPTANCE.md`
+
+### Protected areas and limitations
+
+- Protected primary `D:\AI學習教材\PolyNexus` remains unchanged in its prior
+  dirty state; this sync is performed in a new isolated clone.
+- Fresh CDP remains `NEED_ACTION` (`ECONNREFUSED`, exit `1`); native MV3 and
+  authenticated live-vendor journeys remain `UNVERIFIED`; vendor certification
+  is `NOT_CLAIMED`; no credential or external-send authority is granted.
+- Formal progress is `59/100` after Human-directed checkpoint allocation:
+  CP-00 `8`, CP-02 `22`, accepted CP-03 work `14`, bounded WP-21 `3`, accepted
+  WP-23 `2`, and bounded CP-06 closeout `10`. Unaccepted remainder earns zero.
+- `ADR_IMPACT`: `NONE`. `SCOPE_DEVIATION`: `NONE`.
+
+### Next exact step
+
+The exact status-only delta is validated. Present its exact allowlist to the
+Human for separate commit/push authorization. After any
+approved checkpoint, choose and explicitly route the next development program.
+Do not start a new runtime, vendor journey, submission, or architecture change
+from this handoff alone.
+
 ## Current Task — G22 RC hardening and cross-machine delivery closeout (2026-09-02)
 
 **Status:** `CHECKPOINTED / PASS` for bounded G22 RC hardening and delivery

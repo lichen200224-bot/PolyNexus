@@ -23,6 +23,8 @@
 | `19_DEVELOPMENT_BASELINE.md` | 第一條 Vertical Slice 執行契約 | **下一個開發任務必讀** |
 | `20_FIRST_VERTICAL_SLICE_PLAN.md` | 第一條產品垂直切片詳細工作包 | Slice 開發必讀 |
 | `28_MASTER_DEVELOPMENT_ROADMAP.md` | 全專案開發順序、範圍、時程、權重與 Checkpoint | **專案進度監控／每次交接必讀** |
+| `33_DEVELOPMENT_PROGRESS_AND_GOAL_EXECUTION_STANDARD.md` | Development-only 100 分制、WP ledger、G24–G30 授權與驗收規範 | **G24–G30 每個新 task 必讀** |
+| `tasks/G24-G30-DEVELOPMENT-COMPLETION-ROUTING.md` | Luna High 的 G24–G30 系統提示詞、外部驗證 prompt 與 stop condition | **執行對應 Goal 必讀** |
 | `tasks/WP-08A.md` | ContextPackage REST Contract implementation task | WP-08A Writer / Review handoff |
 | `tasks/WP-08B.md` | ContextPackage UI authoring / selection implementation task | Antigravity Writer / Codex Review handoff |
 | `tasks/WP-09A.md` | Execution command API contract and architecture gate proposal | Human decision / Codex architecture review |

@@ -62,6 +62,23 @@ OpenCode、Antigravity、Codex 預設不得自行 `git add`、commit、push、re
 
 Claude 與後續接入工具適用相同限制。禁止以 `git add .`、`git add -A`、`git push --all`、`git reset --hard`、`git checkout -- .` 或 `git clean -fd` 取代 explicit target/allowlist。Remote rename/add、GitHub repository creation、branch protection 與 history rewrite 都是獨立 Human Gate；commit approval 不自動包含 push 或 remote approval。
 
+### 5.3 G24–G30 single final Git Gate
+
+G24–G30 的每個 Goal 可由 Human 使用單一最終語句
+`<GOAL>_DECISION=ACCEPT_AND_COMMIT_PUSH` 合併 acceptance、exact-allowlist
+stage、單一 commit 與 non-force push 的批准，但只有在 Codex 已先完整揭露並驗證以下內容時有效：
+
+- exact predecessor/output SHA、branch 與 approved remote ref；
+- complete `FILES_TO_STAGE`、`FILES_EXCLUDED`、commit message；
+- working tree、staged state、diff/scope、tests、actual exit codes、independent review 結果；
+- known limitations、unverified items、ADR impact 與 scope deviation。
+
+批准後仍必須逐檔 stage、重新核對 cached allowlist、建立一個 commit、non-force
+push 指定 ref，並在 remote SHA 上執行 clean-clone verification。任何 allowlist、
+branch、remote、review 結果或安全邊界改變都使該 Gate 失效，必須回到 Human
+重新批准。此 Gate 不授權 amend、force push、remote configuration、tag、下一個
+Goal、外部 send、credential/cookie/token 讀取或未揭露檔案。
+
 交接輸出至少要有：`RESULT`、`TASK_ID`、`ATTEMPT`、`BRANCH`、`WRITER`、`REVIEWER`、`ANTIGRAVITY_STATUS`、`NEXT_OWNER`、`CHANGED_FILES`、`TESTS`、`ADR_IMPACT`、`SCOPE_DEVIATION`、`KNOWN_LIMITATIONS`、`UNVERIFIED`、`NEXT_ACTION`、`NEXT_PROMPT_FOR_HUMAN` 與 `FIX_PROMPT`。
 
 ## 6. Rollback

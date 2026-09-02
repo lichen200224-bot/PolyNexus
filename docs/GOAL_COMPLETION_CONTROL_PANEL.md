@@ -2,6 +2,138 @@
 
 Browser-readable companion: [GOAL_COMPLETION_CONTROL_PANEL.html](GOAL_COMPLETION_CONTROL_PANEL.html).
 
+## G24–G30 development completion program — HUMAN CONFIRMED 2026-09-02
+
+`PLAN_STATUS: HUMAN_CONFIRMED / WAIT_FOR_PLANNING_CHECKPOINT`
+
+- `ACCEPTED_BASELINE_SHA`: `0eb56a986e97a45854bd6ddd419c114845ce51f4`
+- `DEVELOPMENT_PROGRESS`: `59/100`
+- `COMPETITION_TRACK`: `NOTE_ONLY_NON_SCORING / HUMAN_OWNED_DELIVERY`
+- `EXECUTION_ORDER`: `G24 → G25 → G26 → G27 → G28 → G29 → G30`
+- `EXECUTION_PROFILE`: one new Codex task per Goal, `gpt-5.6-luna`, reasoning
+  effort `high`, isolated lane, exact approved predecessor SHA
+- `G24_START_SHA`: `PENDING_PLANNING_CHECKPOINT`
+- `G24_STATUS`: `WAIT`; the current planning package must be committed,
+  non-force pushed, and clean-clone verified first
+- `EXTERNAL_VERIFICATION`: delayed to G29; live ChatGPT/Claude/Gemini journeys,
+  native MV3 dispatch, and vendor certification remain `UNVERIFIED` /
+  `NOT_CLAIMED` until current evidence exists
+- `HUMAN_GATE`: normally only the final per-Goal
+  `<GOAL>_DECISION=ACCEPT_AND_COMMIT_PUSH` after Codex discloses exact allowlist,
+  branch, remote, evidence, review, limitations, and commit message
+
+### Development-only score ledger
+
+| Checkpoint / item | Accepted | Total | Remaining Goal |
+|---|---:|---:|---|
+| CP-00 | 8 | 8 | Complete |
+| CP-02 | 22 | 22 | Complete |
+| CP-03: WP-11/12/13 | 14 | 14 | Complete |
+| CP-03: WP-14/15/16 | 0 | 13 | G25 |
+| CP-04: WP-17/18/19 | 0 | 12 | G26 |
+| CP-04: WP-20 | 0 | 5 | G29 external/Human-operated |
+| CP-04: WP-21 | 3 | 3 | Complete, bounded fixture scope |
+| CP-05: WP-22/24/25 | 0 | 6 | G27 |
+| CP-05: WP-23 | 2 | 2 | Complete |
+| CP-05: WP-26/27 | 0 | 5 | G28 |
+| CP-06 | 10 | 10 | Complete through G19/G20/G22/G23 |
+| **Development total** | **59** | **100** | **41 points remain** |
+| Competition | **—** | **—** | Note only; no score |
+
+### New Goal sequence
+
+| Goal | Status | Scope | Score after acceptance |
+|---|---|---|---:|
+| G24 | `WAIT_FOR_PLANNING_CHECKPOINT` | Ledger/evidence reconciliation | 59 |
+| G25 | `GATED_BY_G24` | WP-14/15/16 runtime adapters + Doctor | 72 |
+| G26 | `GATED_BY_G25` | WP-17/18/19 local/policy/WebSurface | 84 |
+| G27 | `GATED_BY_G26` | WP-22/24/25 workflows/guards/metrics | 90 |
+| G28 | `GATED_BY_G27` | WP-26/27 UX + Golden Workflow freeze | 95 |
+| G29 | `GATED_BY_G28` | WP-20 authenticated external-vendor verification | 100 |
+| G30 | `GATED_BY_G29` | Final score/provenance reconciliation | 100 confirmed |
+
+### Independent WP ledger
+
+| WP | Weight | Status | Goal | Checkpoint SHA |
+|---|---:|---|---|---|
+| WP-11 | 4 | `HUMAN_ACCEPTED` | G23 predecessor | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
+| WP-12 | 5 | `HUMAN_ACCEPTED` | G23 predecessor | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
+| WP-13 | 5 | `HUMAN_ACCEPTED` | G23 predecessor | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
+| WP-14 | 5 | `PLANNED` | G25 | `PENDING` |
+| WP-15 | 5 | `PLANNED` | G25 | `PENDING` |
+| WP-16 | 3 | `PLANNED` | G25 | `PENDING` |
+| WP-17 | 4 | `PLANNED` | G26 | `PENDING` |
+| WP-18 | 4 | `PLANNED` | G26 | `PENDING` |
+| WP-19 | 4 | `PLANNED` | G26 | `PENDING` |
+| WP-20 | 5 | `PLANNED / EXTERNAL_LATE` | G29 | `PENDING` |
+| WP-21 | 3 | `HUMAN_ACCEPTED / BOUNDED` | G23 predecessor | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
+| WP-22 | 3 | `PLANNED` | G27 | `PENDING` |
+| WP-23 | 2 | `HUMAN_ACCEPTED` | G23 predecessor | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
+| WP-24 | 2 | `PLANNED` | G27 | `PENDING` |
+| WP-25 | 1 | `PLANNED` | G27 | `PENDING` |
+| WP-26 | 2 | `PLANNED` | G28 | `PENDING` |
+| WP-27 | 3 | `PLANNED` | G28 | `PENDING` |
+| WP-28 | 2 | `HUMAN_ACCEPTED / BOUNDED` | G23 predecessor | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
+| WP-29 | 2 | `HUMAN_ACCEPTED / BOUNDED` | G23 predecessor | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
+| WP-30 | 2 | `HUMAN_ACCEPTED / BOUNDED` | G23 predecessor | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
+| WP-31 | 1 | `HUMAN_ACCEPTED / BOUNDED` | G23 predecessor | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
+| WP-32 | 3 | `HUMAN_ACCEPTED / BOUNDED` | G23 predecessor | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
+
+### Goal provenance ledger
+
+| Goal | Predecessor SHA | Output SHA | Start gate | Score delta | Status |
+|---|---|---|---|---:|---|
+| G24 | `G24_START_SHA (PENDING_PLANNING_CHECKPOINT)` | `PENDING` | Approved planning-package remote SHA becomes G24 predecessor | 0 | `WAIT` |
+| G25 | `G24_OUTPUT_SHA` | `PENDING` | Approved G24 checkpoint | +13 | `GATED` |
+| G26 | `G25_OUTPUT_SHA` | `PENDING` | Approved G25 checkpoint | +12 | `GATED` |
+| G27 | `G26_OUTPUT_SHA` | `PENDING` | Approved G26 checkpoint | +6 | `GATED` |
+| G28 | `G27_OUTPUT_SHA` | `PENDING` | Approved G27 checkpoint | +5 | `GATED` |
+| G29 | `G28_OUTPUT_SHA` | `PENDING` | Approved G28 + external operator | +5 | `GATED / EXTERNAL_LATE` |
+| G30 | `G29_OUTPUT_SHA` | `PENDING` | Approved G29 checkpoint | 0 | `GATED` |
+
+Authoritative standard: [Development Progress and Goal Execution Standard](33_DEVELOPMENT_PROGRESS_AND_GOAL_EXECUTION_STANDARD.md).
+Copy-ready prompts: [G24–G30 Development Completion Routing](tasks/G24-G30-DEVELOPMENT-COMPLETION-ROUTING.md).
+
+The G23 and earlier sections below are historical predecessor snapshots. Their
+old checkpoint presentation does not override the current development-only map.
+
+## G23 final reconciliation and Human acceptance — 2026-09-02
+
+`RESULT: HUMAN_ACCEPTED / PASS / COMPLETE`
+
+- `HUMAN_DECISION`: `G23_DECISION=ACCEPT`
+- `FINAL_SHA`: `0eb56a986e97a45854bd6ddd419c114845ce51f4`
+- `FINAL_BRANCH`: `feature/g22-rc-hardening-cross-machine-delivery-closeout`
+- `APPROVED_REMOTE_REF`: `origin/feature/g22-rc-hardening-cross-machine-delivery-closeout`
+- `CLEAN_CLONE`: `g23-g22-clean-20260902`, exact SHA matched, Git clean,
+  staged empty
+- `GOAL_CHAIN`: G19 `1799994514fc5dc46aef752ab61a3d96583ea3ad`;
+  G20 `48062f1cae608785a39539e1a7bfca5d6726a92e`; G21
+  `ada5e9c8b4873aad4c53c74198171740d376d926`; G22/final
+  `0eb56a986e97a45854bd6ddd419c114845ce51f4`
+- `FORMAL_PROJECT_PROGRESS`: `59/100` after mapping completed work into the
+  existing checkpoint weights
+- `CROSS_MACHINE_CONTINUATION_READY`: `YES`
+- `SUCCESSOR_ROUTING`: G24–G30 is now Human-confirmed; G24 remains
+  `WAIT_FOR_PLANNING_CHECKPOINT`
+- `RESIDUAL_LIMITATIONS`: fresh CDP `NEED_ACTION`; native MV3 and authenticated
+  live-vendor journeys `UNVERIFIED`; vendor certification `NOT_CLAIMED`
+
+### Accepted score map
+
+| Checkpoint | Score | Current state |
+|---|---:|---|
+| CP-00 | 8/8 | Accepted baseline/governance |
+| CP-02 | 22/22 | Accepted First Vertical Slice |
+| CP-03 | 14/27 | WP-11/12/13 accepted; runtime components remain gated |
+| CP-04 | 3/20 | WP-21 bounded browser acceptance only |
+| CP-05 | 2/13 | WP-23 migration/restore evidence accepted |
+| CP-06 | 10/10 | G19/G20/G22/G23 bounded RC hardening and closeout |
+| **Total** | **59/100** | **41 points remain unaccepted** |
+
+The G22 and earlier sections below are predecessor snapshots retained for
+traceability; they do not override this G23 block.
+
 ## G22 RC hardening and delivery closeout — 2026-09-02
 
 `RESULT: PASS / CHECKPOINTED` for bounded G22 RC hardening and delivery closeout
@@ -89,7 +221,7 @@ rebased, overwritten, staged, or otherwise mutated.
 | G20 | `PASS / COMPLETE` | Canonical and second clean clone restore, Vitest, build, validators, and checkpoint |
 | G21 | `PASS / REMEDIATED IN G22` | Independent review findings closed; bounded fixture evidence remains 3/3 and 28/28 |
 | G22 | `PASS / CHECKPOINTED` | Encoded traversal fixed; checkpoint pushed and clean-clone proof passed |
-| G23 | `GATED / NOT STARTED` | Requires G19–G22 terminal evidence; Human decides final acceptance |
+| G23 | `HUMAN_ACCEPTED / PASS / COMPLETE` | Final reconciliation accepted at exact SHA `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
 
 ## G19 imported-file provenance
 
@@ -108,8 +240,8 @@ provenance evidence for the primary artifacts, not final checkpoint blob hashes.
 
 - G19 did not run Web Vitest/build, browser, WP21, vendor, or external acceptance.
 - WP21 real-browser/vendor evidence remains `DEFERRED / UNVERIFIED`.
-- CP06/RC remains provisional with disclosed limitations; no final Human
-  acceptance or `SUPPORTED`/`CERTIFIED` claim is made.
+- G23 final Human acceptance is recorded for the bounded RC checkpoint. This is
+  not a `SUPPORTED`/`CERTIFIED` live-vendor claim.
 - Promoted `docs/31_COMPATIBILITY_MATRIX.md` was retained. Primary untracked
   `docs/31_PROJECT_CONTENT_MAP.md` was excluded without overwrite or deletion.
 - ADR-001–010 remain frozen; ADR-011 is unchanged. Scope deviation: `NONE`.

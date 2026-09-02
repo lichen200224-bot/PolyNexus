@@ -1,5 +1,98 @@
 # Project State
 
+## Current Operational State — 2026-09-02 (G24–G30 program approved; planning checkpoint pending)
+
+This is the authoritative current-state block. The G23 and earlier snapshots
+below remain provenance history and do not override it.
+
+- **Human decision:** the development-only score model, ordered G24–G30 program,
+  bounded Codex autonomy, delayed external verification, and rigorous Luna High
+  task prompts are `HUMAN_CONFIRMED`.
+- **Accepted product baseline:** G23 remains `HUMAN_ACCEPTED / PASS / COMPLETE`
+  at exact SHA `0eb56a986e97a45854bd6ddd419c114845ce51f4` on
+  `origin/feature/g22-rc-hardening-cross-machine-delivery-closeout`.
+- **Development progress:** `59/100`. Current accepted allocation is CP-00
+  `8/8`, CP-02 `22/22`, CP-03 `14/27`, CP-04 `3/20`, CP-05 `2/13`, and
+  CP-06 `10/10`. The remaining `41` points are independently tracked WP items.
+- **Competition boundary:** `COMPETITION_TRACK=NOTE_ONLY_NON_SCORING`;
+  proposal, slides, upload-form checks, submission, and other competition work
+  are Human-owned delivery notes and do not enter or block development progress.
+- **Ordered program:** `G24 → G25 → G26 → G27 → G28 → G29 → G30`.
+  G25 targets WP-14/15/16 (`+13`), G26 WP-17/18/19 (`+12`), G27
+  WP-22/24/25 (`+6`), G28 WP-26/27 (`+5`), G29 WP-20 authenticated vendor
+  verification (`+5`), and G30 final reconciliation (`+0`). G24 establishes the
+  ledger and earns no product points.
+- **External verification:** live authenticated ChatGPT/Claude/Gemini work is
+  deliberately delayed to G29 because it requires Human operation. Until G29
+  passes, live-vendor journeys, native MV3 dispatch, and vendor certification
+  remain `UNVERIFIED` / `NOT_CLAIMED`; credentials, cookies, tokens, and
+  automatic external send remain prohibited.
+- **Execution profile:** every Goal runs in a new Codex task using
+  `gpt-5.6-luna` with reasoning effort `high`. The task must stop before writes
+  if the model/profile, predecessor SHA, remote ref, or isolated-lane gate does
+  not match. Single Active Writer and independent Reviewer remain mandatory.
+- **Human interaction model:** inside an approved Goal, Codex may implement,
+  test, remediate, re-review, and update all progress artifacts until the final
+  gate. The only normal Human intervention is the disclosed
+  `<GOAL>_DECISION=ACCEPT_AND_COMMIT_PUSH`; it never authorizes scope/ADR change,
+  secret handling, automatic external send, force push, remote reconfiguration,
+  or the next Goal.
+- **Planning start gate:** the current G23 acceptance/status delta plus the new
+  governance, scoring standard, routing prompts, and control-panel update are
+  not yet checkpointed. `G24_START_SHA=PENDING_PLANNING_CHECKPOINT`; therefore
+  `G24_STATUS=WAIT` and G24 must not start until an approved remote checkpoint
+  and clean-clone verification establish that immutable SHA.
+- **Architecture / scope:** `ADR_IMPACT=NONE`; `SCOPE_DEVIATION=NONE`.
+  ADR-001–011, Core contracts, Domain, workflow semantics, and persistence are
+  unchanged by this planning package.
+
+## Current Operational State — 2026-09-02 (G23 final Human acceptance)
+
+This is the authoritative current-state block. Retained G19–G22 and earlier
+material below is historical reference and must not override this block.
+
+- **G23 status:** `HUMAN_ACCEPTED / PASS / COMPLETE`. The Human explicitly
+  recorded `G23_DECISION=ACCEPT` on 2026-09-02 after reviewing the final
+  reconciliation packet.
+- **Accepted final SHA:**
+  `0eb56a986e97a45854bd6ddd419c114845ce51f4` on branch
+  `feature/g22-rc-hardening-cross-machine-delivery-closeout`.
+- **Approved remote ref:**
+  `origin/feature/g22-rc-hardening-cross-machine-delivery-closeout`, resolved to
+  the exact accepted SHA above.
+- **Acceptance clean clone:**
+  `C:\Users\hikar\.codex\visualizations\2026\09\01\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\g23-g22-clean-20260902`,
+  exact HEAD `0eb56a986e97a45854bd6ddd419c114845ce51f4`, Git clean and staged state empty.
+- **Terminal goal chain:** G19 `PASS` at
+  `1799994514fc5dc46aef752ab61a3d96583ea3ad`; G20 `PASS` at
+  `48062f1cae608785a39539e1a7bfca5d6726a92e`; G21 bounded browser-fixture
+  `PASS` at `ada5e9c8b4873aad4c53c74198171740d376d926`; G22
+  `PASS / CHECKPOINTED` at the accepted final SHA.
+- **Final deterministic evidence:** G19–G22 remote-ref/clean-clone exact-SHA
+  reconciliation, baseline validator, governance validator, SHA-256 manifest
+  `6/6`, stale/count/provenance/maturity scan, protected-scope check, and
+  `git diff --check` passed with exit `0`; browser-companion passed `9/9`, exit
+  `0`; G22 targeted Core passed `21`, exit `0`. Evidence timestamp:
+  `2026-09-02T03:50:35.528Z`.
+- **Accepted scope:** repository-backed terminal evidence for G19–G22, bounded
+  RC hardening, delivery package, and cross-machine continuation. This is not
+  live-vendor certification.
+- **Residual limitations:** fresh G22 CDP rerun remains `NEED_ACTION`
+  (`ECONNREFUSED`, exit `1`); native MV3 service-worker dispatch is
+  `UNVERIFIED`; authenticated ChatGPT/Claude/Gemini journeys are
+  `DEFERRED / UNVERIFIED`; credentials, cookies, tokens, and automatic external
+  send remain prohibited; vendor certification is `NOT_CLAIMED`.
+- **Historical G23 score snapshot:** `59/100`. The later Human-confirmed
+  development-only model reallocates the same accepted total across CP-00
+  `8/8`, CP-02 `22/22`, CP-03 `14/27`, CP-04 `3/20`, CP-05 `2/13`, and
+  CP-06 `10/10`; Competition is now note-only/non-scoring. G19 and G22 remain
+  recognized through CP-06 without duplicate Goal-level bonus points.
+- **Architecture / scope:** `ADR_IMPACT=NONE`; `SCOPE_DEVIATION=NONE`;
+  ADR-001–010 and all existing product boundaries remain unchanged.
+- **Continuation:** `CROSS_MACHINE_CONTINUATION_READY=YES`. The next program of
+  work requires a new explicit routing decision; no recursive goal or runtime
+  delegation is implied by this acceptance.
+
 ## Current Operational State — 2026-09-02 (G22 RC hardening and delivery closeout)
 
 This is the authoritative current-state block for G22. Retained material below

@@ -138,3 +138,33 @@ Push 成功本身不是跨機驗收。只有以下全部成立，才能宣告 `C
 - 由 Repository current state 決定的 next product task；不得依舊 conversation 猜測 WP/FVS 編號。
 
 Routing footer 必須包含 `TASK_ID`、actual `CURRENT_STATUS`、deterministic `RESULT`、`NEXT_ACTION`、`NEXT_OWNER`、complete `NEXT_PROMPT`、`BLOCKERS` 與 `HUMAN_ACTION_REQUIRED`。未執行、未批准或 blocked 的 phase 不得寫成完成。
+
+## 13. Development-only score acceptance (G24–G30)
+
+正式進度的唯一分母為 `100 development points`；Competition 是
+`NOTE_ONLY_NON_SCORING`，不得增加、減少或阻擋專案開發分數。權重與獨立 WP
+ledger 以 `docs/33_DEVELOPMENT_PROGRESS_AND_GOAL_EXECUTION_STANDARD.md` 為
+authoritative mapping。
+
+每個 WP 必須獨立記錄 `WEIGHT`、`STATUS`、`ACCEPTED_POINTS`、`GOAL_ID`、
+`CHECKPOINT_SHA`、`EVIDENCE`、`REVIEW_RESULT`、`HUMAN_DECISION`、
+`LIMITATIONS` 與 `LAST_UPDATED`。只有以下全部成立才可把該 WP 的完整權重加入
+進度：
+
+1. acceptance criteria 具體且未超出 Scope/ADR；
+2. 本輪 deterministic evidence 與 actual exit code 可重跑；
+3. independent review 是 `VERIFIED_PASS`，沒有 BLOCKER/MAJOR；
+4. Human 最終接受；
+5. exact-allowlist commit 已 non-force push 到 approved remote；
+6. remote exact SHA 的 clean-clone verification 通過。
+
+未達 checkpoint 的 implemented 或 reviewed work 均保留狀態但得分為 `0`。同一
+evidence 不得在 Goal、WP、Checkpoint 重複計分。每次 Goal acceptance 後必須在
+同一 checkpoint 內同步更新 Project State、Current Handoff、Master Roadmap、
+Markdown/HTML control panel、task document、compatibility/limitations（如適用）。
+
+G29 的 authenticated ChatGPT/Claude/Gemini 驗證是最後的人為外部驗證 Goal。
+外部 operator 必須使用專用 prompt/report schema；不得揭露 credential、cookie、
+token，不得自動 send，且沒有本機 process exit code 的人工結果必須寫
+`exit_code: N/A`。任何 vendor/platform 失敗只能標成實際的 `FAIL`、
+`NEED_ACTION` 或 `UNVERIFIED`，不得以 fixture evidence 冒充 live PASS。

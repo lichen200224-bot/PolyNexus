@@ -1,5 +1,26 @@
 # G19-G23 Five-Goal Execution Routing
 
+## Program terminal outcome — 2026-09-02
+
+- `G23_DECISION=ACCEPT` was explicitly provided by the Human.
+- `PROGRAM_STATUS=HUMAN_ACCEPTED / PASS / COMPLETE`.
+- Terminal SHAs: G19
+  `1799994514fc5dc46aef752ab61a3d96583ea3ad`; G20
+  `48062f1cae608785a39539e1a7bfca5d6726a92e`; G21
+  `ada5e9c8b4873aad4c53c74198171740d376d926`; G22/final accepted SHA
+  `0eb56a986e97a45854bd6ddd419c114845ce51f4`.
+- `CROSS_MACHINE_CONTINUATION_READY=YES` for the accepted bounded checkpoint.
+- Formal development progress is `59/100`. A later Human-confirmed reallocation
+  preserves this total under CP-00 `8`, CP-02 `22`, CP-03 `27`, CP-04 `20`,
+  CP-05 `13`, and CP-06 `10`; Competition is note-only/non-scoring. G19 and G22
+  contribute through CP-06 without double counting. Fresh CDP is `NEED_ACTION`; native
+  MV3 and authenticated live-vendor journeys remain `UNVERIFIED`; vendor
+  certification is `NOT_CLAIMED`.
+- This terminal record closes the five-goal routing program. The separate
+  successor routing is G24–G30; G24 remains `WAIT_FOR_PLANNING_CHECKPOINT` until
+  that package has an approved remote SHA and clean-clone proof. This is not
+  recursive delegation permission and does not start another goal or runtime.
+
 ## 1. Program objective
 
 Close the remaining gap between the promoted release candidate and a final,

@@ -74,7 +74,29 @@ Single Active Writer 以實際 task/handoff 為準；實際 Writer 不得擔任�
 
 Routing Decision 是治理紀錄，不新增 `RoutingEnvelope` Domain。未獲新 routing decision 的 Agent 必須停止於 handoff，不得再委派。
 
-### 5.2 Communication Views, not Second Domains
+### 5.2 G24–G30 bounded Goal autonomy
+
+G24–G30 每一個 Goal 必須在新的 Codex task 中，以
+`gpt-5.6-luna`、reasoning effort `high` 執行。新 task 先驗證 exact approved
+predecessor SHA、remote ref、isolated lane、Git state 與 planning documents；
+任一不符即在寫入前停止。不得把模型替換、舊對話記憶或 primary dirty lane
+當作正式 source of truth。
+
+Human 核准某 Goal 的 scope 後，Codex 可在該 scope 內持續：選擇低耦合實作、
+執行 targeted/regression tests、修正 findings、重跑 evidence、更新 progress map
+與 handoff，直到最終 Gate。這是 bounded execution authority，不是 recursive
+delegation permission；若要切換 Runtime／工具或新增 writer，仍必須建立含
+owner、scope、forbidden actions、acceptance 與 stop condition 的 routing decision。
+
+每個 branch 同時只能有一個 active Writer。獨立 Reviewer 不得是同一 patch 的
+Writer；review 結果只能是 `VERIFIED_PASS`、`NEED_FIX`、`FAIL` 或
+`NEED_ACTION`。在 `NEED_FIX` 範圍內 Codex 可繼續修正並重新 review，不需 Human
+逐次批准；但 scope/ADR、秘密資料、外部傳送、不可逆操作或 Git Gate 仍需 Human。
+
+Human 的預設唯一介入點是 Goal 最後的 acceptance + exact-allowlist commit/push
+決定。完成後只可設定下一 Goal 為 `READY`，不得在同一 task 自動啟動下一 Goal。
+
+### 5.3 Communication Views, not Second Domains
 
 TaskPacket／ResultPacket 只作 transport-independent communication mapping：Task view 對應既有 task goal/context/scope/acceptance/stop/return routing；Result view 對應既有 status/summary/changes/evidence/verification/findings/risks/unresolved/next routing。它們不得成為第二套 persisted Task/Result Domain，也不得複製 Evidence、Artifact、ContextPackage 或 Handoff ledger。
 
