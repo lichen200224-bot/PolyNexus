@@ -20,13 +20,18 @@ from uuid import uuid4
 
 from polynexus_core.domain.enums import AuthOwnership, ResumeMode, RunState, UsageVisibility
 from polynexus_core.domain.models import Artifact, ContextPackage, Task
+from polynexus_core.domain.run_lifecycle import assert_transition
 from polynexus_core.domain.runtime_binding import RuntimeBindingError
 from polynexus_core.runtime.contracts import RuntimeCapabilities, RuntimeResult, RuntimeStatus
 from polynexus_core.runtime.redaction import redact_text
 from polynexus_core.runtime.routing_policy import (
     DataClassification,
+    DestinationTrust,
+    ExecutionMode,
     LocalRouteDecision,
     LocalRouteEvidence,
+    PolicyDecision,
+    evaluate_egress_policy,
     evaluate_local_route,
     validate_loopback_endpoint,
 )
@@ -65,6 +70,7 @@ class _LocalRun:
     result: RuntimeResult | None = None
     error: str | None = None
     cleaned: bool = False
+    state_history: list[RunState] = field(default_factory=lambda: [RunState.CREATED])
 
 
 class LocalEndpointError(RuntimeError):
@@ -91,6 +97,14 @@ class LocalModelEndpointAdapter:
             capabilities=self.capabilities(),
             required_capabilities=config.required_capabilities,
         )
+        self._egress_policy = evaluate_egress_policy(
+            classifications=(config.classification,),
+            execution_mode=ExecutionMode.LOCAL_ONLY,
+            destination_trust=DestinationTrust.LOOPBACK,
+            local_available=True,
+        )
+        if self._egress_policy.route != "LOCAL":
+            raise RuntimeBindingError("Local endpoint egress policy rejected")
         self._last_evidence = LocalRouteEvidence(
             endpoint_identity=self._route.endpoint_identity,
             model_identity=self._route.model_identity,
@@ -141,28 +155,42 @@ class LocalModelEndpointAdapter:
         record = self._get(runtime_ref)
         if record.state is not RunState.CREATED:
             raise LocalEndpointError("local_endpoint_request_failed")
-        record.state = RunState.RUNNING
+        if self._egress_policy.decision is not PolicyDecision.ALLOW:
+            self._transition(record, RunState.STARTING)
+            self._transition(record, RunState.FAILED)
+            record.error = "local_endpoint_egress_denied"
+            self._set_error(record.error)
+            raise LocalEndpointError(record.error)
         try:
-            response = await self._chat_completion(record.context, task)
+            self._transition(record, RunState.STARTING)
+            self._transition(record, RunState.RUNNING)
+            # Keep an adapter-level deadline around the whole async operation.
+            # The stdlib worker may still finish an already-accepted HTTP
+            # request after cancellation, so cleanup remains unverified and
+            # the capability stays conservatively false.
+            response = await asyncio.wait_for(
+                self._chat_completion(record.context, task),
+                timeout=self._route.timeout_seconds,
+            )
             record.result = RuntimeResult(
                 summary=redact_text(response, max_length=MAX_RESPONSE_TEXT)
                 or "Local model returned an empty response"
             )
-            record.state = RunState.COMPLETED
+            self._transition(record, RunState.COMPLETED)
             record.error = None
             self._clear_error()
         except asyncio.TimeoutError:
-            record.state = RunState.TIMED_OUT
+            self._transition(record, RunState.TIMED_OUT)
             record.error = _TIMEOUT_FAILURE
             self._set_error(_TIMEOUT_FAILURE)
             raise LocalEndpointError(_TIMEOUT_FAILURE) from None
         except LocalEndpointError as exc:
-            record.state = RunState.FAILED
+            self._transition(record, RunState.FAILED)
             record.error = str(exc)
             self._set_error(record.error)
             raise
         except Exception:
-            record.state = RunState.FAILED
+            self._transition(record, RunState.FAILED)
             record.error = _REQUEST_FAILURE
             self._set_error(_REQUEST_FAILURE)
             raise LocalEndpointError(_REQUEST_FAILURE) from None
@@ -364,3 +392,9 @@ class LocalModelEndpointAdapter:
             return self._runs[runtime_ref]
         except KeyError:
             raise LocalEndpointError(_REQUEST_FAILURE) from None
+
+    @staticmethod
+    def _transition(record: _LocalRun, target: RunState) -> None:
+        assert_transition(record.state, target)
+        record.state = target
+        record.state_history.append(target)

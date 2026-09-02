@@ -35,14 +35,14 @@
 
       <section>
         <h2>目前正式狀態</h2>
-        <div class="callout"><strong>G25: HUMAN_ACCEPTED · PASS · COMPLETE · G24 HUMAN_ACCEPTED</strong><br />G25 exact output SHA: <code>f4168c31592ac5c886b49d8878f60b99016fdcaf</code><br />Approved ref: <code>feature/g24-g30-development-completion-routing</code><br />Development score: <strong>72/100</strong> · G25 delta: <strong>+13</strong><br />WP-14/15/16: <strong>31 / 36 / 58 targeted tests passed</strong> · Carver independent review PASS; exact remote and clean-clone checkpoint verified<br />Execution profile: <strong>new Codex task · gpt-5.6-luna · high</strong><br />G25 evidence: <code>artifacts/verification/g25-runtime-adapters-doctor-20260902/</code></div>
+        <div class="callout warning"><strong>G26: HUMAN_ACCEPTED · CHECKPOINT_PENDING_NEED_ACTION</strong><br />G26 predecessor SHA: <code>04d37291d45ebbda8453f1b39e30fca523ee1548</code><br />Branch: <code>codex/g26-local-policy-acceptance</code> · Approved ref: <code>feature/g24-g30-development-completion-routing</code><br />Development score: <strong>72/100</strong> · G26 delta: <strong>0/12</strong> because full Core regression exited <strong>1</strong><br />G26 Core targeted tests: <strong>14/14 exit 0</strong> · Browser tests: <strong>10/10 exit 0</strong> · Web Vitest: <strong>80/80 exit 0</strong> · Build: <strong>exit 0</strong><br />Independent review: <strong>PASS · 0/0/0</strong> · Human decision: <strong>ACCEPT_AND_COMMIT_PUSH</strong><br />Live ChatGPT/Claude/Gemini verification remains G29; no vendor certification or external send is claimed.</div>
         <p class="muted" style="margin-top:16px;">Codex 可在單一 Goal 核准範圍內實作、測試、修正、重驗與更新所有進度資料；Human 的一般介入點只有最後的 <code>&lt;GOAL&gt;_DECISION=ACCEPT_AND_COMMIT_PUSH</code>。這不授權 scope/ADR 變更、秘密資料、外部自動送出、force push、remote reconfiguration 或下一 Goal。</p>
         <p><a href="33_DEVELOPMENT_PROGRESS_AND_GOAL_EXECUTION_STANDARD.md">Execution standard</a> · <a href="tasks/G24-G30-DEVELOPMENT-COMPLETION-ROUTING.md">G24–G30 copy-ready prompts</a> · <a href="11_PROJECT_STATE.md">Project State</a> · <a href="12_HANDOFF_CURRENT.md">Current Handoff</a></p>
       </section>
 
       <section>
         <h2>Independent WP ledger — CURRENT</h2>
-        <p class="muted">Full per-WP provenance is in <code>artifacts/verification/g24-development-ledger-20260902/ledger.json</code>. Each record includes WP_ID, checkpoint, weight, current status, accepted points, implementation/review/acceptance refs, checkpoint SHA, test commands, actual exit codes, artifacts, limitations, unverified items, ADR impact, scope deviation, and last-updated timestamp. Source/test presence does not award points.</p>
+        <p class="muted">Full per-WP provenance is in the current G26 evidence artifact when available; the prior G24 ledger remains historical. Each record includes WP_ID, checkpoint, weight, current status, accepted points, implementation/review/acceptance refs, checkpoint SHA, test commands, actual exit codes, artifacts, limitations, unverified items, ADR impact, scope deviation, and last-updated timestamp. Source/test presence does not award points.</p>
         <div class="table-wrap"><table><thead><tr><th>WP</th><th>Weight</th><th>Status</th><th>Goal</th><th>Checkpoint SHA</th></tr></thead><tbody>
           <tr><td>WP-11</td><td>4</td><td>HUMAN_ACCEPTED</td><td>G23 predecessor</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
           <tr><td>WP-12</td><td>5</td><td>HUMAN_ACCEPTED</td><td>G23 predecessor</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
@@ -50,9 +50,9 @@
           <tr><td>WP-14</td><td>5</td><td>HUMAN_ACCEPTED / CHECKPOINTED</td><td>G25</td><td><code>f4168c31592ac5c886b49d8878f60b99016fdcaf</code></td></tr>
           <tr><td>WP-15</td><td>5</td><td>HUMAN_ACCEPTED / CHECKPOINTED</td><td>G25</td><td><code>f4168c31592ac5c886b49d8878f60b99016fdcaf</code></td></tr>
           <tr><td>WP-16</td><td>3</td><td>HUMAN_ACCEPTED / CHECKPOINTED</td><td>G25</td><td><code>f4168c31592ac5c886b49d8878f60b99016fdcaf</code></td></tr>
-          <tr><td>WP-17</td><td>4</td><td>IMPLEMENTED_PENDING_REVIEW</td><td>G26</td><td><code>PENDING</code></td></tr>
-          <tr><td>WP-18</td><td>4</td><td>IMPLEMENTED_PENDING_REVIEW</td><td>G26</td><td><code>PENDING</code></td></tr>
-          <tr><td>WP-19</td><td>4</td><td>IMPLEMENTED_PENDING_REVIEW</td><td>G26</td><td><code>PENDING</code></td></tr>
+          <tr><td>WP-17</td><td>4</td><td>NEED_ACTION</td><td>G26</td><td><code>PENDING</code></td></tr>
+          <tr><td>WP-18</td><td>4</td><td>NEED_ACTION</td><td>G26</td><td><code>PENDING</code></td></tr>
+          <tr><td>WP-19</td><td>4</td><td>NEED_ACTION</td><td>G26</td><td><code>PENDING</code></td></tr>
           <tr><td>WP-20</td><td>5</td><td>IMPLEMENTED_PENDING_REVIEW</td><td>G29 · EXTERNAL LATE</td><td><code>PENDING</code></td></tr>
           <tr><td>WP-21</td><td>3</td><td>HUMAN_ACCEPTED</td><td>G23 predecessor; bounded browser fixture scope</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
           <tr><td>WP-22</td><td>3</td><td>IMPLEMENTED_PENDING_REVIEW</td><td>G27</td><td><code>PENDING</code></td></tr>

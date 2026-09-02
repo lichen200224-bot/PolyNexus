@@ -1,5 +1,43 @@
 # Project State
 
+## Current G26 Candidate State — 2026-09-03
+
+This is the current G26 checkpoint candidate. It supersedes no accepted
+checkpoint until the authorized commit, push, and clean-clone gates complete.
+
+- **Goal:** `G26-LOCAL-POLICY-AND-WEBSURFACE-INTERNAL-ACCEPTANCE`.
+- **Branch:** `codex/g26-local-policy-acceptance`; isolated clone HEAD is
+  `04d37291d45ebbda8453f1b39e30fca523ee1548` before G26 edits.
+- **Approved remote ref:** `feature/g24-g30-development-completion-routing` at
+  predecessor `04d37291d45ebbda8453f1b39e30fca523ee1548`.
+- **G25 provenance:** output `f4168c31592ac5c886b49d8878f60b99016fdcaf` is an
+  ancestor of the later state-sync/start SHA; remote ref and ancestry checks
+  passed in `D:/GitBackup/PolyNexus_Backup.git`.
+- **Primary protection:** `D:\AI學習教材\PolyNexus` remains untouched by this
+  candidate; it had pre-existing dirty/untracked work before G26.
+- **G26 status:** `HUMAN_ACCEPTED / CHECKPOINT_PENDING_NEED_ACTION` after
+  `G26_DECISION=ACCEPT_AND_COMMIT_PUSH`; the bounded WP evidence is recorded,
+  but the full Core regression remains exit `1`, so no G26 points are awarded
+  (`PROJECT_SCORE=72/100`, delta `0/12`).
+- **Implemented candidate scope:** WP-17 local endpoint timeout/identity
+  coverage plus request-time egress enforcement, WP-18 highest-classification
+  and egress decision mapping with safe Evidence identity validation, and
+  WP-19 exact IPv4 loopback caller validation plus authenticated service-worker
+  loopback requests and existing browser boundary.
+- **Current evidence:** G26 targeted Core tests passed 14/14, combined API/local
+  routing regression passed 29/29, browser companion tests passed 10/10, Web
+  Vitest passed 80/80, production build passed, baseline and governance
+  validators passed, and syntax/manifest/diff checks passed. Full Core exited
+  `1` with existing persistence/lifecycle/council/resource-guard failures.
+- **Maturity:** local endpoint/policy remain `EXPERIMENTAL`; WebSurface remains
+  `PREVIEW`; live authenticated vendor journeys and certification remain
+  deferred to G29.
+- **ADR / scope:** `ADR_IMPACT=NONE`; `SCOPE_DEVIATION=NONE`; no Domain entity,
+  migration, Run identity, public runtime contract, cloud fallback, secret
+  handling, or vendor-specific Core branch was added.
+- **Next action:** execute the explicitly authorized exact-allowlist
+  stage/commit/push and clean-clone verification. Do not start G27.
+
 ## Current Operational State — 2026-09-02 (G25 runtime adapters and Doctor — CURRENT)
 
 This is the authoritative current-state block. Earlier snapshots below remain

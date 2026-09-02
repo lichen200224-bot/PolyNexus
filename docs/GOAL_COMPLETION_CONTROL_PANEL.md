@@ -2,9 +2,33 @@
 
 Browser-readable companion: [GOAL_COMPLETION_CONTROL_PANEL.html](GOAL_COMPLETION_CONTROL_PANEL.html).
 
+## G26 current candidate — NEED_ACTION (2026-09-03)
+
+- `G26_BRANCH`: `codex/g26-local-policy-acceptance`
+- `G26_PREDECESSOR_SHA`: `04d37291d45ebbda8453f1b39e30fca523ee1548`
+- `G26_STATUS`: `HUMAN_ACCEPTED / CHECKPOINT_PENDING_NEED_ACTION` after
+  `G26_DECISION=ACCEPT_AND_COMMIT_PUSH`; commit/push and clean clone remain.
+- `PROJECT_SCORE`: `72/100`; `G26_SCORE_DELTA=0/12` because full Core regression
+  exited `1` despite bounded G26 evidence passing.
+- `WP17`: implementation candidate / `EXPERIMENTAL`; request-time local egress
+  gate is wired; targeted Core evidence is 14/14, exit `0`.
+  14/14, exit `0`.
+- `WP18`: bounded evidence verified / `EXPERIMENTAL`; targeted Core evidence is
+  14/14, exit `0`.
+- `WP19`: `PREVIEW`; browser Node suite `10/10`, exit `0`; authenticated
+  service-worker loopback path is covered; live vendor journeys
+  remain deferred to G29.
+- `PRIMARY_PROTECTED`: `D:\AI學習教材\PolyNexus`; `ADR_IMPACT=NONE`;
+  `SCOPE_DEVIATION=NONE`.
+- `INDEPENDENT_REVIEW`: `PASS`; `BLOCKER=0`; `MAJOR=0`; `MINOR=0`.
+- `NEXT_ACTION`: execute the authorized stage/commit/push allowlist, verify the
+  approved remote ref and clean clone, publish the output SHA, and set
+  `NEXT_GOAL_READY=G27` without starting G27.
+
 ## G24–G30 development completion program — HUMAN CONFIRMED 2026-09-02
 
-`PLAN_STATUS: HUMAN_CONFIRMED / G25_CURRENT / HUMAN_ACCEPTED / PASS / COMPLETE`
+`PLAN_STATUS: HUMAN_CONFIRMED / G26_CURRENT / NEED_ACTION`; G25 remains
+`HUMAN_ACCEPTED / PASS / COMPLETE` at its exact checkpoint.
 
 - `ACCEPTED_BASELINE_SHA`: `0eb56a986e97a45854bd6ddd419c114845ce51f4`
 - `DEVELOPMENT_PROGRESS`: `72/100`
@@ -33,7 +57,7 @@ Browser-readable companion: [GOAL_COMPLETION_CONTROL_PANEL.html](GOAL_COMPLETION
 | CP-02 | 22 | 22 | Complete |
 | CP-03: WP-11/12/13 | 14 | 14 | Complete |
 | CP-03: WP-14/15/16 | 13 | 13 | G25 (Human accepted; Carver review PASS; checkpointed) |
-| CP-04: WP-17/18/19 | 0 | 12 | G26 (IMPLEMENTED_PENDING_REVIEW) |
+| CP-04: WP-17/18/19 | 0 | 12 | G26 (NEED_ACTION: runtime checks/review pending) |
 | CP-04: WP-20 | 0 | 5 | G29 (IMPLEMENTED_PENDING_REVIEW; external/Human-operated) |
 | CP-04: WP-21 | 3 | 3 | Complete, bounded fixture scope |
 | CP-05: WP-22/24/25 | 0 | 6 | G27 (IMPLEMENTED_PENDING_REVIEW) |
@@ -72,9 +96,9 @@ Every WP-11–WP-32 record contains `WP_ID`, `CHECKPOINT`, `POINT_WEIGHT`,
 | WP-14 | 5 | `HUMAN_ACCEPTED / CHECKPOINTED` | G25 | `f4168c31592ac5c886b49d8878f60b99016fdcaf` |
 | WP-15 | 5 | `HUMAN_ACCEPTED / CHECKPOINTED` | G25 | `f4168c31592ac5c886b49d8878f60b99016fdcaf` |
 | WP-16 | 3 | `HUMAN_ACCEPTED / CHECKPOINTED` | G25 | `f4168c31592ac5c886b49d8878f60b99016fdcaf` |
-| WP-17 | 4 | `IMPLEMENTED_PENDING_REVIEW` | G26 | `PENDING` |
-| WP-18 | 4 | `IMPLEMENTED_PENDING_REVIEW` | G26 | `PENDING` |
-| WP-19 | 4 | `IMPLEMENTED_PENDING_REVIEW` | G26 | `PENDING` |
+| WP-17 | 4 | `NEED_ACTION` | G26 | `PENDING` |
+| WP-18 | 4 | `NEED_ACTION` | G26 | `PENDING` |
+| WP-19 | 4 | `NEED_ACTION` | G26 | `PENDING` |
 | WP-20 | 5 | `IMPLEMENTED_PENDING_REVIEW` | G29 | `PENDING` |
 | WP-21 | 3 | `HUMAN_ACCEPTED` | G23 predecessor; bounded browser fixture scope | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
 | WP-22 | 3 | `IMPLEMENTED_PENDING_REVIEW` | G27 | `PENDING` |

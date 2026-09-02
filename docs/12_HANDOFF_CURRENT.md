@@ -1,5 +1,74 @@
 # Current Handoff
 
+## Current Task — G26 local, policy, and WebSurface acceptance (2026-09-03)
+
+- `TASK_ID`: `G26-LOCAL-POLICY-AND-WEBSURFACE-INTERNAL-ACCEPTANCE`
+- `ATTEMPT`: `1`; `WRITER`: Codex; `REVIEWER`: Feynman, independent read-only
+  review `PASS` (`BLOCKER=0`, `MAJOR=0`, `MINOR=0`); `ANTIGRAVITY_STATUS`:
+  `NOT_REQUIRED` for controlled internal scope;
+  live vendor work belongs to G29.
+- `BRANCH`: `codex/g26-local-policy-acceptance`, isolated lane at
+  `artifacts/worktrees/g26-local-policy-acceptance`.
+- `PREDECESSOR_SHA`: `04d37291d45ebbda8453f1b39e30fca523ee1548`; this equals the
+  approved G25 remote ref at start. G25 output
+  `f4168c31592ac5c886b49d8878f60b99016fdcaf` ancestry passed in the backup
+  repository.
+- `STATUS`: `HUMAN_ACCEPTED / CHECKPOINT_PENDING_NEED_ACTION`; Human decision
+  received: `G26_DECISION=ACCEPT_AND_COMMIT_PUSH`. Full Core regression remains
+  exit `1`, so no G26 points are accepted. `PROJECT_SCORE=72/100`; delta `0/12`.
+- `GOAL`: reconcile WP-17 local profiles, WP-18 classification/routing/egress,
+  and WP-19 WebSurface/authenticated-loopback/manual fallback using controlled
+  fixtures only.
+- `CHANGED_FILES` (exact, including ignored evidence):
+  `services/core/src/polynexus_core/runtime/routing_policy.py`,
+  `services/core/src/polynexus_core/runtime/local_endpoint.py`,
+  `services/core/src/polynexus_core/api/dependencies.py`,
+  `services/core/tests/test_cp04_wp17_wp18_local_routing.py`,
+  `extensions/browser-companion/README.md`,
+  `extensions/browser-companion/src/service-worker.js`,
+  `extensions/browser-companion/tests/test_websurface_drivers.mjs`,
+  `docs/tasks/WP-17.md`,
+  `docs/tasks/WP-18.md`, `docs/tasks/WP-19.md`, `docs/11_PROJECT_STATE.md`,
+  `docs/12_HANDOFF_CURRENT.md`, `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`,
+  `docs/31_COMPATIBILITY_MATRIX.md`, `docs/32_KNOWN_LIMITATIONS.md`,
+  `docs/GOAL_COMPLETION_CONTROL_PANEL.md`,
+  `docs/GOAL_COMPLETION_CONTROL_PANEL.html`,
+  `artifacts/verification/g26-local-policy-acceptance-20260903/ledger.json`,
+  `artifacts/verification/g26-local-policy-acceptance-20260903/summary.md`,
+  `artifacts/verification/g26-local-policy-acceptance-20260903/commands-and-exit-codes.md`.
+- `PROTECTED_AREAS`: primary checkout `D:\AI學習教材\PolyNexus`; no reset,
+  clean, stage, merge, rebase, commit, push, or modification was performed
+  there. No secret, credential, cookie, token, live vendor, or external send.
+- `WP17_STATUS`: bounded deterministic evidence verified; targeted G26 Core
+  tests 14/14 passed, exit `0`; full Core remains a separate exit-`1` gap.
+- `WP18_STATUS`: bounded deterministic evidence verified; targeted G26 Core
+  tests 14/14 passed, exit `0`; policy decisions map to existing `Evidence`
+  and reject unsafe identities.
+- `WP19_STATUS`: browser deterministic suite 10/10 passed, exit `0`; Web
+  Vitest 80/80 and production build passed, exit `0`; service-worker
+  authenticated loopback integration, JS syntax, manifest, and Core caller-auth
+  assertions all passed. Live/native boundaries remain unverified.
+- `TESTS_CURRENT`: G26 Core targeted `14/14`, exit `0`; combined API/local
+  routing regression `29/29`, exit `0`; full Core regression exit `1` with
+  existing persistence/lifecycle/council/resource-guard failures; browser
+  companion `10/10`, Web Vitest `80/80`, build, syntax, manifest, baseline,
+  governance, and `git diff --check` all exit `0`.
+- `ADR_IMPACT`: `NONE`; ADR-001–011 and existing Core/runtime/persistence
+  contracts preserved. `SCOPE_DEVIATION`: `NONE`.
+- `KNOWN_LIMITATIONS`: no live LM Studio/Ollama/vendor certification; controlled
+  loopback fixtures only; local HTTP cancellation/cleanup remains unverified by
+  design; external Web AI verification belongs to G29; full Core regression is
+  not clean and remains outside the awarded G26 score.
+- `INDEPENDENT_REVIEW`: Feynman returned `PASS`, `BLOCKER=0`, `MAJOR=0`,
+  `MINOR=0`; it verified the request-time denied-policy path, lifecycle,
+  evidence identity safety, and service-worker loopback boundary.
+- `NEXT_ACTION`: execute the already authorized exact stage/commit/push
+  allowlist, verify the approved remote ref and clean clone, publish the output
+  SHA, and set `NEXT_GOAL_READY=G27` without starting G27.
+- `DO_NOT_CHANGE`: primary checkout, approved remote configuration/ref,
+  frozen ADR semantics, Domain/persistence schema, secrets, external accounts,
+  or next Goal.
+
 ## Current Task — G25 runtime adapters and Doctor acceptance (2026-09-02)
 
 - `TASK_ID`: `G25-RUNTIME-ADAPTERS-AND-DOCTOR-ACCEPTANCE`

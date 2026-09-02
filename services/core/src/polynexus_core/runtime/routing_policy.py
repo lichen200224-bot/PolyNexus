@@ -14,6 +14,7 @@ from typing import Iterable
 from urllib.parse import SplitResult, urlsplit
 
 from polynexus_core.domain.enums import AuthOwnership, ResumeMode, UsageVisibility
+from polynexus_core.domain.models import Evidence
 from polynexus_core.domain.runtime_binding import RuntimeBindingError
 
 
@@ -24,6 +25,43 @@ class DataClassification(StrEnum):
     INTERNAL = "INTERNAL"
     CONFIDENTIAL = "CONFIDENTIAL"
     RESTRICTED = "RESTRICTED"
+
+
+class ExecutionMode(StrEnum):
+    """Caller-selected egress posture from D05."""
+
+    STANDARD = "STANDARD"
+    LOCAL_PREFERRED = "LOCAL_PREFERRED"
+    LOCAL_ONLY = "LOCAL_ONLY"
+
+
+class DestinationTrust(StrEnum):
+    """Trust classification for the selected destination/tool."""
+
+    LOOPBACK = "LOOPBACK"
+    TRUSTED_EXTERNAL = "TRUSTED_EXTERNAL"
+    UNTRUSTED_EXTERNAL = "UNTRUSTED_EXTERNAL"
+
+
+class PolicyDecision(StrEnum):
+    ALLOW = "ALLOW"
+    APPROVAL_REQUIRED = "APPROVAL_REQUIRED"
+    DENY = "DENY"
+
+
+LOCAL_ROUTE = "LOCAL"
+EXTERNAL_ROUTE = "EXTERNAL"
+MANUAL_ROUTE = "MANUAL"
+_CLASSIFICATION_RANK = {
+    DataClassification.PUBLIC: 0,
+    DataClassification.INTERNAL: 1,
+    DataClassification.CONFIDENTIAL: 2,
+    DataClassification.RESTRICTED: 3,
+}
+_SAFE_AUDIT_ID = re.compile(r"^[a-z][a-z0-9_-]{0,127}$")
+_SENSITIVE_ID_MARKER = re.compile(
+    r"(?:secret|token|password|credential|cookie|api[_-]?key)", re.IGNORECASE
+)
 
 
 LOCAL_ONLY_ROUTE = "LOCAL_ONLY"
@@ -80,6 +118,7 @@ class LocalRouteEvidence:
             "local_endpoint_response_invalid",
             "local_endpoint_timeout",
             "local_endpoint_resume_unsupported",
+            "local_endpoint_egress_denied",
         }:
             raise RuntimeBindingError("Local route evidence is invalid")
 
@@ -93,6 +132,77 @@ class LocalRouteEvidence:
         }
 
 
+@dataclass(frozen=True, slots=True)
+class EgressPolicyDecision:
+    """Bounded policy result that can be mapped to existing Evidence.
+
+    This is an in-memory policy decision, not a new Domain entity or persisted
+    table.  ``as_evidence`` uses the existing Evidence contract when a caller
+    needs durable audit history.
+    """
+
+    classification: DataClassification
+    execution_mode: ExecutionMode
+    destination_trust: DestinationTrust
+    decision: PolicyDecision
+    route: str
+    reason: str
+    local_available: bool
+    side_effect: bool
+
+    def __post_init__(self) -> None:
+        if self.route not in {LOCAL_ROUTE, EXTERNAL_ROUTE, MANUAL_ROUTE}:
+            raise RuntimeBindingError("Egress policy decision is invalid")
+        if not self.reason or len(self.reason) > 96:
+            raise RuntimeBindingError("Egress policy decision is invalid")
+
+    def as_dict(self) -> dict[str, object]:
+        return {
+            "classification": self.classification.value,
+            "execution_mode": self.execution_mode.value,
+            "destination_trust": self.destination_trust.value,
+            "decision": self.decision.value,
+            "route": self.route,
+            "reason": self.reason,
+            "local_available": self.local_available,
+            "side_effect": self.side_effect,
+        }
+
+    def as_evidence(
+        self,
+        *,
+        task_id: str,
+        run_id: str,
+        actor_id: str,
+    ) -> Evidence:
+        """Create durable audit evidence without copying endpoint/secret data."""
+
+        from polynexus_core.domain.enums import EvidenceStatus, EvidenceType
+
+        for value in (task_id, run_id, actor_id):
+            if (
+                not isinstance(value, str)
+                or not _SAFE_AUDIT_ID.fullmatch(value)
+                or _SENSITIVE_ID_MARKER.search(value)
+            ):
+                raise RuntimeBindingError("Egress policy evidence identity is invalid")
+
+        status = {
+            PolicyDecision.ALLOW: EvidenceStatus.PASS,
+            PolicyDecision.APPROVAL_REQUIRED: EvidenceStatus.HUMAN_DECISION,
+            PolicyDecision.DENY: EvidenceStatus.FAIL,
+        }[self.decision]
+        return Evidence(
+            task_id=task_id,
+            run_id=run_id,
+            actor_id=actor_id,
+            source="runtime.routing_policy",
+            type=EvidenceType.RUNTIME_EVIDENCE,
+            status=status,
+            metadata={key: str(value) for key, value in self.as_dict().items()},
+        )
+
+
 def validate_classification(value: object) -> DataClassification:
     if isinstance(value, DataClassification):
         return value
@@ -102,6 +212,108 @@ def validate_classification(value: object) -> DataClassification:
         except ValueError:
             pass
     raise RuntimeBindingError("Runtime route classification is unsupported")
+
+
+def highest_classification(*values: object) -> DataClassification:
+    """Return the highest effective classification; empty input fails closed."""
+
+    if not values:
+        raise RuntimeBindingError("At least one data classification is required")
+    selected = [validate_classification(value) for value in values]
+    return max(selected, key=_CLASSIFICATION_RANK.__getitem__)
+
+
+def validate_execution_mode(value: object) -> ExecutionMode:
+    if isinstance(value, ExecutionMode):
+        return value
+    if isinstance(value, str):
+        try:
+            return ExecutionMode(value.upper())
+        except ValueError:
+            pass
+    raise RuntimeBindingError("Runtime execution mode is unsupported")
+
+
+def validate_destination_trust(value: object) -> DestinationTrust:
+    if isinstance(value, DestinationTrust):
+        return value
+    if isinstance(value, str):
+        try:
+            return DestinationTrust(value.upper())
+        except ValueError:
+            pass
+    raise RuntimeBindingError("Runtime destination trust is unsupported")
+
+
+def evaluate_egress_policy(
+    *,
+    classifications: Iterable[object],
+    execution_mode: object,
+    destination_trust: object,
+    local_available: bool,
+    side_effect: bool = False,
+) -> EgressPolicyDecision:
+    """Apply D05 without downgrade or silent cloud fallback.
+
+    LOCAL_PREFERRED chooses local when available.  If local is unavailable it
+    returns an approval/manual boundary rather than silently selecting an
+    external route.  LOCAL_ONLY and RESTRICTED always deny external egress.
+    """
+
+    try:
+        effective = highest_classification(*tuple(classifications))
+    except RuntimeBindingError:
+        raise
+    except Exception:
+        raise RuntimeBindingError("Data classification aggregation failed") from None
+    mode = validate_execution_mode(execution_mode)
+    trust = validate_destination_trust(destination_trust)
+    if not isinstance(local_available, bool) or not isinstance(side_effect, bool):
+        raise RuntimeBindingError("Egress policy input is invalid")
+
+    if trust is DestinationTrust.LOOPBACK and not local_available:
+        return EgressPolicyDecision(
+            effective, mode, trust, PolicyDecision.DENY, MANUAL_ROUTE,
+            "loopback_unavailable", local_available, side_effect,
+        )
+    if trust is DestinationTrust.LOOPBACK:
+        return EgressPolicyDecision(
+            effective, mode, trust, PolicyDecision.ALLOW, LOCAL_ROUTE,
+            "loopback_allowed", local_available, side_effect,
+        )
+
+    if mode is ExecutionMode.LOCAL_ONLY:
+        decision = PolicyDecision.DENY
+        reason = "local_only_external_denied"
+        route = MANUAL_ROUTE
+    elif effective is DataClassification.RESTRICTED:
+        decision = PolicyDecision.DENY
+        reason = "restricted_external_denied"
+        route = MANUAL_ROUTE
+    elif trust is DestinationTrust.UNTRUSTED_EXTERNAL:
+        decision = PolicyDecision.DENY
+        reason = "untrusted_destination_denied"
+        route = MANUAL_ROUTE
+    elif mode is ExecutionMode.LOCAL_PREFERRED and not local_available:
+        decision = PolicyDecision.APPROVAL_REQUIRED
+        reason = "local_preferred_requires_approval"
+        route = MANUAL_ROUTE
+    elif mode is ExecutionMode.LOCAL_PREFERRED and local_available:
+        decision = PolicyDecision.ALLOW
+        reason = "local_preferred_selected"
+        route = LOCAL_ROUTE
+    elif effective is DataClassification.CONFIDENTIAL or side_effect:
+        decision = PolicyDecision.APPROVAL_REQUIRED
+        reason = "sensitive_or_side_effect_requires_approval"
+        route = MANUAL_ROUTE
+    else:
+        decision = PolicyDecision.ALLOW
+        reason = "standard_trusted_external_allowed"
+        route = EXTERNAL_ROUTE
+
+    return EgressPolicyDecision(
+        effective, mode, trust, decision, route, reason, local_available, side_effect,
+    )
 
 
 def validate_loopback_endpoint(endpoint_url: object) -> SplitResult:

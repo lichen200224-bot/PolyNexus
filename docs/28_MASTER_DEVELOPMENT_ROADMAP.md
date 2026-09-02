@@ -10,6 +10,20 @@
 - **V1 Acceptance Complete target**: 2026-10-31
 - **Primary source documents**: `docs/00_SCOPE_BASELINE.md`, `docs/04_DEVELOPMENT_PLAN.md`, `docs/10_DECISION_LOG.md`, `docs/18_ARCHITECTURE_DECISIONS.md`
 
+## G26 candidate checkpoint — 2026-09-03
+
+- `G26_STATUS=HUMAN_ACCEPTED / CHECKPOINT_PENDING_NEED_ACTION`; isolated branch `codex/g26-local-policy-acceptance`
+  starts from exact G25 state-sync SHA
+  `04d37291d45ebbda8453f1b39e30fca523ee1548`.
+- Candidate scope is WP-17/18/19 only. Browser companion deterministic tests
+  passed 10/10 and Web Vitest passed 80/80 with production build exit `0`;
+  targeted Core G26 tests passed 14/14, while full Core regression exited `1`
+  with existing unrelated failures.
+- Proposed score remains `72/100` (`G26_SCORE_DELTA=0/12`) because full Core
+  regression is not clean; the Human-authorized exact push and clean-clone proof
+  are still pending. Live authenticated vendor verification remains G29.
+- `ADR_IMPACT=NONE`; `SCOPE_DEVIATION=NONE`; primary checkout remains protected.
+
 This document is the project-level monitoring baseline. It defines sequence, scope, estimated duration, owners, evidence, checkpoints, and progress reporting. A task is not accepted because it is implemented; it becomes progress only after deterministic evidence, independent review, and the required Human decision are recorded.
 
 ## 1. Operating rules

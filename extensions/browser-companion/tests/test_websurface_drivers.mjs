@@ -201,6 +201,59 @@ test('loopback response over limit fails closed before JSON parsing', async () =
   await assert.rejects(client.request('/health'), (error) => error.code === 'loopback_response_too_large')
 })
 
+test('service worker exposes only authenticated allowlisted loopback requests', async () => {
+  const originalChrome = globalThis.chrome
+  const originalFetch = globalThis.fetch
+  const listeners = []
+  const requests = []
+  globalThis.chrome = {
+    runtime: {
+      id: 'extension-test-id',
+      onMessage: { addListener(listener) { listeners.push(listener) } },
+    },
+  }
+  globalThis.fetch = async (url, init) => {
+    requests.push({ url, init })
+    return new Response(JSON.stringify({ ready: true }), {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    })
+  }
+  try {
+    const module = await import(`../src/service-worker.js?test=${Date.now()}`)
+    assert.equal(typeof module.handleLoopbackRequest, 'function')
+    const listener = listeners[0]
+    assert.equal(listener({
+      type: 'POLYNEXUS_LOOPBACK_SESSION',
+      base_url: 'http://127.0.0.1:4312',
+      token: 'session-token-value',
+    }, { id: 'extension-test-id' }, () => {}), false)
+
+    let response
+    const keepAlive = listener({
+      type: 'POLYNEXUS_LOOPBACK_REQUEST',
+      path: '/health',
+    }, { id: 'extension-test-id' }, (value) => { response = value })
+    assert.equal(keepAlive, true)
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    assert.deepEqual(response, { ready: true })
+    assert.equal(requests.length, 1)
+    assert.equal(requests[0].url, 'http://127.0.0.1:4312/health')
+    assert.equal(requests[0].init.headers['X-Loopback-Token'], 'session-token-value')
+
+    const denied = await module.handleLoopbackRequest({ path: '/arbitrary' })
+    assert.deepEqual(denied, { status: 'DEGRADED', reason: 'loopback_request_failed' })
+    assert.equal(requests.length, 1)
+    const rejected = await new Promise((resolve) => {
+      listener({ type: 'POLYNEXUS_LOOPBACK_REQUEST', path: '/health' }, { id: 'other-extension' }, resolve)
+    })
+    assert.deepEqual(rejected, { status: 'DEGRADED', reason: 'loopback_request_failed' })
+  } finally {
+    globalThis.chrome = originalChrome
+    globalThis.fetch = originalFetch
+  }
+})
+
 test('executeInTab rejects missing scripting runtime without raw error', async () => {
   await assert.rejects(executeInTab({}, 1, () => true), (error) => error.code === 'browser_scripting_unavailable')
 })

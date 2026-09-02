@@ -4,6 +4,29 @@ This is a bounded V1 release-candidate matrix. It records only capabilities
 that have a deterministic local source and does not certify broad vendor or
 browser compatibility.
 
+## G26 current candidate boundary — 2026-09-03
+
+- `G26_STATUS=HUMAN_ACCEPTED / CHECKPOINT_PENDING_NEED_ACTION`; bounded G26
+  Core/Web checks and independent review are verified, but full Core regression
+  is exit `1`, so no G26 compatibility row earns score yet.
+- WP-17 LocalModelEndpoint profiles (LM Studio/OpenAI-compatible, Ollama, and
+  generic OpenAI-compatible): `EXPERIMENTAL / DETERMINISTIC_LOCAL_CONFORMANCE`
+  candidate. Controlled endpoint evidence exists in source/tests; targeted G26
+  Core tests are 14/14, exit `0`.
+- WP-18 classification/routing/egress: `EXPERIMENTAL /
+  DETERMINISTIC_POLICY_CONFORMANCE` candidate. Highest-classification,
+  explicit mode, decision, and existing-Evidence audit mapping are implemented;
+  targeted Core evidence is 14/14, exit `0`; full Core regression remains exit
+  `1`.
+- WP-19 WebSurface/loopback: `PREVIEW /
+  DETERMINISTIC_WEBSURFACE_CONFORMANCE` candidate. Browser tests passed 10/10 in
+  controlled Node fixtures, including service-worker loopback dispatch; Web
+  Vitest 80/80 and production build also pass; live authenticated ChatGPT/Claude/Gemini journeys,
+  native MV3 dispatch, and certification remain `UNVERIFIED`/`NOT_CLAIMED` for
+  G29.
+- No row is promoted to a higher maturity by this candidate; exact remote
+  clean-clone verification remains required for the checkpoint.
+
 ## G24 current reconciliation boundary — 2026-09-02
 
 - `G24_OUTPUT_SHA`: `61cc7420e290cd93eda787c30b54a93edf4ca9a`.

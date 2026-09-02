@@ -9,7 +9,10 @@ from threading import Thread
 from typing import Iterator
 
 import pytest
+from fastapi import HTTPException
+from starlette.requests import Request
 
+import polynexus_core.api.dependencies as dependency_module
 from polynexus_core.domain.enums import (
     AuthOwnership,
     ExecutionTarget,
@@ -23,6 +26,7 @@ from polynexus_core.runtime.doctor import collect_doctor_report
 from polynexus_core.runtime.local_endpoint import (
     LocalEndpointConfig,
     LocalEndpointKind,
+    LocalEndpointError,
     LocalModelEndpointAdapter,
 )
 from polynexus_core.runtime.registry import (
@@ -31,7 +35,13 @@ from polynexus_core.runtime.registry import (
 )
 from polynexus_core.runtime.routing_policy import (
     DataClassification,
+    DestinationTrust,
+    EgressPolicyDecision,
+    ExecutionMode,
+    PolicyDecision,
     evaluate_local_route,
+    evaluate_egress_policy,
+    highest_classification,
 )
 
 
@@ -282,3 +292,171 @@ def test_doctor_reports_current_safe_local_route_facts(monkeypatch: pytest.Monke
     assert report.freshness.value == "CURRENT"
     serialized = json.dumps(report.as_dict(), sort_keys=True)
     assert "127.0.0.1" not in serialized
+
+
+def test_classification_routing_and_egress_policy_fail_closed() -> None:
+    assert highest_classification(
+        DataClassification.PUBLIC,
+        "internal",
+        DataClassification.CONFIDENTIAL,
+    ) is DataClassification.CONFIDENTIAL
+
+    local = evaluate_egress_policy(
+        classifications=(DataClassification.PUBLIC, DataClassification.RESTRICTED),
+        execution_mode=ExecutionMode.LOCAL_ONLY,
+        destination_trust=DestinationTrust.LOOPBACK,
+        local_available=True,
+    )
+    assert local.decision is PolicyDecision.ALLOW
+    assert local.route == "LOCAL"
+    assert local.classification is DataClassification.RESTRICTED
+    unavailable_local = evaluate_egress_policy(
+        classifications=(DataClassification.PUBLIC,),
+        execution_mode=ExecutionMode.LOCAL_ONLY,
+        destination_trust=DestinationTrust.LOOPBACK,
+        local_available=False,
+    )
+    assert unavailable_local.decision is PolicyDecision.DENY
+    assert unavailable_local.route == "MANUAL"
+
+    standard = evaluate_egress_policy(
+        classifications=(DataClassification.PUBLIC,),
+        execution_mode="STANDARD",
+        destination_trust="TRUSTED_EXTERNAL",
+        local_available=False,
+    )
+    assert standard.decision is PolicyDecision.ALLOW
+    assert standard.route == "EXTERNAL"
+
+    preferred_without_local = evaluate_egress_policy(
+        classifications=(DataClassification.INTERNAL,),
+        execution_mode=ExecutionMode.LOCAL_PREFERRED,
+        destination_trust=DestinationTrust.TRUSTED_EXTERNAL,
+        local_available=False,
+    )
+    assert preferred_without_local.decision is PolicyDecision.APPROVAL_REQUIRED
+    assert preferred_without_local.route == "MANUAL"
+
+    denied = evaluate_egress_policy(
+        classifications=(DataClassification.CONFIDENTIAL,),
+        execution_mode=ExecutionMode.LOCAL_ONLY,
+        destination_trust=DestinationTrust.TRUSTED_EXTERNAL,
+        local_available=True,
+    )
+    assert denied.decision is PolicyDecision.DENY
+    assert denied.route == "MANUAL"
+    evidence = denied.as_evidence(task_id="task_test", run_id="run_test", actor_id="policy")
+    assert evidence.status.value == "FAIL"
+    assert evidence.metadata["decision"] == "DENY"
+    assert "127.0.0.1" not in json.dumps(evidence.metadata)
+
+
+def test_egress_policy_evidence_rejects_unbounded_or_secret_like_identity():
+    decision = evaluate_egress_policy(
+        classifications=[DataClassification.INTERNAL],
+        execution_mode=ExecutionMode.LOCAL_ONLY,
+        destination_trust=DestinationTrust.LOOPBACK,
+        local_available=True,
+    )
+    for field in ("task_id", "run_id", "actor_id"):
+        values = {"task_id": "task_safe", "run_id": "run_safe", "actor_id": "actor_safe"}
+        values[field] = "secret_token_value"
+        with pytest.raises(RuntimeBindingError, match="identity"):
+            decision.as_evidence(**values)
+    with pytest.raises(RuntimeBindingError, match="identity"):
+        decision.as_evidence(task_id="task_safe", run_id="run_safe", actor_id="A" * 129)
+
+
+def test_local_endpoint_timeout_is_terminal_and_cleanup_remains_unverified() -> None:
+    async def run() -> tuple[str, str | None, bool, str | None, tuple[str, ...]]:
+        adapter = LocalModelEndpointAdapter(
+            LocalEndpointConfig(
+                endpoint_url="http://127.0.0.1:8080",
+                model_identity="local-test-model",
+                timeout_seconds=0.1,
+            )
+        )
+        context = ContextPackage(project_id="project_test", version=1)
+        task = Task(
+            project_id="project_test",
+            title="Timeout local route",
+            workflow_id="workflow_test",
+            workflow_version=1,
+        )
+        runtime_ref = await adapter.create_run(context)
+
+        async def never_returns(*_args: object) -> str:
+            await asyncio.sleep(10)
+            return "unreachable"
+
+        adapter._chat_completion = never_returns  # type: ignore[method-assign]
+        with pytest.raises(LocalEndpointError, match="local_endpoint_timeout"):
+            await adapter.submit(runtime_ref, task)
+        status = await adapter.status(runtime_ref)
+        return (
+            status.state.value,
+            status.error,
+            await adapter.cleanup(runtime_ref),
+            adapter.route_evidence().safe_error,
+            tuple(item.value for item in adapter._runs[runtime_ref].state_history),
+        )
+
+    state, error, cleanup, evidence_error, history = asyncio.run(run())
+    assert state == "TIMED_OUT"
+    assert error == "local_endpoint_timeout"
+    assert cleanup is False
+    assert evidence_error == "local_endpoint_timeout"
+    assert history == ("CREATED", "STARTING", "RUNNING", "TIMED_OUT")
+
+
+def test_local_endpoint_denied_policy_is_terminal_and_safe() -> None:
+    async def run() -> tuple[str, str | None, str | None]:
+        adapter = LocalModelEndpointAdapter(_config("http://127.0.0.1:8080"))
+        adapter._egress_policy = EgressPolicyDecision(
+            classification=DataClassification.RESTRICTED,
+            execution_mode=ExecutionMode.LOCAL_ONLY,
+            destination_trust=DestinationTrust.LOOPBACK,
+            decision=PolicyDecision.DENY,
+            route="MANUAL",
+            reason="fixture_denied",
+            local_available=True,
+            side_effect=False,
+        )
+        context = ContextPackage(project_id="project_test", version=1)
+        task = Task(
+            project_id="project_test",
+            title="Denied local route",
+            workflow_id="workflow_test",
+            workflow_version=1,
+        )
+        runtime_ref = await adapter.create_run(context)
+        with pytest.raises(LocalEndpointError, match="local_endpoint_egress_denied"):
+            await adapter.submit(runtime_ref, task)
+        status = await adapter.status(runtime_ref)
+        return status.state.value, status.error, adapter.route_evidence().safe_error
+
+    state, error, evidence_error = asyncio.run(run())
+    assert state == "FAILED"
+    assert error == "local_endpoint_egress_denied"
+    assert evidence_error == "local_endpoint_egress_denied"
+
+
+def test_loopback_auth_requires_ipv4_caller_and_exact_configured_token(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(dependency_module, "_LOOPBACK_TOKEN", "fixture-token")
+    local_request = Request(
+        {"type": "http", "method": "GET", "path": "/", "client": ("127.0.0.1", 4312)}
+    )
+    dependency_module.require_loopback(local_request, "fixture-token")
+    with pytest.raises(HTTPException) as caller_error:
+        dependency_module.require_loopback(
+            Request(
+                {"type": "http", "method": "GET", "path": "/", "client": ("::1", 4312)}
+            ),
+            "fixture-token",
+        )
+    assert getattr(caller_error.value, "status_code", None) == 403
+    with pytest.raises(HTTPException) as token_error:
+        dependency_module.require_loopback(local_request, "wrong-token")
+    assert getattr(token_error.value, "status_code", None) == 403

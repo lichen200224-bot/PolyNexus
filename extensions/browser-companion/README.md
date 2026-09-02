@@ -11,4 +11,8 @@ V1 Level 3A target for each site driver:
 - normalize raw result
 - mandatory manual/clipboard fallback
 
-The localhost API security/pairing implementation belongs to the Core security boundary and will be added during the Web Integration phase. Never add vendor DOM selectors to Core.
+The localhost API security/pairing boundary is split between the Core
+authenticated dependency and the session-memory `LoopbackClient`; both are
+loopback-only and fail closed. Never add vendor DOM selectors to Core.
+
+Live authenticated vendor journeys and certification remain deferred to G29.

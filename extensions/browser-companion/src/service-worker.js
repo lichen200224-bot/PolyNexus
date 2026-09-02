@@ -11,6 +11,20 @@ import { LoopbackClient } from './loopback-client.js'
 
 const drivers = [chatgptDriver, claudeDriver, geminiDriver]
 let sessionLoopbackClient = null
+const LOOPBACK_SESSION_TYPE = 'POLYNEXUS_LOOPBACK_SESSION'
+const LOOPBACK_REQUEST_TYPE = 'POLYNEXUS_LOOPBACK_REQUEST'
+const LOOPBACK_REQUEST_PATHS = new Set([
+  '/health',
+  '/ready',
+  '/capabilities',
+  '/api/v1/health',
+  '/api/v1/ready',
+  '/api/v1/capabilities',
+])
+
+function isExtensionSender(sender, browser = globalThis.chrome) {
+  return typeof browser?.runtime?.id === 'string' && sender?.id === browser.runtime.id
+}
 
 function findDriver(message, sender) {
   const requestedId = typeof message?.driver_id === 'string' ? message.driver_id : ''
@@ -53,10 +67,41 @@ function clearLoopbackSession() {
   return { status: DRIVER_STATUS.READY, auth: 'SESSION_CLEARED' }
 }
 
+export async function handleLoopbackRequest(message) {
+  if (!sessionLoopbackClient || !LOOPBACK_REQUEST_PATHS.has(message?.path)) {
+    return { status: DRIVER_STATUS.DEGRADED, reason: 'loopback_request_failed' }
+  }
+  const method = message.method === undefined ? 'GET' : message.method
+  if (!['GET', 'POST'].includes(method)) {
+    return { status: DRIVER_STATUS.DEGRADED, reason: 'loopback_request_failed' }
+  }
+  try {
+    return await sessionLoopbackClient.request(message.path, {
+      method,
+      body: method === 'POST' ? message.body : undefined,
+    })
+  } catch {
+    return { status: DRIVER_STATUS.DEGRADED, reason: 'loopback_request_failed' }
+  }
+}
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message?.type === 'POLYNEXUS_LOOPBACK_SESSION') {
+  if (message?.type === LOOPBACK_SESSION_TYPE) {
+    if (!isExtensionSender(sender)) {
+      sendResponse({ status: DRIVER_STATUS.DEGRADED, reason: 'driver_unavailable' })
+      return false
+    }
     sendResponse(message.action === 'CLEAR' ? clearLoopbackSession() : configureLoopbackSession(message))
     return false
+  }
+
+  if (message?.type === LOOPBACK_REQUEST_TYPE) {
+    if (!isExtensionSender(sender)) {
+      sendResponse({ status: DRIVER_STATUS.DEGRADED, reason: 'loopback_request_failed' })
+      return false
+    }
+    handleLoopbackRequest(message).then(sendResponse)
+    return true
   }
 
   const action = message?.type === 'POLYNEXUS_DRIVER_HEALTH'

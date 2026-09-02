@@ -1,0 +1,63 @@
+{
+  "goal_id": "G26-LOCAL-POLICY-AND-WEBSURFACE-INTERNAL-ACCEPTANCE",
+  "attempt": 1,
+  "branch": "codex/g26-local-policy-acceptance",
+  "predecessor_sha": "04d37291d45ebbda8453f1b39e30fca523ee1548",
+  "output_sha": "PENDING",
+  "approved_remote_ref": "feature/g24-g30-development-completion-routing",
+  "project_score_before": 72,
+  "project_score_proposed": 72,
+  "score_delta_proposed": 0,
+  "status": "NEED_ACTION",
+  "adr_impact": "NONE",
+  "scope_deviation": "NONE",
+  "review_result": "PASS",
+  "independent_review": {
+    "result": "PASS",
+    "blocker": 0,
+    "major": 0,
+    "minor": 0,
+    "reviewer": "Feynman",
+    "scope": "diff-only G26 WP17/WP18/WP19 boundary review"
+  },
+  "human_decision": "ACCEPT_AND_COMMIT_PUSH",
+  "items": [
+    {
+      "wp_id": "WP-17",
+      "weight": 4,
+      "status": "NEED_ACTION",
+      "accepted_points": 0,
+      "implementation_ref": "services/core/src/polynexus_core/runtime/local_endpoint.py",
+      "test_ref": "services/core/tests/test_cp04_wp17_wp18_local_routing.py",
+      "evidence": "Targeted G26 Core tests 14/14 passed, exit 0; combined API/local routing regression 29/29 passed, exit 0; full Core regression exit 1",
+      "maturity": "EXPERIMENTAL / DETERMINISTIC_LOCAL_CONFORMANCE",
+      "limitations": "Controlled endpoints only; HTTP cleanup/cancel remains unverified",
+      "unverified": ["full Core regression", "HTTP cleanup/cancel", "live LM Studio", "live Ollama", "live OpenAI-compatible vendor"]
+    },
+    {
+      "wp_id": "WP-18",
+      "weight": 4,
+      "status": "NEED_ACTION",
+      "accepted_points": 0,
+      "implementation_ref": "services/core/src/polynexus_core/runtime/routing_policy.py",
+      "test_ref": "services/core/tests/test_cp04_wp17_wp18_local_routing.py",
+      "evidence": "Targeted G26 Core tests 14/14 passed, exit 0; policy decisions map to existing Evidence and reject unsafe identities; full Core regression exit 1",
+      "maturity": "EXPERIMENTAL / DETERMINISTIC_POLICY_CONFORMANCE",
+      "limitations": "Existing Evidence repository boundary must persist returned audit evidence",
+      "unverified": ["full Core regression", "full policy regression suite"]
+    },
+    {
+      "wp_id": "WP-19",
+      "weight": 4,
+      "status": "NEED_ACTION",
+      "accepted_points": 0,
+      "implementation_ref": "extensions/browser-companion/src/driver-contract.js",
+      "test_ref": "extensions/browser-companion/tests/test_websurface_drivers.mjs",
+      "evidence": "Node test suite 10/10 passed; Web Vitest 80/80 and production build passed; G26 Core caller-auth assertions included in 14/14 targeted run; all exit 0",
+      "maturity": "PREVIEW / DETERMINISTIC_WEBSURFACE_CONFORMANCE",
+      "limitations": "Live authenticated vendor journeys and certification deferred to G29",
+      "unverified": ["full Core regression", "live vendor journeys", "native MV3 packaging dispatch"]
+    }
+  ],
+  "clean_clone": "PENDING_HUMAN_GIT_GATE"
+}

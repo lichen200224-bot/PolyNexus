@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
+import hmac
 import os
 from typing import Annotated
 
-from fastapi import Depends, Header, HTTPException, status
+from fastapi import Depends, Header, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
 from polynexus_core.persistence.database import get_session
@@ -17,11 +18,13 @@ _LOOPBACK_TOKEN = os.environ.get("LOOPBACK_TOKEN", "")
 
 
 def require_loopback(
+    request: Request,
     x_loopback_token: Annotated[str | None, Header()] = None,
 ) -> None:
     """Authenticated loopback boundary.
 
     Production behaviour:
+      - The caller must be the exact IPv4 loopback address 127.0.0.1.
       - If LOOPBACK_TOKEN env var is set, the request must present it via
         X-Loopback-Token header. Missing/incorrect token → 403.
       - If LOOPBACK_TOKEN env var is NOT set (empty string), ALL requests
@@ -37,7 +40,15 @@ def require_loopback(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Loopback authentication not configured",
         )
-    if x_loopback_token != _LOOPBACK_TOKEN:
+    caller = request.client.host if request.client is not None else None
+    if caller != "127.0.0.1":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Loopback caller rejected",
+        )
+    if not isinstance(x_loopback_token, str) or not hmac.compare_digest(
+        x_loopback_token, _LOOPBACK_TOKEN
+    ):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Invalid loopback token",

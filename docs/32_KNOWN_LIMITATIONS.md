@@ -3,6 +3,24 @@
 These limitations are intentional boundaries, not hidden compatibility
 claims.
 
+## G26 current candidate limitations — 2026-09-03
+
+- G26 targeted Core pytest is now verified at 14/14 and the combined API/local
+  routing regression at 29/29, both exit `0`. Full Core regression exits `1`
+  with existing persistence/lifecycle/council/resource-guard failures. Web
+  Vitest and the production build are verified at 80/80 and exit `0`.
+- Local endpoint cancellation and remote cleanup remain conservatively
+  unverified: an already accepted synchronous HTTP request cannot be safely
+  terminated by this adapter, so its capability remains false.
+- LM Studio, Ollama, and generic OpenAI-compatible checks use controlled
+  fixtures only; no live vendor certification or cloud fallback is claimed.
+- WebSurface drivers remain `PREVIEW`; live authenticated vendor journeys,
+  native MV3 dispatch, credentials/cookies/tokens, and external send remain
+  deferred to G29.
+- G26 has Human authorization for the checkpoint, but retains score delta
+  `0/12` because full Core regression is not clean; commit/push and clean-clone
+  evidence remain required for the checkpoint.
+
 ## G24 current reconciliation boundary — 2026-09-02
 
 - G24 records existing limitations and unverified boundaries; it removes none.
