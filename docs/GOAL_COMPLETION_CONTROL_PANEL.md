@@ -4,10 +4,10 @@ Browser-readable companion: [GOAL_COMPLETION_CONTROL_PANEL.html](GOAL_COMPLETION
 
 ## G24–G30 development completion program — HUMAN CONFIRMED 2026-09-02
 
-`PLAN_STATUS: HUMAN_CONFIRMED / G25_CURRENT / HUMAN_ACCEPTED / COMMIT_PENDING`
+`PLAN_STATUS: HUMAN_CONFIRMED / G25_CURRENT / HUMAN_ACCEPTED / PASS / COMPLETE`
 
 - `ACCEPTED_BASELINE_SHA`: `0eb56a986e97a45854bd6ddd419c114845ce51f4`
-- `DEVELOPMENT_PROGRESS`: `59/100`
+- `DEVELOPMENT_PROGRESS`: `72/100`
 - `COMPETITION_TRACK`: `NOTE_ONLY_NON_SCORING / HUMAN_OWNED_DELIVERY`
 - `EXECUTION_ORDER`: `G24 → G25 → G26 → G27 → G28 → G29 → G30`
 - `EXECUTION_PROFILE`: one new Codex task per Goal, `gpt-5.6-luna`, reasoning
@@ -32,7 +32,7 @@ Browser-readable companion: [GOAL_COMPLETION_CONTROL_PANEL.html](GOAL_COMPLETION
 | CP-00 | 8 | 8 | Complete |
 | CP-02 | 22 | 22 | Complete |
 | CP-03: WP-11/12/13 | 14 | 14 | Complete |
-| CP-03: WP-14/15/16 | 0 | 13 | G25 (Human accepted; Carver review PASS; commit/push/checkpoint pending) |
+| CP-03: WP-14/15/16 | 13 | 13 | G25 (Human accepted; Carver review PASS; checkpointed) |
 | CP-04: WP-17/18/19 | 0 | 12 | G26 (IMPLEMENTED_PENDING_REVIEW) |
 | CP-04: WP-20 | 0 | 5 | G29 (IMPLEMENTED_PENDING_REVIEW; external/Human-operated) |
 | CP-04: WP-21 | 3 | 3 | Complete, bounded fixture scope |
@@ -48,8 +48,8 @@ Browser-readable companion: [GOAL_COMPLETION_CONTROL_PANEL.html](GOAL_COMPLETION
 | Goal | Status | Scope | Score after acceptance |
 |---|---|---|---:|
 | G24 | `HUMAN_ACCEPTED / PASS / COMPLETE` | Exact SHA confirmed; score 59 | 59 |
-| G25 | `HUMAN_ACCEPTED / COMMIT_PENDING` | WP-14/15/16 runtime adapters + Doctor | 72 |
-| G26 | `GATED_BY_G25` | WP-17/18/19 local/policy/WebSurface | 84 |
+| G25 | `HUMAN_ACCEPTED / PASS / COMPLETE` | WP-14/15/16 runtime adapters + Doctor | 72 |
+| G26 | `READY` | WP-17/18/19 local/policy/WebSurface; predecessor `f4168c31592ac5c886b49d8878f60b99016fdcaf` | 84 |
 | G27 | `GATED_BY_G26` | WP-22/24/25 workflows/guards/metrics | 90 |
 | G28 | `GATED_BY_G27` | WP-26/27 UX + Golden Workflow freeze | 95 |
 | G29 | `GATED_BY_G28` | WP-20 authenticated external-vendor verification | 100 |
@@ -69,9 +69,9 @@ Every WP-11–WP-32 record contains `WP_ID`, `CHECKPOINT`, `POINT_WEIGHT`,
 | WP-11 | 4 | `HUMAN_ACCEPTED` | G23 predecessor | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
 | WP-12 | 5 | `HUMAN_ACCEPTED` | G23 predecessor | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
 | WP-13 | 5 | `HUMAN_ACCEPTED` | G23 predecessor | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
-| WP-14 | 5 | `HUMAN_ACCEPTED / COMMIT_PENDING` | G25 | `PENDING_CHECKPOINT` |
-| WP-15 | 5 | `HUMAN_ACCEPTED / COMMIT_PENDING` | G25 | `PENDING_CHECKPOINT` |
-| WP-16 | 3 | `HUMAN_ACCEPTED / COMMIT_PENDING` | G25 | `PENDING_CHECKPOINT` |
+| WP-14 | 5 | `HUMAN_ACCEPTED / CHECKPOINTED` | G25 | `f4168c31592ac5c886b49d8878f60b99016fdcaf` |
+| WP-15 | 5 | `HUMAN_ACCEPTED / CHECKPOINTED` | G25 | `f4168c31592ac5c886b49d8878f60b99016fdcaf` |
+| WP-16 | 3 | `HUMAN_ACCEPTED / CHECKPOINTED` | G25 | `f4168c31592ac5c886b49d8878f60b99016fdcaf` |
 | WP-17 | 4 | `IMPLEMENTED_PENDING_REVIEW` | G26 | `PENDING` |
 | WP-18 | 4 | `IMPLEMENTED_PENDING_REVIEW` | G26 | `PENDING` |
 | WP-19 | 4 | `IMPLEMENTED_PENDING_REVIEW` | G26 | `PENDING` |
@@ -94,8 +94,8 @@ Every WP-11–WP-32 record contains `WP_ID`, `CHECKPOINT`, `POINT_WEIGHT`,
 | Goal | Predecessor SHA | Output SHA | Start gate | Score delta | Status |
 |---|---|---|---|---:|---|
 | G24 | `fde4c8f1d017992755c6af2bd600c9bd715efd6b` | `61cc7420e290cd93eda787c30b54a93edf4ca9a` | Human-confirmed formal checkpoint | 0 | `HUMAN_ACCEPTED / PASS / COMPLETE` |
-| G25 | `61cc7420e290cd93eda787c30b54a93edf4ca9a` | `PENDING_FINAL_COMMIT_SHA` | Approved G24 checkpoint | +13 | `HUMAN_ACCEPTED / COMMIT_PENDING` |
-| G26 | `G25_OUTPUT_SHA` | `PENDING` | Approved G25 checkpoint | +12 | `GATED` |
+| G25 | `61cc7420e290cd93eda787c30b54a93edf4ca9a` | `f4168c31592ac5c886b49d8878f60b99016fdcaf` | Approved G24 checkpoint | +13 | `HUMAN_ACCEPTED / PASS / COMPLETE` |
+| G26 | `f4168c31592ac5c886b49d8878f60b99016fdcaf` | `PENDING` | Approved G25 checkpoint | +12 | `READY` |
 | G27 | `G26_OUTPUT_SHA` | `PENDING` | Approved G26 checkpoint | +6 | `GATED` |
 | G28 | `G27_OUTPUT_SHA` | `PENDING` | Approved G27 checkpoint | +5 | `GATED` |
 | G29 | `G28_OUTPUT_SHA` | `PENDING` | Approved G28 + external operator | +5 | `GATED / EXTERNAL_LATE` |

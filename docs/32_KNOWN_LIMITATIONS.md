@@ -21,7 +21,7 @@ claims.
   G29 because it requires Human operation. The external operator plan forbids
   credential/cookie/token capture and automatic send, and requires a structured
   result for each vendor and failure path.
-- Formal development progress is `59/100`. Competition work is
+- Formal development progress is `72/100`. Competition work is
   `NOTE_ONLY_NON_SCORING` and does not create a product limitation or reduce the
   development score.
 
@@ -40,9 +40,9 @@ claims.
 - A legacy Doctor compatibility module preserves the accepted G18 public API
   while the new runtime Doctor report is introduced. This is a bounded
   integration seam, not a second execution identity or a second Run model.
-- Human authorized `G25_DECISION=ACCEPT_AND_COMMIT_PUSH`; final WP-14/15/16
-  checkpoint verification and the `+13` score remain pending commit, push, and
-  clean-clone evidence. The required independent read-only review returned
+- Human authorized `G25_DECISION=ACCEPT_AND_COMMIT_PUSH`; WP-14/15/16 are
+  checkpointed at `f4168c31592ac5c886b49d8878f60b99016fdcaf` with exact remote
+  and clean-clone evidence, earning `+13`. The required independent read-only review returned
   PASS with no BLOCKER, MAJOR, or MINOR findings. Governance validation now
   passes with the system Windows PowerShell validator, exit `0`; the earlier bundled
   PowerShell Core module failure is retained as a historical environment
@@ -53,7 +53,7 @@ claims.
 G23 is `HUMAN_ACCEPTED / PASS / COMPLETE` at exact SHA
 `0eb56a986e97a45854bd6ddd419c114845ce51f4`. The Human accepted the disclosed
 bounded G19–G22 evidence and cross-machine delivery checkpoint; this does not
-remove or waive any limitation below. Formal project progress is `59/100` under
+remove or waive any limitation below. Formal project progress is `72/100` under
 the Human-directed G23 checkpoint allocation; the remaining 41 points retain the
 unaccepted product and live-integration gaps.
 

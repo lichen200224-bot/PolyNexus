@@ -3,9 +3,9 @@
 ## Current Task — G25 runtime adapters and Doctor acceptance (2026-09-02)
 
 - `TASK_ID`: `G25-RUNTIME-ADAPTERS-AND-DOCTOR-ACCEPTANCE`
-- `STATUS`: `HUMAN_ACCEPTED / COMMIT_PENDING`; Human decision received:
-  `G25_DECISION=ACCEPT_AND_COMMIT_PUSH`. Commit, push, and checkpoint
-  verification are still pending.
+- `STATUS`: `HUMAN_ACCEPTED / PASS / COMPLETE`; Human decision received:
+  `G25_DECISION=ACCEPT_AND_COMMIT_PUSH`. Exact remote and clean-clone
+  checkpoint verification completed.
 - `ATTEMPT`: `1` in isolated lane `artifacts/worktrees/g25-runtime-adapters-doctor`.
 - `BRANCH`: `feature/g24-g30-development-completion-routing` from exact
   predecessor `61cc7420e290cd93eda787c30b54a93edf4ca9a`.
@@ -18,22 +18,20 @@
 - `G24_CLEAN_CLONE`: predecessor clone was clean and staged-empty; exact-ref
   verification exit `0`. The protected primary checkout
   `D:\AI學習教材\PolyNexus` was not modified.
-- `WP14_STATUS`: Human-accepted candidate, 31 targeted tests passed, exit `0`;
-  local deterministic `EXPERIMENTAL`, +5 pending checkpoint verification.
-- `WP15_STATUS`: Human-accepted candidate, 36 targeted tests passed, exit `0`;
-  local deterministic `EXPERIMENTAL`, +5 pending checkpoint verification.
-- `WP16_STATUS`: Human-accepted candidate, 58 targeted tests passed, exit `0`;
-  G18 compatibility 7 passed, exit `0`; Doctor remains bounded `PREVIEW`, +3
-  pending checkpoint verification.
+- `WP14_STATUS`: `HUMAN_ACCEPTED / CHECKPOINTED`, 31 targeted tests passed,
+  exit `0`; local deterministic `EXPERIMENTAL`, `5/5` accepted.
+- `WP15_STATUS`: `HUMAN_ACCEPTED / CHECKPOINTED`, 36 targeted tests passed,
+  exit `0`; local deterministic `EXPERIMENTAL`, `5/5` accepted.
+- `WP16_STATUS`: `HUMAN_ACCEPTED / CHECKPOINTED`, 58 targeted tests passed,
+  exit `0`; G18 compatibility 7 passed, exit `0`; Doctor remains bounded
+  `PREVIEW`, `3/3` accepted.
 - `INTEGRATION`: private Registry observation factory plus
   `runtime/doctor_legacy.py` compatibility surface; no second Run identity,
   public contract change, persistence/migration change, or vendor Core branch.
 - `ADR_IMPACT`: ADR-012 integration addendum; ADR-011 preserved.
 - `SCOPE_DEVIATION`: `BOUNDED_G25_INTEGRATION`, limited to the two compatibility
   seams above and disclosed in the task/ADR records.
-- `PROJECT_SCORE`: remains `59/100` until the authorized checkpoint is verified;
-  candidate target after successful commit/push/clean-clone verification is
-  `72/100`.
+- `PROJECT_SCORE`: `72/100` after the verified G25 checkpoint (`+13`).
 - `GOVERNANCE`: system Windows PowerShell validator passed, exit `0`; the
   earlier bundled PowerShell Core module failure is historical environment
   evidence only.
@@ -58,18 +56,14 @@
   evidence files under `artifacts/verification/g25-runtime-adapters-doctor-20260902/`.
 - `STAGE_ALLOWLIST`: the exact list above only; no other tracked, untracked, or
   ignored path may be staged. Current staged state is empty.
-- `NEXT_ACTION`: stage the exact allowlist, commit with the proposed message,
-  non-force push the approved ref, verify the exact SHA, and run clean-clone
-  verification. Do not start G26.
-- `NEXT_OWNER`: Codex for the authorized final Git closeout and verification.
-- `NEXT_PROMPT`: `G25_DECISION=ACCEPT_AND_COMMIT_PUSH` authorizes only the exact
-  allowlist, proposed commit, approved remote ref, non-force push, and the
-  post-push clean-clone verification described in this handoff; that decision
-  has now been received.
-- `BLOCKERS`: no open product BLOCKER or MAJOR review finding; commit/push SHA
-  and post-push clean-clone verification remain pending.
-- `HUMAN_ACTION_REQUIRED`: none for the authorized closeout; report any failed
-  gate as `NEED_ACTION` and do not broaden scope.
+- `G25_OUTPUT_SHA`: `f4168c31592ac5c886b49d8878f60b99016fdcaf`.
+- `G25_CLEAN_CLONE`: `C:\Users\hikar\.codex\visualizations\2026\09\01\01a05d1b-755c-7d60-abeb-6f2c8aa57967\g25-final-clean-f416-20260903`; exact SHA matched,
+  Git clean, staged empty.
+- `NEXT_ACTION`: `NEXT_GOAL_READY=G26`; start G26 from the exact G25 SHA.
+- `NEXT_OWNER`: Codex for G26 WP-17/WP-18/WP-19 implementation and acceptance.
+- `BLOCKERS`: none for the accepted G25 scope; live vendor, credentials,
+  external send and certification remain outside scope.
+- `HUMAN_ACTION_REQUIRED`: none until the G26 final decision block.
 
 ## Historical G24 handoff record
 

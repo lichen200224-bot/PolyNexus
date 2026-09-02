@@ -22,7 +22,7 @@ browser compatibility.
 - Until G29 produces current vendor-specific evidence, ChatGPT/Claude/Gemini
   authenticated journeys and native MV3 dispatch remain `UNVERIFIED`, and
   vendor certification remains `NOT_CLAIMED`.
-- Formal development progress is `59/100`; Competition is
+- Formal development progress is `72/100`; Competition is
   `NOTE_ONLY_NON_SCORING` and has no compatibility maturity effect.
 
 ## G25 current candidate boundary — 2026-09-02
@@ -40,9 +40,8 @@ browser compatibility.
   have deterministic local conformance evidence but no production/live-vendor
   integration evidence; the reference local runtime alone carries the highest
   bounded baseline label.
-- These labels are Human-authorized candidate evidence pending final checkpoint
-  verification; the required independent review returned PASS with no severity
-  findings. No
+- These labels are Human-accepted checkpoint evidence; the required independent
+  review returned PASS with no severity findings. No
   compatibility claim is made for live vendors, browser-loaded
   MV3 dispatch, network transports, or authenticated sessions.
 
@@ -55,7 +54,7 @@ browser compatibility.
 - Compatibility and maturity labels below are intentionally unchanged by G23:
   the acceptance does not certify live vendors, native MV3 dispatch, or an
   authenticated external-send journey.
-- Formal project progress is `59/100` under the current development-only
+- Formal project progress is `72/100` under the current development-only
   allocation.
   Compatibility labels remain evidence-bounded; recognized points do not turn
   `PREVIEW`, `IN_DEVELOPMENT`, or `UNVERIFIED` capabilities into certification.

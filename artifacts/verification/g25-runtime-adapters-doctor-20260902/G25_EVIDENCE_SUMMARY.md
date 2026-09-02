@@ -8,11 +8,21 @@ Base score: `59/100`; candidate maximum: `+13`; candidate target: `72/100`
 
 ## Current candidate
 
-The candidate is in the isolated lane
-`artifacts/worktrees/g25-runtime-adapters-doctor`. Human authorization
-`G25_DECISION=ACCEPT_AND_COMMIT_PUSH` has been received; commit, push, and
-checkpoint verification remain pending. The protected primary checkout was not
-modified.
+The candidate is checkpointed at
+`f4168c31592ac5c886b49d8878f60b99016fdcaf` on the approved remote ref
+`feature/g24-g30-development-completion-routing`. Human authorization
+`G25_DECISION=ACCEPT_AND_COMMIT_PUSH` was received, and exact remote/clean-clone
+verification is recorded below. The protected primary checkout was not modified.
+
+## Checkpoint provenance
+
+- `git ls-remote D:/GitBackup/PolyNexus_Backup.git refs/heads/feature/g24-g30-development-completion-routing`
+  returned `f4168c31592ac5c886b49d8878f60b99016fdcaf`, exit `0`.
+- Final clean clone:
+  `C:\Users\hikar\.codex\visualizations\2026\09\01\01a05d1b-755c-7d60-abeb-6f2c8aa57967\g25-final-clean-f416-20260903`.
+- Clean clone `HEAD` equals the exact SHA; `git status --porcelain` and
+  `git diff --cached --name-status` are empty; `git diff --check` exits `0`.
+- System Windows PowerShell governance validator passes, exit `0`.
 
 WP-14 Codex Runtime Adapter is a deterministic local `EXPERIMENTAL` adapter.
 WP-15 OpenCode Runtime Adapter is a deterministic local `EXPERIMENTAL` adapter.
@@ -67,5 +77,7 @@ database migration, external login, or vendor send was introduced.
 
 Independent read-only review was routed to the distinct reviewer Carver. The
 final remediation review returned `PASS` with `BLOCKER=0`, `MAJOR=0`, and
-`MINOR=0`. Until the authorized checkpoint is verified, all three WP scores
-remain unearned and project progress remains `59/100`.
+`MINOR=0`. The approved remote ref resolves to the exact checkpoint SHA above,
+and clean-clone verification matched it with Git clean and staged-empty state.
+WP-14/15/16 are therefore accepted at `5 + 5 + 3 = 13` points and project
+progress is `72/100`. `NEXT_GOAL_READY=G26`.

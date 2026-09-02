@@ -6,20 +6,20 @@ This is the authoritative current-state block. Earlier snapshots below remain
 provenance history and do not override it.
 
 - **Goal:** `G25-RUNTIME-ADAPTERS-AND-DOCTOR-ACCEPTANCE`.
-- **G25 status:** `HUMAN_ACCEPTED / COMMIT_PENDING`; Human decision received:
-  `G25_DECISION=ACCEPT_AND_COMMIT_PUSH`. No commit or push has occurred yet.
+- **G25 status:** `HUMAN_ACCEPTED / PASS / COMPLETE`; Human decision received:
+  `G25_DECISION=ACCEPT_AND_COMMIT_PUSH` and the exact checkpoint is verified.
 - **G24 formal checkpoint:** `HUMAN_ACCEPTED / PASS / COMPLETE` with
   `G24_OUTPUT_SHA=61cc7420e290cd93eda787c30b54a93edf4ca9a`; approved remote ref
   `feature/g24-g30-development-completion-routing` resolves to that exact SHA.
-  Project score is `59/100`.
+  Project score is `59/100` before G25 and `72/100` after the accepted G25
+  checkpoint.
 - **G24 clean clone:** `artifacts/worktrees/g25-runtime-adapters-doctor` was
   clean and staged-empty at the predecessor before G25 edits; exact-ref check
   exited `0`.
 - **G25 lane:** this candidate is based directly on the exact predecessor. The
   protected primary checkout `D:\AI學習教材\PolyNexus` was not modified.
-- **Candidate score:** WP-14 `+5`, WP-15 `+5`, WP-16 `+3` are Human-authorized
-  evidence candidates; accepted progress remains `59/100` until checkpoint
-  verification. Candidate target: `72/100`.
+- **Accepted score:** WP-14 `5/5`, WP-15 `5/5`, and WP-16 `3/3` are accepted at
+  the exact G25 checkpoint; accepted project progress is `72/100`.
 - **Current evidence:** WP-14 `31 passed`, WP-15 `36 passed`, WP-16 `58 passed`,
   G18 compatibility `7 passed`, packaging `3 passed`, and Full Core exited `0`
   with one Windows-policy symlink skip. Baseline exited `0`; governance
@@ -29,8 +29,8 @@ provenance history and do not override it.
   declaration/probe failures stay separate. `doctor_legacy.py` preserves the
   accepted G18 public surface.
 - **Independent review:** Carver completed the bounded read-only review with
-  `PASS`, `BLOCKER=0`, `MAJOR=0`, `MINOR=0`. Human authorization is recorded;
-  commit, push, and checkpoint verification remain pending.
+  `PASS`, `BLOCKER=0`, `MAJOR=0`, `MINOR=0`. Exact remote and clean-clone
+  checkpoint verification completed at `f4168c31592ac5c886b49d8878f60b99016fdcaf`.
 - **Maturity:** Codex and OpenCode remain local deterministic `EXPERIMENTAL`
   implementations. Doctor reports observations conservatively and does not
   promote them to production support or certification. Live vendor journeys,
@@ -41,8 +41,11 @@ provenance history and do not override it.
   seam and legacy Doctor compatibility module are directly required to combine
   WP-14/15/16 without changing public contracts, persistence schema, or Run
   identity.
-- **Next action:** perform the exact authorized Git closeout and clean-clone
-  verification. G26 must not start from this task.
+- **G25 checkpoint:** approved ref `feature/g24-g30-development-completion-routing`
+  resolves to `f4168c31592ac5c886b49d8878f60b99016fdcaf`.
+- **Clean clone:** `C:\Users\hikar\.codex\visualizations\2026\09\01\01a05d1b-755c-7d60-abeb-6f2c8aa57967\g25-final-clean-f416-20260903` has the exact
+  SHA, Git clean state and staged-empty state.
+- **Next action:** `NEXT_GOAL_READY=G26`; start G26 only from this exact SHA.
 
 
 ## Historical Operational State — 2026-09-02 (G24 ledger reconciliation before G25)
@@ -526,20 +529,20 @@ This is the authoritative current-state block. Earlier snapshots below remain
 provenance history and do not override it.
 
 - **Goal:** `G25-RUNTIME-ADAPTERS-AND-DOCTOR-ACCEPTANCE`.
-- **G25 status:** `HUMAN_ACCEPTED / COMMIT_PENDING`; Human decision received:
-  `G25_DECISION=ACCEPT_AND_COMMIT_PUSH`. No commit or push has occurred yet.
+- **G25 status:** `HUMAN_ACCEPTED / PASS / COMPLETE`; Human decision received:
+  `G25_DECISION=ACCEPT_AND_COMMIT_PUSH` and the exact checkpoint is verified.
 - **G24 formal checkpoint:** `HUMAN_ACCEPTED / PASS / COMPLETE` with
   `G24_OUTPUT_SHA=61cc7420e290cd93eda787c30b54a93edf4ca9a`; approved remote ref
   `feature/g24-g30-development-completion-routing` resolves to that exact SHA.
-  Project score is `59/100`.
+  Project score is `59/100` before G25 and `72/100` after the accepted G25
+  checkpoint.
 - **G24 clean clone:** `artifacts/worktrees/g25-runtime-adapters-doctor` was
   clean and staged-empty at the predecessor before G25 edits; exact-ref check
   exited `0`.
 - **G25 lane:** this candidate is based directly on the exact predecessor. The
   protected primary checkout `D:\AI學習教材\PolyNexus` was not modified.
-- **Candidate score:** WP-14 `+5`, WP-15 `+5`, WP-16 `+3` are Human-authorized
-  evidence candidates; accepted progress remains `59/100` until checkpoint
-  verification. Candidate target: `72/100`.
+- **Accepted score:** WP-14 `5/5`, WP-15 `5/5`, and WP-16 `3/3` are accepted at
+  the exact G25 checkpoint; accepted project progress is `72/100`.
 - **Current evidence:** WP-14 `31 passed`, WP-15 `36 passed`, WP-16 `58 passed`,
   G18 compatibility `7 passed`, packaging `3 passed`, and Full Core exited `0`
   with one Windows-policy symlink skip. Baseline exited `0`; governance
@@ -549,8 +552,8 @@ provenance history and do not override it.
   declaration/probe failures stay separate. `doctor_legacy.py` preserves the
   accepted G18 public surface.
 - **Independent review:** Carver completed the bounded read-only review with
-  `PASS`, `BLOCKER=0`, `MAJOR=0`, `MINOR=0`. Human authorization is recorded;
-  commit, push, and checkpoint verification remain pending.
+  `PASS`, `BLOCKER=0`, `MAJOR=0`, `MINOR=0`. Exact remote and clean-clone
+  checkpoint verification completed at `f4168c31592ac5c886b49d8878f60b99016fdcaf`.
 - **Maturity:** Codex and OpenCode remain local deterministic `EXPERIMENTAL`
   implementations. Doctor reports observations conservatively and does not
   promote them to production support or certification. Live vendor journeys,
@@ -561,5 +564,8 @@ provenance history and do not override it.
   seam and legacy Doctor compatibility module are directly required to combine
   WP-14/15/16 without changing public contracts, persistence schema, or Run
   identity.
-- **Next action:** perform the exact authorized Git closeout and clean-clone
-  verification. G26 must not start from this task.
+- **G25 checkpoint:** approved ref `feature/g24-g30-development-completion-routing`
+  resolves to `f4168c31592ac5c886b49d8878f60b99016fdcaf`.
+- **Clean clone:** `C:\Users\hikar\.codex\visualizations\2026\09\01\01a05d1b-755c-7d60-abeb-6f2c8aa57967\g25-current-check` has the exact
+  SHA, Git clean state and staged-empty state.
+- **Next action:** `NEXT_GOAL_READY=G26`; start G26 only from this exact SHA.

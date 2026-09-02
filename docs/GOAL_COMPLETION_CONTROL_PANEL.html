@@ -26,16 +26,16 @@
         <h1>G24–G30 已核准 · 開發完成路線</h1>
         <p class="muted">狀態快照：2026-09-02（Asia/Taipei）。開發專用 100 分制；競賽為人工備註軌，不納入進度。每個 Goal 在新的 Codex task 以 GPT-5.6 Luna / High 執行。</p>
         <div class="meta">
-          <div class="metric"><span class="muted">正式進度</span><strong>59 / 100</strong></div>
+          <div class="metric"><span class="muted">正式進度</span><strong>72 / 100</strong></div>
           <div class="metric"><span class="muted">G24–G30 plan</span><strong class="ready">HUMAN CONFIRMED</strong></div>
-          <div class="metric"><span class="muted">G25 status</span><strong class="gated">HUMAN ACCEPTED · COMMIT PENDING</strong></div>
+          <div class="metric"><span class="muted">G25 status</span><strong class="ready">HUMAN ACCEPTED · PASS · COMPLETE</strong></div>
           <div class="metric"><span class="muted">外部驗證</span><strong class="gated">G29 · LATE</strong></div>
         </div>
       </header>
 
       <section>
         <h2>目前正式狀態</h2>
-        <div class="callout"><strong>G25: HUMAN_ACCEPTED · COMMIT_PENDING · G24 HUMAN_ACCEPTED</strong><br />G24 exact output SHA: <code>61cc7420e290cd93eda787c30b54a93edf4ca9a</code><br />Approved ref: <code>feature/g24-g30-development-completion-routing</code><br />Development score: <strong>59/100</strong> · Candidate G25 target: <strong>72/100</strong><br />WP-14/15/16: <strong>31 / 36 / 58 targeted tests passed</strong> · Carver independent review PASS; commit/push/checkpoint pending<br />Execution profile: <strong>new Codex task · gpt-5.6-luna · high</strong><br />G25 candidate evidence: <code>artifacts/verification/g25-runtime-adapters-doctor-20260902/</code></div>
+        <div class="callout"><strong>G25: HUMAN_ACCEPTED · PASS · COMPLETE · G24 HUMAN_ACCEPTED</strong><br />G25 exact output SHA: <code>f4168c31592ac5c886b49d8878f60b99016fdcaf</code><br />Approved ref: <code>feature/g24-g30-development-completion-routing</code><br />Development score: <strong>72/100</strong> · G25 delta: <strong>+13</strong><br />WP-14/15/16: <strong>31 / 36 / 58 targeted tests passed</strong> · Carver independent review PASS; exact remote and clean-clone checkpoint verified<br />Execution profile: <strong>new Codex task · gpt-5.6-luna · high</strong><br />G25 evidence: <code>artifacts/verification/g25-runtime-adapters-doctor-20260902/</code></div>
         <p class="muted" style="margin-top:16px;">Codex 可在單一 Goal 核准範圍內實作、測試、修正、重驗與更新所有進度資料；Human 的一般介入點只有最後的 <code>&lt;GOAL&gt;_DECISION=ACCEPT_AND_COMMIT_PUSH</code>。這不授權 scope/ADR 變更、秘密資料、外部自動送出、force push、remote reconfiguration 或下一 Goal。</p>
         <p><a href="33_DEVELOPMENT_PROGRESS_AND_GOAL_EXECUTION_STANDARD.md">Execution standard</a> · <a href="tasks/G24-G30-DEVELOPMENT-COMPLETION-ROUTING.md">G24–G30 copy-ready prompts</a> · <a href="11_PROJECT_STATE.md">Project State</a> · <a href="12_HANDOFF_CURRENT.md">Current Handoff</a></p>
       </section>
@@ -47,9 +47,9 @@
           <tr><td>WP-11</td><td>4</td><td>HUMAN_ACCEPTED</td><td>G23 predecessor</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
           <tr><td>WP-12</td><td>5</td><td>HUMAN_ACCEPTED</td><td>G23 predecessor</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
           <tr><td>WP-13</td><td>5</td><td>HUMAN_ACCEPTED</td><td>G23 predecessor</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
-          <tr><td>WP-14</td><td>5</td><td>HUMAN_ACCEPTED / COMMIT_PENDING</td><td>G25</td><td><code>PENDING_CHECKPOINT</code></td></tr>
-          <tr><td>WP-15</td><td>5</td><td>HUMAN_ACCEPTED / COMMIT_PENDING</td><td>G25</td><td><code>PENDING_CHECKPOINT</code></td></tr>
-          <tr><td>WP-16</td><td>3</td><td>HUMAN_ACCEPTED / COMMIT_PENDING</td><td>G25</td><td><code>PENDING_CHECKPOINT</code></td></tr>
+          <tr><td>WP-14</td><td>5</td><td>HUMAN_ACCEPTED / CHECKPOINTED</td><td>G25</td><td><code>f4168c31592ac5c886b49d8878f60b99016fdcaf</code></td></tr>
+          <tr><td>WP-15</td><td>5</td><td>HUMAN_ACCEPTED / CHECKPOINTED</td><td>G25</td><td><code>f4168c31592ac5c886b49d8878f60b99016fdcaf</code></td></tr>
+          <tr><td>WP-16</td><td>3</td><td>HUMAN_ACCEPTED / CHECKPOINTED</td><td>G25</td><td><code>f4168c31592ac5c886b49d8878f60b99016fdcaf</code></td></tr>
           <tr><td>WP-17</td><td>4</td><td>IMPLEMENTED_PENDING_REVIEW</td><td>G26</td><td><code>PENDING</code></td></tr>
           <tr><td>WP-18</td><td>4</td><td>IMPLEMENTED_PENDING_REVIEW</td><td>G26</td><td><code>PENDING</code></td></tr>
           <tr><td>WP-19</td><td>4</td><td>IMPLEMENTED_PENDING_REVIEW</td><td>G26</td><td><code>PENDING</code></td></tr>
@@ -73,8 +73,8 @@
         <h2>Goal provenance ledger</h2>
         <div class="table-wrap"><table><thead><tr><th>Goal</th><th>Predecessor SHA</th><th>Output SHA</th><th>Start gate</th><th>Delta</th><th>Status</th></tr></thead><tbody>
           <tr><td>G24</td><td><code>fde4c8f1d017992755c6af2bd600c9bd715efd6b</code></td><td><code>61cc7420e290cd93eda787c30b54a93edf4ca9a</code></td><td>Human-confirmed formal checkpoint</td><td>0</td><td>HUMAN_ACCEPTED / PASS / COMPLETE</td></tr>
-          <tr><td>G25</td><td><code>61cc7420e290cd93eda787c30b54a93edf4ca9a</code></td><td><code>PENDING_FINAL_COMMIT_SHA</code></td><td>Approved G24</td><td>+13</td><td>HUMAN_ACCEPTED / COMMIT_PENDING</td></tr>
-          <tr><td>G26</td><td><code>G25_OUTPUT_SHA</code></td><td><code>PENDING</code></td><td>Approved G25</td><td>+12</td><td>GATED</td></tr>
+          <tr><td>G25</td><td><code>61cc7420e290cd93eda787c30b54a93edf4ca9a</code></td><td><code>f4168c31592ac5c886b49d8878f60b99016fdcaf</code></td><td>Approved G24</td><td>+13</td><td>HUMAN_ACCEPTED / PASS / COMPLETE</td></tr>
+          <tr><td>G26</td><td><code>f4168c31592ac5c886b49d8878f60b99016fdcaf</code></td><td><code>PENDING</code></td><td>Approved G25</td><td>+12</td><td>READY</td></tr>
           <tr><td>G27</td><td><code>G26_OUTPUT_SHA</code></td><td><code>PENDING</code></td><td>Approved G26</td><td>+6</td><td>GATED</td></tr>
           <tr><td>G28</td><td><code>G27_OUTPUT_SHA</code></td><td><code>PENDING</code></td><td>Approved G27</td><td>+5</td><td>GATED</td></tr>
           <tr><td>G29</td><td><code>G28_OUTPUT_SHA</code></td><td><code>PENDING</code></td><td>Approved G28 + Human operator</td><td>+5</td><td>GATED / EXTERNAL_LATE</td></tr>
@@ -112,7 +112,7 @@
         <div class="goal-flow">
           <article class="goal"><span class="badge gated">HUMAN PENDING</span><h3>G24 · Ledger</h3><p>Reconcile independent WP score/evidence ledger. Score stays 59.</p></article>
           <article class="goal"><span class="badge gated">COMMIT PENDING</span><h3>G25 · Runtime</h3><p>WP-14/15/16 adapters and Doctor. Target 72.</p></article>
-          <article class="goal"><span class="badge gated">GATED</span><h3>G26 · Internal integration</h3><p>WP-17/18/19 local, policy, WebSurface. Target 84.</p></article>
+          <article class="goal"><span class="badge ready">READY</span><h3>G26 · Internal integration</h3><p>WP-17/18/19 local, policy, WebSurface. Target 84. Predecessor f4168c3.</p></article>
           <article class="goal"><span class="badge gated">GATED</span><h3>G27 · Product breadth</h3><p>WP-22/24/25 workflows, guards, metrics. Target 90.</p></article>
           <article class="goal"><span class="badge gated">GATED</span><h3>G28 · Feature freeze</h3><p>WP-26/27 UX and Golden Workflow evidence. Target 95.</p></article>
           <article class="goal"><span class="badge warning">EXTERNAL · LATE</span><h3>G29 · Vendor</h3><p>WP-20 Human-operated authenticated journeys. Target 100.</p></article>
@@ -132,7 +132,7 @@
               <tr><td>CP-04</td><td>3 / 20</td><td>WP-21 bounded fixture accepted; G26 +12, G29 +5</td></tr>
               <tr><td>CP-05</td><td>2 / 13</td><td>WP-23 accepted; G27 +6, G28 +5</td></tr>
               <tr><td>CP-06</td><td>10 / 10</td><td>G19 provenance, G20 reproducibility, G22 hardening/delivery, G23 Human acceptance</td></tr>
-              <tr><td><strong>Total</strong></td><td><strong>59 / 100</strong></td><td>Remaining 41 points are unaccepted and visible</td></tr>
+              <tr><td><strong>Total</strong></td><td><strong>72 / 100</strong></td><td>Remaining 28 points are unaccepted and visible</td></tr>
               <tr><td>Competition</td><td>—</td><td>NOTE_ONLY_NON_SCORING; Human-owned delivery</td></tr>
             </tbody>
           </table>
@@ -146,11 +146,11 @@
           <li><code>docs/31_COMPATIBILITY_MATRIX.md</code> remains the promoted file; primary <code>docs/31_PROJECT_CONTENT_MAP.md</code> was excluded without overwrite.</li>
           <li>G21 verifies only a controlled synthetic-host browser fixture. Live vendor login, DOM compatibility, and external send remain <strong class="warning">DEFERRED / UNVERIFIED</strong> until G29.</li>
           <li>Credential, cookie, token, and automatic external send remain prohibited. Human confirms every send in G29.</li>
-          <li>ADR-001–010 remain frozen; ADR-011 is unchanged; formal development progress is 59/100.</li>
+          <li>ADR-001–010 remain frozen; ADR-011 is unchanged; formal development progress is 72/100.</li>
         </ul>
       </section>
 
-      <footer>G24 is Human-accepted at its exact checkpoint and the project score is 59/100. G25 WP-14/15/16 has Human authorization, with commit/push and clean-clone checkpoint verification pending. External verification is deliberately deferred to G29. Do not claim vendor certification before current evidence.</footer>
+      <footer>G24 and G25 are Human-accepted at exact checkpoints; G25 output SHA is f4168c31592ac5c886b49d8878f60b99016fdcaf and project score is 72/100. NEXT_GOAL_READY=G26. External verification is deliberately deferred to G29. Do not claim vendor certification before current evidence.</footer>
     </main>
   </body>
 </html>

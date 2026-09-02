@@ -44,8 +44,8 @@ The project uses a 100-point checkpoint-weighted progress model. Only `ACCEPTED`
 ### G24–G30 Human-confirmed development completion program — 2026-09-02
 
 - G23 remains accepted at exact SHA
-  `0eb56a986e97a45854bd6ddd419c114845ce51f4`; the accepted total remains
-  **59/100**.
+  `0eb56a986e97a45854bd6ddd419c114845ce51f4`; the accepted total before G25
+  was **59/100**, now raised to **72/100** by the verified G25 checkpoint.
 - The current denominator contains development work only. Competition is
   `NOTE_ONLY_NON_SCORING`, Human-owned, and cannot add, subtract, or block
   development points.
@@ -75,9 +75,9 @@ The project uses a 100-point checkpoint-weighted progress model. Only `ACCEPTED`
 | WP-11 work modes | 4 | 4 | Accepted |
 | WP-12 Council | 5 | 5 | Accepted |
 | WP-13 workflow gates | 5 | 5 | Accepted with disclosed limitation |
-| WP-14 Codex Runtime adapter | 5 | 0 | G25 — HUMAN_ACCEPTED / COMMIT_PENDING |
-| WP-15 OpenCode Runtime adapter | 5 | 0 | G25 — HUMAN_ACCEPTED / COMMIT_PENDING |
-| WP-16 Doctor/conformance | 3 | 0 | G25 — HUMAN_ACCEPTED / COMMIT_PENDING |
+| WP-14 Codex Runtime adapter | 5 | 5 | G25 — HUMAN_ACCEPTED / CHECKPOINTED |
+| WP-15 OpenCode Runtime adapter | 5 | 5 | G25 — HUMAN_ACCEPTED / CHECKPOINTED |
+| WP-16 Doctor/conformance | 3 | 3 | G25 — HUMAN_ACCEPTED / CHECKPOINTED |
 | WP-17 local endpoint profiles | 4 | 0 | G26 — IMPLEMENTED_PENDING_REVIEW |
 | WP-18 classification/routing | 4 | 0 | G26 — IMPLEMENTED_PENDING_REVIEW |
 | WP-19 WebSurface/MV3 boundary | 4 | 0 | G26 — IMPLEMENTED_PENDING_REVIEW |
@@ -107,26 +107,25 @@ The project uses a 100-point checkpoint-weighted progress model. Only `ACCEPTED`
 
 ### G25 candidate acceptance state — 2026-09-02
 
-- Candidate lane is based on the exact accepted G24 SHA above. WP-14, WP-15,
+- Candidate lane was based on the exact accepted G24 SHA above. WP-14, WP-15,
   and WP-16 have deterministic local evidence; Carver's distinct bounded
   read-only review returned `PASS` with `BLOCKER=0`, `MAJOR=0`, `MINOR=0`.
-  Human authorization `G25_DECISION=ACCEPT_AND_COMMIT_PUSH` is recorded;
-  commit, push, and checkpoint verification remain pending.
+  Human authorization `G25_DECISION=ACCEPT_AND_COMMIT_PUSH` is recorded and the
+  checkpoint is verified at `f4168c31592ac5c886b49d8878f60b99016fdcaf`.
 - Current candidate evidence is WP-14 `31 passed`, WP-15 `36 passed`, WP-16
   `58 passed`, G18 compatibility `7 passed`, packaging `3 passed`, Full Core
   exit `0` with one Windows-policy symlink skip, and baseline exit `0`.
 - Governance validation passed with the system Windows PowerShell validator,
   exit `0`; the earlier bundled PowerShell Core module failure remains an
-  environment-only historical result. No score has been awarded; the candidate
-  would move the project from `59/100` to `72/100` only after the authorized
-  commit, push, and clean-clone checkpoint verification.
+  environment-only historical result. The accepted project score is now
+  `72/100` after exact remote and clean-clone checkpoint verification.
 - The bounded G25 integration adds a private Registry observation factory and
   a legacy Doctor compatibility module; ADR-012 has an explicit integration
   addendum, while ADR-011, public runtime contracts, persistence/migrations,
   and Run identity remain unchanged.
 
-All sections below this line are `HISTORICAL` predecessor snapshots and do not
-override the current G25 section above.
+`NEXT_GOAL_READY=G26`. All sections below this line are `HISTORICAL` predecessor
+snapshots and do not override the current G25 section above.
 
 ### Historical G23 final acceptance snapshot — 2026-09-02
 
