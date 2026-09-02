@@ -54,6 +54,6 @@
   "limitations": [
     "native browser-loaded MV3 service-worker dispatch remains UNVERIFIED",
     "live ChatGPT/Claude/Gemini login, DOM compatibility, credentials, and external send remain DEFERRED / UNVERIFIED",
-    "G22 checkpoint and clean-clone verification are pending"
+    "Fresh G22 CDP browser rerun remains NEED_ACTION because the controlled CDP endpoint was unavailable; the bounded G22 checkpoint and prior clean-clone verification are complete"
   ]
 }
