@@ -6,8 +6,8 @@ browser compatibility.
 
 ## G24 current reconciliation boundary — 2026-09-02
 
-- `G24_START_SHA`: `fde4c8f1d017992755c6af2bd600c9bd715efd6b`.
-- `G24_STATUS`: `VERIFIED_PASS_PENDING_HUMAN`; `GOAL_SCORE_DELTA=0`;
+- `G24_OUTPUT_SHA`: `61cc7420e290cd93eda787c30b54a93edf4ca9a`.
+- `G24_STATUS`: `HUMAN_ACCEPTED / PASS / COMPLETE`; `GOAL_SCORE_DELTA=0`;
   development progress remains `59/100`.
 - The G24 ledger reconciles implementation/evidence/maturity labels only. It
   does not promote any capability or change the matrix below.
@@ -15,7 +15,7 @@ browser compatibility.
 ## Planned completion routing — 2026-09-02
 
 - The Human-confirmed G24–G30 program preserves all current maturity labels.
-  Planning does not convert a capability into `SUPPORTED` or `CERTIFIED`.
+  Planning does not elevate any capability to a higher maturity state.
 - G26 covers deterministic/internal WP-17/18/19 compatibility work. The
   Human-operated authenticated WP-20 vendor journeys are intentionally delayed
   to G29, after G28 feature-freeze evidence.
@@ -24,6 +24,27 @@ browser compatibility.
   vendor certification remains `NOT_CLAIMED`.
 - Formal development progress is `59/100`; Competition is
   `NOTE_ONLY_NON_SCORING` and has no compatibility maturity effect.
+
+## G25 current candidate boundary — 2026-09-02
+
+- WP-14 Codex Runtime Adapter: `EXPERIMENTAL`; deterministic local conformance
+  evidence exists, but no live Codex CLI/account or production certification.
+- WP-15 OpenCode Runtime Adapter: `EXPERIMENTAL`; deterministic local
+  conformance evidence exists, but no live OpenCode CLI/account or production
+  certification.
+- WP-16 Runtime Doctor: `PREVIEW`; it reports observed health/readiness,
+  declarations, probe failures, version, and bounded evidence without promoting
+  an observed or preview state to production support.
+- `PREVIEW` here describes the Doctor diagnostic/reporting surface: it is not a
+  runtime capability claim. The adapter rows use `EXPERIMENTAL` because they
+  have deterministic local conformance evidence but no production/live-vendor
+  integration evidence; the reference local runtime alone carries the highest
+  bounded baseline label.
+- These labels are Human-authorized candidate evidence pending final checkpoint
+  verification; the required independent review returned PASS with no severity
+  findings. No
+  compatibility claim is made for live vendors, browser-loaded
+  MV3 dispatch, network transports, or authenticated sessions.
 
 ## Current checkpoint — 2026-09-02 (G23 Human-accepted final reconciliation)
 

@@ -4,7 +4,7 @@ Browser-readable companion: [GOAL_COMPLETION_CONTROL_PANEL.html](GOAL_COMPLETION
 
 ## G24–G30 development completion program — HUMAN CONFIRMED 2026-09-02
 
-`PLAN_STATUS: HUMAN_CONFIRMED / G24_CURRENT / VERIFIED_PASS_PENDING_HUMAN`
+`PLAN_STATUS: HUMAN_CONFIRMED / G25_CURRENT / HUMAN_ACCEPTED / COMMIT_PENDING`
 
 - `ACCEPTED_BASELINE_SHA`: `0eb56a986e97a45854bd6ddd419c114845ce51f4`
 - `DEVELOPMENT_PROGRESS`: `59/100`
@@ -12,8 +12,9 @@ Browser-readable companion: [GOAL_COMPLETION_CONTROL_PANEL.html](GOAL_COMPLETION
 - `EXECUTION_ORDER`: `G24 → G25 → G26 → G27 → G28 → G29 → G30`
 - `EXECUTION_PROFILE`: one new Codex task per Goal, `gpt-5.6-luna`, reasoning
   effort `high`, isolated lane, exact approved predecessor SHA
-- `G24_START_SHA`: `fde4c8f1d017992755c6af2bd600c9bd715efd6b`
-- `G24_STATUS`: `VERIFIED_PASS_PENDING_HUMAN`; `G24_OUTPUT_SHA=PENDING`
+- `G24_OUTPUT_SHA`: `61cc7420e290cd93eda787c30b54a93edf4ca9a`
+- `G24_STATUS`: `HUMAN_ACCEPTED / PASS / COMPLETE`; approved ref
+  `feature/g24-g30-development-completion-routing` resolves exactly to this SHA
 - `INDEPENDENT_REVIEW`: `VERIFIED_PASS`; `BLOCKER=0`; `MAJOR=0`; `MINOR=0`
 - `G24_LEDGER`: `artifacts/verification/g24-development-ledger-20260902/ledger.json`
 - `G24_EVIDENCE`: current ledger/summary/commands artifact; historical WP evidence remains explicitly `HISTORICAL`
@@ -31,7 +32,7 @@ Browser-readable companion: [GOAL_COMPLETION_CONTROL_PANEL.html](GOAL_COMPLETION
 | CP-00 | 8 | 8 | Complete |
 | CP-02 | 22 | 22 | Complete |
 | CP-03: WP-11/12/13 | 14 | 14 | Complete |
-| CP-03: WP-14/15/16 | 0 | 13 | G25 (WP-14/15 PLANNED; WP-16 IMPLEMENTED_PENDING_REVIEW) |
+| CP-03: WP-14/15/16 | 0 | 13 | G25 (Human accepted; Carver review PASS; commit/push/checkpoint pending) |
 | CP-04: WP-17/18/19 | 0 | 12 | G26 (IMPLEMENTED_PENDING_REVIEW) |
 | CP-04: WP-20 | 0 | 5 | G29 (IMPLEMENTED_PENDING_REVIEW; external/Human-operated) |
 | CP-04: WP-21 | 3 | 3 | Complete, bounded fixture scope |
@@ -46,8 +47,8 @@ Browser-readable companion: [GOAL_COMPLETION_CONTROL_PANEL.html](GOAL_COMPLETION
 
 | Goal | Status | Scope | Score after acceptance |
 |---|---|---|---:|
-| G24 | `VERIFIED_PASS_PENDING_HUMAN` | Ledger/evidence reconciliation; Human final gate pending | 59 |
-| G25 | `GATED_BY_G24` | WP-14/15/16 runtime adapters + Doctor | 72 |
+| G24 | `HUMAN_ACCEPTED / PASS / COMPLETE` | Exact SHA confirmed; score 59 | 59 |
+| G25 | `HUMAN_ACCEPTED / COMMIT_PENDING` | WP-14/15/16 runtime adapters + Doctor | 72 |
 | G26 | `GATED_BY_G25` | WP-17/18/19 local/policy/WebSurface | 84 |
 | G27 | `GATED_BY_G26` | WP-22/24/25 workflows/guards/metrics | 90 |
 | G28 | `GATED_BY_G27` | WP-26/27 UX + Golden Workflow freeze | 95 |
@@ -68,9 +69,9 @@ Every WP-11–WP-32 record contains `WP_ID`, `CHECKPOINT`, `POINT_WEIGHT`,
 | WP-11 | 4 | `HUMAN_ACCEPTED` | G23 predecessor | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
 | WP-12 | 5 | `HUMAN_ACCEPTED` | G23 predecessor | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
 | WP-13 | 5 | `HUMAN_ACCEPTED` | G23 predecessor | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
-| WP-14 | 5 | `PLANNED` | G25 | `PENDING` |
-| WP-15 | 5 | `PLANNED` | G25 | `PENDING` |
-| WP-16 | 3 | `IMPLEMENTED_PENDING_REVIEW` | G25 | `PENDING` |
+| WP-14 | 5 | `HUMAN_ACCEPTED / COMMIT_PENDING` | G25 | `PENDING_CHECKPOINT` |
+| WP-15 | 5 | `HUMAN_ACCEPTED / COMMIT_PENDING` | G25 | `PENDING_CHECKPOINT` |
+| WP-16 | 3 | `HUMAN_ACCEPTED / COMMIT_PENDING` | G25 | `PENDING_CHECKPOINT` |
 | WP-17 | 4 | `IMPLEMENTED_PENDING_REVIEW` | G26 | `PENDING` |
 | WP-18 | 4 | `IMPLEMENTED_PENDING_REVIEW` | G26 | `PENDING` |
 | WP-19 | 4 | `IMPLEMENTED_PENDING_REVIEW` | G26 | `PENDING` |
@@ -92,8 +93,8 @@ Every WP-11–WP-32 record contains `WP_ID`, `CHECKPOINT`, `POINT_WEIGHT`,
 
 | Goal | Predecessor SHA | Output SHA | Start gate | Score delta | Status |
 |---|---|---|---|---:|---|
-| G24 | `fde4c8f1d017992755c6af2bd600c9bd715efd6b` | `PENDING` | Exact planning checkpoint verified; Human final gate pending | 0 | `VERIFIED_PASS_PENDING_HUMAN` |
-| G25 | `G24_OUTPUT_SHA` | `PENDING` | Approved G24 checkpoint | +13 | `GATED` |
+| G24 | `fde4c8f1d017992755c6af2bd600c9bd715efd6b` | `61cc7420e290cd93eda787c30b54a93edf4ca9a` | Human-confirmed formal checkpoint | 0 | `HUMAN_ACCEPTED / PASS / COMPLETE` |
+| G25 | `61cc7420e290cd93eda787c30b54a93edf4ca9a` | `PENDING_FINAL_COMMIT_SHA` | Approved G24 checkpoint | +13 | `HUMAN_ACCEPTED / COMMIT_PENDING` |
 | G26 | `G25_OUTPUT_SHA` | `PENDING` | Approved G25 checkpoint | +12 | `GATED` |
 | G27 | `G26_OUTPUT_SHA` | `PENDING` | Approved G26 checkpoint | +6 | `GATED` |
 | G28 | `G27_OUTPUT_SHA` | `PENDING` | Approved G27 checkpoint | +5 | `GATED` |

@@ -6,8 +6,8 @@ claims.
 ## G24 current reconciliation boundary — 2026-09-02
 
 - G24 records existing limitations and unverified boundaries; it removes none.
-- `G24_START_SHA=fde4c8f1d017992755c6af2bd600c9bd715efd6b`,
-  `G24_STATUS=VERIFIED_PASS_PENDING_HUMAN`, and score remains `59/100`.
+- `G24_OUTPUT_SHA=61cc7420e290cd93eda787c30b54a93edf4ca9a`,
+  `G24_STATUS=HUMAN_ACCEPTED / PASS / COMPLETE`, and score remains `59/100`.
 - Source/test presence for later WPs remains unaccepted until WP-level review,
   Human acceptance, exact checkpoint, and clean-clone evidence.
 
@@ -24,6 +24,29 @@ claims.
 - Formal development progress is `59/100`. Competition work is
   `NOTE_ONLY_NON_SCORING` and does not create a product limitation or reduce the
   development score.
+
+## G25 current candidate limitations — 2026-09-02
+
+- WP-14 and WP-15 are deterministic local adapter implementations with
+  `EXPERIMENTAL` maturity. Their tests use controlled in-process fixtures; no
+  live Codex/OpenCode CLI, account, network, or vendor session was used.
+- WP-16 Doctor reports declarations and observations conservatively. It cannot
+  establish production support, certification, live vendor compatibility, or
+  authenticated readiness from local fixtures alone.
+- The Registry observation factory is intentionally private and separate from
+  execution-time compatibility validation. It exists so Doctor can report a
+  capability/auth declaration failure without changing normal execution
+  selection.
+- A legacy Doctor compatibility module preserves the accepted G18 public API
+  while the new runtime Doctor report is introduced. This is a bounded
+  integration seam, not a second execution identity or a second Run model.
+- Human authorized `G25_DECISION=ACCEPT_AND_COMMIT_PUSH`; final WP-14/15/16
+  checkpoint verification and the `+13` score remain pending commit, push, and
+  clean-clone evidence. The required independent read-only review returned
+  PASS with no BLOCKER, MAJOR, or MINOR findings. Governance validation now
+  passes with the system Windows PowerShell validator, exit `0`; the earlier bundled
+  PowerShell Core module failure is retained as a historical environment
+  result.
 
 ## Current RC status — 2026-09-02 (G23 Human-accepted bounded closeout)
 

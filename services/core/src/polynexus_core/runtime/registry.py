@@ -269,6 +269,25 @@ class RuntimeRegistry:
         _validate_adapter_compatibility(profile, adapter, required_capabilities)
         return adapter
 
+    def _create_adapter_for_observation(self, profile: RuntimeProfile) -> RuntimeAdapter:
+        """Construct a registered adapter without execution compatibility checks.
+
+        Doctor must observe capability/version declaration failures separately
+        from factory failures.  Execution callers continue to use
+        ``create_adapter()``, which retains auth and required-capability
+        validation.  This private observation seam still uses the Registry's
+        registered factory and never falls back to the reference adapter.
+        """
+        try:
+            factory = self._factories.get(profile.adapter_id)
+        except Exception:
+            factory = None
+        if factory is None:
+            raise RuntimeBindingError(
+                "No adapter factory registered for the resolved profile"
+            ) from None
+        return factory()
+
     def inspect_selected_profile(
         self,
         *,

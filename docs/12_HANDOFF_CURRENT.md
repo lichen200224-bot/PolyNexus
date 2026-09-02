@@ -1,6 +1,77 @@
 # Current Handoff
 
-## Current Task — G24 development ledger and evidence reconciliation (2026-09-02)
+## Current Task — G25 runtime adapters and Doctor acceptance (2026-09-02)
+
+- `TASK_ID`: `G25-RUNTIME-ADAPTERS-AND-DOCTOR-ACCEPTANCE`
+- `STATUS`: `HUMAN_ACCEPTED / COMMIT_PENDING`; Human decision received:
+  `G25_DECISION=ACCEPT_AND_COMMIT_PUSH`. Commit, push, and checkpoint
+  verification are still pending.
+- `ATTEMPT`: `1` in isolated lane `artifacts/worktrees/g25-runtime-adapters-doctor`.
+- `BRANCH`: `feature/g24-g30-development-completion-routing` from exact
+  predecessor `61cc7420e290cd93eda787c30b54a93edf4ca9a`.
+- `WRITER`: Codex sole active writer. `REVIEWER`: Carver, a distinct bounded
+  read-only reviewer, returned `PASS` with `BLOCKER=0`, `MAJOR=0`, `MINOR=0`.
+  `ANTIGRAVITY_STATUS`: `NOT_REQUIRED` — Core-only scope.
+- `G24_CHECKPOINT`: `HUMAN_ACCEPTED / PASS / COMPLETE`;
+  `G24_OUTPUT_SHA=61cc7420e290cd93eda787c30b54a93edf4ca9a`; approved remote ref
+  resolves exactly to that SHA; project score is `59/100`.
+- `G24_CLEAN_CLONE`: predecessor clone was clean and staged-empty; exact-ref
+  verification exit `0`. The protected primary checkout
+  `D:\AI學習教材\PolyNexus` was not modified.
+- `WP14_STATUS`: Human-accepted candidate, 31 targeted tests passed, exit `0`;
+  local deterministic `EXPERIMENTAL`, +5 pending checkpoint verification.
+- `WP15_STATUS`: Human-accepted candidate, 36 targeted tests passed, exit `0`;
+  local deterministic `EXPERIMENTAL`, +5 pending checkpoint verification.
+- `WP16_STATUS`: Human-accepted candidate, 58 targeted tests passed, exit `0`;
+  G18 compatibility 7 passed, exit `0`; Doctor remains bounded `PREVIEW`, +3
+  pending checkpoint verification.
+- `INTEGRATION`: private Registry observation factory plus
+  `runtime/doctor_legacy.py` compatibility surface; no second Run identity,
+  public contract change, persistence/migration change, or vendor Core branch.
+- `ADR_IMPACT`: ADR-012 integration addendum; ADR-011 preserved.
+- `SCOPE_DEVIATION`: `BOUNDED_G25_INTEGRATION`, limited to the two compatibility
+  seams above and disclosed in the task/ADR records.
+- `PROJECT_SCORE`: remains `59/100` until the authorized checkpoint is verified;
+  candidate target after successful commit/push/clean-clone verification is
+  `72/100`.
+- `GOVERNANCE`: system Windows PowerShell validator passed, exit `0`; the
+  earlier bundled PowerShell Core module failure is historical environment
+  evidence only.
+- `EVIDENCE_ARTIFACT`: `artifacts/verification/g25-runtime-adapters-doctor-20260902/`
+  contains `G25_EVIDENCE_SUMMARY.md` and a JSON-valid ledger with per-WP
+  provenance plus the complete current verification command list.
+- `CHANGED_FILES`: `docs/10_DECISION_LOG.md`, `docs/11_PROJECT_STATE.md`,
+  `docs/12_HANDOFF_CURRENT.md`, `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`,
+  `docs/31_COMPATIBILITY_MATRIX.md`, `docs/32_KNOWN_LIMITATIONS.md`,
+  `docs/GOAL_COMPLETION_CONTROL_PANEL.md`,
+  `docs/GOAL_COMPLETION_CONTROL_PANEL.html`,
+  `docs/31_ADR_012_RUNTIME_DOCTOR_REPORTING.md`, `docs/tasks/WP-14.md`,
+  `docs/tasks/WP-15.md`, `docs/tasks/WP-16.md`,
+  `services/core/src/polynexus_core/runtime/codex.py`,
+  `services/core/src/polynexus_core/runtime/opencode.py`,
+  `services/core/src/polynexus_core/runtime/doctor.py`,
+  `services/core/src/polynexus_core/runtime/doctor_legacy.py`,
+  `services/core/src/polynexus_core/runtime/registry.py`,
+  `services/core/tests/test_wp14_codex_runtime.py`,
+  `services/core/tests/test_wp15_opencode_runtime.py`,
+  `services/core/tests/test_wp16_runtime_doctor.py`, plus the two ignored
+  evidence files under `artifacts/verification/g25-runtime-adapters-doctor-20260902/`.
+- `STAGE_ALLOWLIST`: the exact list above only; no other tracked, untracked, or
+  ignored path may be staged. Current staged state is empty.
+- `NEXT_ACTION`: stage the exact allowlist, commit with the proposed message,
+  non-force push the approved ref, verify the exact SHA, and run clean-clone
+  verification. Do not start G26.
+- `NEXT_OWNER`: Codex for the authorized final Git closeout and verification.
+- `NEXT_PROMPT`: `G25_DECISION=ACCEPT_AND_COMMIT_PUSH` authorizes only the exact
+  allowlist, proposed commit, approved remote ref, non-force push, and the
+  post-push clean-clone verification described in this handoff; that decision
+  has now been received.
+- `BLOCKERS`: no open product BLOCKER or MAJOR review finding; commit/push SHA
+  and post-push clean-clone verification remain pending.
+- `HUMAN_ACTION_REQUIRED`: none for the authorized closeout; report any failed
+  gate as `NEED_ACTION` and do not broaden scope.
+
+## Historical G24 handoff record
 
 ### Identity and routing
 
@@ -16,21 +87,22 @@
   `refs/heads/feature/g24-g30-development-completion-routing`; no remote
   configuration change is proposed
 - `G24_START_SHA`: `fde4c8f1d017992755c6af2bd600c9bd715efd6b`
-- `G24_OUTPUT_SHA`: `PENDING`
-- `STATUS`: `VERIFIED_PASS_PENDING_HUMAN`
+- `G24_OUTPUT_SHA`: `61cc7420e290cd93eda787c30b54a93edf4ca9a0`
+- `G24_ACCEPTANCE`: `HUMAN_ACCEPTED / PASS / COMPLETE`
+- `STATUS`: `HUMAN_ACCEPTED / PASS / COMPLETE`
 - `WRITER`: `Codex` — sole active writer in the isolated G24 lane
 - `REVIEWER`: independent read-only G24 review returned `VERIFIED_PASS` with
   `BLOCKER=0`, `MAJOR=0`, `MINOR=0`
 - `ANTIGRAVITY_STATUS`: `NOT_REQUIRED` — this package changes only governance,
   plans, reports, and control panels; G29 contains the later external/browser
   operator plan
-- `NEXT_OWNER`: `Human` for G24 final decision and exact-allowlist commit/push
-  authorization; G25 remains gated and is not started by this task
+- `NEXT_OWNER`: `Codex` for G25 WP-14/WP-15/WP-16 implementation and acceptance;
+  G25 starts only from this exact predecessor checkpoint
 - `MODEL_PROFILE`: `gpt-5.6-luna / high` for each new G24–G30 task
 
 ### Human-confirmed outcome
 
-- `PLAN_STATUS`: `HUMAN_CONFIRMED / G24_CURRENT / VERIFIED_PASS_PENDING_HUMAN`
+- `PLAN_STATUS`: `HUMAN_CONFIRMED / G24_CURRENT / HUMAN_ACCEPTED / PASS / COMPLETE`
 - `PROJECT_PROGRESS`: `59/100` development-only points
 - `COMPETITION_TRACK`: `NOTE_ONLY_NON_SCORING / HUMAN_OWNED_DELIVERY`
 - `GOAL_ORDER`: `G24 → G25 → G26 → G27 → G28 → G29 → G30`
@@ -39,7 +111,9 @@
 - `HUMAN_INTERVENTION`: normally only each Goal's final
   `ACCEPT_AND_COMMIT_PUSH` decision after exact files, branch, remote, evidence,
   review, limitations, and proposed commit are disclosed
-- `G24_STATUS`: `VERIFIED_PASS_PENDING_HUMAN`
+- `G24_STATUS`: `HUMAN_ACCEPTED / PASS / COMPLETE`
+- `G24_DECISION`: Human authorized formal acceptance/checkpoint confirmation on
+  2026-09-02; this status update does not authorize G25 commit/push.
 
 ### Development-only score map
 
@@ -91,6 +165,14 @@ final Human-authorized Git Gate.
 
 ### Current G24 verification
 
+- Fresh clean-clone verification for the approved predecessor:
+  `artifacts/worktrees/g25-runtime-adapters-doctor`; `HEAD` equals
+  `61cc7420e290cd93eda787c30b54a93edf4ca9a0`, `git status --short --branch`
+  is clean, and staged name-status is empty; command exit `0`.
+- Approved remote resolution: `git ls-remote backup
+  refs/heads/feature/g24-g30-development-completion-routing` returned
+  `61cc7420e290cd93eda787c30b54a93edf4ca9a0`; exit `0`.
+
 - Ledger schema/score assertion: 22 records, WP weights `70`, CP-00/02 base
   weights `30`, denominator `100`, earned `59`; corrected command 6 exit `0`.
 - Current-state marker assertion: seven synchronized current documents contain
@@ -126,8 +208,8 @@ final Human-authorized Git Gate.
 - Review-2 MAJOR fixes have been applied. Review-3 found one MAJOR G24
   self-referential predecessor/output-SHA contradiction; the protocol was
   corrected so the post-push planning SHA becomes `G24_START_SHA` (G24
-  predecessor) while `G24_OUTPUT_SHA` remains `PENDING`. Review-4 found one
-  remaining MAJOR because the copy-ready G24 prompt still said to read the SHA
+  predecessor) while the G24 output SHA was still a pre-acceptance placeholder.
+  Review-4 found one remaining MAJOR because the copy-ready G24 prompt still said to read the SHA
   only from the handoff; that exception is now explicit. Review-5 returned
   `VERIFIED_PASS` with BLOCKER `0`, MAJOR `0`, MINOR `0`; score/panel/prompt/
   protocol/scope-security checks all passed. `PLANNING_PACKAGE_REVIEW=VERIFIED_PASS`
@@ -142,19 +224,13 @@ final Human-authorized Git Gate.
 ### Stop condition and next exact action
 
 All current diff/scope, score, baseline, governance, panel/schema, and independent
-review gates pass. Present the Human with the exact stage allowlist,
-branch, remote ref, commit message, and the single G24 authorization phrase.
-Do not stage, commit, push, or start G25 before that authorization.
+review gates pass. Human has now authorized the G24 formal acceptance/checkpoint
+confirmation. The exact predecessor is ready for the G25 start gate; do not stage,
+commit, or push G25 before its final Human gate.
 
-`NEXT_PROMPT_FOR_HUMAN`:
-
-```text
-G24_DECISION=ACCEPT_AND_COMMIT_PUSH
-```
-
-This phrase is valid only for the exact proposal disclosed with the final review;
-it does not authorize force push, remote changes, additional files, G24 execution,
-external send, or secret access.
+`NEXT_ACTION`: Run the G25 start gate from predecessor
+`61cc7420e290cd93eda787c30b54a93edf4ca9a0`, then inspect and implement only
+WP-14, WP-15, and WP-16 within the approved scope.
 
 ## Current Task — G23 final reconciliation and Human acceptance (2026-09-02)
 

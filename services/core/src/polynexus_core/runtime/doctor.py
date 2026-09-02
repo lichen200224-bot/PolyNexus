@@ -1,595 +1,875 @@
-"""Bounded, source-bound runtime Doctor evidence (G18).
+"""Deterministic Core-only Runtime Doctor (WP-16).
 
-Doctor is an internal diagnostic boundary in V1.  It does not create a
-public API, persist evidence, or infer maturity from historical documents.
-Every claim carries a safe provenance record containing the exact source
-commit, UTC timestamp, command label, exit code, and freshness state.
+The Doctor is a read-only composition root for runtime inventory reporting. It
+owns a fixed, ordered inventory and a fresh in-memory ``RuntimeRegistry``;
+the product's default registry and ``ExecutionService`` remain unchanged.
+
+Only the non-lifecycle RuntimeAdapter surfaces are observed here:
+``health()``, ``readiness()``, ``capabilities()``, and ``version_info()``.
+Health and readiness are current asynchronous probes. Capabilities and
+versions are adapter declarations. Conformance evidence is static metadata
+kept separate from both kinds of observation.
+
+This module deliberately has no API, UI, persistence, migration, network,
+credential, supervisor, or vendor-branch behavior. It is not a production
+runtime detector and never invokes a real vendor CLI.
 """
 from __future__ import annotations
 
-import re
+import asyncio
+import math
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from enum import StrEnum
-from typing import Any, Mapping
 
 from polynexus_core.persistence.database import schema_head_status
-from polynexus_core.runtime.registry import RuntimeRegistry
-
-MAX_CLAIMS = 32
-MAX_NAME_LENGTH = 64
-MAX_VALUE_LENGTH = 128
-MAX_SOURCE_LENGTH = 64
-MAX_COMMAND_LENGTH = 64
-DEFAULT_FRESHNESS_WINDOW = timedelta(minutes=15)
-DOCTOR_COMMAND = "runtime-doctor"
-SCHEMA_COMMAND = "alembic-schema-head"
-COMMIT_PATTERN = re.compile(r"^[0-9a-f]{40}$")
-SAFE_LABEL_PATTERN = re.compile(r"^[a-z][a-z0-9._/-]{0,63}$")
-SAFE_VALUE_PATTERN = re.compile(r"^[A-Za-z0-9_.:/-]{1,128}$")
-
-
-class EvidenceFreshness(StrEnum):
-    CURRENT = "CURRENT"
-    STALE = "STALE"
-    HISTORICAL = "HISTORICAL"
-    UNVERIFIED = "UNVERIFIED"
-    NOT_PRESENT = "NOT_PRESENT"
+from polynexus_core.domain.enums import (
+    AuthOwnership,
+    ExecutionTarget,
+    ResumeMode,
+    TransportKind,
+    UsageVisibility,
+)
+from polynexus_core.domain.runtime_binding import RuntimeProfile
+from polynexus_core.runtime.codex import CodexRuntimeAdapter
+from polynexus_core.runtime.contracts import RuntimeAdapter, RuntimeCapabilities
+from polynexus_core.runtime.opencode import OpenCodeRuntimeAdapter
+from polynexus_core.runtime.reference import ReferenceRuntimeAdapter
+from polynexus_core.runtime.registry import AdapterFactory, RuntimeRegistry
 
 
-class MaturityState(StrEnum):
-    CERTIFIED = "CERTIFIED"
+DOCTOR_CONTRACT_VERSION = "runtime-adapter/v1"
+DEFAULT_PROBE_TIMEOUT_SECONDS = 1.0
+
+CURRENT_PROBE = "CURRENT_PROBE"
+ADAPTER_DECLARATION = "ADAPTER_DECLARATION"
+UNAVAILABLE = "UNAVAILABLE"
+
+
+class DoctorReportStatus(StrEnum):
+    """Whether the report itself was complete, partial, or failed."""
+
+    COMPLETE = "COMPLETE"
+    PARTIAL = "PARTIAL"
+    FAILED = "FAILED"
+
+
+class DoctorMaturity(StrEnum):
+    """Truthful maturity labels available to the Doctor MVP."""
+
     SUPPORTED = "SUPPORTED"
-    PREVIEW = "PREVIEW"
     EXPERIMENTAL = "EXPERIMENTAL"
-    DETECTED = "DETECTED"
-    INCOMPATIBLE = "INCOMPATIBLE"
-    UNVERIFIED = "UNVERIFIED"
-    NOT_PRESENT = "NOT_PRESENT"
 
 
-def _utc(value: datetime) -> datetime:
-    if value.tzinfo is None:
-        raise ValueError("timestamp must be timezone-aware")
-    return value.astimezone(timezone.utc)
+class DoctorErrorCategory(StrEnum):
+    """Fixed, public-safe error categories; raw exception text is excluded."""
 
-
-def _safe_label(value: object, *, maximum: int) -> str | None:
-    if not isinstance(value, str) or not value or len(value) > maximum:
-        return None
-    if (
-        SAFE_LABEL_PATTERN.fullmatch(value) is None
-        or value.startswith("/")
-        or "//" in value
-        or ".." in value
-    ):
-        return None
-    return value
-
-
-def _safe_commit(value: object) -> str | None:
-    if not isinstance(value, str) or COMMIT_PATTERN.fullmatch(value) is None:
-        return None
-    return value
-
-
-def _safe_value(value: object) -> bool | int | str | None:
-    if value is None or isinstance(value, bool):
-        return value
-    if isinstance(value, int) and 0 <= value <= 255:
-        return value
-    if isinstance(value, str) and 0 < len(value) <= MAX_VALUE_LENGTH:
-        # Values are deliberately restricted to opaque/version-like labels.
-        # This excludes paths, URLs, key/value payloads, and free-form errors.
-        lowered = value.lower()
-        forbidden_markers = (
-            "authorization",
-            "bearer",
-            "cookie",
-            "password",
-            "secret",
-            "token",
-        )
-        if (
-            SAFE_VALUE_PATTERN.fullmatch(value) is not None
-            and not value.startswith(("/", "\\"))
-            and "://" not in value
-            and "=" not in value
-            and not any(marker in lowered for marker in forbidden_markers)
-        ):
-            return value
-    return None
-
-
-@dataclass(frozen=True, slots=True)
-class EvidenceProvenance:
-    """Safe, bounded provenance attached to every Doctor claim."""
-    source: str
-    exact_commit: str | None
-    generated_at: datetime
-    command: str
-    exit_code: int | None
-    freshness: EvidenceFreshness
-
-    def __post_init__(self) -> None:
-        safe_source = _safe_label(self.source, maximum=MAX_SOURCE_LENGTH)
-        safe_command = _safe_label(self.command, maximum=MAX_COMMAND_LENGTH)
-        if safe_source is None or safe_command is None:
-            raise ValueError("unsafe evidence provenance label")
-        if self.exit_code is not None and (
-            not isinstance(self.exit_code, int)
-            or isinstance(self.exit_code, bool)
-            or not 0 <= self.exit_code <= 255
-        ):
-            raise ValueError("invalid evidence exit code")
-        if not isinstance(self.freshness, EvidenceFreshness):
-            raise ValueError("invalid evidence freshness")
-        object.__setattr__(self, "source", safe_source)
-        object.__setattr__(self, "exact_commit", _safe_commit(self.exact_commit))
-        object.__setattr__(self, "generated_at", _utc(self.generated_at))
-        object.__setattr__(self, "command", safe_command)
-
-    def as_dict(self) -> dict[str, object]:
-        return {
-            "source": self.source,
-            "exact_commit": self.exact_commit,
-            "generated_at": self.generated_at.isoformat().replace("+00:00", "Z"),
-            "command": self.command,
-            "exit_code": self.exit_code,
-            "freshness": self.freshness.value,
-        }
+    INVENTORY_INVALID = "INVENTORY_INVALID"
+    FACTORY_FAILURE = "FACTORY_FAILURE"
+    HEALTH_FAILURE = "HEALTH_FAILURE"
+    READINESS_FAILURE = "READINESS_FAILURE"
+    CAPABILITIES_FAILURE = "CAPABILITIES_FAILURE"
+    VERSION_FAILURE = "VERSION_FAILURE"
+    PROBE_TIMEOUT = "PROBE_TIMEOUT"
+    TIMESTAMP_FAILURE = "TIMESTAMP_FAILURE"
 
 
 @dataclass(frozen=True)
-class DoctorClaim:
-    name: str
-    value: bool | int | str | None
-    maturity: MaturityState
-    evidence: EvidenceProvenance
+class DoctorConformanceEvidence:
+    """Static evidence for a runtime's declared conformance maturity.
 
-    def __post_init__(self) -> None:
-        if _safe_label(self.name, maximum=MAX_NAME_LENGTH) is None:
-            raise ValueError("unsafe Doctor claim name")
-        if not isinstance(self.maturity, MaturityState):
-            raise ValueError("invalid Doctor claim maturity")
-        safe = _safe_value(self.value)
-        if safe != self.value:
-            raise ValueError("unsafe Doctor claim value")
-        if self.maturity in {MaturityState.CERTIFIED, MaturityState.SUPPORTED}:
-            raise ValueError("Doctor cannot self-assert certified maturity")
-
-    def as_dict(self) -> dict[str, object]:
-        return {
-            "name": self.name,
-            "value": self.value,
-            "maturity": self.maturity.value,
-            "evidence": self.evidence.as_dict(),
-        }
-
-
-@dataclass(frozen=True)
-class DoctorReport:
-    generated_at: datetime
-    freshness: EvidenceFreshness
-    maturity: MaturityState
-    claims: tuple[DoctorClaim, ...]
-
-    def __post_init__(self) -> None:
-        object.__setattr__(self, "generated_at", _utc(self.generated_at))
-        if len(self.claims) > MAX_CLAIMS:
-            raise ValueError("Doctor report exceeds bounded claim count")
-        if not isinstance(self.freshness, EvidenceFreshness):
-            raise ValueError("invalid Doctor report freshness")
-        if not isinstance(self.maturity, MaturityState):
-            raise ValueError("invalid Doctor report maturity")
-        if self.maturity in {MaturityState.CERTIFIED, MaturityState.SUPPORTED}:
-            raise ValueError("Doctor cannot self-assert certified maturity")
-
-    def as_dict(self) -> dict[str, object]:
-        return {
-            "generated_at": self.generated_at.isoformat().replace("+00:00", "Z"),
-            "freshness": self.freshness.value,
-            "maturity": self.maturity.value,
-            "claims": [claim.as_dict() for claim in self.claims],
-        }
-
-
-def _classify_freshness(
-    *,
-    exact_commit: str | None,
-    generated_at: datetime,
-    now: datetime,
-    exit_code: int | None,
-    historical: bool,
-    current_commit: str | None,
-    freshness_window: timedelta,
-) -> EvidenceFreshness:
-    if _safe_commit(exact_commit) is None or exit_code is None or exit_code != 0:
-        return EvidenceFreshness.UNVERIFIED
-    if historical:
-        return EvidenceFreshness.HISTORICAL
-    if current_commit is not None:
-        safe_current_commit = _safe_commit(current_commit)
-        if safe_current_commit is None:
-            return EvidenceFreshness.UNVERIFIED
-        if exact_commit != safe_current_commit:
-            return EvidenceFreshness.HISTORICAL
-    age = _utc(now) - _utc(generated_at)
-    if age < timedelta(0) or age > freshness_window:
-        return EvidenceFreshness.STALE
-    return EvidenceFreshness.CURRENT
-
-
-def _claim_maturity(
-    freshness: EvidenceFreshness,
-    *,
-    observed: bool,
-    compatible: bool = True,
-) -> MaturityState:
-    if freshness is EvidenceFreshness.NOT_PRESENT:
-        return MaturityState.NOT_PRESENT
-    if freshness is not EvidenceFreshness.CURRENT:
-        return MaturityState.UNVERIFIED
-    if not observed:
-        return MaturityState.UNVERIFIED
-    if not compatible:
-        return MaturityState.INCOMPATIBLE
-    return MaturityState.PREVIEW
-
-
-def _base_provenance(
-    *,
-    source: str,
-    exact_commit: str | None,
-    generated_at: datetime,
-    command: str,
-    exit_code: int | None,
-    freshness: EvidenceFreshness,
-) -> EvidenceProvenance:
-    safe_commit = _safe_commit(exact_commit)
-    safe_command = _safe_label(command, maximum=MAX_COMMAND_LENGTH) or DOCTOR_COMMAND
-    safe_exit = (
-        exit_code
-        if isinstance(exit_code, int)
-        and not isinstance(exit_code, bool)
-        and 0 <= exit_code <= 255
-        else None
-    )
-    return EvidenceProvenance(
-        source=source,
-        exact_commit=safe_commit,
-        generated_at=generated_at,
-        command=safe_command,
-        exit_code=safe_exit,
-        freshness=freshness,
-    )
-
-
-async def collect_doctor_report(
-    registry: RuntimeRegistry,
-    *,
-    exact_commit: str | None,
-    generated_at: datetime | None = None,
-    now: datetime | None = None,
-    current_commit: str | None = None,
-    historical: bool = False,
-    exit_code: int | None = 0,
-    freshness_window: timedelta = DEFAULT_FRESHNESS_WINDOW,
-    explicit_request: str | None = None,
-    environment: Mapping[str, str] | None = None,
-) -> DoctorReport:
-    """Collect a bounded Doctor report without persisting or exporting secrets.
-
-    Missing/invalid provenance or a failed probe is represented as
-    ``UNVERIFIED``.  The function never includes exception text or caller
-    supplied identifiers in the report.
+    This is deliberately separate from current health/readiness observations
+    and from the adapter's capability declaration.
     """
-    observed_at = _utc(generated_at or datetime.now(timezone.utc))
-    observed_now = _utc(now or datetime.now(timezone.utc))
-    freshness = _classify_freshness(
-        exact_commit=exact_commit,
-        generated_at=observed_at,
-        now=observed_now,
-        exit_code=exit_code,
-        historical=historical,
-        current_commit=current_commit,
-        freshness_window=freshness_window,
-    )
-    claims: list[DoctorClaim] = []
-    profile = None
-    adapter = None
-    compatible = False
-    health_checks_passed = False
-    try:
-        profile, adapter = registry.inspect_selected_profile(
-            explicit_request=explicit_request,
-            environment=environment,
-        )
-        compatible = True
-    except Exception:
-        # The public report intentionally contains no exception or input data.
-        claims.append(
-            DoctorClaim(
-                name="runtime_profile",
-                value=None,
-                maturity=(
-                    MaturityState.INCOMPATIBLE
-                    if freshness is EvidenceFreshness.CURRENT
-                    else MaturityState.UNVERIFIED
-                ),
-                evidence=_base_provenance(
-                    source="runtime.registry",
-                    exact_commit=exact_commit,
-                    generated_at=observed_at,
-                    command=DOCTOR_COMMAND,
-                    exit_code=1,
-                    freshness=EvidenceFreshness.UNVERIFIED,
-                ),
-            )
+
+    source: str
+    outcome: str
+    scope: str
+    checkpoint: str
+    test_source: str
+
+
+@dataclass(frozen=True)
+class DoctorRuntimeSpec:
+    """One immutable inventory row and its composition-root factory."""
+
+    provider_id: str
+    transport_kind: TransportKind
+    runtime_id: str
+    adapter_id: str
+    runtime_profile_ref: str
+    factory: AdapterFactory
+    maturity: DoctorMaturity
+    evidence: DoctorConformanceEvidence
+    execution_target: ExecutionTarget = ExecutionTarget.LOCAL
+    profile_revision: int = 1
+    auth_ownership: AuthOwnership = AuthOwnership.NONE
+    usage_visibility: UsageVisibility = UsageVisibility.UNAVAILABLE
+
+    def to_profile(self) -> RuntimeProfile:
+        """Create the in-memory profile used only by this Doctor registry."""
+
+        return RuntimeProfile(
+            provider_id=self.provider_id,
+            transport_kind=self.transport_kind,
+            runtime_id=self.runtime_id,
+            adapter_id=self.adapter_id,
+            execution_target=self.execution_target,
+            runtime_profile_ref=self.runtime_profile_ref,
+            profile_revision=self.profile_revision,
+            auth_ownership=self.auth_ownership,
+            secret_ref_id=None,
+            usage_visibility=self.usage_visibility,
         )
 
-    if profile is not None and adapter is not None:
-        health_checks_passed = True
-        profile_values = {
-            "provider": profile.provider_id,
-            "transport": profile.transport_kind.value,
-            "runtime": profile.runtime_id,
-            "adapter": profile.adapter_id,
-            "execution_target": profile.execution_target.value,
-            "profile_ref": profile.runtime_profile_ref,
-            "profile_revision": profile.profile_revision,
-            "auth_ownership": profile.auth_ownership.value,
-            "usage_visibility": profile.usage_visibility.value,
-        }
-        for name, value in profile_values.items():
-            claims.append(
-                DoctorClaim(
-                    name=name,
-                    value=_safe_value(value),
-                    maturity=_claim_maturity(freshness, observed=True, compatible=compatible),
-                    evidence=_base_provenance(
-                        source="runtime.registry",
-                        exact_commit=exact_commit,
-                        generated_at=observed_at,
-                        command=DOCTOR_COMMAND,
-                        exit_code=exit_code,
-                        freshness=freshness,
-                    ),
-                )
-            )
+
+@dataclass(frozen=True)
+class DoctorRuntimeEntry:
+    """A sanitized report row for one inventoried runtime."""
+
+    provider_id: str
+    transport_kind: TransportKind
+    runtime_id: str
+    adapter_id: str
+    execution_target: ExecutionTarget
+    runtime_profile_ref: str
+    profile_revision: int
+    health: bool | None
+    health_source: str
+    readiness: bool | None
+    readiness_source: str
+    runtime_version: str | None
+    runtime_version_source: str
+    adapter_version: str | None
+    adapter_version_source: str
+    capabilities: RuntimeCapabilities | None
+    capabilities_source: str
+    maturity: DoctorMaturity
+    evidence_source: str
+    conformance_evidence: DoctorConformanceEvidence
+    error_category: DoctorErrorCategory | None
+
+
+@dataclass(frozen=True)
+class RuntimeDoctorReport:
+    """Immutable Doctor output with no raw exception or traceback material."""
+
+    contract_version: str
+    status: DoctorReportStatus
+    timestamp: datetime
+    entries: tuple[DoctorRuntimeEntry, ...]
+    error_category: DoctorErrorCategory | None
+
+    @property
+    def observed_at(self) -> datetime:
+        """Compatibility alias for consumers that call the timestamp observed_at."""
+
+        return self.timestamp
+
+
+_REFERENCE_IDENTITY = (
+    "polynexus",
+    TransportKind.LOCAL,
+    "reference",
+    "builtin.reference",
+    ExecutionTarget.LOCAL,
+)
+_CANONICAL_POLICIES_BY_PROFILE = {
+    "reference.local": (
+        _REFERENCE_IDENTITY,
+        DoctorMaturity.SUPPORTED,
+        "DETERMINISTIC_REFERENCE_RUNTIME",
+        ReferenceRuntimeAdapter,
+    ),
+    "conformance.codex.local": (
+        (
+            "polynexus",
+            TransportKind.LOCAL,
+            "codex-conformance",
+            "builtin.codex-conformance",
+            ExecutionTarget.LOCAL,
+        ),
+        DoctorMaturity.EXPERIMENTAL,
+        "DETERMINISTIC_LOCAL_CONFORMANCE",
+        CodexRuntimeAdapter,
+    ),
+    "conformance.opencode.local": (
+        (
+            "polynexus",
+            TransportKind.LOCAL,
+            "opencode-conformance",
+            "builtin.opencode-conformance",
+            ExecutionTarget.LOCAL,
+        ),
+        DoctorMaturity.EXPERIMENTAL,
+        "DETERMINISTIC_LOCAL_CONFORMANCE",
+        OpenCodeRuntimeAdapter,
+    ),
+}
+_CANONICAL_POLICIES_BY_IDENTITY = {
+    identity: (profile_ref, maturity, scope, factory)
+    for profile_ref, (identity, maturity, scope, factory) in _CANONICAL_POLICIES_BY_PROFILE.items()
+}
+_ALLOWED_EVIDENCE_OUTCOMES = frozenset({"PASS", "UNVERIFIED"})
+_ALLOWED_EVIDENCE_SCOPES = frozenset(
+    {
+        "DETERMINISTIC_REFERENCE_RUNTIME",
+        "DETERMINISTIC_LOCAL_CONFORMANCE",
+        "TEST_ONLY",
+    }
+)
+_PUBLIC_VERSION_MAX_LENGTH = 128
+_PUBLIC_EVIDENCE_MAX_LENGTH = 256
+_FORBIDDEN_PUBLIC_MARKERS = (
+    "secret",
+    "token",
+    "cookie",
+    "session",
+    "password",
+    "passwd",
+    "api_key",
+    "apikey",
+    "authorization",
+    "bearer",
+    "certified",
+    "production",
+    "supported",
+    "preview",
+)
+_CREDENTIAL_PUBLIC_PREFIXES = (
+    "sk-",
+    "ghp_",
+    "github_pat_",
+    "xoxb-",
+    "xoxp-",
+    "aiza",
+    "akia",
+)
+_ACCEPTED_INTEGRATION_CHECKPOINT = "65c6582c70c4e724005adb983d65aba10ea3e8be"
+_CUSTOM_TEST_EVIDENCE = DoctorConformanceEvidence(
+    source="TEST_EVIDENCE",
+    outcome="UNVERIFIED",
+    scope="TEST_ONLY",
+    checkpoint="test-checkpoint",
+    test_source="services/core/tests/test_wp16_runtime_doctor.py",
+)
+_CANONICAL_EVIDENCE_BY_PROFILE = {
+    "reference.local": DoctorConformanceEvidence(
+        source="DETERMINISTIC_REFERENCE_TESTS",
+        outcome="PASS",
+        scope="DETERMINISTIC_REFERENCE_RUNTIME",
+        checkpoint=_ACCEPTED_INTEGRATION_CHECKPOINT,
+        test_source="services/core/tests/test_runtime_skeleton.py",
+    ),
+    "conformance.codex.local": DoctorConformanceEvidence(
+        source="INDEPENDENT_CONFORMANCE_REVIEW",
+        outcome="PASS",
+        scope="DETERMINISTIC_LOCAL_CONFORMANCE",
+        checkpoint=_ACCEPTED_INTEGRATION_CHECKPOINT,
+        test_source="services/core/tests/test_wp14_codex_runtime.py",
+    ),
+    "conformance.opencode.local": DoctorConformanceEvidence(
+        source="INDEPENDENT_CONFORMANCE_REVIEW",
+        outcome="PASS",
+        scope="DETERMINISTIC_LOCAL_CONFORMANCE",
+        checkpoint=_ACCEPTED_INTEGRATION_CHECKPOINT,
+        test_source="services/core/tests/test_wp15_opencode_runtime.py",
+    ),
+}
+
+
+def _truthful_maturity_and_evidence(
+    spec: DoctorRuntimeSpec,
+    maturity: DoctorMaturity,
+) -> bool:
+    """Reject support or certification claims outside their approved scope."""
+
+    if (
+        spec.evidence.outcome not in _ALLOWED_EVIDENCE_OUTCOMES
+        or spec.evidence.scope not in _ALLOWED_EVIDENCE_SCOPES
+    ):
+        return False
+
+    identity = (
+        spec.provider_id,
+        spec.transport_kind,
+        spec.runtime_id,
+        spec.adapter_id,
+        spec.execution_target,
+    )
+    identity_policy = _CANONICAL_POLICIES_BY_IDENTITY.get(identity)
+    if identity_policy is not None:
+        expected_profile_ref, expected_maturity, expected_scope, expected_factory = identity_policy
+        return (
+            spec.runtime_profile_ref == expected_profile_ref
+            and maturity is expected_maturity
+            and spec.factory is expected_factory
+            and spec.evidence == _CANONICAL_EVIDENCE_BY_PROFILE[expected_profile_ref]
+            and spec.evidence.scope == expected_scope
+        )
+
+    profile_policy = _CANONICAL_POLICIES_BY_PROFILE.get(spec.runtime_profile_ref)
+    if profile_policy is not None:
+        expected_identity, expected_maturity, expected_scope, expected_factory = profile_policy
+        return (
+            identity == expected_identity
+            and maturity is expected_maturity
+            and spec.factory is expected_factory
+            and spec.evidence == _CANONICAL_EVIDENCE_BY_PROFILE[spec.runtime_profile_ref]
+            and spec.evidence.scope == expected_scope
+        )
+
+    # Custom inventories are a test seam only. Their explicit UNVERIFIED /
+    # TEST_ONLY tuple can exercise probe and failure paths, but can never
+    # publish a conformance PASS for an unrecognized runtime.
+    return maturity is DoctorMaturity.EXPERIMENTAL and spec.evidence == _CUSTOM_TEST_EVIDENCE
+
+
+def _utc_now() -> datetime:
+    return datetime.now(timezone.utc)
+
+
+def _safe_metadata(value: object) -> bool:
+    """Accept bounded static evidence without ever rendering it on failure."""
+
+    try:
+        if not isinstance(value, str) or not value or len(value) > 256:
+            return False
+        return all(
+            ord(character) >= 0x20 and character != "\x7f"
+            for character in value
+        )
+    except Exception:
+        return False
+
+
+def _safe_public_version(value: object) -> bool:
+    """Accept only a bounded, public-looking adapter version declaration."""
+
+    return _safe_public_token(value, max_length=_PUBLIC_VERSION_MAX_LENGTH)
+
+
+def _safe_public_token(value: object, *, max_length: int) -> bool:
+    """Accept bounded public metadata without credential-shaped material."""
+
+    try:
+        if (
+            not isinstance(value, str)
+            or len(value) > max_length
+            or not _safe_metadata(value)
+            or not value[0].isalnum()
+        ):
+            return False
+        normalized = value.casefold()
+        if any(marker in normalized for marker in _FORBIDDEN_PUBLIC_MARKERS):
+            return False
+        if normalized.startswith(_CREDENTIAL_PUBLIC_PREFIXES):
+            return False
+        return all(character.isalnum() or character in "._+:/-" for character in value)
+    except Exception:
+        return False
+
+
+def _prepare_inventory(
+    specs: tuple[DoctorRuntimeSpec, ...],
+    unreadable: bool,
+) -> tuple[tuple[DoctorRuntimeSpec, RuntimeProfile, DoctorMaturity], ...] | None:
+    """Validate the complete inventory before registering any row."""
+
+    if unreadable or not specs:
+        return None
+
+    seen_profile_refs: set[str] = set()
+    seen_adapter_ids: set[str] = set()
+    prepared: list[tuple[DoctorRuntimeSpec, RuntimeProfile, DoctorMaturity]] = []
+
+    for spec in specs:
+        if not isinstance(spec, DoctorRuntimeSpec):
+            return None
+        if not callable(spec.factory):
+            return None
+        if not isinstance(spec.runtime_profile_ref, str) or not spec.runtime_profile_ref or len(spec.runtime_profile_ref) > 256 or not _safe_metadata(spec.runtime_profile_ref):
+            return None
+        if not isinstance(spec.adapter_id, str) or not spec.adapter_id or len(spec.adapter_id) > 256 or not _safe_metadata(spec.adapter_id):
+            return None
         try:
-            capabilities = adapter.capabilities()
-            capability_values: dict[str, Any] = {
-                "cancel": capabilities.cancel,
-                "resume": capabilities.resume.value,
-                "artifacts": capabilities.artifacts,
-                "timeout_cleanup_verified": capabilities.timeout_cleanup_verified,
-                "usage_visibility": capabilities.usage_visibility.value,
-                "auth_ownership": capabilities.auth_ownership.value,
-            }
-            for name, value in capability_values.items():
-                claims.append(
-                    DoctorClaim(
-                        name=f"capability.{name}",
-                        value=_safe_value(value),
-                        maturity=_claim_maturity(freshness, observed=True, compatible=True),
-                        evidence=_base_provenance(
-                            source="runtime.adapter",
-                            exact_commit=exact_commit,
-                            generated_at=observed_at,
-                            command=DOCTOR_COMMAND,
-                            exit_code=exit_code,
-                            freshness=freshness,
-                        ),
-                    )
-                )
+            if spec.runtime_profile_ref in seen_profile_refs:
+                return None
+            if spec.adapter_id in seen_adapter_ids:
+                return None
         except Exception:
-            for name in (
-                "capability.cancel",
-                "capability.resume",
-                "capability.artifacts",
-                "capability.timeout_cleanup_verified",
-                "capability.usage_visibility",
-                "capability.auth_ownership",
-            ):
-                claims.append(
-                    DoctorClaim(
-                        name=name,
-                        value=None,
-                        maturity=MaturityState.UNVERIFIED,
-                        evidence=_base_provenance(
-                            source="runtime.adapter",
-                            exact_commit=exact_commit,
-                            generated_at=observed_at,
-                            command=DOCTOR_COMMAND,
-                            exit_code=1,
-                            freshness=EvidenceFreshness.UNVERIFIED,
-                        ),
-                    )
-                )
+            return None
+        if not isinstance(spec.transport_kind, TransportKind):
+            return None
+        if not isinstance(spec.execution_target, ExecutionTarget):
+            return None
+        if not isinstance(spec.auth_ownership, AuthOwnership):
+            return None
+        if not isinstance(spec.usage_visibility, UsageVisibility):
+            return None
+        if not isinstance(spec.profile_revision, int) or spec.profile_revision < 1:
+            return None
+        if not isinstance(spec.evidence, DoctorConformanceEvidence):
+            return None
+        if not all(
+            _safe_public_token(value, max_length=_PUBLIC_EVIDENCE_MAX_LENGTH)
+            for value in (
+                spec.evidence.source,
+                spec.evidence.outcome,
+                spec.evidence.scope,
+                spec.evidence.checkpoint,
+                spec.evidence.test_source,
+            )
+        ):
+            return None
+
         try:
-            version = adapter.version_info()
-            safe_version = _safe_value(version)
-            claims.append(
-                DoctorClaim(
-                    name="adapter_version",
-                    value=safe_version,
-                    maturity=_claim_maturity(
-                        freshness,
-                        observed=safe_version is not None,
-                        compatible=True,
-                    ),
-                    evidence=_base_provenance(
-                        source="runtime.adapter",
-                        exact_commit=exact_commit,
-                        generated_at=observed_at,
-                        command=DOCTOR_COMMAND,
-                        exit_code=exit_code,
-                        freshness=freshness,
-                    ),
-                )
-            )
+            maturity = DoctorMaturity(spec.maturity)
+            if not _truthful_maturity_and_evidence(spec, maturity):
+                return None
+            profile = spec.to_profile()
+        except asyncio.CancelledError:
+            return None
         except Exception:
-            claims.append(
-                DoctorClaim(
-                    name="adapter_version",
-                    value=None,
-                    maturity=MaturityState.UNVERIFIED,
-                    evidence=_base_provenance(
-                        source="runtime.adapter",
-                        exact_commit=exact_commit,
-                        generated_at=observed_at,
-                        command=DOCTOR_COMMAND,
-                        exit_code=1,
-                        freshness=EvidenceFreshness.UNVERIFIED,
-                    ),
-                )
-            )
+            return None
+
         try:
-            route_probe = getattr(adapter, "route_evidence", None)
-            if not callable(route_probe):
-                route_probe = None
-            if route_probe is None:
-                raise LookupError
-            route_evidence = route_probe()
-            timeout_seconds = float(route_evidence.timeout_seconds)
-            timeout_value: int | str | None = (
-                int(timeout_seconds)
-                if timeout_seconds.is_integer()
-                else format(timeout_seconds, ".3f").rstrip("0").rstrip(".")
-            )
-            route_values = {
-                "route.endpoint": route_evidence.endpoint_identity,
-                "route.model": route_evidence.model_identity,
-                "route.policy": route_evidence.route,
-                "route.timeout_seconds": timeout_value,
-                "route.safe_error": route_evidence.safe_error or None,
-            }
-            for name, value in route_values.items():
-                claims.append(
-                    DoctorClaim(
-                        name=name,
-                        value=_safe_value(value),
-                        maturity=_claim_maturity(
-                            freshness,
-                            observed=True,
-                            compatible=True,
-                        ),
-                        evidence=_base_provenance(
-                            source="runtime.routing",
-                            exact_commit=exact_commit,
-                            generated_at=observed_at,
-                            command=DOCTOR_COMMAND,
-                            exit_code=exit_code,
-                            freshness=freshness,
-                        ),
-                    )
-                )
-        except LookupError:
-            pass
+            seen_profile_refs.add(spec.runtime_profile_ref)
+            seen_adapter_ids.add(spec.adapter_id)
         except Exception:
-            claims.append(
-                DoctorClaim(
-                    name="route.policy",
-                    value=None,
-                    maturity=MaturityState.UNVERIFIED,
-                    evidence=_base_provenance(
-                        source="runtime.routing",
-                        exact_commit=exact_commit,
-                        generated_at=observed_at,
-                        command=DOCTOR_COMMAND,
-                        exit_code=1,
-                        freshness=EvidenceFreshness.UNVERIFIED,
-                    ),
-                )
+            return None
+        prepared.append((spec, profile, maturity))
+
+    return tuple(prepared)
+
+
+def _sanitize_capabilities(value: object) -> RuntimeCapabilities | None:
+    """Rebuild only validated capability fields for the public report."""
+
+    try:
+        if type(value) is not RuntimeCapabilities:
+            return None
+        if not all(
+            isinstance(field, bool)
+            for field in (
+                value.cancel,
+                value.artifacts,
+                value.timeout_cleanup_verified,
             )
-        for name, probe in (("health", adapter.health), ("readiness", adapter.readiness)):
+        ):
+            return None
+        if not isinstance(value.resume, ResumeMode):
+            return None
+        if not isinstance(value.usage_visibility, UsageVisibility):
+            return None
+        if not isinstance(value.auth_ownership, AuthOwnership):
+            return None
+        return RuntimeCapabilities(
+            cancel=value.cancel,
+            resume=value.resume,
+            artifacts=value.artifacts,
+            timeout_cleanup_verified=value.timeout_cleanup_verified,
+            usage_visibility=value.usage_visibility,
+            auth_ownership=value.auth_ownership,
+        )
+    except Exception:
+        return None
+
+
+async def _probe_bool(
+    adapter: RuntimeAdapter,
+    method_name: str,
+    failure_category: DoctorErrorCategory,
+    timeout_seconds: float,
+) -> tuple[bool | None, DoctorErrorCategory | None]:
+    """Run one asynchronous boolean probe with cancellation-aware timeout."""
+
+    try:
+        method = getattr(adapter, method_name)
+        operation = method()
+        result = await asyncio.wait_for(operation, timeout=timeout_seconds)
+    except asyncio.TimeoutError:
+        return None, DoctorErrorCategory.PROBE_TIMEOUT
+    except asyncio.CancelledError:
+        raise
+    except Exception:
+        return None, failure_category
+
+    if not isinstance(result, bool):
+        return None, failure_category
+    return result, None
+
+
+DEFAULT_DOCTOR_RUNTIME_SPECS: tuple[DoctorRuntimeSpec, ...] = (
+    DoctorRuntimeSpec(
+        provider_id="polynexus",
+        transport_kind=TransportKind.LOCAL,
+        runtime_id="reference",
+        adapter_id="builtin.reference",
+        runtime_profile_ref="reference.local",
+        factory=ReferenceRuntimeAdapter,
+        maturity=DoctorMaturity.SUPPORTED,
+        evidence=DoctorConformanceEvidence(
+            source="DETERMINISTIC_REFERENCE_TESTS",
+            outcome="PASS",
+            scope="DETERMINISTIC_REFERENCE_RUNTIME",
+            checkpoint=_ACCEPTED_INTEGRATION_CHECKPOINT,
+            test_source="services/core/tests/test_runtime_skeleton.py",
+        ),
+    ),
+    DoctorRuntimeSpec(
+        provider_id="polynexus",
+        transport_kind=TransportKind.LOCAL,
+        runtime_id="codex-conformance",
+        adapter_id="builtin.codex-conformance",
+        runtime_profile_ref="conformance.codex.local",
+        factory=CodexRuntimeAdapter,
+        maturity=DoctorMaturity.EXPERIMENTAL,
+        evidence=DoctorConformanceEvidence(
+            source="INDEPENDENT_CONFORMANCE_REVIEW",
+            outcome="PASS",
+            scope="DETERMINISTIC_LOCAL_CONFORMANCE",
+            checkpoint=_ACCEPTED_INTEGRATION_CHECKPOINT,
+            test_source="services/core/tests/test_wp14_codex_runtime.py",
+        ),
+    ),
+    DoctorRuntimeSpec(
+        provider_id="polynexus",
+        transport_kind=TransportKind.LOCAL,
+        runtime_id="opencode-conformance",
+        adapter_id="builtin.opencode-conformance",
+        runtime_profile_ref="conformance.opencode.local",
+        factory=OpenCodeRuntimeAdapter,
+        maturity=DoctorMaturity.EXPERIMENTAL,
+        evidence=DoctorConformanceEvidence(
+            source="INDEPENDENT_CONFORMANCE_REVIEW",
+            outcome="PASS",
+            scope="DETERMINISTIC_LOCAL_CONFORMANCE",
+            checkpoint=_ACCEPTED_INTEGRATION_CHECKPOINT,
+            test_source="services/core/tests/test_wp15_opencode_runtime.py",
+        ),
+    ),
+)
+
+
+class RuntimeDoctor:
+    """Collect a deterministic report from a private Doctor registry."""
+
+    def __init__(
+        self,
+        specs: Sequence[DoctorRuntimeSpec] = DEFAULT_DOCTOR_RUNTIME_SPECS,
+        *,
+        clock: Callable[[], datetime] = _utc_now,
+        probe_timeout: float = DEFAULT_PROBE_TIMEOUT_SECONDS,
+    ) -> None:
+        try:
+            self._specs = tuple(specs)
+            self._inventory_unreadable = False
+        except asyncio.CancelledError:
+            self._specs = ()
+            self._inventory_unreadable = True
+        except Exception:
+            self._specs = ()
+            self._inventory_unreadable = True
+        if not isinstance(probe_timeout, (int, float)) or isinstance(probe_timeout, bool):
+            raise ValueError("probe_timeout must be a finite positive number")
+        if not math.isfinite(float(probe_timeout)) or probe_timeout <= 0:
+            raise ValueError("probe_timeout must be a finite positive number")
+        self._clock = clock
+        self._probe_timeout = float(probe_timeout)
+
+    @property
+    def specs(self) -> tuple[DoctorRuntimeSpec, ...]:
+        """Return the immutable ordered inventory owned by this Doctor."""
+
+        return self._specs
+
+    async def collect(self) -> RuntimeDoctorReport:
+        """Collect one report without exposing raw failures to the caller."""
+
+        timestamp, timestamp_error = self._timestamp()
+        inventory = _prepare_inventory(self._specs, self._inventory_unreadable)
+        if inventory is None:
+            return RuntimeDoctorReport(
+                contract_version=DOCTOR_CONTRACT_VERSION,
+                status=DoctorReportStatus.FAILED,
+                timestamp=timestamp,
+                entries=(),
+                error_category=DoctorErrorCategory.INVENTORY_INVALID,
+            )
+
+        registry = RuntimeRegistry()
+        for spec, profile, _ in inventory:
             try:
-                value = await probe()
-                if value is not True:
-                    health_checks_passed = False
-                claims.append(
-                    DoctorClaim(
-                        name=name,
-                        value=value is True,
-                        maturity=_claim_maturity(
-                            freshness,
-                            observed=True,
-                            compatible=value is True,
-                        ),
-                        evidence=_base_provenance(
-                            source="runtime.adapter",
-                            exact_commit=exact_commit,
-                            generated_at=observed_at,
-                            command=DOCTOR_COMMAND,
-                            exit_code=exit_code,
-                            freshness=freshness,
-                        ),
-                    )
+                registry.register(profile, spec.factory)
+            except asyncio.CancelledError:
+                return RuntimeDoctorReport(
+                    contract_version=DOCTOR_CONTRACT_VERSION,
+                    status=DoctorReportStatus.FAILED,
+                    timestamp=timestamp,
+                    entries=(),
+                    error_category=DoctorErrorCategory.INVENTORY_INVALID,
                 )
             except Exception:
-                health_checks_passed = False
-                claims.append(
-                    DoctorClaim(
-                        name=name,
-                        value=None,
-                        maturity=MaturityState.UNVERIFIED,
-                        evidence=_base_provenance(
-                            source="runtime.adapter",
-                            exact_commit=exact_commit,
-                            generated_at=observed_at,
-                            command=DOCTOR_COMMAND,
-                            exit_code=1,
-                            freshness=EvidenceFreshness.UNVERIFIED,
-                        ),
-                    )
+                return RuntimeDoctorReport(
+                    contract_version=DOCTOR_CONTRACT_VERSION,
+                    status=DoctorReportStatus.FAILED,
+                    timestamp=timestamp,
+                    entries=(),
+                    error_category=DoctorErrorCategory.INVENTORY_INVALID,
                 )
 
-    schema_ok = schema_head_status()
-    claims.append(
-        DoctorClaim(
-            name="schema_head",
-            value=schema_ok,
-            maturity=_claim_maturity(
-                freshness,
-                observed=True,
-                compatible=schema_ok,
-            ),
-            evidence=_base_provenance(
-                source="persistence.schema",
-                exact_commit=exact_commit,
-                generated_at=observed_at,
-                command=SCHEMA_COMMAND,
-                exit_code=exit_code if schema_ok else 1,
-                freshness=(freshness if schema_ok else EvidenceFreshness.UNVERIFIED),
-            ),
+        collected_entries: list[DoctorRuntimeEntry] = []
+        for spec, profile, maturity in inventory:
+            collected_entries.append(
+                await self._collect_entry(registry, spec, profile, maturity)
+            )
+        entries = tuple(collected_entries)
+        report_error = timestamp_error
+        if report_error is None:
+            report_error = next(
+                (entry.error_category for entry in entries if entry.error_category is not None),
+                None,
+            )
+        status = (
+            DoctorReportStatus.PARTIAL
+            if report_error is not None
+            else DoctorReportStatus.COMPLETE
         )
+        return RuntimeDoctorReport(
+            contract_version=DOCTOR_CONTRACT_VERSION,
+            status=status,
+            timestamp=timestamp,
+            entries=entries,
+            error_category=report_error,
+        )
+
+    def _timestamp(self) -> tuple[datetime, DoctorErrorCategory | None]:
+        try:
+            value = self._clock()
+            if not isinstance(value, datetime) or value.tzinfo is None:
+                raise ValueError
+            return value.astimezone(timezone.utc), None
+        except asyncio.CancelledError:
+            return _utc_now(), DoctorErrorCategory.TIMESTAMP_FAILURE
+        except Exception:
+            return _utc_now(), DoctorErrorCategory.TIMESTAMP_FAILURE
+
+    async def _collect_entry(
+        self,
+        registry: RuntimeRegistry,
+        spec: DoctorRuntimeSpec,
+        profile: RuntimeProfile,
+        maturity: DoctorMaturity,
+    ) -> DoctorRuntimeEntry:
+        adapter: RuntimeAdapter | None = None
+        try:
+            adapter = registry._create_adapter_for_observation(profile)
+        except asyncio.CancelledError:
+            return DoctorRuntimeEntry(
+                provider_id=spec.provider_id,
+                transport_kind=spec.transport_kind,
+                runtime_id=spec.runtime_id,
+                adapter_id=spec.adapter_id,
+                execution_target=spec.execution_target,
+                runtime_profile_ref=spec.runtime_profile_ref,
+                profile_revision=spec.profile_revision,
+                health=None,
+                health_source=UNAVAILABLE,
+                readiness=None,
+                readiness_source=UNAVAILABLE,
+                runtime_version=None,
+                runtime_version_source=UNAVAILABLE,
+                adapter_version=None,
+                adapter_version_source=UNAVAILABLE,
+                capabilities=None,
+                capabilities_source=UNAVAILABLE,
+                maturity=maturity,
+                evidence_source=spec.evidence.source,
+                conformance_evidence=spec.evidence,
+                error_category=DoctorErrorCategory.FACTORY_FAILURE,
+            )
+        except Exception:
+            return DoctorRuntimeEntry(
+                provider_id=spec.provider_id,
+                transport_kind=spec.transport_kind,
+                runtime_id=spec.runtime_id,
+                adapter_id=spec.adapter_id,
+                execution_target=spec.execution_target,
+                runtime_profile_ref=spec.runtime_profile_ref,
+                profile_revision=spec.profile_revision,
+                health=None,
+                health_source=UNAVAILABLE,
+                readiness=None,
+                readiness_source=UNAVAILABLE,
+                runtime_version=None,
+                runtime_version_source=UNAVAILABLE,
+                adapter_version=None,
+                adapter_version_source=UNAVAILABLE,
+                capabilities=None,
+                capabilities_source=UNAVAILABLE,
+                maturity=maturity,
+                evidence_source=spec.evidence.source,
+                conformance_evidence=spec.evidence,
+                error_category=DoctorErrorCategory.FACTORY_FAILURE,
+            )
+
+        health, health_error = await _probe_bool(
+            adapter,
+            "health",
+            DoctorErrorCategory.HEALTH_FAILURE,
+            self._probe_timeout,
+        )
+        readiness, readiness_error = await _probe_bool(
+            adapter,
+            "readiness",
+            DoctorErrorCategory.READINESS_FAILURE,
+            self._probe_timeout,
+        )
+
+        capabilities: RuntimeCapabilities | None = None
+        try:
+            value = getattr(adapter, "capabilities")()
+            capabilities = _sanitize_capabilities(value)
+            if capabilities is None:
+                raise TypeError
+        except asyncio.CancelledError:
+            capabilities_error = DoctorErrorCategory.CAPABILITIES_FAILURE
+        except Exception:
+            capabilities_error = DoctorErrorCategory.CAPABILITIES_FAILURE
+        else:
+            capabilities_error = None
+
+        adapter_version: str | None = None
+        try:
+            value = getattr(adapter, "version_info")()
+            if _safe_public_version(value):
+                adapter_version = value
+            else:
+                raise TypeError
+        except asyncio.CancelledError:
+            version_error = DoctorErrorCategory.VERSION_FAILURE
+        except Exception:
+            version_error = DoctorErrorCategory.VERSION_FAILURE
+        else:
+            version_error = None
+
+        error_category = next(
+            (
+                category
+                for category in (
+                    health_error,
+                    readiness_error,
+                    capabilities_error,
+                    version_error,
+                )
+                if category is not None
+            ),
+            None,
+        )
+        return self._entry(
+            spec,
+            maturity,
+            health=health,
+            readiness=readiness,
+            capabilities=capabilities,
+            adapter_version=adapter_version,
+            error_category=error_category,
+        )
+
+    @staticmethod
+    def _entry(
+        spec: DoctorRuntimeSpec,
+        maturity: DoctorMaturity,
+        *,
+        health: bool | None,
+        readiness: bool | None,
+        capabilities: RuntimeCapabilities | None,
+        adapter_version: str | None,
+        error_category: DoctorErrorCategory | None,
+    ) -> DoctorRuntimeEntry:
+        return DoctorRuntimeEntry(
+            provider_id=spec.provider_id,
+            transport_kind=spec.transport_kind,
+            runtime_id=spec.runtime_id,
+            adapter_id=spec.adapter_id,
+            execution_target=spec.execution_target,
+            runtime_profile_ref=spec.runtime_profile_ref,
+            profile_revision=spec.profile_revision,
+            health=health,
+            health_source=CURRENT_PROBE,
+            readiness=readiness,
+            readiness_source=CURRENT_PROBE,
+            runtime_version=None,
+            runtime_version_source=UNAVAILABLE,
+            adapter_version=adapter_version,
+            adapter_version_source=ADAPTER_DECLARATION,
+            capabilities=capabilities,
+            capabilities_source=ADAPTER_DECLARATION,
+            maturity=maturity,
+            evidence_source=spec.evidence.source,
+            conformance_evidence=spec.evidence,
+            error_category=error_category,
+        )
+
+
+def build_default_doctor(
+    *,
+    clock: Callable[[], datetime] = _utc_now,
+    probe_timeout: float = DEFAULT_PROBE_TIMEOUT_SECONDS,
+) -> RuntimeDoctor:
+    """Build the dedicated Doctor composition root."""
+
+    return RuntimeDoctor(
+        DEFAULT_DOCTOR_RUNTIME_SPECS,
+        clock=clock,
+        probe_timeout=probe_timeout,
     )
 
-    claims = claims[:MAX_CLAIMS]
-    if not claims:
-        report_freshness = EvidenceFreshness.NOT_PRESENT
-    elif any(claim.evidence.freshness is not EvidenceFreshness.CURRENT for claim in claims):
-        report_freshness = EvidenceFreshness.UNVERIFIED
-    else:
-        report_freshness = EvidenceFreshness.CURRENT
-    if report_freshness is not EvidenceFreshness.CURRENT:
-        report_maturity = MaturityState.UNVERIFIED
-    elif not compatible:
-        report_maturity = MaturityState.INCOMPATIBLE
-    elif (
-        not schema_ok
-        or not health_checks_passed
-        or any(claim.maturity is MaturityState.UNVERIFIED for claim in claims)
-    ):
-        report_maturity = MaturityState.UNVERIFIED
-    else:
-        # Current evidence is sufficient for PREVIEW only.  Certification is
-        # owned by the independent conformance/acceptance gate, not Doctor.
-        report_maturity = MaturityState.PREVIEW
-    return DoctorReport(
-        generated_at=observed_at,
-        freshness=report_freshness,
-        maturity=report_maturity,
-        claims=tuple(claims),
-    )
+
+# G18 compatibility boundary.  The older source-bound freshness report remains
+# available to existing Core consumers while WP-16 exposes RuntimeDoctor's
+# separate inventory report.  The wrapper forwards the current module's safe
+# schema probe so tests and callers can replace that probe without reaching
+# through this module boundary.
+from polynexus_core.runtime import doctor_legacy as _doctor_legacy
+
+DoctorClaim = _doctor_legacy.DoctorClaim
+DoctorReport = _doctor_legacy.DoctorReport
+EvidenceFreshness = _doctor_legacy.EvidenceFreshness
+EvidenceProvenance = _doctor_legacy.EvidenceProvenance
+MaturityState = _doctor_legacy.MaturityState
+MAX_CLAIMS = _doctor_legacy.MAX_CLAIMS
+DOCTOR_COMMAND = _doctor_legacy.DOCTOR_COMMAND
+SCHEMA_COMMAND = _doctor_legacy.SCHEMA_COMMAND
+
+
+async def collect_doctor_report(*args, **kwargs):  # type: ignore[no-untyped-def]
+    _doctor_legacy.schema_head_status = schema_head_status
+    return await _doctor_legacy.collect_doctor_report(*args, **kwargs)
+
+
+__all__ = [
+    "ADAPTER_DECLARATION",
+    "CURRENT_PROBE",
+    "DEFAULT_DOCTOR_RUNTIME_SPECS",
+    "DEFAULT_PROBE_TIMEOUT_SECONDS",
+    "DOCTOR_CONTRACT_VERSION",
+    "DoctorConformanceEvidence",
+    "DoctorClaim",
+    "DoctorErrorCategory",
+    "DoctorMaturity",
+    "DoctorReport",
+    "DoctorReportStatus",
+    "DoctorRuntimeEntry",
+    "DoctorRuntimeSpec",
+    "EvidenceFreshness",
+    "EvidenceProvenance",
+    "MaturityState",
+    "RuntimeDoctor",
+    "RuntimeDoctorReport",
+    "UNAVAILABLE",
+    "build_default_doctor",
+    "collect_doctor_report",
+]

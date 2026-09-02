@@ -1,12 +1,58 @@
 # Project State
 
-## Current Operational State — 2026-09-02 (G24 ledger reconciliation — CURRENT)
+## Current Operational State — 2026-09-02 (G25 runtime adapters and Doctor — CURRENT)
 
-This is the authoritative current-state block. The G23 and earlier snapshots
-below remain provenance history and do not override it.
+This is the authoritative current-state block. Earlier snapshots below remain
+provenance history and do not override it.
+
+- **Goal:** `G25-RUNTIME-ADAPTERS-AND-DOCTOR-ACCEPTANCE`.
+- **G25 status:** `HUMAN_ACCEPTED / COMMIT_PENDING`; Human decision received:
+  `G25_DECISION=ACCEPT_AND_COMMIT_PUSH`. No commit or push has occurred yet.
+- **G24 formal checkpoint:** `HUMAN_ACCEPTED / PASS / COMPLETE` with
+  `G24_OUTPUT_SHA=61cc7420e290cd93eda787c30b54a93edf4ca9a`; approved remote ref
+  `feature/g24-g30-development-completion-routing` resolves to that exact SHA.
+  Project score is `59/100`.
+- **G24 clean clone:** `artifacts/worktrees/g25-runtime-adapters-doctor` was
+  clean and staged-empty at the predecessor before G25 edits; exact-ref check
+  exited `0`.
+- **G25 lane:** this candidate is based directly on the exact predecessor. The
+  protected primary checkout `D:\AI學習教材\PolyNexus` was not modified.
+- **Candidate score:** WP-14 `+5`, WP-15 `+5`, WP-16 `+3` are Human-authorized
+  evidence candidates; accepted progress remains `59/100` until checkpoint
+  verification. Candidate target: `72/100`.
+- **Current evidence:** WP-14 `31 passed`, WP-15 `36 passed`, WP-16 `58 passed`,
+  G18 compatibility `7 passed`, packaging `3 passed`, and Full Core exited `0`
+  with one Windows-policy symlink skip. Baseline exited `0`; governance
+  validator passed with system Windows PowerShell, exit `0`.
+- **Integration boundary:** Registry execution compatibility remains in
+  `create_adapter()`; Doctor uses a bounded private observation factory so
+  declaration/probe failures stay separate. `doctor_legacy.py` preserves the
+  accepted G18 public surface.
+- **Independent review:** Carver completed the bounded read-only review with
+  `PASS`, `BLOCKER=0`, `MAJOR=0`, `MINOR=0`. Human authorization is recorded;
+  commit, push, and checkpoint verification remain pending.
+- **Maturity:** Codex and OpenCode remain local deterministic `EXPERIMENTAL`
+  implementations. Doctor reports observations conservatively and does not
+  promote them to production support or certification. Live vendor journeys,
+  native MV3 dispatch, credentials, cookies, tokens, cloud fallback, and
+  external send remain outside this Goal.
+- **ADR / scope:** `ADR_IMPACT=ADR-012 integration addendum; ADR-011 preserved`.
+  `SCOPE_DEVIATION=BOUNDED_G25_INTEGRATION`: the private Registry observation
+  seam and legacy Doctor compatibility module are directly required to combine
+  WP-14/15/16 without changing public contracts, persistence schema, or Run
+  identity.
+- **Next action:** perform the exact authorized Git closeout and clean-clone
+  verification. G26 must not start from this task.
+
+
+## Historical Operational State — 2026-09-02 (G24 ledger reconciliation before G25)
+
+This is the historical G24 pre-acceptance reconciliation record. The G25 block
+above is authoritative; this record remains provenance only.
 
 - **Goal:** `G24-DEVELOPMENT-LEDGER-AND-EVIDENCE-RECONCILIATION`.
-- **G24 status:** `VERIFIED_PASS_PENDING_HUMAN`; documentation/evidence only;
+- **G24 pre-acceptance status:** `VERIFIED_PASS_PENDING_HUMAN`; documentation/
+  evidence only before the Human confirmation;
   no product behavior or score is added.
 - **Independent review:** `VERIFIED_PASS`; `BLOCKER=0`, `MAJOR=0`, `MINOR=0`.
 - **G24 predecessor:** exact `fde4c8f1d017992755c6af2bd600c9bd715efd6b` on
@@ -47,9 +93,9 @@ below remain provenance history and do not override it.
   `<GOAL>_DECISION=ACCEPT_AND_COMMIT_PUSH`; it never authorizes scope/ADR change,
   secret handling, automatic external send, force push, remote reconfiguration,
   or the next Goal.
-- **Planning checkpoint:** the approved remote ref resolves to the exact G24
-  predecessor above. `G24_OUTPUT_SHA=PENDING` until the Human Git gate authorizes
-  one commit and non-force push. `NEXT_GOAL_READY=G25_PENDING_HUMAN_DECISION`.
+- **Historical planning checkpoint:** before Human confirmation the output SHA
+  was pending. The confirmed value and G25 routing state are recorded in the
+  authoritative G25 block above.
 - **Architecture / scope:** `ADR_IMPACT=NONE`; `SCOPE_DEVIATION=NONE`.
   ADR-001–011, Core contracts, Domain, workflow semantics, and persistence are
   unchanged by this planning package.
@@ -474,3 +520,46 @@ WP-09B, WP-09C, WP-09D, WP-10, WP-11, WP-12 and WP-13 are accepted. CP-02 is com
 - Accepted project progress is **30/100 = 30%**; accepted FVS progress is **22/22 = 100%**; WP-10 earns **2/2 CP-02 points**.
 - CP-02 First Vertical Slice is complete. WP-11 is `ACCEPTED` (Attempt 4): Codex review PASS and Human acceptance recorded on 2026-08-20; `services/core/tests/test_wp11_work_mode.py` has 23 passed, full Core is `193 collected / 192 passed / 1 skipped`, and `validate_baseline.py` is PASS. WP-11 item progress is 100%. The roadmap does not define a standalone WP-11 point allocation inside CP-03, so accepted project progress remains **30/100** until that allocation is explicitly recorded; CP-03 is now in progress. Next owner: WP-12 planning.
 - WP-12 is `ACCEPTED` (Attempt 8): 45 contract tests PASS, full Core 238 collected / 237 passed / 1 skipped, `validate_baseline.py` PASS, Codex PASS and Human acceptance recorded on 2026-08-21, and commit `d6823d6` pushed. WP-13 is the next task; CP-03 point allocation remains deferred until CP-03 completion.
+## Current Operational State — 2026-09-02 (G25 runtime adapters and Doctor — CURRENT)
+
+This is the authoritative current-state block. Earlier snapshots below remain
+provenance history and do not override it.
+
+- **Goal:** `G25-RUNTIME-ADAPTERS-AND-DOCTOR-ACCEPTANCE`.
+- **G25 status:** `HUMAN_ACCEPTED / COMMIT_PENDING`; Human decision received:
+  `G25_DECISION=ACCEPT_AND_COMMIT_PUSH`. No commit or push has occurred yet.
+- **G24 formal checkpoint:** `HUMAN_ACCEPTED / PASS / COMPLETE` with
+  `G24_OUTPUT_SHA=61cc7420e290cd93eda787c30b54a93edf4ca9a`; approved remote ref
+  `feature/g24-g30-development-completion-routing` resolves to that exact SHA.
+  Project score is `59/100`.
+- **G24 clean clone:** `artifacts/worktrees/g25-runtime-adapters-doctor` was
+  clean and staged-empty at the predecessor before G25 edits; exact-ref check
+  exited `0`.
+- **G25 lane:** this candidate is based directly on the exact predecessor. The
+  protected primary checkout `D:\AI學習教材\PolyNexus` was not modified.
+- **Candidate score:** WP-14 `+5`, WP-15 `+5`, WP-16 `+3` are Human-authorized
+  evidence candidates; accepted progress remains `59/100` until checkpoint
+  verification. Candidate target: `72/100`.
+- **Current evidence:** WP-14 `31 passed`, WP-15 `36 passed`, WP-16 `58 passed`,
+  G18 compatibility `7 passed`, packaging `3 passed`, and Full Core exited `0`
+  with one Windows-policy symlink skip. Baseline exited `0`; governance
+  validator passed with system Windows PowerShell, exit `0`.
+- **Integration boundary:** Registry execution compatibility remains in
+  `create_adapter()`; Doctor uses a bounded private observation factory so
+  declaration/probe failures stay separate. `doctor_legacy.py` preserves the
+  accepted G18 public surface.
+- **Independent review:** Carver completed the bounded read-only review with
+  `PASS`, `BLOCKER=0`, `MAJOR=0`, `MINOR=0`. Human authorization is recorded;
+  commit, push, and checkpoint verification remain pending.
+- **Maturity:** Codex and OpenCode remain local deterministic `EXPERIMENTAL`
+  implementations. Doctor reports observations conservatively and does not
+  promote them to production support or certification. Live vendor journeys,
+  native MV3 dispatch, credentials, cookies, tokens, cloud fallback, and
+  external send remain outside this Goal.
+- **ADR / scope:** `ADR_IMPACT=ADR-012 integration addendum; ADR-011 preserved`.
+  `SCOPE_DEVIATION=BOUNDED_G25_INTEGRATION`: the private Registry observation
+  seam and legacy Doctor compatibility module are directly required to combine
+  WP-14/15/16 without changing public contracts, persistence schema, or Run
+  identity.
+- **Next action:** perform the exact authorized Git closeout and clean-clone
+  verification. G26 must not start from this task.

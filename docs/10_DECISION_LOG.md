@@ -68,6 +68,36 @@ V1 補足最小必要：Compatibility/Migration、Evaluation/Quality、Cost/Reso
 - Planning package 必須先獨立 checkpoint 並記錄 immutable `G24_START_SHA`；該 SHA 未建立以前 G24 維持 `WAIT`。
 - 本決策是治理、進度與 routing 更新，`ADR_IMPACT=NONE`、`SCOPE_DEVIATION=NONE`，不修改 ADR-001～011 或 Core contract。
 
+### D12 — WP-16 Runtime Doctor Reporting — HUMAN ACCEPTED / IMPLEMENTATION AUTHORIZED (2026-08-27)
+
+#### G25 integration addendum — 2026-09-02
+
+The G25 combined lane adds only a bounded private Registry observation factory
+and `doctor_legacy.py` compatibility surface. Normal `create_adapter()` keeps
+its execution-time capability/auth validation; Doctor uses the observation path
+to distinguish declaration/probe failures from factory failures. No public
+runtime contract, Run identity, persistence schema, migration authority,
+vendor-specific Core branch, or production-support claim changes. The addendum
+is subject to the current G25 independent-review and final Human gate.
+
+#### G25 final Git gate authorization — ACCEPT_AND_COMMIT_PUSH (2026-09-02)
+
+Human explicitly authorized `G25_DECISION=ACCEPT_AND_COMMIT_PUSH` for the exact
+G25 allowlist, proposed commit message, and approved remote ref recorded in
+`docs/12_HANDOFF_CURRENT.md`. Independent Carver review is `PASS` with
+`BLOCKER=0`, `MAJOR=0`, `MINOR=0`; baseline and governance validators passed
+with exit `0`. The `+13` remains conditional until the exact commit is pushed,
+the remote SHA is verified, and the fresh clean-clone verification succeeds.
+No force push, remote reconfiguration, extra path, secret handling, external
+send, or G26 start is authorized.
+
+- WP-16 v1 採 Core-only、deterministic、read-only Doctor MVP；不新增 API、UI、DB、migration、network、credentials、real vendor CLI 或 persistence。
+- Doctor 使用專用 composition root 與 immutable ordered inventory，建立 fresh `RuntimeRegistry`；不修改 `build_default_registry()`、`RuntimeAdapter` method set、`ExecutionService`、supervisor、domain 或 persistence，也不新增 general Registry enumeration contract。
+- `reference.local` 僅在 `DETERMINISTIC_REFERENCE_RUNTIME` 範圍標示 `SUPPORTED`；Codex/OpenCode 僅標示 `EXPERIMENTAL` 與 `DETERMINISTIC_LOCAL_CONFORMANCE`，不得宣稱 production、`SUPPORTED`、`CERTIFIED` 或實際 vendor detection。
+- health/readiness 是 `CURRENT_PROBE`；capabilities/version 是 adapter declaration；conformance evidence 另列 outcome、scope、checkpoint 與 test source。Codex/OpenCode 無獨立 runtime version 時回報 `None` / `UNAVAILABLE`，不得把 adapter version 冒充 runtime version。
+- factory、probe、timeout、invalid inventory 均 fail closed；報告只保留固定 error category，不保留 raw exception、message、args、cause、context 或 traceback。factory failure 形成 partial row 並繼續其他 rows；inventory invalid 回報 `FAILED` 且 entries 為空。
+- Architecture record 與 implementation exact allowlist 見 `docs/31_ADR_012_RUNTIME_DOCTOR_REPORTING.md` 與 `docs/tasks/WP-16.md`。本決策只授權本輪 implementation；fresh independent Codex review、Human acceptance、stage、commit、named-ref push 與後續 WP-16 work 仍是分離 gates。
+
 ## Architecture Decisions
 
 ADR-001～010 全部 CONFIRMED；詳見 `18_ARCHITECTURE_DECISIONS.md`。
