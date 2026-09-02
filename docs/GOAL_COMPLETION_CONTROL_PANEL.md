@@ -17,8 +17,11 @@ Browser-readable companion: [GOAL_COMPLETION_CONTROL_PANEL.html](GOAL_COMPLETION
 - `BROWSER_BOUNDARY`: G21 HTTPS predecessor artifact is `3/3` golden and
   `28/28` failure paths with observed external requests `0` and cleanup PASS;
   native MV3 worker and live vendor behavior remain `UNVERIFIED`.
-- `CROSS_MACHINE`: `CROSS_MACHINE_CONTINUATION_READY`; clean clone at
-  `g22-clean-20260902` matched checkpoint `532ce8f1…` and passed required gates.
+- `CROSS_MACHINE`: `CROSS_MACHINE_CONTINUATION_READY`; validated product
+  checkpoint `532ce8f1…` matched clean clone `g22-clean-20260902` and passed
+  required gates. Later independently reviewed evidence-state tip `9a17716f…`
+  matched final clean clone `g22-clean-final-20260902`; current final branch tip
+  is resolved from the approved remote and published in the completion result.
 - `NEXT_GOAL_READY`: `G23` — final reconciliation and Human acceptance packet.
 
 ## G21 bounded real-browser WP21 checkpoint — 2026-09-02

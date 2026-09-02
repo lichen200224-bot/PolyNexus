@@ -66,9 +66,15 @@ check found a line-ending hash mismatch.
 ## Delivery and cross-machine gate
 
 The G22 artifact index records current commands and inherited G21 evidence. The
-exact-allowlist checkpoint was pushed to the approved remote; a clean clone at
-that checkpoint contains the required paths, has clean Git state, and passed
-baseline, targeted Core, browser-companion, and Web install/test/build checks.
+validated product checkpoint `532ce8f1c479a3c593c990ede89b5b75e810762f` was
+verified by clean clone `g22-clean-20260902`, which contains the required paths,
+has clean Git state, and passed baseline, targeted Core, browser-companion, and
+Web install/test/build checks. The later independently reviewed evidence-state
+tip `9a17716f87e4df14def5086bafee6d86d3484596` was verified by final clean clone
+`g22-clean-final-20260902`; its required paths, manifest, and baseline checks
+also exited `0`. The current final branch tip is resolved from the approved
+remote and published in the completion result, not embedded in this
+self-referential task document.
 Therefore:
 
 - `CROSS_MACHINE_CONTINUATION_READY` is claimed for the bounded delivery scope.

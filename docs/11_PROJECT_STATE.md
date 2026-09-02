@@ -26,9 +26,14 @@ is historical reference and must not override this block.
   requests `0`, cleanup PASS). A fresh G22 rerun could not connect to CDP and
   returned exit `1`; native browser-loaded MV3 service-worker dispatch and live
   vendor certification remain `UNVERIFIED`.
-- **Cross-machine:** `CROSS_MACHINE_CONTINUATION_READY` for checkpoint
-  `532ce8f1c479a3c593c990ede89b5b75e810762f`; clean clone is
+- **Cross-machine:** `CROSS_MACHINE_CONTINUATION_READY` for the validated product
+  checkpoint `532ce8f1c479a3c593c990ede89b5b75e810762f`; its clean clone is
   `C:\Users\hikar\.codex\visualizations\2026\09\01\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\g22-clean-20260902`.
+  The later independently reviewed evidence-state tip is
+  `9a17716f87e4df14def5086bafee6d86d3484596`, verified by clean clone
+  `C:\Users\hikar\.codex\visualizations\2026\09\01\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\g22-clean-final-20260902`.
+  The current final branch tip is resolved from the approved remote; its exact
+  SHA is published in the completion result, not embedded in this block.
 - **Scope / architecture:** only browser-companion loopback validation,
   regression tests, G22 evidence, and status/delivery documents are in scope;
   Core contracts, Domain/workflow semantics, persistence, Product Scope, and

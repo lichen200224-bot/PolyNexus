@@ -41,19 +41,25 @@
   },
   "cross_machine": {
     "verdict": "CROSS_MACHINE_CONTINUATION_READY",
-    "checkpoint_sha": "532ce8f1c479a3c593c990ede89b5b75e810762f",
-    "clean_clone": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\01\\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\\g22-clean-20260902",
+    "validated_product_checkpoint_sha": "532ce8f1c479a3c593c990ede89b5b75e810762f",
+    "validated_product_checkpoint_clean_clone": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\01\\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\\g22-clean-20260902",
     "clean_clone_baseline_exit_code": 0,
     "clean_clone_targeted_core_exit_code": 0,
     "clean_clone_browser_exit_code": 0,
     "clean_clone_web_npm_ci_exit_code": 0,
     "clean_clone_web_test_exit_code": 0,
-    "clean_clone_web_build_exit_code": 0
+    "clean_clone_web_build_exit_code": 0,
+    "last_independently_reviewed_evidence_tip_sha": "9a17716f87e4df14def5086bafee6d86d3484596",
+    "last_independently_reviewed_evidence_tip_clean_clone": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\01\\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\\g22-clean-final-20260902",
+    "last_independently_reviewed_evidence_tip_required_paths_exit_code": 0,
+    "last_independently_reviewed_evidence_tip_manifest_exit_code": 0,
+    "last_independently_reviewed_evidence_tip_baseline_exit_code": 0,
+    "current_final_branch_tip": "resolved from approved remote; exact SHA is published in the completion result rather than embedded in this self-referential artifact"
   },
   "next_goal_ready": "G23",
   "limitations": [
     "native browser-loaded MV3 service-worker dispatch remains UNVERIFIED",
     "live ChatGPT/Claude/Gemini login, DOM compatibility, credentials, and external send remain DEFERRED / UNVERIFIED",
-    "Fresh G22 CDP browser rerun remains NEED_ACTION because the controlled CDP endpoint was unavailable; the bounded G22 checkpoint and prior clean-clone verification are complete"
+    "Fresh G22 CDP browser rerun remains NEED_ACTION because the controlled CDP endpoint was unavailable; the validated product checkpoint and later evidence-tip clean-clone verification are complete"
   ]
 }

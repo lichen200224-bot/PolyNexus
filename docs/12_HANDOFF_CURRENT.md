@@ -18,8 +18,12 @@ closeout; final Human acceptance remains G23.
 - `BRANCH`: `feature/g22-rc-hardening-cross-machine-delivery-closeout`
 - `PREDECESSOR_SHA`: `ada5e9c8b4873aad4c53c74198171740d376d926`
 - `REMOTE_REF`: `origin/feature/g22-rc-hardening-cross-machine-delivery-closeout`
-  is pushed and verified at the exact final output SHA published in the
-  completion result.
+  is pushed. Validated product checkpoint is `532ce8f1c479a3c593c990ede89b5b75e810762f`
+  with clean clone `g22-clean-20260902`; the later independently reviewed
+  evidence-state tip is `9a17716f87e4df14def5086bafee6d86d3484596` with final
+  clean clone `g22-clean-final-20260902`. The current final branch tip is
+  resolved from the approved remote and its exact SHA is published in the
+  completion result, not embedded in this self-referential handoff.
 - `WORKTREE_STATE`: clean; staged state empty after the G22 checkpoint/state
   update.
 - `ADR_IMPACT`: `NONE`; ADR-001–010 and ADR-011 are unchanged.
@@ -62,10 +66,13 @@ closeout; final Human acceptance remains G23.
   `1` with `ECONNREFUSED`; this remains an explicit `NEED_ACTION` limitation,
   not a browser PASS. The G21 predecessor HTTPS artifact is the current
   bounded browser evidence and no broad vendor claim is made.
-- Clean clone `C:\Users\hikar\.codex\visualizations\2026\09\01\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\g22-clean-20260902` resolved the pushed checkpoint,
-  remained clean, contained required paths, passed baseline, targeted Core,
-  browser, Web install/test/build checks, and established
-  `CROSS_MACHINE_CONTINUATION_READY`.
+- Validated product checkpoint clean clone `C:\Users\hikar\.codex\visualizations\2026\09\01\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\g22-clean-20260902` remained clean,
+  contained required paths, passed baseline, targeted Core, browser, Web
+  install/test/build checks, and established `CROSS_MACHINE_CONTINUATION_READY`.
+  Later evidence-state tip `9a17716f87e4df14def5086bafee6d86d3484596` was
+  independently reviewed and matched by final clean clone
+  `C:\Users\hikar\.codex\visualizations\2026\09\01\01a05dc0-65d4-7db3-98f4-f2d2c6fbd525\g22-clean-final-20260902`; its required paths,
+  manifest, and baseline checks also exited `0`.
 
 ### G22 bounded remediation
 
@@ -74,7 +81,7 @@ closeout; final Human acceptance remains G23.
 - `extensions/browser-companion/tests/test_websurface_drivers.mjs` covers the
   five encoded-dot review examples, encoded slash/backslash variants, raw
   traversal, credentialed/HTTPS/localhost rejection, and valid loopback use.
-- G21 evidence/status claims are being reconciled from `22/22` to the actual
+- G21 evidence/status claims were reconciled from `22/22` to the actual
   `28/28`; the live vendor, native browser-loaded MV3 worker, and credentialed
   external-send boundaries remain `UNVERIFIED`.
 

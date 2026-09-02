@@ -68,8 +68,12 @@ The project uses a 100-point checkpoint-weighted progress model. Only `ACCEPTED`
 - The encoded-loopback traversal review finding is remediated with raw
   percent-encoded dot/slash/backslash rejection and regression coverage.
 - Core, targeted RC, browser-companion, Web install/test/build, baseline, and
-  governance checks have current exit-code evidence. Cross-machine checkpoint
-  and clean-clone verification remain pending until the final G22 checkpoint.
+  governance checks have current exit-code evidence. The validated product
+  checkpoint is `532ce8f1` with clean clone `g22-clean-20260902`; the later
+  independently reviewed evidence-state tip is `9a17716f` with final clean clone
+  `g22-clean-final-20260902`. The current final branch tip is resolved from the
+  approved remote and published in the completion result, not embedded in this
+  self-referential snapshot.
 - Browser live-vendor, native MV3 worker, and a fresh CDP rerun without a
   listener remain `UNVERIFIED`/`NEED_ACTION`; no certification is claimed.
 
