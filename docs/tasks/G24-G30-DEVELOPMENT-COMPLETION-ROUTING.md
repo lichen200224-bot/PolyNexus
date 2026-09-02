@@ -1,8 +1,24 @@
 # G24–G30 Development Completion Routing
 
-## 1. Program decision
+## G24 execution record — CURRENT
 
-- `PROGRAM_STATUS`: `HUMAN_CONFIRMED / READY_FOR_PLANNING_CHECKPOINT`
+- `TASK_ID`: `G24-DEVELOPMENT-LEDGER-AND-EVIDENCE-RECONCILIATION`
+- `ATTEMPT`: `1`; `WRITER`: `Codex`; `REVIEWER`: independent read-only review `VERIFIED_PASS` (`BLOCKER=0`, `MAJOR=0`, `MINOR=0`)
+- `BRANCH`: `feature/g24-g30-development-completion-routing`
+- `PREDECESSOR_SHA`: `fde4c8f1d017992755c6af2bd600c9bd715efd6b`
+- `STATUS`: `VERIFIED_PASS_PENDING_HUMAN`; `GOAL_SCORE_DELTA=0`; `PROJECT_SCORE=59/100`
+- `COMPETITION_TRACK`: `NOTE_ONLY_NON_SCORING`; `PROJECT_PROGRESS_IMPACT=NONE`; `DELIVERY_OWNER=HUMAN`
+- `LEDGER`: `artifacts/verification/g24-development-ledger-20260902/ledger.json`
+- `OUTPUT_SHA_CANDIDATE`: `PENDING`; `NEXT_GOAL_READY`: `G25_PENDING_HUMAN_DECISION`
+- `ADR_IMPACT`: `NONE`; `SCOPE_DEVIATION`: `NONE`
+- `ANTIGRAVITY_STATUS`: `NOT_REQUIRED` — documentation/evidence reconciliation only.
+- `PROTECTED_PRIMARY`: `D:\AI學習教材\PolyNexus` unchanged and excluded.
+- `NEXT_ACTION`: present the exact Human Git gate; do not stage, commit, push, or start G25 without the Human decision.
+- `DO_NOT_CHANGE`: Product Scope, product source, Domain, Runtime Contract, workflow semantics, persistence/migration schema, ADR-001–011, secrets, live vendor actions, or next Goal.
+
+## 1. Program decision — HISTORICAL PLANNING PACKAGE
+
+- `PROGRAM_STATUS`: `HISTORICAL HUMAN_CONFIRMED / READY_FOR_PLANNING_CHECKPOINT`
 - `MODEL`: `gpt-5.6-luna`
 - `REASONING_EFFORT`: `high`
 - `SCORING_MODEL`: `DEVELOPMENT_ONLY_100`

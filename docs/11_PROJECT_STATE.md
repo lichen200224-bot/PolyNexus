@@ -1,10 +1,17 @@
 # Project State
 
-## Current Operational State — 2026-09-02 (G24–G30 program approved; planning checkpoint pending)
+## Current Operational State — 2026-09-02 (G24 ledger reconciliation — CURRENT)
 
 This is the authoritative current-state block. The G23 and earlier snapshots
 below remain provenance history and do not override it.
 
+- **Goal:** `G24-DEVELOPMENT-LEDGER-AND-EVIDENCE-RECONCILIATION`.
+- **G24 status:** `VERIFIED_PASS_PENDING_HUMAN`; documentation/evidence only;
+  no product behavior or score is added.
+- **Independent review:** `VERIFIED_PASS`; `BLOCKER=0`, `MAJOR=0`, `MINOR=0`.
+- **G24 predecessor:** exact `fde4c8f1d017992755c6af2bd600c9bd715efd6b` on
+  `feature/g24-g30-development-completion-routing`, verified against the
+  approved remote ref before edits.
 - **Human decision:** the development-only score model, ordered G24–G30 program,
   bounded Codex autonomy, delayed external verification, and rigorous Luna High
   task prompts are `HUMAN_CONFIRMED`.
@@ -14,6 +21,9 @@ below remain provenance history and do not override it.
 - **Development progress:** `59/100`. Current accepted allocation is CP-00
   `8/8`, CP-02 `22/22`, CP-03 `14/27`, CP-04 `3/20`, CP-05 `2/13`, and
   CP-06 `10/10`. The remaining `41` points are independently tracked WP items.
+- **WP ledger:** `artifacts/verification/g24-development-ledger-20260902/ledger.json`
+  contains one current record for every WP-11 through WP-32; source/test
+  presence is not acceptance and unaccepted items remain at zero.
 - **Competition boundary:** `COMPETITION_TRACK=NOTE_ONLY_NON_SCORING`;
   proposal, slides, upload-form checks, submission, and other competition work
   are Human-owned delivery notes and do not enter or block development progress.
@@ -37,11 +47,9 @@ below remain provenance history and do not override it.
   `<GOAL>_DECISION=ACCEPT_AND_COMMIT_PUSH`; it never authorizes scope/ADR change,
   secret handling, automatic external send, force push, remote reconfiguration,
   or the next Goal.
-- **Planning start gate:** the current G23 acceptance/status delta plus the new
-  governance, scoring standard, routing prompts, and control-panel update are
-  not yet checkpointed. `G24_START_SHA=PENDING_PLANNING_CHECKPOINT`; therefore
-  `G24_STATUS=WAIT` and G24 must not start until an approved remote checkpoint
-  and clean-clone verification establish that immutable SHA.
+- **Planning checkpoint:** the approved remote ref resolves to the exact G24
+  predecessor above. `G24_OUTPUT_SHA=PENDING` until the Human Git gate authorizes
+  one commit and non-force push. `NEXT_GOAL_READY=G25_PENDING_HUMAN_DECISION`.
 - **Architecture / scope:** `ADR_IMPACT=NONE`; `SCOPE_DEVIATION=NONE`.
   ADR-001–011, Core contracts, Domain, workflow semantics, and persistence are
   unchanged by this planning package.

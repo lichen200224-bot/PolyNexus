@@ -4,6 +4,14 @@ This is a bounded V1 release-candidate matrix. It records only capabilities
 that have a deterministic local source and does not certify broad vendor or
 browser compatibility.
 
+## G24 current reconciliation boundary — 2026-09-02
+
+- `G24_START_SHA`: `fde4c8f1d017992755c6af2bd600c9bd715efd6b`.
+- `G24_STATUS`: `VERIFIED_PASS_PENDING_HUMAN`; `GOAL_SCORE_DELTA=0`;
+  development progress remains `59/100`.
+- The G24 ledger reconciles implementation/evidence/maturity labels only. It
+  does not promote any capability or change the matrix below.
+
 ## Planned completion routing — 2026-09-02
 
 - The Human-confirmed G24–G30 program preserves all current maturity labels.

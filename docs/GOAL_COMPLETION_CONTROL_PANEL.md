@@ -4,7 +4,7 @@ Browser-readable companion: [GOAL_COMPLETION_CONTROL_PANEL.html](GOAL_COMPLETION
 
 ## G24–G30 development completion program — HUMAN CONFIRMED 2026-09-02
 
-`PLAN_STATUS: HUMAN_CONFIRMED / WAIT_FOR_PLANNING_CHECKPOINT`
+`PLAN_STATUS: HUMAN_CONFIRMED / G24_CURRENT / VERIFIED_PASS_PENDING_HUMAN`
 
 - `ACCEPTED_BASELINE_SHA`: `0eb56a986e97a45854bd6ddd419c114845ce51f4`
 - `DEVELOPMENT_PROGRESS`: `59/100`
@@ -12,9 +12,11 @@ Browser-readable companion: [GOAL_COMPLETION_CONTROL_PANEL.html](GOAL_COMPLETION
 - `EXECUTION_ORDER`: `G24 → G25 → G26 → G27 → G28 → G29 → G30`
 - `EXECUTION_PROFILE`: one new Codex task per Goal, `gpt-5.6-luna`, reasoning
   effort `high`, isolated lane, exact approved predecessor SHA
-- `G24_START_SHA`: `PENDING_PLANNING_CHECKPOINT`
-- `G24_STATUS`: `WAIT`; the current planning package must be committed,
-  non-force pushed, and clean-clone verified first
+- `G24_START_SHA`: `fde4c8f1d017992755c6af2bd600c9bd715efd6b`
+- `G24_STATUS`: `VERIFIED_PASS_PENDING_HUMAN`; `G24_OUTPUT_SHA=PENDING`
+- `INDEPENDENT_REVIEW`: `VERIFIED_PASS`; `BLOCKER=0`; `MAJOR=0`; `MINOR=0`
+- `G24_LEDGER`: `artifacts/verification/g24-development-ledger-20260902/ledger.json`
+- `G24_EVIDENCE`: current ledger/summary/commands artifact; historical WP evidence remains explicitly `HISTORICAL`
 - `EXTERNAL_VERIFICATION`: delayed to G29; live ChatGPT/Claude/Gemini journeys,
   native MV3 dispatch, and vendor certification remain `UNVERIFIED` /
   `NOT_CLAIMED` until current evidence exists
@@ -22,20 +24,20 @@ Browser-readable companion: [GOAL_COMPLETION_CONTROL_PANEL.html](GOAL_COMPLETION
   `<GOAL>_DECISION=ACCEPT_AND_COMMIT_PUSH` after Codex discloses exact allowlist,
   branch, remote, evidence, review, limitations, and commit message
 
-### Development-only score ledger
+### Development-only score ledger — CURRENT
 
 | Checkpoint / item | Accepted | Total | Remaining Goal |
 |---|---:|---:|---|
 | CP-00 | 8 | 8 | Complete |
 | CP-02 | 22 | 22 | Complete |
 | CP-03: WP-11/12/13 | 14 | 14 | Complete |
-| CP-03: WP-14/15/16 | 0 | 13 | G25 |
-| CP-04: WP-17/18/19 | 0 | 12 | G26 |
-| CP-04: WP-20 | 0 | 5 | G29 external/Human-operated |
+| CP-03: WP-14/15/16 | 0 | 13 | G25 (WP-14/15 PLANNED; WP-16 IMPLEMENTED_PENDING_REVIEW) |
+| CP-04: WP-17/18/19 | 0 | 12 | G26 (IMPLEMENTED_PENDING_REVIEW) |
+| CP-04: WP-20 | 0 | 5 | G29 (IMPLEMENTED_PENDING_REVIEW; external/Human-operated) |
 | CP-04: WP-21 | 3 | 3 | Complete, bounded fixture scope |
-| CP-05: WP-22/24/25 | 0 | 6 | G27 |
+| CP-05: WP-22/24/25 | 0 | 6 | G27 (IMPLEMENTED_PENDING_REVIEW) |
 | CP-05: WP-23 | 2 | 2 | Complete |
-| CP-05: WP-26/27 | 0 | 5 | G28 |
+| CP-05: WP-26/27 | 0 | 5 | G28 (IMPLEMENTED_PENDING_REVIEW) |
 | CP-06 | 10 | 10 | Complete through G19/G20/G22/G23 |
 | **Development total** | **59** | **100** | **41 points remain** |
 | Competition | **—** | **—** | Note only; no score |
@@ -44,7 +46,7 @@ Browser-readable companion: [GOAL_COMPLETION_CONTROL_PANEL.html](GOAL_COMPLETION
 
 | Goal | Status | Scope | Score after acceptance |
 |---|---|---|---:|
-| G24 | `WAIT_FOR_PLANNING_CHECKPOINT` | Ledger/evidence reconciliation | 59 |
+| G24 | `VERIFIED_PASS_PENDING_HUMAN` | Ledger/evidence reconciliation; Human final gate pending | 59 |
 | G25 | `GATED_BY_G24` | WP-14/15/16 runtime adapters + Doctor | 72 |
 | G26 | `GATED_BY_G25` | WP-17/18/19 local/policy/WebSurface | 84 |
 | G27 | `GATED_BY_G26` | WP-22/24/25 workflows/guards/metrics | 90 |
@@ -52,7 +54,14 @@ Browser-readable companion: [GOAL_COMPLETION_CONTROL_PANEL.html](GOAL_COMPLETION
 | G29 | `GATED_BY_G28` | WP-20 authenticated external-vendor verification | 100 |
 | G30 | `GATED_BY_G29` | Final score/provenance reconciliation | 100 confirmed |
 
-### Independent WP ledger
+### Independent WP ledger — CURRENT
+
+Machine-readable source of truth: `artifacts/verification/g24-development-ledger-20260902/ledger.json`.
+Every WP-11–WP-32 record contains `WP_ID`, `CHECKPOINT`, `POINT_WEIGHT`,
+`CURRENT_STATUS`, `ACCEPTED_POINTS`, `IMPLEMENTATION_REF`, `REVIEW_REF`,
+`ACCEPTANCE_REF`, `CHECKPOINT_SHA`, `TEST_COMMANDS`, `ACTUAL_EXIT_CODES`,
+`ARTIFACT_REFS`, `KNOWN_LIMITATIONS`, `UNVERIFIED`, `ADR_IMPACT`,
+`SCOPE_DEVIATION`, and `LAST_UPDATED`.
 
 | WP | Weight | Status | Goal | Checkpoint SHA |
 |---|---:|---|---|---|
@@ -61,29 +70,29 @@ Browser-readable companion: [GOAL_COMPLETION_CONTROL_PANEL.html](GOAL_COMPLETION
 | WP-13 | 5 | `HUMAN_ACCEPTED` | G23 predecessor | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
 | WP-14 | 5 | `PLANNED` | G25 | `PENDING` |
 | WP-15 | 5 | `PLANNED` | G25 | `PENDING` |
-| WP-16 | 3 | `PLANNED` | G25 | `PENDING` |
-| WP-17 | 4 | `PLANNED` | G26 | `PENDING` |
-| WP-18 | 4 | `PLANNED` | G26 | `PENDING` |
-| WP-19 | 4 | `PLANNED` | G26 | `PENDING` |
-| WP-20 | 5 | `PLANNED / EXTERNAL_LATE` | G29 | `PENDING` |
-| WP-21 | 3 | `HUMAN_ACCEPTED / BOUNDED` | G23 predecessor | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
-| WP-22 | 3 | `PLANNED` | G27 | `PENDING` |
+| WP-16 | 3 | `IMPLEMENTED_PENDING_REVIEW` | G25 | `PENDING` |
+| WP-17 | 4 | `IMPLEMENTED_PENDING_REVIEW` | G26 | `PENDING` |
+| WP-18 | 4 | `IMPLEMENTED_PENDING_REVIEW` | G26 | `PENDING` |
+| WP-19 | 4 | `IMPLEMENTED_PENDING_REVIEW` | G26 | `PENDING` |
+| WP-20 | 5 | `IMPLEMENTED_PENDING_REVIEW` | G29 | `PENDING` |
+| WP-21 | 3 | `HUMAN_ACCEPTED` | G23 predecessor; bounded browser fixture scope | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
+| WP-22 | 3 | `IMPLEMENTED_PENDING_REVIEW` | G27 | `PENDING` |
 | WP-23 | 2 | `HUMAN_ACCEPTED` | G23 predecessor | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
-| WP-24 | 2 | `PLANNED` | G27 | `PENDING` |
-| WP-25 | 1 | `PLANNED` | G27 | `PENDING` |
-| WP-26 | 2 | `PLANNED` | G28 | `PENDING` |
-| WP-27 | 3 | `PLANNED` | G28 | `PENDING` |
-| WP-28 | 2 | `HUMAN_ACCEPTED / BOUNDED` | G23 predecessor | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
-| WP-29 | 2 | `HUMAN_ACCEPTED / BOUNDED` | G23 predecessor | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
-| WP-30 | 2 | `HUMAN_ACCEPTED / BOUNDED` | G23 predecessor | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
-| WP-31 | 1 | `HUMAN_ACCEPTED / BOUNDED` | G23 predecessor | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
-| WP-32 | 3 | `HUMAN_ACCEPTED / BOUNDED` | G23 predecessor | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
+| WP-24 | 2 | `IMPLEMENTED_PENDING_REVIEW` | G27 | `PENDING` |
+| WP-25 | 1 | `IMPLEMENTED_PENDING_REVIEW` | G27 | `PENDING` |
+| WP-26 | 2 | `IMPLEMENTED_PENDING_REVIEW` | G28 | `PENDING` |
+| WP-27 | 3 | `IMPLEMENTED_PENDING_REVIEW` | G28 | `PENDING` |
+| WP-28 | 2 | `HUMAN_ACCEPTED` | G23 predecessor; bounded acceptance scope | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
+| WP-29 | 2 | `HUMAN_ACCEPTED` | G23 predecessor; bounded acceptance scope | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
+| WP-30 | 2 | `HUMAN_ACCEPTED` | G23 predecessor; bounded acceptance scope | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
+| WP-31 | 1 | `HUMAN_ACCEPTED` | G23 predecessor; bounded acceptance scope | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
+| WP-32 | 3 | `HUMAN_ACCEPTED` | G23 predecessor; bounded acceptance scope | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
 
 ### Goal provenance ledger
 
 | Goal | Predecessor SHA | Output SHA | Start gate | Score delta | Status |
 |---|---|---|---|---:|---|
-| G24 | `G24_START_SHA (PENDING_PLANNING_CHECKPOINT)` | `PENDING` | Approved planning-package remote SHA becomes G24 predecessor | 0 | `WAIT` |
+| G24 | `fde4c8f1d017992755c6af2bd600c9bd715efd6b` | `PENDING` | Exact planning checkpoint verified; Human final gate pending | 0 | `VERIFIED_PASS_PENDING_HUMAN` |
 | G25 | `G24_OUTPUT_SHA` | `PENDING` | Approved G24 checkpoint | +13 | `GATED` |
 | G26 | `G25_OUTPUT_SHA` | `PENDING` | Approved G25 checkpoint | +12 | `GATED` |
 | G27 | `G26_OUTPUT_SHA` | `PENDING` | Approved G26 checkpoint | +6 | `GATED` |

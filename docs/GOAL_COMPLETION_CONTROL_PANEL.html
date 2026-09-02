@@ -28,50 +28,51 @@
         <div class="meta">
           <div class="metric"><span class="muted">正式進度</span><strong>59 / 100</strong></div>
           <div class="metric"><span class="muted">G24–G30 plan</span><strong class="ready">HUMAN CONFIRMED</strong></div>
-          <div class="metric"><span class="muted">G24 start gate</span><strong class="gated">WAIT FOR SHA</strong></div>
+          <div class="metric"><span class="muted">G24 status</span><strong class="gated">VERIFIED · HUMAN PENDING</strong></div>
           <div class="metric"><span class="muted">外部驗證</span><strong class="gated">G29 · LATE</strong></div>
         </div>
       </header>
 
       <section>
         <h2>目前正式狀態</h2>
-        <div class="callout"><strong>PLAN: HUMAN_CONFIRMED · PLANNING CHECKPOINT PENDING</strong><br />Accepted baseline: <code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code><br />Development score: <strong>59/100</strong><br />Competition: <strong>NOTE_ONLY_NON_SCORING · HUMAN OWNED</strong><br />Goal order: <strong>G24 → G25 → G26 → G27 → G28 → G29 → G30</strong><br />Execution profile: <strong>new Codex task · gpt-5.6-luna · high</strong><br />G24_START_SHA: <strong class="gated">PENDING_PLANNING_CHECKPOINT</strong></div>
+        <div class="callout"><strong>G24: VERIFIED_PASS_PENDING_HUMAN · HUMAN_CONFIRMED PROGRAM</strong><br />Accepted baseline: <code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code><br />Development score: <strong>59/100</strong> · Goal score delta: <strong>0</strong><br />Competition: <strong>NOTE_ONLY_NON_SCORING · HUMAN OWNED</strong><br />Goal order: <strong>G24 → G25 → G26 → G27 → G28 → G29 → G30</strong><br />Execution profile: <strong>new Codex task · gpt-5.6-luna · high</strong><br />G24_START_SHA: <strong class="ready">fde4c8f1d017992755c6af2bd600c9bd715efd6b</strong> · G24_OUTPUT_SHA: <strong class="gated">PENDING</strong><br />Independent review: <strong class="ready">VERIFIED_PASS</strong> · BLOCKER 0 · MAJOR 0 · MINOR 0<br />Ledger: <code>artifacts/verification/g24-development-ledger-20260902/ledger.json</code></div>
         <p class="muted" style="margin-top:16px;">Codex 可在單一 Goal 核准範圍內實作、測試、修正、重驗與更新所有進度資料；Human 的一般介入點只有最後的 <code>&lt;GOAL&gt;_DECISION=ACCEPT_AND_COMMIT_PUSH</code>。這不授權 scope/ADR 變更、秘密資料、外部自動送出、force push、remote reconfiguration 或下一 Goal。</p>
         <p><a href="33_DEVELOPMENT_PROGRESS_AND_GOAL_EXECUTION_STANDARD.md">Execution standard</a> · <a href="tasks/G24-G30-DEVELOPMENT-COMPLETION-ROUTING.md">G24–G30 copy-ready prompts</a> · <a href="11_PROJECT_STATE.md">Project State</a> · <a href="12_HANDOFF_CURRENT.md">Current Handoff</a></p>
       </section>
 
       <section>
-        <h2>Independent WP ledger</h2>
+        <h2>Independent WP ledger — CURRENT</h2>
+        <p class="muted">Full per-WP provenance is in <code>artifacts/verification/g24-development-ledger-20260902/ledger.json</code>. Each record includes WP_ID, checkpoint, weight, current status, accepted points, implementation/review/acceptance refs, checkpoint SHA, test commands, actual exit codes, artifacts, limitations, unverified items, ADR impact, scope deviation, and last-updated timestamp. Source/test presence does not award points.</p>
         <div class="table-wrap"><table><thead><tr><th>WP</th><th>Weight</th><th>Status</th><th>Goal</th><th>Checkpoint SHA</th></tr></thead><tbody>
           <tr><td>WP-11</td><td>4</td><td>HUMAN_ACCEPTED</td><td>G23 predecessor</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
           <tr><td>WP-12</td><td>5</td><td>HUMAN_ACCEPTED</td><td>G23 predecessor</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
           <tr><td>WP-13</td><td>5</td><td>HUMAN_ACCEPTED</td><td>G23 predecessor</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
           <tr><td>WP-14</td><td>5</td><td>PLANNED</td><td>G25</td><td><code>PENDING</code></td></tr>
           <tr><td>WP-15</td><td>5</td><td>PLANNED</td><td>G25</td><td><code>PENDING</code></td></tr>
-          <tr><td>WP-16</td><td>3</td><td>PLANNED</td><td>G25</td><td><code>PENDING</code></td></tr>
-          <tr><td>WP-17</td><td>4</td><td>PLANNED</td><td>G26</td><td><code>PENDING</code></td></tr>
-          <tr><td>WP-18</td><td>4</td><td>PLANNED</td><td>G26</td><td><code>PENDING</code></td></tr>
-          <tr><td>WP-19</td><td>4</td><td>PLANNED</td><td>G26</td><td><code>PENDING</code></td></tr>
-          <tr><td>WP-20</td><td>5</td><td>PLANNED / EXTERNAL_LATE</td><td>G29</td><td><code>PENDING</code></td></tr>
-          <tr><td>WP-21</td><td>3</td><td>HUMAN_ACCEPTED / BOUNDED</td><td>G23 predecessor</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
-          <tr><td>WP-22</td><td>3</td><td>PLANNED</td><td>G27</td><td><code>PENDING</code></td></tr>
+          <tr><td>WP-16</td><td>3</td><td>IMPLEMENTED_PENDING_REVIEW</td><td>G25</td><td><code>PENDING</code></td></tr>
+          <tr><td>WP-17</td><td>4</td><td>IMPLEMENTED_PENDING_REVIEW</td><td>G26</td><td><code>PENDING</code></td></tr>
+          <tr><td>WP-18</td><td>4</td><td>IMPLEMENTED_PENDING_REVIEW</td><td>G26</td><td><code>PENDING</code></td></tr>
+          <tr><td>WP-19</td><td>4</td><td>IMPLEMENTED_PENDING_REVIEW</td><td>G26</td><td><code>PENDING</code></td></tr>
+          <tr><td>WP-20</td><td>5</td><td>IMPLEMENTED_PENDING_REVIEW</td><td>G29 · EXTERNAL LATE</td><td><code>PENDING</code></td></tr>
+          <tr><td>WP-21</td><td>3</td><td>HUMAN_ACCEPTED</td><td>G23 predecessor; bounded browser fixture scope</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
+          <tr><td>WP-22</td><td>3</td><td>IMPLEMENTED_PENDING_REVIEW</td><td>G27</td><td><code>PENDING</code></td></tr>
           <tr><td>WP-23</td><td>2</td><td>HUMAN_ACCEPTED</td><td>G23 predecessor</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
-          <tr><td>WP-24</td><td>2</td><td>PLANNED</td><td>G27</td><td><code>PENDING</code></td></tr>
-          <tr><td>WP-25</td><td>1</td><td>PLANNED</td><td>G27</td><td><code>PENDING</code></td></tr>
-          <tr><td>WP-26</td><td>2</td><td>PLANNED</td><td>G28</td><td><code>PENDING</code></td></tr>
-          <tr><td>WP-27</td><td>3</td><td>PLANNED</td><td>G28</td><td><code>PENDING</code></td></tr>
-          <tr><td>WP-28</td><td>2</td><td>HUMAN_ACCEPTED / BOUNDED</td><td>G23 predecessor</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
-          <tr><td>WP-29</td><td>2</td><td>HUMAN_ACCEPTED / BOUNDED</td><td>G23 predecessor</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
-          <tr><td>WP-30</td><td>2</td><td>HUMAN_ACCEPTED / BOUNDED</td><td>G23 predecessor</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
-          <tr><td>WP-31</td><td>1</td><td>HUMAN_ACCEPTED / BOUNDED</td><td>G23 predecessor</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
-          <tr><td>WP-32</td><td>3</td><td>HUMAN_ACCEPTED / BOUNDED</td><td>G23 predecessor</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
+          <tr><td>WP-24</td><td>2</td><td>IMPLEMENTED_PENDING_REVIEW</td><td>G27</td><td><code>PENDING</code></td></tr>
+          <tr><td>WP-25</td><td>1</td><td>IMPLEMENTED_PENDING_REVIEW</td><td>G27</td><td><code>PENDING</code></td></tr>
+          <tr><td>WP-26</td><td>2</td><td>IMPLEMENTED_PENDING_REVIEW</td><td>G28</td><td><code>PENDING</code></td></tr>
+          <tr><td>WP-27</td><td>3</td><td>IMPLEMENTED_PENDING_REVIEW</td><td>G28</td><td><code>PENDING</code></td></tr>
+          <tr><td>WP-28</td><td>2</td><td>HUMAN_ACCEPTED</td><td>G23 predecessor; bounded acceptance scope</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
+          <tr><td>WP-29</td><td>2</td><td>HUMAN_ACCEPTED</td><td>G23 predecessor; bounded acceptance scope</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
+          <tr><td>WP-30</td><td>2</td><td>HUMAN_ACCEPTED</td><td>G23 predecessor; bounded acceptance scope</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
+          <tr><td>WP-31</td><td>1</td><td>HUMAN_ACCEPTED</td><td>G23 predecessor; bounded acceptance scope</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
+          <tr><td>WP-32</td><td>3</td><td>HUMAN_ACCEPTED</td><td>G23 predecessor; bounded acceptance scope</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
         </tbody></table></div>
       </section>
 
       <section>
         <h2>Goal provenance ledger</h2>
         <div class="table-wrap"><table><thead><tr><th>Goal</th><th>Predecessor SHA</th><th>Output SHA</th><th>Start gate</th><th>Delta</th><th>Status</th></tr></thead><tbody>
-          <tr><td>G24</td><td><code>G24_START_SHA (PENDING_PLANNING_CHECKPOINT)</code></td><td><code>PENDING</code></td><td>Approved planning-package remote SHA becomes G24 predecessor</td><td>0</td><td>WAIT</td></tr>
+          <tr><td>G24</td><td><code>fde4c8f1d017992755c6af2bd600c9bd715efd6b</code></td><td><code>PENDING</code></td><td>Exact planning checkpoint verified; Human final gate pending</td><td>0</td><td>VERIFIED_PASS_PENDING_HUMAN</td></tr>
           <tr><td>G25</td><td><code>G24_OUTPUT_SHA</code></td><td><code>PENDING</code></td><td>Approved G24</td><td>+13</td><td>GATED</td></tr>
           <tr><td>G26</td><td><code>G25_OUTPUT_SHA</code></td><td><code>PENDING</code></td><td>Approved G25</td><td>+12</td><td>GATED</td></tr>
           <tr><td>G27</td><td><code>G26_OUTPUT_SHA</code></td><td><code>PENDING</code></td><td>Approved G26</td><td>+6</td><td>GATED</td></tr>
@@ -109,7 +110,7 @@
       <section>
         <h2>G24–G30 ordered Goal flow</h2>
         <div class="goal-flow">
-          <article class="goal"><span class="badge gated">WAIT FOR SHA</span><h3>G24 · Ledger</h3><p>Reconcile independent WP score/evidence ledger. Score stays 59.</p></article>
+          <article class="goal"><span class="badge gated">HUMAN PENDING</span><h3>G24 · Ledger</h3><p>Reconcile independent WP score/evidence ledger. Score stays 59.</p></article>
           <article class="goal"><span class="badge gated">GATED</span><h3>G25 · Runtime</h3><p>WP-14/15/16 adapters and Doctor. Target 72.</p></article>
           <article class="goal"><span class="badge gated">GATED</span><h3>G26 · Internal integration</h3><p>WP-17/18/19 local, policy, WebSurface. Target 84.</p></article>
           <article class="goal"><span class="badge gated">GATED</span><h3>G27 · Product breadth</h3><p>WP-22/24/25 workflows, guards, metrics. Target 90.</p></article>
@@ -149,7 +150,7 @@
         </ul>
       </section>
 
-      <footer>G24 cannot start until this planning package has an approved remote SHA and clean-clone proof. External verification is deliberately deferred to G29. Do not claim vendor certification before current evidence.</footer>
+      <footer>G24 ledger reconciliation is complete pending independent review and Human final decision. Commit/push and G25 remain gated. External verification is deliberately deferred to G29. Do not claim vendor certification before current evidence.</footer>
     </main>
   </body>
 </html>

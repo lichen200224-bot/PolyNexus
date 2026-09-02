@@ -56,9 +56,15 @@ The project uses a 100-point checkpoint-weighted progress model. Only `ACCEPTED`
   holds authenticated external-vendor validation until after deterministic and
   internal product work. Every Goal uses a new Codex task with
   `gpt-5.6-luna`, reasoning effort `high`.
-- Planning documents and prompts must first be committed, non-force pushed to
-  the approved remote, and clean-clone verified. Until that immutable SHA is
-  recorded, `G24_START_SHA=PENDING_PLANNING_CHECKPOINT` and `G24_STATUS=WAIT`.
+- The planning checkpoint is verified at exact
+  `G24_START_SHA=fde4c8f1d017992755c6af2bd600c9bd715efd6b` on the approved remote
+  ref. G24 is `VERIFIED_PASS_PENDING_HUMAN`; its output SHA remains `PENDING`
+  until the final Human Git gate.
+- The current per-WP evidence ledger is
+  `artifacts/verification/g24-development-ledger-20260902/ledger.json`.
+  Existing implementation/test presence for later WPs is recorded as
+  `IMPLEMENTED_PENDING_REVIEW` and earns zero until WP-level review, Human
+  acceptance, and checkpoint evidence exist.
 
 #### Current development-only allocation and remaining routing
 
@@ -69,20 +75,20 @@ The project uses a 100-point checkpoint-weighted progress model. Only `ACCEPTED`
 | WP-11 work modes | 4 | 4 | Accepted |
 | WP-12 Council | 5 | 5 | Accepted |
 | WP-13 workflow gates | 5 | 5 | Accepted with disclosed limitation |
-| WP-14 Codex Runtime adapter | 5 | 0 | G25 |
-| WP-15 OpenCode Runtime adapter | 5 | 0 | G25 |
-| WP-16 Doctor/conformance | 3 | 0 | G25 |
-| WP-17 local endpoint profiles | 4 | 0 | G26 |
-| WP-18 classification/routing | 4 | 0 | G26 |
-| WP-19 WebSurface/MV3 boundary | 4 | 0 | G26 |
-| WP-20 authenticated Level 3A vendor flow | 5 | 0 | G29, external/Human-operated |
+| WP-14 Codex Runtime adapter | 5 | 0 | G25 — PLANNED |
+| WP-15 OpenCode Runtime adapter | 5 | 0 | G25 — PLANNED |
+| WP-16 Doctor/conformance | 3 | 0 | G25 — IMPLEMENTED_PENDING_REVIEW |
+| WP-17 local endpoint profiles | 4 | 0 | G26 — IMPLEMENTED_PENDING_REVIEW |
+| WP-18 classification/routing | 4 | 0 | G26 — IMPLEMENTED_PENDING_REVIEW |
+| WP-19 WebSurface/MV3 boundary | 4 | 0 | G26 — IMPLEMENTED_PENDING_REVIEW |
+| WP-20 authenticated Level 3A vendor flow | 5 | 0 | G29 — IMPLEMENTED_PENDING_REVIEW; external/Human-operated |
 | WP-21 bounded browser fixture | 3 | 3 | Accepted through G21–G23 |
-| WP-22 workflow templates | 3 | 0 | G27 |
+| WP-22 workflow templates | 3 | 0 | G27 — IMPLEMENTED_PENDING_REVIEW |
 | WP-23 backup/restore/migration | 2 | 2 | Accepted through G17/G22/G23 |
-| WP-24 resource guards | 2 | 0 | G27 |
-| WP-25 evaluation/usage metrics | 1 | 0 | G27 |
-| WP-26 UX progressive disclosure | 2 | 0 | G28 |
-| WP-27 Golden Workflow regression | 3 | 0 | G28 |
+| WP-24 resource guards | 2 | 0 | G27 — IMPLEMENTED_PENDING_REVIEW |
+| WP-25 evaluation/usage metrics | 1 | 0 | G27 — IMPLEMENTED_PENDING_REVIEW |
+| WP-26 UX progressive disclosure | 2 | 0 | G28 — IMPLEMENTED_PENDING_REVIEW |
+| WP-27 Golden Workflow regression | 3 | 0 | G28 — IMPLEMENTED_PENDING_REVIEW |
 | CP-06 bounded RC hardening/closeout | 10 | 10 | Accepted through G19/G20/G22/G23 |
 | **Development total** | **100** | **59** | **41 points remain** |
 | Competition | **—** | **—** | `NOTE_ONLY_NON_SCORING` |
@@ -98,6 +104,9 @@ The project uses a 100-point checkpoint-weighted progress model. Only `ACCEPTED`
 | G28 | WP-26/27 UX and Golden Workflow feature-freeze evidence | +5 | 95 | Approved G27 checkpoint |
 | G29 | WP-20 authenticated vendor external verification | +5 | 100 | Approved G28 checkpoint + Human-operated environment |
 | G30 | Final 100-point reconciliation | 0 | 100 confirmed | Approved G29 checkpoint |
+
+All sections below this line are `HISTORICAL` predecessor snapshots and do not
+override the current G24 section above.
 
 ### Historical G23 final acceptance snapshot — 2026-09-02
 

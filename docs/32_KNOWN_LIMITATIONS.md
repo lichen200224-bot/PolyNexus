@@ -3,6 +3,14 @@
 These limitations are intentional boundaries, not hidden compatibility
 claims.
 
+## G24 current reconciliation boundary — 2026-09-02
+
+- G24 records existing limitations and unverified boundaries; it removes none.
+- `G24_START_SHA=fde4c8f1d017992755c6af2bd600c9bd715efd6b`,
+  `G24_STATUS=VERIFIED_PASS_PENDING_HUMAN`, and score remains `59/100`.
+- Source/test presence for later WPs remains unaccepted until WP-level review,
+  Human acceptance, exact checkpoint, and clean-clone evidence.
+
 ## Planned limitation-resolution routing — 2026-09-02
 
 - The Human-confirmed G24–G30 plan does not itself remove any limitation.
