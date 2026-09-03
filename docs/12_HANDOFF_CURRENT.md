@@ -61,9 +61,11 @@
 - `INDEPENDENT_REVIEW`: Feynman returned `PASS`, `BLOCKER=0`, `MAJOR=0`,
   `MINOR=0`; it verified the request-time denied-policy path, lifecycle,
   evidence identity safety, and service-worker loopback boundary.
-- `G26_OUTPUT_SHA`: `4fd73b5ac3b59ae1f948f8d95ad795112552b1b2` (bounded product
-  checkpoint); clean clone verified at
-  `C:\Users\hikar\.codex\visualizations\2026\09\02\01a0641b-117b-7b83-a4dd-7172a552aded\g26-final-clean-4fd73b5`.
+- `G26_PRODUCT_OUTPUT_SHA`: `4fd73b5ac3b59ae1f948f8d95ad795112552b1b2`;
+  `G26_STATE_SYNC_SHA`: `07ebdb8a691997dc33fd6368507b707a6c0f4597`. The
+  product SHA and later docs/evidence state-sync SHA are intentionally distinct,
+  following the G25 provenance model; clean clone verified at
+  `C:\Users\hikar\.codex\visualizations\2026\09\02\01a0641b-117b-7b83-a4dd-7172a552aded\g26-final-clean-07ebdb8`.
 - `NEXT_ACTION`: `NEXT_GOAL_READY=G27`; do not start G27.
 - `DO_NOT_CHANGE`: primary checkout, approved remote configuration/ref,
   frozen ADR semantics, Domain/persistence schema, secrets, external accounts,

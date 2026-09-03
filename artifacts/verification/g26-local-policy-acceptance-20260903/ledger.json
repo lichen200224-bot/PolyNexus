@@ -4,6 +4,9 @@
   "branch": "codex/g26-local-policy-acceptance",
   "predecessor_sha": "04d37291d45ebbda8453f1b39e30fca523ee1548",
   "output_sha": "4fd73b5ac3b59ae1f948f8d95ad795112552b1b2",
+  "output_sha_role": "G26_PRODUCT_OUTPUT_SHA; bounded code checkpoint",
+  "state_sync_sha": "07ebdb8a691997dc33fd6368507b707a6c0f4597",
+  "state_sync_sha_role": "G26_STATE_SYNC_SHA; docs/evidence checkpoint",
   "approved_remote_ref": "feature/g24-g30-development-completion-routing",
   "project_score_before": 72,
   "project_score_proposed": 84,
@@ -59,5 +62,6 @@
       "unverified": ["full Core regression", "live vendor journeys", "native MV3 packaging dispatch"]
     }
   ],
-  "clean_clone": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\02\\01a0641b-117b-7b83-a4dd-7172a552aded\\g26-final-clean-4fd73b5"
+  "clean_clone": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\02\\01a0641b-117b-7b83-a4dd-7172a552aded\\g26-final-clean-07ebdb8",
+  "clean_clone_sha": "07ebdb8a691997dc33fd6368507b707a6c0f4597"
 }
