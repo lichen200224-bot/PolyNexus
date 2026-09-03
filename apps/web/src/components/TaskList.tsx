@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import type { ApiClientConfig, Task } from '../api'
 import { listTasks, AuthError } from '../api'
 import { CreateTaskForm } from './CreateTaskForm'
+import { StatusMessage } from './StatusMessage'
 
 interface TaskListProps {
   config: ApiClientConfig
@@ -25,13 +26,14 @@ export function TaskList({ config, projectId, onSelectTask, onBack }: TaskListPr
   const load = () => {
     setLoading(true)
     setError(null)
+    setTasks([])
     listTasks(config, projectId)
       .then((res) => setTasks(res.tasks))
       .catch((err) => {
         if (err instanceof AuthError) {
           setError('Authentication required')
         } else {
-          setError(err.message || 'Failed to load tasks')
+          setError('Unable to load tasks. Try again.')
         }
       })
       .finally(() => setLoading(false))
@@ -40,15 +42,21 @@ export function TaskList({ config, projectId, onSelectTask, onBack }: TaskListPr
   useEffect(() => { load() }, [config, projectId])
 
   if (loading) {
-    return <div className="status-message" role="status">Loading tasks...</div>
+    return <StatusMessage kind="loading">Loading tasks...</StatusMessage>
   }
 
   if (error) {
     return (
-      <div className="status-message status-error" role="alert">
-        {error}
-        <button type="button" onClick={onBack} className="back-link">Back to projects</button>
-      </div>
+      <StatusMessage
+        kind={error === 'Authentication required' ? 'permission' : 'error'}
+        title={error}
+        action={
+          <>
+            <button type="button" onClick={load}>Retry</button>
+            <button type="button" onClick={onBack} className="back-link">Back to projects</button>
+          </>
+        }
+      />
     )
   }
 
@@ -72,7 +80,7 @@ export function TaskList({ config, projectId, onSelectTask, onBack }: TaskListPr
         />
       )}
       {tasks.length === 0 ? (
-        <div className="status-message">No tasks in this project yet.</div>
+        <StatusMessage kind="empty">No tasks in this project yet.</StatusMessage>
       ) : (
         <ul className="task-list" role="list">
           {tasks.map((t) => (

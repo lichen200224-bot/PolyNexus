@@ -1,10 +1,35 @@
 # Project State
 
+## Current G28 Candidate State — HUMAN_ACCEPTED / PASS / COMPLETE (2026-09-03)
+
+This isolated candidate starts from the exact approved G27 continuation tip.
+
+- **Goal:** `G28-UX-AND-GOLDEN-WORKFLOW-FEATURE-FREEZE`.
+- **Branch:** `feature/g28-ux-feature-freeze`.
+- **Predecessor:** `56c941a6077802e326284f1b70fd9719f146e5b4`, the approved remote
+  tip and clean isolated-lane start SHA. The preceding G27 product output is
+  `27ff09c224344821868dd8fd36ec2c0eb11504df`; `56c941a...` is its later
+  docs-only acceptance-provenance checkpoint.
+- **Start gate:** approved remote/ref `D:/GitBackup/PolyNexus_Backup.git`,
+  `feature/g24-g30-development-completion-routing` resolved to the exact
+  predecessor; branch, HEAD, clean state, and staged-empty state were checked
+  before edits. Primary dirty/untracked work was untouched.
+- **Score:** `95/100` (`90/100` predecessor plus G28 `+5`; WP-26 `2`,
+  WP-27 `3`).
+- **Status:** `HUMAN_ACCEPTED / PASS / COMPLETE`; Human decision recorded as
+  `G28_DECISION=ACCEPT_AND_COMMIT_PUSH`. WP-26 and WP-27 are accepted with
+  independent read-only review `PASS` and zero blocker/major/minor findings.
+- **G28_PRODUCT_OUTPUT_SHA:** `PENDING_FIRST_CHECKPOINT` until the authorized
+  commit is created; the later state-sync output SHA will be recorded after it.
+- **NEXT_GOAL_READY:** `G29`; G29 is not started by this task.
+
 ## Current G27 Candidate State — 2026-09-03
 
-This is the Human-accepted G27 checkpoint. The G27 product output is
-`27ff09c224344821868dd8fd36ec2c0eb11504df`; the approved remote and fresh
-clean-clone verification both match it.
+This is the Human-accepted G27 checkpoint. The G27 product implementation
+output is `27ff09c224344821868dd8fd36ec2c0eb11504df`. A later docs-only
+acceptance-provenance checkpoint is the terminal approved continuation tip
+`56c941a6077802e326284f1b70fd9719f146e5b4`; that is the exact G28
+predecessor and matches the approved remote and clean isolated lane.
 
 - **Goal:** `G27-WORKFLOW-GUARDS-AND-METRICS-ACCEPTANCE`.
 - **Branch:** `feature/g27-workflow-guards-metrics`; isolated lane at
@@ -14,9 +39,9 @@ clean-clone verification both match it.
   `4fd73b5ac3b59ae1f948f8d95ad795112552b1b2`; G26 state-sync was
   `07ebdb8a691997dc33fd6368507b707a6c0f4597`.
 - **Approved remote/ref:** `D:/GitBackup/PolyNexus_Backup.git`,
-  `feature/g24-g30-development-completion-routing`; the ref and ancestry
-  match the isolated-lane start gate. Primary dirty/untracked work remains
-  untouched.
+  `feature/g24-g30-development-completion-routing` at
+  `56c941a6077802e326284f1b70fd9719f146e5b4`; the ref and ancestry match the
+  isolated-lane start gate. Primary dirty/untracked work remains untouched.
 - **G26 gate:** `HUMAN_ACCEPTED / PASS / COMPLETE`, score `84/100`, delta
   `+12/12`. G27 proposes `WP-22=3`, `WP-24=2`, `WP-25=1`, delta `+6`,
   expected post-acceptance score `90/100`.
@@ -27,10 +52,14 @@ clean-clone verification both match it.
   exactly nine V1 templates; WP-24 covers timeout/budget/concurrency/cleanup
   and setup-failure cleanup; WP-25 covers descriptive source-backed metrics.
 - **Score:** `90/100` (`84/100` predecessor plus G27 `+6`).
+- **G27 provenance reconciliation:** `G27_PRODUCT_OUTPUT_SHA=27ff09c...` is
+  retained as the implementation commit; `G27_OUTPUT_SHA=56c941a...` is the
+  later approved terminal state-sync checkpoint used by G28. No product
+  behavior was changed by this reconciliation.
 - **Current evidence:** targeted G27 suite, full Core rerun, approved remote
   push, and fresh clean-clone verification are recorded in
-  `artifacts/verification/g27-workflow-guards-metrics-20260903/`; no G28 work
-  has started. `NEXT_GOAL_READY=G28` is recorded as a gate only.
+  `artifacts/verification/g27-workflow-guards-metrics-20260903/`; G28 is now
+  active only in its isolated lane and remains pending Human decision.
 - **ADR impact/scope deviation:** `NONE` / `NONE`. No new persisted entity,
   workflow node, vendor integration, migration, secret, or external send was
   introduced.

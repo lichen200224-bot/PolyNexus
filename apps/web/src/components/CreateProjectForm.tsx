@@ -28,9 +28,9 @@ export function CreateProjectForm({ config, onCreated, onCancel }: CreateProject
       if (err instanceof AuthError) {
         setError('Authentication required')
       } else if (err instanceof ApiError && err.status === 422) {
-        setError(err.body ? String(err.body) : 'Invalid input')
+        setError('Invalid project data. Check the required fields.')
       } else {
-        setError(err instanceof Error ? err.message : 'Failed to create project')
+        setError('Unable to create project. Try again.')
       }
       setSubmitting(false)
     }

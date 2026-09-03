@@ -21,6 +21,10 @@
   </head>
   <body>
     <main>
+      <section>
+        <h2>G28 checkpoint — HUMAN_ACCEPTED / PASS / COMPLETE</h2>
+        <div class="callout"><strong>G28: HUMAN_ACCEPTED / PASS / COMPLETE</strong><br />Branch: <code>feature/g28-ux-feature-freeze</code> · Exact predecessor: <code>56c941a6077802e326284f1b70fd9719f146e5b4</code><br />G27 product output: <code>27ff09c224344821868dd8fd36ec2c0eb11504df</code> · Approved remote tip: <code>56c941a...</code><br />Development score: <strong>95/100</strong> · Accepted G28 delta: <strong>+5</strong><br />WP-26: <strong>2 points accepted</strong> · WP-27: <strong>3 points accepted</strong><br />Independent review: <strong>PASS · 0/0/0</strong> · Human decision: <strong>ACCEPT_AND_COMMIT_PUSH</strong> · G29: <strong>GATED / NOT STARTED</strong><br />Evidence: <code>artifacts/verification/g28-ux-feature-freeze-20260903/</code> · Live vendor/login/send remains deferred.</div>
+      </section>
       <header class="hero">
         <p class="eyebrow">PolyNexus · execution control</p>
         <h1>G24–G30 已核准 · 開發完成路線</h1>
@@ -59,8 +63,8 @@
           <tr><td>WP-23</td><td>2</td><td>HUMAN_ACCEPTED</td><td>G23 predecessor</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
           <tr><td>WP-24</td><td>2</td><td>HUMAN_ACCEPTED / PASS / CHECKPOINTED</td><td>G27</td><td><code>27ff09c224344821868dd8fd36ec2c0eb11504df</code></td></tr>
           <tr><td>WP-25</td><td>1</td><td>HUMAN_ACCEPTED / PASS / CHECKPOINTED</td><td>G27</td><td><code>27ff09c224344821868dd8fd36ec2c0eb11504df</code></td></tr>
-          <tr><td>WP-26</td><td>2</td><td>IMPLEMENTED_PENDING_REVIEW</td><td>G28</td><td><code>PENDING</code></td></tr>
-          <tr><td>WP-27</td><td>3</td><td>IMPLEMENTED_PENDING_REVIEW</td><td>G28</td><td><code>PENDING</code></td></tr>
+          <tr><td>WP-26</td><td>2</td><td>HUMAN_ACCEPTED / PASS / COMPLETE</td><td>G28</td><td><code>PENDING_STATE_SYNC</code></td></tr>
+          <tr><td>WP-27</td><td>3</td><td>HUMAN_ACCEPTED / PASS / COMPLETE</td><td>G28</td><td><code>PENDING_STATE_SYNC</code></td></tr>
           <tr><td>WP-28</td><td>2</td><td>HUMAN_ACCEPTED</td><td>G23 predecessor; bounded acceptance scope</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
           <tr><td>WP-29</td><td>2</td><td>HUMAN_ACCEPTED</td><td>G23 predecessor; bounded acceptance scope</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
           <tr><td>WP-30</td><td>2</td><td>HUMAN_ACCEPTED</td><td>G23 predecessor; bounded acceptance scope</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
@@ -75,8 +79,8 @@
           <tr><td>G24</td><td><code>fde4c8f1d017992755c6af2bd600c9bd715efd6b</code></td><td><code>61cc7420e290cd93eda787c30b54a93edf4ca9a</code></td><td>Human-confirmed formal checkpoint</td><td>0</td><td>HUMAN_ACCEPTED / PASS / COMPLETE</td></tr>
           <tr><td>G25</td><td><code>61cc7420e290cd93eda787c30b54a93edf4ca9a</code></td><td><code>f4168c31592ac5c886b49d8878f60b99016fdcaf</code></td><td>Approved G24</td><td>+13</td><td>HUMAN_ACCEPTED / PASS / COMPLETE</td></tr>
           <tr><td>G26</td><td><code>f4168c31592ac5c886b49d8878f60b99016fdcaf</code></td><td><code>PENDING</code></td><td>Approved G25</td><td>+12</td><td>READY</td></tr>
-          <tr><td>G27</td><td><code>7a7dee67395c8a07f2e5b055a306e63190bbd1f8</code></td><td><code>PENDING_HUMAN_CHECKPOINT</code></td><td>Approved G26 continuation tip</td><td>+6</td><td>VERIFIED_PASS_PENDING_HUMAN</td></tr>
-          <tr><td>G28</td><td><code>G27_OUTPUT_SHA</code></td><td><code>PENDING</code></td><td>Approved G27</td><td>+5</td><td>GATED</td></tr>
+          <tr><td>G27</td><td><code>7a7dee67395c8a07f2e5b055a306e63190bbd1f8</code></td><td><code>56c941a6077802e326284f1b70fd9719f146e5b4</code></td><td>Approved G26 continuation tip; later docs-only state-sync</td><td>+6</td><td>HUMAN_ACCEPTED / PASS / COMPLETE</td></tr>
+          <tr><td>G28</td><td><code>56c941a6077802e326284f1b70fd9719f146e5b4</code></td><td><code>PENDING</code></td><td>Approved G27 exact remote tip</td><td>+5</td><td>VERIFIED_PASS_PENDING_HUMAN</td></tr>
           <tr><td>G29</td><td><code>G28_OUTPUT_SHA</code></td><td><code>PENDING</code></td><td>Approved G28 + Human operator</td><td>+5</td><td>GATED / EXTERNAL_LATE</td></tr>
           <tr><td>G30</td><td><code>G29_OUTPUT_SHA</code></td><td><code>PENDING</code></td><td>Approved G29</td><td>0</td><td>GATED</td></tr>
         </tbody></table></div>
@@ -114,7 +118,7 @@
           <article class="goal"><span class="badge gated">COMMIT PENDING</span><h3>G25 · Runtime</h3><p>WP-14/15/16 adapters and Doctor. Target 72.</p></article>
           <article class="goal"><span class="badge ready">READY</span><h3>G26 · Internal integration</h3><p>WP-17/18/19 local, policy, WebSurface. Target 84. Predecessor f4168c3.</p></article>
           <article class="goal"><span class="badge gated">GATED</span><h3>G27 · Product breadth</h3><p>WP-22/24/25 workflows, guards, metrics. Target 90.</p></article>
-          <article class="goal"><span class="badge gated">GATED</span><h3>G28 · Feature freeze</h3><p>WP-26/27 UX and Golden Workflow evidence. Target 95.</p></article>
+          <article class="goal"><span class="badge ready">ACCEPTED</span><h3>G28 · Feature freeze</h3><p>WP-26/27 UX and Golden Workflow evidence. Score 95.</p></article>
           <article class="goal"><span class="badge warning">EXTERNAL · LATE</span><h3>G29 · Vendor</h3><p>WP-20 Human-operated authenticated journeys. Target 100.</p></article>
           <article class="goal"><span class="badge gated">GATED</span><h3>G30 · Final</h3><p>Final score/provenance reconciliation. Confirm 100.</p></article>
         </div>
@@ -129,10 +133,10 @@
               <tr><td>CP-00</td><td>8 / 8</td><td>Baseline and governance accepted</td></tr>
               <tr><td>CP-02</td><td>22 / 22</td><td>First Vertical Slice accepted</td></tr>
               <tr><td>CP-03</td><td>14 / 27</td><td>WP-11/12/13 accepted; G25 remainder 13</td></tr>
-              <tr><td>CP-04</td><td>3 / 20</td><td>WP-21 bounded fixture accepted; G26 +12, G29 +5</td></tr>
-              <tr><td>CP-05</td><td>2 / 13</td><td>WP-23 accepted; G27 +6, G28 +5</td></tr>
+              <tr><td>CP-04</td><td>15 / 20</td><td>WP-19 +12 and WP-21 bounded fixture accepted; G29 +5</td></tr>
+              <tr><td>CP-05</td><td>8 / 13</td><td>WP-23 accepted; G27 +6; G28 +5 pending Human</td></tr>
               <tr><td>CP-06</td><td>10 / 10</td><td>G19 provenance, G20 reproducibility, G22 hardening/delivery, G23 Human acceptance</td></tr>
-              <tr><td><strong>Total</strong></td><td><strong>72 / 100</strong></td><td>Remaining 28 points are unaccepted and visible</td></tr>
+          <tr><td><strong>Total</strong></td><td><strong>95 / 100</strong></td><td>G29 +5 remains gated</td></tr>
               <tr><td>Competition</td><td>—</td><td>NOTE_ONLY_NON_SCORING; Human-owned delivery</td></tr>
             </tbody>
           </table>
@@ -150,7 +154,7 @@
         </ul>
       </section>
 
-      <footer>G24 and G25 are Human-accepted at exact checkpoints; G25 output SHA is f4168c31592ac5c886b49d8878f60b99016fdcaf and project score is 72/100. NEXT_GOAL_READY=G26. External verification is deliberately deferred to G29. Do not claim vendor certification before current evidence.</footer>
+      <footer>G28 is Human-accepted at score 95/100; its exact output SHA will be recorded after the authorized checkpoint and state-sync. G29 is gated; external verification is deliberately deferred. Do not claim vendor certification.</footer>
     </main>
   </body>
 </html>

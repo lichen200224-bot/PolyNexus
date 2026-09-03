@@ -2,6 +2,18 @@
 
 Browser-readable companion: [GOAL_COMPLETION_CONTROL_PANEL.html](GOAL_COMPLETION_CONTROL_PANEL.html).
 
+## G28 checkpoint — HUMAN_ACCEPTED / PASS / COMPLETE (2026-09-03)
+
+- `G28_BRANCH`: `feature/g28-ux-feature-freeze`
+- `G28_PREDECESSOR_SHA`: `56c941a6077802e326284f1b70fd9719f146e5b4`
+- `G27_PRODUCT_OUTPUT_SHA`: `27ff09c224344821868dd8fd36ec2c0eb11504df`
+- `G27_OUTPUT_SHA`: `56c941a6077802e326284f1b70fd9719f146e5b4` (later
+  docs-only acceptance-provenance checkpoint; exact approved remote tip)
+- `PROJECT_SCORE`: `95/100` (`90/100` + accepted G28 delta `+5`)
+- `WP-26`, `WP-27`: `HUMAN_ACCEPTED / PASS / COMPLETE`
+- `G28_DECISION=ACCEPT_AND_COMMIT_PUSH`; `G28_OUTPUT_SHA=PENDING_STATE_SYNC`
+- `NEXT_GOAL_READY`: `G29`; G29 is not started by this task.
+
 ## G27 checkpoint — HUMAN_ACCEPTED / PASS / COMPLETE (2026-09-03)
 
 - `G27_BRANCH`: `feature/g27-workflow-guards-metrics`
@@ -9,13 +21,15 @@ Browser-readable companion: [GOAL_COMPLETION_CONTROL_PANEL.html](GOAL_COMPLETION
 - G26 product/state-sync provenance: `4fd73b5...` / `07ebdb8...`; approved
   remote/ref is `D:/GitBackup/PolyNexus_Backup.git` /
   `feature/g24-g30-development-completion-routing`.
-- `G27_OUTPUT_SHA`: `27ff09c224344821868dd8fd36ec2c0eb11504df`.
+- `G27_PRODUCT_OUTPUT_SHA`: `27ff09c224344821868dd8fd36ec2c0eb11504df`.
+- `G27_OUTPUT_SHA`: `56c941a6077802e326284f1b70fd9719f146e5b4` (approved terminal
+  state-sync tip used as G28 predecessor).
 - `PROJECT_SCORE`: `90/100` (`84/100` + `6`; WP-22/24/25 = `3+2+1`).
 - `WP-22`, `WP-24`, `WP-25`: `HUMAN_ACCEPTED / PASS / CHECKPOINTED`.
 - `G27_DECISION=ACCEPT_AND_COMMIT_PUSH`; remote and fresh clean clone match.
 - Evidence: `artifacts/verification/g27-workflow-guards-metrics-20260903/`.
-  Primary worktree is protected; `NEXT_GOAL_READY=G28` is set, but G28 has not
-  started.
+  Primary worktree is protected; `NEXT_GOAL_READY=G28` was set and G28 was
+  subsequently executed in its isolated lane.
 
 ## G26 current checkpoint — HUMAN_ACCEPTED / PASS / COMPLETE (2026-09-03)
 
@@ -76,9 +90,9 @@ Browser-readable companion: [GOAL_COMPLETION_CONTROL_PANEL.html](GOAL_COMPLETION
 | CP-04: WP-21 | 3 | 3 | Complete, bounded fixture scope |
 | CP-05: WP-22/24/25 | 6 | 6 | G27 (HUMAN_ACCEPTED / PASS / CHECKPOINTED) |
 | CP-05: WP-23 | 2 | 2 | Complete |
-| CP-05: WP-26/27 | 0 | 5 | G28 (IMPLEMENTED_PENDING_REVIEW) |
+| CP-05: WP-26/27 | 5 | 5 | G28 (HUMAN_ACCEPTED / PASS / COMPLETE; +5) |
 | CP-06 | 10 | 10 | Complete through G19/G20/G22/G23 |
-| **Development total** | **84** | **100** | **16 points remain** |
+| **Development total** | **95** | **100** | **G29 +5 remains gated** |
 | Competition | **—** | **—** | Note only; no score |
 
 ### New Goal sequence
@@ -88,8 +102,8 @@ Browser-readable companion: [GOAL_COMPLETION_CONTROL_PANEL.html](GOAL_COMPLETION
 | G24 | `HUMAN_ACCEPTED / PASS / COMPLETE` | Exact SHA confirmed; score 59 | 59 |
 | G25 | `HUMAN_ACCEPTED / PASS / COMPLETE` | WP-14/15/16 runtime adapters + Doctor | 72 |
 | G26 | `HUMAN_ACCEPTED / PASS / COMPLETE` | WP-17/18/19 local/policy/WebSurface; output `4fd73b5ac3b59ae1f948f8d95ad795112552b1b2` | 84 |
-| G27 | `CURRENT_CANDIDATE_PENDING_HUMAN` | WP-22/24/25 workflows/guards/metrics | 90 |
-| G28 | `GATED_BY_G27` | WP-26/27 UX + Golden Workflow freeze | 95 |
+| G27 | `HUMAN_ACCEPTED / PASS / COMPLETE` | WP-22/24/25 workflows/guards/metrics | 90 |
+| G28 | `HUMAN_ACCEPTED / PASS / COMPLETE` | WP-26/27 UX + Golden Workflow freeze | 95 |
 | G29 | `GATED_BY_G28` | WP-20 authenticated external-vendor verification | 100 |
 | G30 | `GATED_BY_G29` | Final score/provenance reconciliation | 100 confirmed |
 
@@ -119,8 +133,8 @@ Every WP-11–WP-32 record contains `WP_ID`, `CHECKPOINT`, `POINT_WEIGHT`,
 | WP-23 | 2 | `HUMAN_ACCEPTED` | G23 predecessor | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
 | WP-24 | 2 | `HUMAN_ACCEPTED / PASS / CHECKPOINTED` | G27 | `27ff09c224344821868dd8fd36ec2c0eb11504df` |
 | WP-25 | 1 | `HUMAN_ACCEPTED / PASS / CHECKPOINTED` | G27 | `27ff09c224344821868dd8fd36ec2c0eb11504df` |
-| WP-26 | 2 | `IMPLEMENTED_PENDING_REVIEW` | G28 | `PENDING` |
-| WP-27 | 3 | `IMPLEMENTED_PENDING_REVIEW` | G28 | `PENDING` |
+| WP-26 | 2 | `HUMAN_ACCEPTED / PASS / COMPLETE` | G28 | `PENDING_STATE_SYNC` |
+| WP-27 | 3 | `HUMAN_ACCEPTED / PASS / COMPLETE` | G28 | `PENDING_STATE_SYNC` |
 | WP-28 | 2 | `HUMAN_ACCEPTED` | G23 predecessor; bounded acceptance scope | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
 | WP-29 | 2 | `HUMAN_ACCEPTED` | G23 predecessor; bounded acceptance scope | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
 | WP-30 | 2 | `HUMAN_ACCEPTED` | G23 predecessor; bounded acceptance scope | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
@@ -134,8 +148,8 @@ Every WP-11–WP-32 record contains `WP_ID`, `CHECKPOINT`, `POINT_WEIGHT`,
 | G24 | `fde4c8f1d017992755c6af2bd600c9bd715efd6b` | `61cc7420e290cd93eda787c30b54a93edf4ca9a` | Human-confirmed formal checkpoint | 0 | `HUMAN_ACCEPTED / PASS / COMPLETE` |
 | G25 | `61cc7420e290cd93eda787c30b54a93edf4ca9a` | `f4168c31592ac5c886b49d8878f60b99016fdcaf` | Approved G24 checkpoint | +13 | `HUMAN_ACCEPTED / PASS / COMPLETE` |
 | G26 | `f4168c31592ac5c886b49d8878f60b99016fdcaf` | `4fd73b5ac3b59ae1f948f8d95ad795112552b1b2` | Approved G25 checkpoint | +12 | `HUMAN_ACCEPTED / PASS / COMPLETE` |
-| G27 | `7a7dee67395c8a07f2e5b055a306e63190bbd1f8` | `27ff09c224344821868dd8fd36ec2c0eb11504df` | Approved G26 continuation tip | +6 | `HUMAN_ACCEPTED / PASS / COMPLETE` |
-| G28 | `G27_OUTPUT_SHA` | `PENDING` | Approved G27 checkpoint | +5 | `GATED` |
+| G27 | `7a7dee67395c8a07f2e5b055a306e63190bbd1f8` | `56c941a6077802e326284f1b70fd9719f146e5b4` | Approved G26 continuation tip; later docs-only state-sync | +6 | `HUMAN_ACCEPTED / PASS / COMPLETE` |
+| G28 | `56c941a6077802e326284f1b70fd9719f146e5b4` | `PENDING_STATE_SYNC` | Approved G27 exact remote tip | +5 | `HUMAN_ACCEPTED / PASS / COMPLETE` |
 | G29 | `G28_OUTPUT_SHA` | `PENDING` | Approved G28 + external operator | +5 | `GATED / EXTERNAL_LATE` |
 | G30 | `G29_OUTPUT_SHA` | `PENDING` | Approved G29 checkpoint | 0 | `GATED` |
 

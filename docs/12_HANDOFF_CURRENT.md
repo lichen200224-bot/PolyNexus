@@ -1,6 +1,47 @@
 # Current Handoff
 
-## Current Task — G27 workflow, guards, and metrics acceptance (2026-09-03)
+## Current Task — G28 UX and deterministic feature freeze (2026-09-03)
+
+- `TASK_ID`: `G28-UX-AND-DETERMINISTIC-FEATURE-FREEZE`
+- `ATTEMPT`: `1`; `WRITER`: Codex; `REVIEWER`: independent read-only review
+  `PASS` (`BLOCKER=0`, `MAJOR=0`, `MINOR=0`); `ANTIGRAVITY_STATUS`:
+  `NOT_REQUIRED_FOR_THIS_LOCAL_CONTROLLED_LANE` — Codex executed the named
+  controlled CDP browser journeys.
+- `BRANCH`: `feature/g28-ux-feature-freeze`, isolated lane at
+  `artifacts/worktrees/g28-ux-feature-freeze`.
+- `PREDECESSOR_SHA`: `56c941a6077802e326284f1b70fd9719f146e5b4`, exact approved
+  remote/ref tip and clean isolated-lane start.
+- `G27_PRODUCT_OUTPUT_SHA`: `27ff09c224344821868dd8fd36ec2c0eb11504df`;
+  `G27_OUTPUT_SHA`: `56c941a6077802e326284f1b70fd9719f146e5b4` after the later
+  docs-only acceptance-provenance checkpoint. G27 score is `90/100`.
+- `STATUS`: `HUMAN_ACCEPTED / PASS / COMPLETE`; `G28_DECISION=ACCEPT_AND_COMMIT_PUSH`;
+  G28 targets WP-26
+  UX/accessibility/states and WP-27 four-Golden-Workflow deterministic
+  feature-freeze evidence. Web `85/85`, build `0`, affected Core `40`,
+  browser-companion `10/10`, controlled browser `4/4`, baseline/governance and
+  diff checks all exit `0`. `G28_PRODUCT_OUTPUT_SHA=PENDING_FIRST_CHECKPOINT`;
+  `G28_OUTPUT_SHA=PENDING_STATE_SYNC`. `NEXT_GOAL_READY=G29`; do not start G29
+  in this task.
+- `CHANGED_FILES`: Web source/UI files `apps/web/src/App.tsx`,
+  `apps/web/src/components/StatusMessage.tsx`, `ProjectList.tsx`,
+  `TaskList.tsx`, `RunPreparation.tsx`, `RunDetail.tsx`,
+  `CreateProjectForm.tsx`, `CreateTaskForm.tsx`, `apps/web/src/styles.css`,
+  and `apps/web/src/WP26.test.tsx`; task records `docs/tasks/WP-26.md` and
+  `docs/tasks/WP-27.md`; current state/handoff/roadmap/compatibility/
+  limitations/control-panel HTML/Markdown docs; ignored evidence under
+  `artifacts/verification/g28-ux-feature-freeze-20260903/`.
+- `INDEPENDENT_REVIEW`: `PASS`; `BLOCKER=0`; `MAJOR=0`; `MINOR=0`; bounded
+  report is `artifacts/verification/g28-ux-feature-freeze-20260903/independent-review.md`.
+- `EVIDENCE`: `artifacts/verification/g28-ux-feature-freeze-20260903/` contains
+  summary, ledger, commands, browser journey results, sanitized trace and
+  screenshot. No live vendor traffic or external send occurred.
+- `KNOWN_ISSUE`: pytest emitted a non-fatal Windows temp-directory cleanup
+  PermissionError after the successful exit-`0` result; retained as an explicit
+  environment warning, not relabeled.
+- `PROVENANCE_NOTE`: the approved remote was observed at `56c941a...`, while
+  the prior G27 handoff named the earlier product commit `27ff09c...`; this
+  bounded state-sync records both without rewriting history or changing
+  product semantics.
 
 - `TASK_ID`: `G27-WORKFLOW-GUARDS-AND-METRICS-ACCEPTANCE`
 - `ATTEMPT`: `1`; `WRITER`: Codex; `REVIEWER`: independent read-only review
@@ -14,7 +55,8 @@
 - `GOAL`: WP-22 nine V1 workflow templates and three representative executions;
   WP-24 resource guards; WP-25 minimal evaluation/usage metrics.
 - `STATUS`: `HUMAN_ACCEPTED / PASS / COMPLETE`; `G27_DECISION=ACCEPT_AND_COMMIT_PUSH`;
-  `G27_OUTPUT_SHA=27ff09c224344821868dd8fd36ec2c0eb11504df`; score `90/100`
+  `G27_PRODUCT_OUTPUT_SHA=27ff09c224344821868dd8fd36ec2c0eb11504df`;
+  `G27_OUTPUT_SHA=56c941a6077802e326284f1b70fd9719f146e5b4`; score `90/100`
   (`+6` from `84/100`).
 - `CHANGED_FILES`: `services/core/src/polynexus_core/runtime/supervisor.py`,
   `services/core/src/polynexus_core/evaluation/metrics.py`,

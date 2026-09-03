@@ -1,5 +1,15 @@
 # PolyNexus V1 Compatibility Matrix
 
+## G28 candidate verification — 2026-09-03
+
+The WebSurface candidate adds progressive disclosure, keyboard-visible skip
+navigation, consistent loading/empty/error/permission/Human-required/terminal
+states, retry affordances, stale-data clearing, and generic error redaction.
+The local deterministic browser fixture verified the success navigation,
+Human-required, TIMED_OUT, and retryable-error routes in Chrome
+`152.0.7977.66`; no live vendor traffic was used. See
+`artifacts/verification/g28-ux-feature-freeze-20260903/`.
+
 This is a bounded V1 release-candidate matrix. It records only capabilities
 that have a deterministic local source and does not certify broad vendor or
 browser compatibility.

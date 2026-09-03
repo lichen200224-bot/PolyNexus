@@ -1,5 +1,18 @@
 # PolyNexus Master Development Roadmap & Checkpoint Register
 
+## G28 checkpoint — HUMAN_ACCEPTED / PASS / COMPLETE (2026-09-03)
+
+- Branch: `feature/g28-ux-feature-freeze`.
+- Exact predecessor/start SHA: `56c941a6077802e326284f1b70fd9719f146e5b4`.
+- G27 product output: `27ff09c224344821868dd8fd36ec2c0eb11504df`; approved
+  terminal output/state-sync tip: `56c941a...`.
+- Score: `95/100` (`90/100` plus the accepted bounded `+5`).
+- Scope: WP-26 UX/accessibility/states; WP-27 Golden Workflow regressions and
+  feature-freeze evidence. Independent review PASS with zero findings.
+- `G28_DECISION=ACCEPT_AND_COMMIT_PUSH`; `G28_PRODUCT_OUTPUT_SHA` is pending
+  the first checkpoint commit and `G28_OUTPUT_SHA` the later state-sync.
+- `NEXT_GOAL_READY=G29`; G29 is not started in this task.
+
 ## Current G27 candidate checkpoint — 2026-09-03
 
 - `G27_STATUS=HUMAN_ACCEPTED / PASS / COMPLETE`; isolated branch
@@ -7,13 +20,15 @@
   `7a7dee67395c8a07f2e5b055a306e63190bbd1f8` from the approved backup remote.
 - G26 is `HUMAN_ACCEPTED / PASS / COMPLETE` at `84/100`. G27 accepted
   `WP-22=3`, `WP-24=2`, `WP-25=1`, for `+6` and `90/100`.
-- `G27_OUTPUT_SHA=27ff09c224344821868dd8fd36ec2c0eb11504df`; approved remote
-  push and fresh clean-clone SHA verification passed.
+- `G27_PRODUCT_OUTPUT_SHA=27ff09c224344821868dd8fd36ec2c0eb11504df`; the
+  later docs-only acceptance-provenance checkpoint
+  `G27_OUTPUT_SHA=56c941a6077802e326284f1b70fd9719f146e5b4` is the approved
+  remote tip and exact G28 predecessor. Both refs are retained for provenance.
 - Current deterministic evidence and independent review are recorded in
   `artifacts/verification/g27-workflow-guards-metrics-20260903/`; one
   pre-existing Windows symlink-policy skip is explicit. `ADR_IMPACT=NONE`,
   `SCOPE_DEVIATION=NONE`, primary worktree unchanged, and
-  `NEXT_GOAL_READY=G28` is not set.
+  `NEXT_GOAL_READY=G28` is set; G28 is active in its isolated lane.
 
 ## Document status
 
@@ -111,14 +126,14 @@ The project uses a 100-point checkpoint-weighted progress model. Only `ACCEPTED`
 | WP-19 WebSurface/MV3 boundary | 4 | 4 | G26 — HUMAN_ACCEPTED / PASS / CHECKPOINTED |
 | WP-20 authenticated Level 3A vendor flow | 5 | 0 | G29 — IMPLEMENTED_PENDING_REVIEW; external/Human-operated |
 | WP-21 bounded browser fixture | 3 | 3 | Accepted through G21–G23 |
-| WP-22 workflow templates | 3 | 0 | G27 — VERIFIED_PASS_PENDING_HUMAN |
+| WP-22 workflow templates | 3 | 3 | G27 — HUMAN_ACCEPTED / PASS / CHECKPOINTED |
 | WP-23 backup/restore/migration | 2 | 2 | Accepted through G17/G22/G23 |
-| WP-24 resource guards | 2 | 0 | G27 — VERIFIED_PASS_PENDING_HUMAN |
-| WP-25 evaluation/usage metrics | 1 | 0 | G27 — VERIFIED_PASS_PENDING_HUMAN |
-| WP-26 UX progressive disclosure | 2 | 0 | G28 — IMPLEMENTED_PENDING_REVIEW |
-| WP-27 Golden Workflow regression | 3 | 0 | G28 — IMPLEMENTED_PENDING_REVIEW |
+| WP-24 resource guards | 2 | 2 | G27 — HUMAN_ACCEPTED / PASS / CHECKPOINTED |
+| WP-25 evaluation/usage metrics | 1 | 1 | G27 — HUMAN_ACCEPTED / PASS / CHECKPOINTED |
+| WP-26 UX progressive disclosure | 2 | 2 | G28 — HUMAN_ACCEPTED / PASS / COMPLETE |
+| WP-27 Golden Workflow regression | 3 | 3 | G28 — HUMAN_ACCEPTED / PASS / COMPLETE |
 | CP-06 bounded RC hardening/closeout | 10 | 10 | Accepted through G19/G20/G22/G23 |
-| **Development total** | **100** | **84** | **16 points remain** |
+| **Development total** | **100** | **90** | **10 points remain** |
 | Competition | **—** | **—** | `NOTE_ONLY_NON_SCORING` |
 
 #### Ordered Goal forecast

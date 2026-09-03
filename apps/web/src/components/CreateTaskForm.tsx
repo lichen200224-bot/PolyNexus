@@ -43,11 +43,11 @@ export function CreateTaskForm({ config, projectId, onCreated, onCancel }: Creat
       if (err instanceof AuthError) {
         setError('Authentication required')
       } else if (err instanceof ApiError && err.status === 422) {
-        setError(err.body ? String(err.body) : 'Invalid input')
+        setError('Invalid task data. Check the required fields.')
       } else if (err instanceof ApiError && err.status === 404) {
         setError('Project not found')
       } else {
-        setError(err instanceof Error ? err.message : 'Failed to create task')
+        setError('Unable to create task. Try again.')
       }
       setSubmitting(false)
     }

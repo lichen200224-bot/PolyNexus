@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import type { ApiClientConfig, Task, Run, ContextPackageCreateRequest } from '../api'
 import { listRuns, createRun, createContextPackage, AuthError, ApiError } from '../api'
+import { StatusMessage } from './StatusMessage'
 
 interface RunPreparationProps {
   config: ApiClientConfig
@@ -41,6 +42,7 @@ export function RunPreparation({ config, task, onBack, onOpenDetail }: RunPrepar
   const [contextPackageId, setContextPackageId] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [runsError, setRunsError] = useState<string | null>(null)
 
   // ContextPackage authoring state
   const [showCpForm, setShowCpForm] = useState(false)
@@ -59,13 +61,15 @@ export function RunPreparation({ config, task, onBack, onOpenDetail }: RunPrepar
 
   const loadRuns = () => {
     setLoading(true)
+    setRuns([])
+    setRunsError(null)
     listRuns(config, task.id)
       .then((res) => setRuns(res.runs))
       .catch((err) => {
         if (err instanceof AuthError) {
-          setError('Authentication required')
+          setRunsError('Authentication required')
         } else {
-          setError(err.message || 'Failed to load runs')
+          setRunsError('Unable to load runs. Try again.')
         }
       })
       .finally(() => setLoading(false))
@@ -87,11 +91,11 @@ export function RunPreparation({ config, task, onBack, onOpenDetail }: RunPrepar
       if (err instanceof AuthError) {
         setError('Authentication required')
       } else if (err instanceof ApiError && err.status === 422) {
-        setError(err.body ? String(err.body) : 'Invalid ContextPackage')
+        setError('Invalid ContextPackage. Check the reference and try again.')
       } else if (err instanceof ApiError && err.status === 404) {
         setError('Task not found')
       } else {
-        setError(err instanceof Error ? err.message : 'Failed to create run')
+        setError('Unable to create run. Try again.')
       }
     } finally {
       setSubmitting(false)
@@ -148,9 +152,9 @@ export function RunPreparation({ config, task, onBack, onOpenDetail }: RunPrepar
       } else if (err instanceof ApiError && err.status === 404) {
         setCpError('Project not found')
       } else if (err instanceof ApiError && err.status === 422) {
-        setCpError(err.body ? String(err.body) : 'Validation error')
+        setCpError('Validation error. Check the ContextPackage fields.')
       } else {
-        setCpError(err instanceof Error ? err.message : 'Failed to create ContextPackage')
+        setCpError('Unable to create ContextPackage. Try again.')
       }
     } finally {
       setCpSubmitting(false)
@@ -351,9 +355,19 @@ export function RunPreparation({ config, task, onBack, onOpenDetail }: RunPrepar
       <div className="runs-section">
         <h3>Runs</h3>
         {loading ? (
-          <div className="status-message" role="status">Loading runs...</div>
+          <StatusMessage kind="loading">Loading runs...</StatusMessage>
+        ) : runsError ? (
+          <StatusMessage
+            kind={runsError === 'Authentication required' ? 'permission' : 'error'}
+            title={runsError}
+            action={<button type="button" onClick={loadRuns}>Retry</button>}
+          >
+            {runsError === 'Authentication required' && (
+              <p className="status-hint">Set the LOOPBACK_TOKEN environment variable on the Core server to enable API access.</p>
+            )}
+          </StatusMessage>
         ) : runs.length === 0 ? (
-          <div className="status-message">No runs yet.</div>
+          <StatusMessage kind="empty">No runs yet.</StatusMessage>
         ) : (
           <ul className="run-list" role="list">
             {runs.map((r) => (

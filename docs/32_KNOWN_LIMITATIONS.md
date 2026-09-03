@@ -1,5 +1,16 @@
 # V1 Known Limitations
 
+## G28 candidate limitations — 2026-09-03
+
+- Browser evidence is a local Vite app with an in-page deterministic fetch
+  fixture. It is not live vendor, authenticated, native MV3, or certification
+  evidence; those remain deferred to G29.
+- Core regression evidence covers the four canonical Golden Workflow paths and
+  affected failure/cleanup/resource/metric/loader suites. Full Core is not
+  rerun as a G28 gate because no Core contract or persistence behavior changed.
+- No automatic external send, credential, cookie, token, cloud fallback, or raw
+  server error detail is used or retained.
+
 These limitations are intentional boundaries, not hidden compatibility
 claims.
 

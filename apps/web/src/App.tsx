@@ -30,15 +30,17 @@ export function App() {
   const config = useMemo(createDefaultConfig, [])
 
   return (
-    <main className="shell">
-      <header>
+    <main className="shell" id="workspace-main">
+      <a className="skip-link" href="#workspace-content">Skip to workspace</a>
+      <header aria-labelledby="app-heading">
         <p className="eyebrow">PolyNexus · Development Baseline v1.0</p>
-        <h1>Multi-AI Collaboration & Validation Workspace</h1>
+        <h1 id="app-heading">Multi-AI Collaboration & Validation Workspace</h1>
         <p className="subtitle">
           Select a project, then start with the purpose of the work—not the provider.
         </p>
       </header>
 
+      <div id="workspace-content" tabIndex={-1}>
       {state.view === 'projects' && (
         <>
           <section className="panel" aria-labelledby="project-heading">
@@ -103,6 +105,7 @@ export function App() {
           />
         </>
       )}
+      </div>
 
       <section className="modes-section" aria-labelledby="modes-heading">
         <details className="disclosure-card">

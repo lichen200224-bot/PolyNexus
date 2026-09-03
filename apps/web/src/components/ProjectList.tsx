@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import type { ApiClientConfig, Project } from '../api'
 import { listProjects, AuthError } from '../api'
 import { CreateProjectForm } from './CreateProjectForm'
+import { StatusMessage } from './StatusMessage'
 
 interface ProjectListProps {
   config: ApiClientConfig
@@ -17,13 +18,14 @@ export function ProjectList({ config, onSelectProject }: ProjectListProps) {
   const load = () => {
     setLoading(true)
     setError(null)
+    setProjects([])
     listProjects(config)
       .then((res) => setProjects(res.projects))
       .catch((err) => {
         if (err instanceof AuthError) {
           setError('Authentication required')
         } else {
-          setError(err.message || 'Failed to load projects')
+          setError('Unable to load projects. Try again.')
         }
       })
       .finally(() => setLoading(false))
@@ -32,26 +34,28 @@ export function ProjectList({ config, onSelectProject }: ProjectListProps) {
   useEffect(() => { load() }, [config])
 
   if (loading) {
-    return <div className="status-message" role="status">Loading projects...</div>
+    return <StatusMessage kind="loading">Loading projects...</StatusMessage>
   }
 
   if (error) {
     return (
-      <div className="status-message status-error" role="alert">
-        {error}
+      <StatusMessage
+        kind={error === 'Authentication required' ? 'permission' : 'error'}
+        title={error}
+        action={<button type="button" onClick={load}>Retry</button>}
+      >
         {error === 'Authentication required' && (
           <p className="status-hint">
             Set the LOOPBACK_TOKEN environment variable on the Core server to enable API access.
           </p>
         )}
-      </div>
+      </StatusMessage>
     )
   }
 
   if (projects.length === 0) {
     return (
-      <div className="status-message">
-        <p>No projects yet.</p>
+      <StatusMessage kind="empty" title="No projects yet.">
         <button type="button" onClick={() => setShowCreate(true)}>
           Create first project
         </button>
@@ -62,7 +66,7 @@ export function ProjectList({ config, onSelectProject }: ProjectListProps) {
             onCancel={() => setShowCreate(false)}
           />
         )}
-      </div>
+      </StatusMessage>
     )
   }
 

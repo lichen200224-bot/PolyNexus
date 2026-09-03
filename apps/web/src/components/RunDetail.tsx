@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import type { ApiClientConfig, Run, RunResult, Finding, Evidence, Artifact, RunEvent } from '../api'
 import { getRun, getRunResult, getRunFindings, getRunEvidence, getRunArtifacts, getRunHistory, AuthError, ApiError, NotFoundError } from '../api'
+import { StatusMessage } from './StatusMessage'
 
 interface RunDetailProps {
   config: ApiClientConfig
@@ -16,6 +17,27 @@ function toUserMessage(err: unknown): string {
     return 'Unable to load run data.'
   }
   return 'Unable to load run data.'
+}
+
+const HUMAN_REQUIRED_STATES = new Set(['HUMAN_REQUIRED', 'WAITING_FOR_HUMAN', 'PENDING_HUMAN'])
+const TERMINAL_ERROR_STATES = new Set(['FAILED', 'TIMED_OUT', 'CANCELLED', 'ORPHANED'])
+
+function stateMessage(state: string): { kind: 'human-required' | 'terminal'; title: string; detail: string } | null {
+  if (HUMAN_REQUIRED_STATES.has(state)) {
+    return {
+      kind: 'human-required',
+      title: 'Human action required',
+      detail: 'Review the required decision or confirmation outside this read-only result view, then reload the run.',
+    }
+  }
+  if (TERMINAL_ERROR_STATES.has(state)) {
+    return {
+      kind: 'terminal',
+      title: `Run ended: ${state}`,
+      detail: 'This terminal state is shown as recorded. No success or evidence is inferred; inspect the durable history below.',
+    }
+  }
+  return null
 }
 
 export function RunDetail({ config, runId, onBack }: RunDetailProps) {
@@ -64,17 +86,18 @@ export function RunDetail({ config, runId, onBack }: RunDetailProps) {
         <button type="button" onClick={onBack} className="back-link" aria-label="Back to run preparation">Back to preparation</button>
       </div>
 
-      {loading && <div role="status" className="status-message">Loading run detail...</div>}
+      {loading && <StatusMessage kind="loading">Loading run detail...</StatusMessage>}
 
       {error && (
-        <div role="alert" className="form-error">
-          <p>{error}</p>
-          <button type="button" onClick={load}>Retry</button>
-        </div>
+        <StatusMessage kind={error === 'Authentication required. Set LOOPBACK_TOKEN on the Core server.' ? 'permission' : 'error'} title={error} action={<button type="button" onClick={load}>Retry</button>} />
       )}
 
       {!loading && !error && run && (
         <>
+          {(() => {
+            const notice = stateMessage(run.state)
+            return notice ? <StatusMessage kind={notice.kind} title={notice.title}>{notice.detail}</StatusMessage> : null
+          })()}
           <section aria-labelledby="run-meta-heading" className="task-info">
             <div className="section-header">
               <h3 id="run-meta-heading">Run overview</h3>
