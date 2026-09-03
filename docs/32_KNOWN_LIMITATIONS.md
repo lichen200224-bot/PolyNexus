@@ -17,9 +17,9 @@ claims.
 - WebSurface drivers remain `PREVIEW`; live authenticated vendor journeys,
   native MV3 dispatch, credentials/cookies/tokens, and external send remain
   deferred to G29.
-- G26 has Human authorization for the checkpoint, but retains score delta
-  `0/12` because full Core regression is not clean; commit/push and clean-clone
-  evidence remain required for the checkpoint.
+- G26 is Human-accepted at bounded internal scope with score delta `+12/12`.
+  The full Core regression has unrelated exit-`1` failures outside WP-17/18/19;
+  those failures remain visible and are not relabeled as G26 failures.
 
 ## G24 current reconciliation boundary — 2026-09-02
 

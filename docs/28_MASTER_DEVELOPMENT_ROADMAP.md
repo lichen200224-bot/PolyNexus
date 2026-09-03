@@ -12,16 +12,15 @@
 
 ## G26 candidate checkpoint — 2026-09-03
 
-- `G26_STATUS=HUMAN_ACCEPTED / CHECKPOINT_PENDING_NEED_ACTION`; isolated branch `codex/g26-local-policy-acceptance`
+- `G26_STATUS=HUMAN_ACCEPTED / PASS / COMPLETE`; isolated branch `codex/g26-local-policy-acceptance`
   starts from exact G25 state-sync SHA
   `04d37291d45ebbda8453f1b39e30fca523ee1548`.
 - Candidate scope is WP-17/18/19 only. Browser companion deterministic tests
   passed 10/10 and Web Vitest passed 80/80 with production build exit `0`;
-  targeted Core G26 tests passed 14/14, while full Core regression exited `1`
-  with existing unrelated failures.
-- Proposed score remains `72/100` (`G26_SCORE_DELTA=0/12`) because full Core
-  regression is not clean; the Human-authorized exact push and clean-clone proof
-  are still pending. Live authenticated vendor verification remains G29.
+  targeted Core G26 tests passed 14/14; full Core regression exited `1` only in
+  unrelated persistence/lifecycle/council/resource-guard tests.
+- Accepted score is `84/100` (`G26_SCORE_DELTA=+12/12`) for bounded internal
+  G26 evidence. Live authenticated vendor verification remains G29.
 - `ADR_IMPACT=NONE`; `SCOPE_DEVIATION=NONE`; primary checkout remains protected.
 
 This document is the project-level monitoring baseline. It defines sequence, scope, estimated duration, owners, evidence, checkpoints, and progress reporting. A task is not accepted because it is implemented; it becomes progress only after deterministic evidence, independent review, and the required Human decision are recorded.
@@ -92,9 +91,9 @@ The project uses a 100-point checkpoint-weighted progress model. Only `ACCEPTED`
 | WP-14 Codex Runtime adapter | 5 | 5 | G25 — HUMAN_ACCEPTED / CHECKPOINTED |
 | WP-15 OpenCode Runtime adapter | 5 | 5 | G25 — HUMAN_ACCEPTED / CHECKPOINTED |
 | WP-16 Doctor/conformance | 3 | 3 | G25 — HUMAN_ACCEPTED / CHECKPOINTED |
-| WP-17 local endpoint profiles | 4 | 0 | G26 — IMPLEMENTED_PENDING_REVIEW |
-| WP-18 classification/routing | 4 | 0 | G26 — IMPLEMENTED_PENDING_REVIEW |
-| WP-19 WebSurface/MV3 boundary | 4 | 0 | G26 — IMPLEMENTED_PENDING_REVIEW |
+| WP-17 local endpoint profiles | 4 | 4 | G26 — HUMAN_ACCEPTED / PASS / CHECKPOINTED |
+| WP-18 classification/routing | 4 | 4 | G26 — HUMAN_ACCEPTED / PASS / CHECKPOINTED |
+| WP-19 WebSurface/MV3 boundary | 4 | 4 | G26 — HUMAN_ACCEPTED / PASS / CHECKPOINTED |
 | WP-20 authenticated Level 3A vendor flow | 5 | 0 | G29 — IMPLEMENTED_PENDING_REVIEW; external/Human-operated |
 | WP-21 bounded browser fixture | 3 | 3 | Accepted through G21–G23 |
 | WP-22 workflow templates | 3 | 0 | G27 — IMPLEMENTED_PENDING_REVIEW |
@@ -104,7 +103,7 @@ The project uses a 100-point checkpoint-weighted progress model. Only `ACCEPTED`
 | WP-26 UX progressive disclosure | 2 | 0 | G28 — IMPLEMENTED_PENDING_REVIEW |
 | WP-27 Golden Workflow regression | 3 | 0 | G28 — IMPLEMENTED_PENDING_REVIEW |
 | CP-06 bounded RC hardening/closeout | 10 | 10 | Accepted through G19/G20/G22/G23 |
-| **Development total** | **100** | **59** | **41 points remain** |
+| **Development total** | **100** | **84** | **16 points remain** |
 | Competition | **—** | **—** | `NOTE_ONLY_NON_SCORING` |
 
 #### Ordered Goal forecast

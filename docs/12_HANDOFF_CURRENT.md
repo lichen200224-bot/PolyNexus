@@ -13,9 +13,9 @@
   approved G25 remote ref at start. G25 output
   `f4168c31592ac5c886b49d8878f60b99016fdcaf` ancestry passed in the backup
   repository.
-- `STATUS`: `HUMAN_ACCEPTED / CHECKPOINT_PENDING_NEED_ACTION`; Human decision
-  received: `G26_DECISION=ACCEPT_AND_COMMIT_PUSH`. Full Core regression remains
-  exit `1`, so no G26 points are accepted. `PROJECT_SCORE=72/100`; delta `0/12`.
+- `STATUS`: `HUMAN_ACCEPTED / PASS / COMPLETE`; Human decision recorded:
+  `G26_DECISION=ACCEPT_AND_COMMIT_PUSH`. Bounded WP-17/18/19 evidence passed;
+  `PROJECT_SCORE=84/100`; delta `+12/12`.
 - `GOAL`: reconcile WP-17 local profiles, WP-18 classification/routing/egress,
   and WP-19 WebSurface/authenticated-loopback/manual fallback using controlled
   fixtures only.
@@ -39,15 +39,14 @@
 - `PROTECTED_AREAS`: primary checkout `D:\AI學習教材\PolyNexus`; no reset,
   clean, stage, merge, rebase, commit, push, or modification was performed
   there. No secret, credential, cookie, token, live vendor, or external send.
-- `WP17_STATUS`: bounded deterministic evidence verified; targeted G26 Core
-  tests 14/14 passed, exit `0`; full Core remains a separate exit-`1` gap.
-- `WP18_STATUS`: bounded deterministic evidence verified; targeted G26 Core
+- `WP17_STATUS`: `HUMAN_ACCEPTED / PASS / CHECKPOINTED`; targeted G26 Core
+  tests 14/14 passed, exit `0`.
+- `WP18_STATUS`: `HUMAN_ACCEPTED / PASS / CHECKPOINTED`; targeted G26 Core
   tests 14/14 passed, exit `0`; policy decisions map to existing `Evidence`
   and reject unsafe identities.
-- `WP19_STATUS`: browser deterministic suite 10/10 passed, exit `0`; Web
-  Vitest 80/80 and production build passed, exit `0`; service-worker
-  authenticated loopback integration, JS syntax, manifest, and Core caller-auth
-  assertions all passed. Live/native boundaries remain unverified.
+- `WP19_STATUS`: `HUMAN_ACCEPTED / PASS / CHECKPOINTED`; browser deterministic
+  suite 10/10, Web Vitest 80/80, production build, service-worker loopback,
+  syntax, manifest, and Core caller-auth assertions all passed.
 - `TESTS_CURRENT`: G26 Core targeted `14/14`, exit `0`; combined API/local
   routing regression `29/29`, exit `0`; full Core regression exit `1` with
   existing persistence/lifecycle/council/resource-guard failures; browser
@@ -57,14 +56,15 @@
   contracts preserved. `SCOPE_DEVIATION`: `NONE`.
 - `KNOWN_LIMITATIONS`: no live LM Studio/Ollama/vendor certification; controlled
   loopback fixtures only; local HTTP cancellation/cleanup remains unverified by
-  design; external Web AI verification belongs to G29; full Core regression is
-  not clean and remains outside the awarded G26 score.
+  design; external Web AI verification belongs to G29; full Core regression has
+  unrelated exit-`1` failures outside the bounded G26 WP paths.
 - `INDEPENDENT_REVIEW`: Feynman returned `PASS`, `BLOCKER=0`, `MAJOR=0`,
   `MINOR=0`; it verified the request-time denied-policy path, lifecycle,
   evidence identity safety, and service-worker loopback boundary.
-- `NEXT_ACTION`: execute the already authorized exact stage/commit/push
-  allowlist, verify the approved remote ref and clean clone, publish the output
-  SHA, and set `NEXT_GOAL_READY=G27` without starting G27.
+- `G26_OUTPUT_SHA`: `4fd73b5ac3b59ae1f948f8d95ad795112552b1b2` (bounded product
+  checkpoint); clean clone verified at
+  `C:\Users\hikar\.codex\visualizations\2026\09\02\01a0641b-117b-7b83-a4dd-7172a552aded\g26-final-clean-4fd73b5`.
+- `NEXT_ACTION`: `NEXT_GOAL_READY=G27`; do not start G27.
 - `DO_NOT_CHANGE`: primary checkout, approved remote configuration/ref,
   frozen ADR semantics, Domain/persistence schema, secrets, external accounts,
   or next Goal.

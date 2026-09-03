@@ -3,12 +3,12 @@
   "attempt": 1,
   "branch": "codex/g26-local-policy-acceptance",
   "predecessor_sha": "04d37291d45ebbda8453f1b39e30fca523ee1548",
-  "output_sha": "PENDING",
+  "output_sha": "4fd73b5ac3b59ae1f948f8d95ad795112552b1b2",
   "approved_remote_ref": "feature/g24-g30-development-completion-routing",
   "project_score_before": 72,
-  "project_score_proposed": 72,
-  "score_delta_proposed": 0,
-  "status": "NEED_ACTION",
+  "project_score_proposed": 84,
+  "score_delta_proposed": 12,
+  "status": "HUMAN_ACCEPTED / PASS / COMPLETE",
   "adr_impact": "NONE",
   "scope_deviation": "NONE",
   "review_result": "PASS",
@@ -25,8 +25,8 @@
     {
       "wp_id": "WP-17",
       "weight": 4,
-      "status": "NEED_ACTION",
-      "accepted_points": 0,
+      "status": "HUMAN_ACCEPTED / PASS / CHECKPOINTED",
+      "accepted_points": 4,
       "implementation_ref": "services/core/src/polynexus_core/runtime/local_endpoint.py",
       "test_ref": "services/core/tests/test_cp04_wp17_wp18_local_routing.py",
       "evidence": "Targeted G26 Core tests 14/14 passed, exit 0; combined API/local routing regression 29/29 passed, exit 0; full Core regression exit 1",
@@ -37,8 +37,8 @@
     {
       "wp_id": "WP-18",
       "weight": 4,
-      "status": "NEED_ACTION",
-      "accepted_points": 0,
+      "status": "HUMAN_ACCEPTED / PASS / CHECKPOINTED",
+      "accepted_points": 4,
       "implementation_ref": "services/core/src/polynexus_core/runtime/routing_policy.py",
       "test_ref": "services/core/tests/test_cp04_wp17_wp18_local_routing.py",
       "evidence": "Targeted G26 Core tests 14/14 passed, exit 0; policy decisions map to existing Evidence and reject unsafe identities; full Core regression exit 1",
@@ -49,8 +49,8 @@
     {
       "wp_id": "WP-19",
       "weight": 4,
-      "status": "NEED_ACTION",
-      "accepted_points": 0,
+      "status": "HUMAN_ACCEPTED / PASS / CHECKPOINTED",
+      "accepted_points": 4,
       "implementation_ref": "extensions/browser-companion/src/driver-contract.js",
       "test_ref": "extensions/browser-companion/tests/test_websurface_drivers.mjs",
       "evidence": "Node test suite 10/10 passed; Web Vitest 80/80 and production build passed; G26 Core caller-auth assertions included in 14/14 targeted run; all exit 0",
@@ -59,5 +59,5 @@
       "unverified": ["full Core regression", "live vendor journeys", "native MV3 packaging dispatch"]
     }
   ],
-  "clean_clone": "PENDING_HUMAN_GIT_GATE"
+  "clean_clone": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\02\\01a0641b-117b-7b83-a4dd-7172a552aded\\g26-final-clean-4fd73b5"
 }

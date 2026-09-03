@@ -2,8 +2,9 @@
 
 ## Current G26 Candidate State — 2026-09-03
 
-This is the current G26 checkpoint candidate. It supersedes no accepted
-checkpoint until the authorized commit, push, and clean-clone gates complete.
+This is the current G26 accepted checkpoint. The product checkpoint is
+`4fd73b5ac3b59ae1f948f8d95ad795112552b1b2`; a later docs-only state-sync
+preserves the same approved remote ref.
 
 - **Goal:** `G26-LOCAL-POLICY-AND-WEBSURFACE-INTERNAL-ACCEPTANCE`.
 - **Branch:** `codex/g26-local-policy-acceptance`; isolated clone HEAD is
@@ -15,10 +16,9 @@ checkpoint until the authorized commit, push, and clean-clone gates complete.
   passed in `D:/GitBackup/PolyNexus_Backup.git`.
 - **Primary protection:** `D:\AI學習教材\PolyNexus` remains untouched by this
   candidate; it had pre-existing dirty/untracked work before G26.
-- **G26 status:** `HUMAN_ACCEPTED / CHECKPOINT_PENDING_NEED_ACTION` after
-  `G26_DECISION=ACCEPT_AND_COMMIT_PUSH`; the bounded WP evidence is recorded,
-  but the full Core regression remains exit `1`, so no G26 points are awarded
-  (`PROJECT_SCORE=72/100`, delta `0/12`).
+- **G26 status:** `HUMAN_ACCEPTED / PASS / COMPLETE` after
+  `G26_DECISION=ACCEPT_AND_COMMIT_PUSH`; WP-17/18/19 each earned their bounded
+  allocation (`PROJECT_SCORE=84/100`, delta `+12/12`).
 - **Implemented candidate scope:** WP-17 local endpoint timeout/identity
   coverage plus request-time egress enforcement, WP-18 highest-classification
   and egress decision mapping with safe Evidence identity validation, and
@@ -35,8 +35,9 @@ checkpoint until the authorized commit, push, and clean-clone gates complete.
 - **ADR / scope:** `ADR_IMPACT=NONE`; `SCOPE_DEVIATION=NONE`; no Domain entity,
   migration, Run identity, public runtime contract, cloud fallback, secret
   handling, or vendor-specific Core branch was added.
-- **Next action:** execute the explicitly authorized exact-allowlist
-  stage/commit/push and clean-clone verification. Do not start G27.
+- **Clean clone:** exact product checkpoint was cloned and verified clean with
+  staged state empty at `C:\Users\hikar\.codex\visualizations\2026\09\02\01a0641b-117b-7b83-a4dd-7172a552aded\g26-final-clean-4fd73b5`.
+- **Next action:** `NEXT_GOAL_READY=G27`; do not start G27 in this task.
 
 ## Current Operational State — 2026-09-02 (G25 runtime adapters and Doctor — CURRENT)
 

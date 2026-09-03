@@ -6,9 +6,9 @@ browser compatibility.
 
 ## G26 current candidate boundary — 2026-09-03
 
-- `G26_STATUS=HUMAN_ACCEPTED / CHECKPOINT_PENDING_NEED_ACTION`; bounded G26
-  Core/Web checks and independent review are verified, but full Core regression
-  is exit `1`, so no G26 compatibility row earns score yet.
+- `G26_STATUS=HUMAN_ACCEPTED / PASS / COMPLETE`; bounded G26 Core/Web checks
+  and independent review are verified. The bounded rows earn their G26 score;
+  unrelated full-Core failures remain documented separately.
 - WP-17 LocalModelEndpoint profiles (LM Studio/OpenAI-compatible, Ollama, and
   generic OpenAI-compatible): `EXPERIMENTAL / DETERMINISTIC_LOCAL_CONFORMANCE`
   candidate. Controlled endpoint evidence exists in source/tests; targeted G26
@@ -24,8 +24,8 @@ browser compatibility.
   Vitest 80/80 and production build also pass; live authenticated ChatGPT/Claude/Gemini journeys,
   native MV3 dispatch, and certification remain `UNVERIFIED`/`NOT_CLAIMED` for
   G29.
-- No row is promoted to a higher maturity by this candidate; exact remote
-  clean-clone verification remains required for the checkpoint.
+- No row is promoted to a higher maturity by this candidate; the checkpoint
+  preserves `EXPERIMENTAL` and `PREVIEW` labels with exact clean-clone evidence.
 
 ## G24 current reconciliation boundary — 2026-09-02
 

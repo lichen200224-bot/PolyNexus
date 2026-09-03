@@ -30,8 +30,10 @@ The portable Python runtime was used only inside the isolated worktree and is
 not part of the staged allowlist. The initial `py -3` exit `112` remains an
 environment probe; the later targeted Core evidence is current and passed.
 
-Required but currently unverified: clean-clone checkpoint, full Core regression
-cleanliness, HTTP cleanup/cancel, and any live/native browser journey.
-Independent review is PASS. No skipped result is treated as PASS. Human
-decision is recorded as `G26_DECISION=ACCEPT_AND_COMMIT_PUSH`; the score remains
-72/100 with delta 0/12 because full Core regression exited 1.
+Required limitations retained: full Core regression cleanliness outside the
+bounded G26 paths, HTTP cleanup/cancel, and live/native browser journeys.
+Independent review is PASS for the bounded G26 scope. No skipped result is
+treated as PASS. Human decision is recorded as
+`G26_DECISION=ACCEPT_AND_COMMIT_PUSH`; G26 earns +12 and project score is 84/100.
+The bounded product checkpoint is `4fd73b5ac3b59ae1f948f8d95ad795112552b1b2`,
+and its clean clone was verified at the recorded path.
