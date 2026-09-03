@@ -2,8 +2,9 @@
 
 ## Current G27 Candidate State — 2026-09-03
 
-This is the active G27 candidate. It is not Human accepted and carries no
-new score until the final decision and checkpoint.
+This is the Human-accepted G27 checkpoint. The G27 product output is
+`27ff09c224344821868dd8fd36ec2c0eb11504df`; the approved remote and fresh
+clean-clone verification both match it.
 
 - **Goal:** `G27-WORKFLOW-GUARDS-AND-METRICS-ACCEPTANCE`.
 - **Branch:** `feature/g27-workflow-guards-metrics`; isolated lane at
@@ -19,14 +20,17 @@ new score until the final decision and checkpoint.
 - **G26 gate:** `HUMAN_ACCEPTED / PASS / COMPLETE`, score `84/100`, delta
   `+12/12`. G27 proposes `WP-22=3`, `WP-24=2`, `WP-25=1`, delta `+6`,
   expected post-acceptance score `90/100`.
-- **G27 status:** `VERIFIED_PASS_PENDING_HUMAN` after bounded implementation,
-  deterministic verification, and independent read-only review (`PASS`,
-  `BLOCKER=0`, `MAJOR=0`, `MINOR=0`). WP-22 covers
+- **G27 status:** `HUMAN_ACCEPTED / PASS / COMPLETE` after bounded
+  implementation, deterministic verification, independent read-only review
+  (`PASS`, `BLOCKER=0`, `MAJOR=0`, `MINOR=0`), and
+  `G27_DECISION=ACCEPT_AND_COMMIT_PUSH`. WP-22 covers
   exactly nine V1 templates; WP-24 covers timeout/budget/concurrency/cleanup
   and setup-failure cleanup; WP-25 covers descriptive source-backed metrics.
-- **Current evidence:** targeted G27 suite and full Core rerun are recorded in
+- **Score:** `90/100` (`84/100` predecessor plus G27 `+6`).
+- **Current evidence:** targeted G27 suite, full Core rerun, approved remote
+  push, and fresh clean-clone verification are recorded in
   `artifacts/verification/g27-workflow-guards-metrics-20260903/`; no G28 work
-  has started.
+  has started. `NEXT_GOAL_READY=G28` is recorded as a gate only.
 - **ADR impact/scope deviation:** `NONE` / `NONE`. No new persisted entity,
   workflow node, vendor integration, migration, secret, or external send was
   introduced.

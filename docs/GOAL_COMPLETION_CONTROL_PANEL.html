@@ -26,7 +26,7 @@
         <h1>G24–G30 已核准 · 開發完成路線</h1>
         <p class="muted">狀態快照：2026-09-02（Asia/Taipei）。開發專用 100 分制；競賽為人工備註軌，不納入進度。每個 Goal 在新的 Codex task 以 GPT-5.6 Luna / High 執行。</p>
         <div class="meta">
-          <div class="metric"><span class="muted">正式進度</span><strong>84 / 100</strong></div>
+          <div class="metric"><span class="muted">正式進度</span><strong>90 / 100</strong></div>
           <div class="metric"><span class="muted">G24–G30 plan</span><strong class="ready">HUMAN CONFIRMED</strong></div>
           <div class="metric"><span class="muted">G26 status</span><strong class="ready">HUMAN ACCEPTED · PASS · COMPLETE</strong></div>
           <div class="metric"><span class="muted">外部驗證</span><strong class="gated">G29 · LATE</strong></div>
@@ -35,7 +35,7 @@
 
       <section>
         <h2>目前正式狀態</h2>
-        <div class="callout"><strong>G27: VERIFIED_PASS · HUMAN DECISION REQUIRED</strong><br />G27 predecessor SHA: <code>7a7dee67395c8a07f2e5b055a306e63190bbd1f8</code><br />Branch: <code>feature/g27-workflow-guards-metrics</code> · Approved remote/ref: <code>D:/GitBackup/PolyNexus_Backup.git</code> / <code>feature/g24-g30-development-completion-routing</code><br />Development score: <strong>84/100</strong> · Proposed G27 delta: <strong>+6</strong> · Expected after acceptance: <strong>90/100</strong><br />WP-22 templates: <strong>3</strong> · WP-24 guards: <strong>2</strong> · WP-25 metrics: <strong>1</strong><br />Full Core: <strong>720 passed · 1 skipped · exit 0</strong> · targeted G27 suite: <strong>40 passed · exit 0</strong><br />Independent review: <strong>PASS · 0/0/0</strong> · Human decision: <strong>G27_DECISION=ACCEPT_AND_COMMIT_PUSH</strong><br />Live vendor verification remains G29; no vendor certification or external send is claimed.</div>
+        <div class="callout"><strong>G27: HUMAN_ACCEPTED · PASS · COMPLETE</strong><br />G27 predecessor SHA: <code>7a7dee67395c8a07f2e5b055a306e63190bbd1f8</code><br />G27 product output SHA: <code>27ff09c224344821868dd8fd36ec2c0eb11504df</code><br />Branch: <code>feature/g27-workflow-guards-metrics</code> · Approved remote/ref: <code>D:/GitBackup/PolyNexus_Backup.git</code> / <code>feature/g24-g30-development-completion-routing</code><br />Development score: <strong>90/100</strong> · Accepted G27 delta: <strong>+6</strong><br />WP-22 templates: <strong>3/3</strong> · WP-24 guards: <strong>2/2</strong> · WP-25 metrics: <strong>1/1</strong><br />Full Core: <strong>720 passed · 1 skipped · exit 0</strong> · targeted G27 suite: <strong>40 passed · exit 0</strong><br />Independent review: <strong>PASS · 0/0/0</strong> · Remote/fresh clean clone: <strong>SHA matched · clean</strong><br />Human decision: <strong>G27_DECISION=ACCEPT_AND_COMMIT_PUSH</strong> · NEXT_GOAL_READY: <strong>G28</strong><br />Live vendor verification remains G29; no vendor certification or external send is claimed.</div>
         <p class="muted" style="margin-top:16px;">Codex 可在單一 Goal 核准範圍內實作、測試、修正、重驗與更新所有進度資料；Human 的一般介入點只有最後的 <code>&lt;GOAL&gt;_DECISION=ACCEPT_AND_COMMIT_PUSH</code>。這不授權 scope/ADR 變更、秘密資料、外部自動送出、force push、remote reconfiguration 或下一 Goal。</p>
         <p><a href="33_DEVELOPMENT_PROGRESS_AND_GOAL_EXECUTION_STANDARD.md">Execution standard</a> · <a href="tasks/G24-G30-DEVELOPMENT-COMPLETION-ROUTING.md">G24–G30 copy-ready prompts</a> · <a href="11_PROJECT_STATE.md">Project State</a> · <a href="12_HANDOFF_CURRENT.md">Current Handoff</a></p>
       </section>
@@ -55,10 +55,10 @@
           <tr><td>WP-19</td><td>4</td><td>HUMAN_ACCEPTED / CHECKPOINTED</td><td>G26</td><td><code>4fd73b5ac3b59ae1f948f8d95ad795112552b1b2</code></td></tr>
           <tr><td>WP-20</td><td>5</td><td>IMPLEMENTED_PENDING_REVIEW</td><td>G29 · EXTERNAL LATE</td><td><code>PENDING</code></td></tr>
           <tr><td>WP-21</td><td>3</td><td>HUMAN_ACCEPTED</td><td>G23 predecessor; bounded browser fixture scope</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
-          <tr><td>WP-22</td><td>3</td><td>VERIFIED_PASS_PENDING_HUMAN</td><td>G27</td><td><code>PENDING_HUMAN_CHECKPOINT</code></td></tr>
+          <tr><td>WP-22</td><td>3</td><td>HUMAN_ACCEPTED / PASS / CHECKPOINTED</td><td>G27</td><td><code>27ff09c224344821868dd8fd36ec2c0eb11504df</code></td></tr>
           <tr><td>WP-23</td><td>2</td><td>HUMAN_ACCEPTED</td><td>G23 predecessor</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
-          <tr><td>WP-24</td><td>2</td><td>VERIFIED_PASS_PENDING_HUMAN</td><td>G27</td><td><code>PENDING_HUMAN_CHECKPOINT</code></td></tr>
-          <tr><td>WP-25</td><td>1</td><td>VERIFIED_PASS_PENDING_HUMAN</td><td>G27</td><td><code>PENDING_HUMAN_CHECKPOINT</code></td></tr>
+          <tr><td>WP-24</td><td>2</td><td>HUMAN_ACCEPTED / PASS / CHECKPOINTED</td><td>G27</td><td><code>27ff09c224344821868dd8fd36ec2c0eb11504df</code></td></tr>
+          <tr><td>WP-25</td><td>1</td><td>HUMAN_ACCEPTED / PASS / CHECKPOINTED</td><td>G27</td><td><code>27ff09c224344821868dd8fd36ec2c0eb11504df</code></td></tr>
           <tr><td>WP-26</td><td>2</td><td>IMPLEMENTED_PENDING_REVIEW</td><td>G28</td><td><code>PENDING</code></td></tr>
           <tr><td>WP-27</td><td>3</td><td>IMPLEMENTED_PENDING_REVIEW</td><td>G28</td><td><code>PENDING</code></td></tr>
           <tr><td>WP-28</td><td>2</td><td>HUMAN_ACCEPTED</td><td>G23 predecessor; bounded acceptance scope</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>

@@ -13,8 +13,9 @@
   `07ebdb8...` respectively.
 - `GOAL`: WP-22 nine V1 workflow templates and three representative executions;
   WP-24 resource guards; WP-25 minimal evaluation/usage metrics.
-- `STATUS`: `VERIFIED_PASS_PENDING_HUMAN`; current score `84/100`, proposed
-  delta `+6`, expected `90/100` only after Human acceptance/checkpoint.
+- `STATUS`: `HUMAN_ACCEPTED / PASS / COMPLETE`; `G27_DECISION=ACCEPT_AND_COMMIT_PUSH`;
+  `G27_OUTPUT_SHA=27ff09c224344821868dd8fd36ec2c0eb11504df`; score `90/100`
+  (`+6` from `84/100`).
 - `CHANGED_FILES`: `services/core/src/polynexus_core/runtime/supervisor.py`,
   `services/core/src/polynexus_core/evaluation/metrics.py`,
   `services/core/tests/test_workflow_loader.py`,
@@ -30,9 +31,8 @@
 - `ADR_IMPACT`: `NONE`; `SCOPE_DEVIATION`: `NONE`.
 - `KNOWN_LIMITATIONS`: no live vendor certification or external send; one
   pre-existing Windows symlink-policy test remains skipped where applicable.
-- `NEXT`: complete independent review, then present the final G27 decision
-  block. Do not stage, commit, push, or start G28 before
-  `G27_DECISION=ACCEPT_AND_COMMIT_PUSH`.
+- `NEXT`: G27 is checkpointed and `NEXT_GOAL_READY=G28` is set as a gate only.
+  Do not start G28 in this task.
 - `DO_NOT_CHANGE`: primary worktree, frozen ADR/baseline contracts, secrets,
   vendor integrations, migrations, or G28 scope.
 

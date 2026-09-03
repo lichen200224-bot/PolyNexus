@@ -1,19 +1,28 @@
 {
   "ledger_id": "G27-WORKFLOW-GUARDS-AND-METRICS-ACCEPTANCE",
-  "status": "VERIFIED_PASS_PENDING_HUMAN",
+  "status": "HUMAN_ACCEPTED / PASS / COMPLETE",
   "predecessor_sha": "7a7dee67395c8a07f2e5b055a306e63190bbd1f8",
   "approved_remote": "D:/GitBackup/PolyNexus_Backup.git",
   "approved_ref": "refs/heads/feature/g24-g30-development-completion-routing",
   "project_score_before": 84,
   "goal_score_delta": 6,
   "project_score_after_human_acceptance": 90,
+  "g27_output_sha": "27ff09c224344821868dd8fd36ec2c0eb11504df",
+  "remote_push": "PASS",
+  "clean_clone": {
+    "path": "artifacts/verification/g27-clean-clone-20260903",
+    "sha": "27ff09c224344821868dd8fd36ec2c0eb11504df",
+    "status": "clean"
+  },
   "competition": "NOTE_ONLY_NON_SCORING",
   "records": [
     {
       "wp_id": "WP-22",
       "checkpoint": "CP-05",
       "point_weight": 3,
-      "status": "VERIFIED_PASS_PENDING_HUMAN",
+      "status": "HUMAN_ACCEPTED / PASS / CHECKPOINTED",
+      "accepted_points": 3,
+      "checkpoint_sha": "27ff09c224344821868dd8fd36ec2c0eb11504df",
       "implementation_ref": "workflows/builtin/*.yaml; services/core/src/polynexus_core/workflows",
       "test_ref": "services/core/tests/test_workflow_loader.py; services/core/tests/test_cp05_wp27_golden_workflows.py"
     },
@@ -21,7 +30,9 @@
       "wp_id": "WP-24",
       "checkpoint": "CP-05",
       "point_weight": 2,
-      "status": "VERIFIED_PASS_PENDING_HUMAN",
+      "status": "HUMAN_ACCEPTED / PASS / CHECKPOINTED",
+      "accepted_points": 2,
+      "checkpoint_sha": "27ff09c224344821868dd8fd36ec2c0eb11504df",
       "implementation_ref": "services/core/src/polynexus_core/runtime/supervisor.py",
       "test_ref": "services/core/tests/test_wp24_resource_guards.py; services/core/tests/test_cp06_wp28_failure_injection.py"
     },
@@ -29,7 +40,9 @@
       "wp_id": "WP-25",
       "checkpoint": "CP-05",
       "point_weight": 1,
-      "status": "VERIFIED_PASS_PENDING_HUMAN",
+      "status": "HUMAN_ACCEPTED / PASS / CHECKPOINTED",
+      "accepted_points": 1,
+      "checkpoint_sha": "27ff09c224344821868dd8fd36ec2c0eb11504df",
       "implementation_ref": "services/core/src/polynexus_core/evaluation/metrics.py",
       "test_ref": "services/core/tests/test_wp25_evaluation_metrics.py"
     }
@@ -53,6 +66,8 @@
     "governance_exit_code": 0,
     "diff_check_exit_code": 0
   },
-  "human_acceptance": "PENDING",
-  "output_sha": "PENDING"
+  "human_acceptance": "G27_DECISION=ACCEPT_AND_COMMIT_PUSH",
+  "output_sha": "27ff09c224344821868dd8fd36ec2c0eb11504df",
+  "next_goal_ready": "G28",
+  "next_goal_started": false
 }

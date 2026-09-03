@@ -2,18 +2,20 @@
 
 Browser-readable companion: [GOAL_COMPLETION_CONTROL_PANEL.html](GOAL_COMPLETION_CONTROL_PANEL.html).
 
-## G27 current candidate — VERIFIED_PASS_PENDING_HUMAN (2026-09-03)
+## G27 checkpoint — HUMAN_ACCEPTED / PASS / COMPLETE (2026-09-03)
 
 - `G27_BRANCH`: `feature/g27-workflow-guards-metrics`
 - `G27_PREDECESSOR_SHA`: `7a7dee67395c8a07f2e5b055a306e63190bbd1f8`
 - G26 product/state-sync provenance: `4fd73b5...` / `07ebdb8...`; approved
   remote/ref is `D:/GitBackup/PolyNexus_Backup.git` /
   `feature/g24-g30-development-completion-routing`.
-- `PROJECT_SCORE`: `84/100` current; proposed G27 delta `+6` (`3+2+1`),
-  expected `90/100` after Human acceptance/checkpoint.
-- `WP-22`, `WP-24`, `WP-25`: `VERIFIED_PASS_PENDING_HUMAN`.
+- `G27_OUTPUT_SHA`: `27ff09c224344821868dd8fd36ec2c0eb11504df`.
+- `PROJECT_SCORE`: `90/100` (`84/100` + `6`; WP-22/24/25 = `3+2+1`).
+- `WP-22`, `WP-24`, `WP-25`: `HUMAN_ACCEPTED / PASS / CHECKPOINTED`.
+- `G27_DECISION=ACCEPT_AND_COMMIT_PUSH`; remote and fresh clean clone match.
 - Evidence: `artifacts/verification/g27-workflow-guards-metrics-20260903/`.
-  Primary worktree is protected; no G28 work has started.
+  Primary worktree is protected; `NEXT_GOAL_READY=G28` is set, but G28 has not
+  started.
 
 ## G26 current checkpoint — HUMAN_ACCEPTED / PASS / COMPLETE (2026-09-03)
 
@@ -72,7 +74,7 @@ Browser-readable companion: [GOAL_COMPLETION_CONTROL_PANEL.html](GOAL_COMPLETION
 | CP-04: WP-17/18/19 | 12 | 12 | G26 (HUMAN_ACCEPTED / PASS / COMPLETE) |
 | CP-04: WP-20 | 0 | 5 | G29 (IMPLEMENTED_PENDING_REVIEW; external/Human-operated) |
 | CP-04: WP-21 | 3 | 3 | Complete, bounded fixture scope |
-| CP-05: WP-22/24/25 | 0 | 6 | G27 (VERIFIED_PASS_PENDING_HUMAN) |
+| CP-05: WP-22/24/25 | 6 | 6 | G27 (HUMAN_ACCEPTED / PASS / CHECKPOINTED) |
 | CP-05: WP-23 | 2 | 2 | Complete |
 | CP-05: WP-26/27 | 0 | 5 | G28 (IMPLEMENTED_PENDING_REVIEW) |
 | CP-06 | 10 | 10 | Complete through G19/G20/G22/G23 |
@@ -113,10 +115,10 @@ Every WP-11–WP-32 record contains `WP_ID`, `CHECKPOINT`, `POINT_WEIGHT`,
 | WP-19 | 4 | `HUMAN_ACCEPTED / PASS / CHECKPOINTED` | G26 | `4fd73b5ac3b59ae1f948f8d95ad795112552b1b2` |
 | WP-20 | 5 | `IMPLEMENTED_PENDING_REVIEW` | G29 | `PENDING` |
 | WP-21 | 3 | `HUMAN_ACCEPTED` | G23 predecessor; bounded browser fixture scope | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
-| WP-22 | 3 | `VERIFIED_PASS_PENDING_HUMAN` | G27 | `PENDING_HUMAN_CHECKPOINT` |
+| WP-22 | 3 | `HUMAN_ACCEPTED / PASS / CHECKPOINTED` | G27 | `27ff09c224344821868dd8fd36ec2c0eb11504df` |
 | WP-23 | 2 | `HUMAN_ACCEPTED` | G23 predecessor | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
-| WP-24 | 2 | `VERIFIED_PASS_PENDING_HUMAN` | G27 | `PENDING_HUMAN_CHECKPOINT` |
-| WP-25 | 1 | `VERIFIED_PASS_PENDING_HUMAN` | G27 | `PENDING_HUMAN_CHECKPOINT` |
+| WP-24 | 2 | `HUMAN_ACCEPTED / PASS / CHECKPOINTED` | G27 | `27ff09c224344821868dd8fd36ec2c0eb11504df` |
+| WP-25 | 1 | `HUMAN_ACCEPTED / PASS / CHECKPOINTED` | G27 | `27ff09c224344821868dd8fd36ec2c0eb11504df` |
 | WP-26 | 2 | `IMPLEMENTED_PENDING_REVIEW` | G28 | `PENDING` |
 | WP-27 | 3 | `IMPLEMENTED_PENDING_REVIEW` | G28 | `PENDING` |
 | WP-28 | 2 | `HUMAN_ACCEPTED` | G23 predecessor; bounded acceptance scope | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
@@ -132,7 +134,7 @@ Every WP-11–WP-32 record contains `WP_ID`, `CHECKPOINT`, `POINT_WEIGHT`,
 | G24 | `fde4c8f1d017992755c6af2bd600c9bd715efd6b` | `61cc7420e290cd93eda787c30b54a93edf4ca9a` | Human-confirmed formal checkpoint | 0 | `HUMAN_ACCEPTED / PASS / COMPLETE` |
 | G25 | `61cc7420e290cd93eda787c30b54a93edf4ca9a` | `f4168c31592ac5c886b49d8878f60b99016fdcaf` | Approved G24 checkpoint | +13 | `HUMAN_ACCEPTED / PASS / COMPLETE` |
 | G26 | `f4168c31592ac5c886b49d8878f60b99016fdcaf` | `4fd73b5ac3b59ae1f948f8d95ad795112552b1b2` | Approved G25 checkpoint | +12 | `HUMAN_ACCEPTED / PASS / COMPLETE` |
-| G27 | `7a7dee67395c8a07f2e5b055a306e63190bbd1f8` | `PENDING_HUMAN_CHECKPOINT` | Approved G26 continuation tip | +6 | `VERIFIED_PASS_PENDING_HUMAN` |
+| G27 | `7a7dee67395c8a07f2e5b055a306e63190bbd1f8` | `27ff09c224344821868dd8fd36ec2c0eb11504df` | Approved G26 continuation tip | +6 | `HUMAN_ACCEPTED / PASS / COMPLETE` |
 | G28 | `G27_OUTPUT_SHA` | `PENDING` | Approved G27 checkpoint | +5 | `GATED` |
 | G29 | `G28_OUTPUT_SHA` | `PENDING` | Approved G28 + external operator | +5 | `GATED / EXTERNAL_LATE` |
 | G30 | `G29_OUTPUT_SHA` | `PENDING` | Approved G29 checkpoint | 0 | `GATED` |

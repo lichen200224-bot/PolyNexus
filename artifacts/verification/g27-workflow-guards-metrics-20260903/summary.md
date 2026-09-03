@@ -7,8 +7,8 @@
 - G26 provenance: product checkpoint `4fd73b5ac3b59ae1f948f8d95ad795112552b1b2`,
   state-sync `07ebdb8a691997dc33fd6368507b707a6c0f4597`, accepted score
   `84/100` and delta `+12/12`.
-- G27 candidate delta: `+6` (`WP-22=3`, `WP-24=2`, `WP-25=1`); expected
-  post-acceptance score `90/100`. No points are awarded before Human decision.
+- G27 accepted delta: `+6` (`WP-22=3`, `WP-24=2`, `WP-25=1`); final score
+  `90/100` after `G27_DECISION=ACCEPT_AND_COMMIT_PUSH`.
 - WP-22: exactly nine V1 declarative templates; schema/canonical load and
   representative execution evidence passed.
 - WP-24: timeout, operation budget, global concurrency, shared cleanup,
@@ -17,6 +17,8 @@
 - WP-25: descriptive source-backed metrics preserve missing data, bind both
   run and parent task, remain non-persistent, and are stable after reload.
 - Independent review: `PASS`, `BLOCKER=0`, `MAJOR=0`, `MINOR=0`.
+- Product checkpoint: `27ff09c224344821868dd8fd36ec2c0eb11504df`; push exit `0`.
+  Fresh clean clone matched the same SHA and was clean.
 - `ADR_IMPACT=NONE`; `SCOPE_DEVIATION=NONE`.
 
 ## Changed product/test files
@@ -42,7 +44,5 @@
 ## Limitations and gate
 
 Live vendor execution, external sends, visual workflow authoring, distributed
-scheduling, arbitrary scripting, and G28 remain unverified or out of scope.
-The candidate is waiting for exactly one Human decision:
-`G27_DECISION=ACCEPT_AND_COMMIT_PUSH`. Until then, no stage, commit, push, or
-G28 work is authorized.
+scheduling, and arbitrary scripting remain unverified or out of scope. G27 is
+checkpointed; `NEXT_GOAL_READY=G28` is set, but G28 has not started.

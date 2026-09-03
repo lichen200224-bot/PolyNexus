@@ -2,12 +2,13 @@
 
 ## Current G27 candidate checkpoint — 2026-09-03
 
-- `G27_STATUS=VERIFIED_PASS_PENDING_HUMAN`; isolated branch
+- `G27_STATUS=HUMAN_ACCEPTED / PASS / COMPLETE`; isolated branch
   `feature/g27-workflow-guards-metrics` starts at exact predecessor
   `7a7dee67395c8a07f2e5b055a306e63190bbd1f8` from the approved backup remote.
-- G26 is `HUMAN_ACCEPTED / PASS / COMPLETE` at `84/100`. G27 proposes
-  `WP-22=3`, `WP-24=2`, `WP-25=1`, for `+6` and expected `90/100` after the
-  required Human decision and checkpoint.
+- G26 is `HUMAN_ACCEPTED / PASS / COMPLETE` at `84/100`. G27 accepted
+  `WP-22=3`, `WP-24=2`, `WP-25=1`, for `+6` and `90/100`.
+- `G27_OUTPUT_SHA=27ff09c224344821868dd8fd36ec2c0eb11504df`; approved remote
+  push and fresh clean-clone SHA verification passed.
 - Current deterministic evidence and independent review are recorded in
   `artifacts/verification/g27-workflow-guards-metrics-20260903/`; one
   pre-existing Windows symlink-policy skip is explicit. `ADR_IMPACT=NONE`,
