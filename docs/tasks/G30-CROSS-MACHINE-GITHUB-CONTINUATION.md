@@ -2,31 +2,54 @@
 
 ## Current disposition
 
-- `STATUS`: `NEED_ACTION / HUMAN_DECISION_REQUIRED`
+- `STATUS`: `VERIFIED / CROSS_MACHINE_CONTINUATION_READY`
 - `PURPOSE`: make another computer able to obtain the approved PolyNexus
   tracked project over network Git/GitHub and continue development/testing.
-- `WRITER`: `Codex` — read-only precheck and documentation only
-- `REMOTE_MUTATION`: `NOT_PERFORMED`
-- `COMMIT_PUSH`: `NOT_PERFORMED`
+- `WRITER`: `Codex` — bounded documentation publication and verification
+- `REMOTE_MUTATION`: `COMPLETED` — `origin` configured only in the isolated G30 lane
+- `COMMIT_PUSH`: `COMPLETED` — documentation-only commit pushed to the approved ref
 
 ## Verified current state
 
-- Current approved local checkpoint/ref:
+- Published approved GitHub checkpoint/ref:
+  `https://github.com/lichen200224-bot/PolyNexus.git` /
+  `feature/g24-g30-development-completion-routing` /
+  `e65c19bc6df8dd0362749d9016feabacf8acf6dc`.
+- The predecessor approved local checkpoint/ref remains:
   `D:/GitBackup/PolyNexus_Backup.git` /
   `feature/g24-g30-development-completion-routing` /
   `2bbcb0cb2cc6bc39e5a5770f91b9c58c03fed762`.
-- Current local remotes are `backup` (local bare repository) and `baseline`
-  (local bundle). There is no configured GitHub `origin`.
+- Isolated G30 lane remotes now include the approved GitHub `origin`, in
+  addition to local `backup` and `baseline`. Primary remote configuration was
+  not changed.
 - The `backup` path is not a portable network source for another computer.
 - The approved checkpoint contains tracked PolyNexus source and predecessor
   records including WP-19, G21, and browser-companion source/tests.
-- The current G30 lane is dirty. G29 operator pack, G29 HTML manual, G30 task
-  records, and ignored verification evidence are not present in the approved
-  remote checkpoint and must not be silently assumed to be cloneable.
+- The published checkpoint includes the G29 operator pack, G29 HTML manual,
+  G30 task records, and cross-machine continuation instructions. Ignored
+  verification evidence remains excluded and must not be silently assumed to
+  be cloneable.
 - Primary checkout remains protected and dirty; it is not a source for a
   cross-machine export.
 
-## Required Human decisions before GitHub work
+### Clean-clone evidence
+
+- New clean clone:
+  `D:/AI學習教材/PolyNexus/artifacts/verification/g30-cross-machine-clean-clone-20260903`.
+- Clone command used the approved GitHub URL and branch; clone completed with
+  exit code `0`.
+- Clean clone HEAD matched the published ref:
+  `e65c19bc6df8dd0362749d9016feabacf8acf6dc`.
+- `git status --short --branch` was clean and tracked the approved GitHub ref.
+- Required G29/G30 docs, `scripts/setup_dev.ps1`, browser-companion source/tests,
+  Core source, migrations, and tests were present.
+- Clean-clone deterministic checks: baseline validator exit `0`; governance
+  validator exit `0`; browser-companion tests `10 passed / 0 failed / 0 skipped`,
+  exit `0`; Core pytest exit `0` with all collected tests passing. The Core run
+  emitted only the known non-fatal Windows pytest temp cleanup warning after
+  successful completion.
+
+## Historical pre-push Human gate (completed)
 
 Provide all of the following in one explicit Git Gate:
 
@@ -117,7 +140,7 @@ the result be called `CROSS_MACHINE_CONTINUATION_READY`.
 
 ## Current next action
 
-Human supplies the exact GitHub URL, branch decision, and explicit remote/
-commit/push authorization. Until then, use the approved local checkpoint for
-tracked source and transfer the sanitized G29/G30 documentation overlay
-separately. Do not start G31.
+Cross-machine GitHub continuation is verified. The next owner is the
+authorized Human operator for the deferred G30 Level 3A vendor reports; use the
+published G29/G30 operator pack and return sanitized reports only. Do not start
+G31.

@@ -24,9 +24,15 @@ was available. G30 does not claim WP-20 completion or a 100/100 score.
 - `EXTERNAL_REPORTS`: `NONE`; no live/fixture vendor evidence is claimed
 - `COMPUTER_TOOL_RESULT`: browser binding unavailable; Playwright unavailable;
   local Chrome CDP `127.0.0.1:9222` unreachable; no login or send occurred
-- `CLEAN_CLONE_RESULT`: `NOT_RUN` — no accepted G30 checkpoint exists
-- `GITHUB_CONTINUATION`: `NEED_ACTION / HUMAN_DECISION_REQUIRED`; current remotes
-  are local `backup` and `baseline` only, with no GitHub `origin`; see
+- `CLEAN_CLONE_RESULT`: `PASS` — clean clone from the approved GitHub ref
+  completed at `artifacts/verification/g30-cross-machine-clean-clone-20260903`;
+  clone status was clean, required files were present, baseline/governance
+  validators and browser-companion tests exited `0`, and Core pytest exited `0`
+  with the known non-fatal Windows pytest temp cleanup warning.
+- `GITHUB_CONTINUATION`: `VERIFIED / CROSS_MACHINE_CONTINUATION_READY`; approved
+  remote `https://github.com/lichen200224-bot/PolyNexus.git`, ref
+  `feature/g24-g30-development-completion-routing`, output SHA
+  `e65c19bc6df8dd0362749d9016feabacf8acf6dc`; see
   `docs/tasks/G30-CROSS-MACHINE-GITHUB-CONTINUATION.md`
 - `ADR_IMPACT`: `NONE`; `SCOPE_DEVIATION`: `NONE`
 - `TASK_DOC`: `docs/tasks/G30-FINAL-EXTERNAL-VERIFICATION-AND-100-POINT-RECONCILIATION.md`
