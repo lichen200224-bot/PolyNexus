@@ -1,5 +1,41 @@
 # Current Handoff
 
+## Current Task — G27 workflow, guards, and metrics acceptance (2026-09-03)
+
+- `TASK_ID`: `G27-WORKFLOW-GUARDS-AND-METRICS-ACCEPTANCE`
+- `ATTEMPT`: `1`; `WRITER`: Codex; `REVIEWER`: independent read-only review
+  `PASS` (`BLOCKER=0`, `MAJOR=0`, `MINOR=0`); `ANTIGRAVITY_STATUS`:
+  `NOT_REQUIRED` for Core/YAML scope.
+- `BRANCH`: `feature/g27-workflow-guards-metrics`, isolated lane at
+  `artifacts/worktrees/g27-workflow-guards-metrics`.
+- `PREDECESSOR_SHA`: `7a7dee67395c8a07f2e5b055a306e63190bbd1f8`, exact approved
+  remote/ref start; G26 product/state-sync SHAs are `4fd73b5...` and
+  `07ebdb8...` respectively.
+- `GOAL`: WP-22 nine V1 workflow templates and three representative executions;
+  WP-24 resource guards; WP-25 minimal evaluation/usage metrics.
+- `STATUS`: `VERIFIED_PASS_PENDING_HUMAN`; current score `84/100`, proposed
+  delta `+6`, expected `90/100` only after Human acceptance/checkpoint.
+- `CHANGED_FILES`: `services/core/src/polynexus_core/runtime/supervisor.py`,
+  `services/core/src/polynexus_core/evaluation/metrics.py`,
+  `services/core/tests/test_workflow_loader.py`,
+  `services/core/tests/test_wp24_resource_guards.py`,
+  `services/core/tests/test_wp25_evaluation_metrics.py`,
+  `docs/tasks/WP-22.md`, `docs/tasks/WP-24.md`, `docs/tasks/WP-25.md`,
+  `docs/11_PROJECT_STATE.md`, `docs/12_HANDOFF_CURRENT.md`,
+  `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`, both control-panel files, and the
+  ignored local G27 evidence bundle.
+- `IMPLEMENTATION`: setup failure now preserves an allocated runtime reference
+  through shared cleanup; metrics require matching run and parent task identity;
+  the existing nine templates remain fixed-node, versioned V1 definitions.
+- `ADR_IMPACT`: `NONE`; `SCOPE_DEVIATION`: `NONE`.
+- `KNOWN_LIMITATIONS`: no live vendor certification or external send; one
+  pre-existing Windows symlink-policy test remains skipped where applicable.
+- `NEXT`: complete independent review, then present the final G27 decision
+  block. Do not stage, commit, push, or start G28 before
+  `G27_DECISION=ACCEPT_AND_COMMIT_PUSH`.
+- `DO_NOT_CHANGE`: primary worktree, frozen ADR/baseline contracts, secrets,
+  vendor integrations, migrations, or G28 scope.
+
 ## Current Task — G26 local, policy, and WebSurface acceptance (2026-09-03)
 
 - `TASK_ID`: `G26-LOCAL-POLICY-AND-WEBSURFACE-INTERNAL-ACCEPTANCE`

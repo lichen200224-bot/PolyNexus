@@ -75,7 +75,12 @@ def calculate_evaluation_metrics(
         run.state is RunState.CANCELLED for run in terminal_runs
     )
 
-    matched_evidence = [item for item in evidence if item.run_id in run_ids]
+    run_task_ids = {run.id: run.task_id for run in runs}
+    matched_evidence = [
+        item
+        for item in evidence
+        if item.run_id in run_ids and item.task_id == run_task_ids.get(item.run_id)
+    ]
     evidence_run_ids = {item.run_id for item in matched_evidence}
 
     fallback_values: dict[str, bool] = {}

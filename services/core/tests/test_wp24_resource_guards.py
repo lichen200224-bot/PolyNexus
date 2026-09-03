@@ -39,11 +39,15 @@ class GuardProbeAdapter:
         operation_delay: float = 0.0,
         block_status: bool = False,
         block_cleanup: bool = False,
+        fail_submit: bool = False,
+        cancel_state: RunState = RunState.TIMED_OUT,
         shared_tracker: dict[str, int] | None = None,
     ) -> None:
         self.operation_delay = operation_delay
         self.block_status = block_status
         self.block_cleanup = block_cleanup
+        self.fail_submit = fail_submit
+        self.cancel_state = cancel_state
         self.shared_tracker = shared_tracker
         self.state = RunState.CREATED
         self.active = False
@@ -84,6 +88,8 @@ class GuardProbeAdapter:
     async def submit(self, runtime_ref: str, task: Task) -> None:
         del runtime_ref, task
         await self._delay()
+        if self.fail_submit:
+            raise RuntimeError("setup failure marker")
         self.state = RunState.RUNNING
 
     async def status(self, runtime_ref: str) -> RuntimeStatus:
@@ -101,7 +107,7 @@ class GuardProbeAdapter:
     async def cancel(self, runtime_ref: str) -> None:
         del runtime_ref
         await self._delay()
-        self.state = RunState.TIMED_OUT
+        self.state = self.cancel_state
 
     async def resume(self, runtime_ref: str, checkpoint: str | None = None) -> None:
         del runtime_ref, checkpoint
@@ -163,6 +169,47 @@ def test_cleanup_timeout_fails_closed_as_orphaned(monkeypatch) -> None:
         RunState.CANCEL_REQUESTED,
         RunState.ORPHANED,
     ]
+
+
+def test_cancel_success_verifies_cleanup_and_terminal_state() -> None:
+    task, context = _inputs()
+    adapter = GuardProbeAdapter(cancel_state=RunState.CANCELLED)
+    supervisor = RunSupervisor(adapter)
+
+    async def run() -> object:
+        session = await supervisor.start(task, context, WORKFLOW)
+        return await supervisor.cancel(session)
+
+    execution = asyncio.run(run())
+
+    assert execution.run.state is RunState.CANCELLED
+    assert adapter.cleanup_called
+    assert not adapter.active
+    assert [event.to_state for event in execution.run.events][-2:] == [
+        RunState.CANCEL_REQUESTED,
+        RunState.CANCELLED,
+    ]
+
+
+def test_setup_failure_cleans_allocated_runtime_and_fails_closed() -> None:
+    task, context = _inputs()
+    adapter = GuardProbeAdapter(fail_submit=True, cancel_state=RunState.CANCELLED)
+    run = Run(
+        task_id=task.id,
+        workflow_id=WORKFLOW.id,
+        workflow_version=WORKFLOW.version,
+        context_package_id=context.id,
+    )
+    run.transition(RunState.STARTING)
+    execution = asyncio.run(
+        RunSupervisor(adapter).execute_claimed_run(run, task, context, WORKFLOW)
+    )
+
+    assert execution.run.state is RunState.FAILED
+    assert execution.result is None
+    assert adapter.cleanup_called
+    assert not adapter.active
+    assert RunState.ORPHANED not in [event.to_state for event in execution.run.events]
 
 
 def test_operation_budget_is_bounded_and_uses_cleanup(monkeypatch) -> None:

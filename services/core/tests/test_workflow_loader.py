@@ -25,6 +25,17 @@ BUILTIN_WORKFLOWS = (
 )
 
 
+def test_v1_builtin_inventory_is_exactly_nine_templates() -> None:
+    discovered = {
+        path.stem
+        for path in (ROOT / "workflows" / "builtin").glob("*.yaml")
+        if path.stem != "verified-gate"
+    }
+
+    assert discovered == set(BUILTIN_WORKFLOWS)
+    assert len(discovered) == 9
+
+
 class FakeRuntime:
     def __init__(self) -> None:
         self.created_context = None

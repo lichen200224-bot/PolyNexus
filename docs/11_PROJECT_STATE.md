@@ -1,5 +1,36 @@
 # Project State
 
+## Current G27 Candidate State — 2026-09-03
+
+This is the active G27 candidate. It is not Human accepted and carries no
+new score until the final decision and checkpoint.
+
+- **Goal:** `G27-WORKFLOW-GUARDS-AND-METRICS-ACCEPTANCE`.
+- **Branch:** `feature/g27-workflow-guards-metrics`; isolated lane at
+  `artifacts/worktrees/g27-workflow-guards-metrics`.
+- **Predecessor:** `7a7dee67395c8a07f2e5b055a306e63190bbd1f8`, the latest clean
+  approved continuation tip. G26 product checkpoint was
+  `4fd73b5ac3b59ae1f948f8d95ad795112552b1b2`; G26 state-sync was
+  `07ebdb8a691997dc33fd6368507b707a6c0f4597`.
+- **Approved remote/ref:** `D:/GitBackup/PolyNexus_Backup.git`,
+  `feature/g24-g30-development-completion-routing`; the ref and ancestry
+  match the isolated-lane start gate. Primary dirty/untracked work remains
+  untouched.
+- **G26 gate:** `HUMAN_ACCEPTED / PASS / COMPLETE`, score `84/100`, delta
+  `+12/12`. G27 proposes `WP-22=3`, `WP-24=2`, `WP-25=1`, delta `+6`,
+  expected post-acceptance score `90/100`.
+- **G27 status:** `VERIFIED_PASS_PENDING_HUMAN` after bounded implementation,
+  deterministic verification, and independent read-only review (`PASS`,
+  `BLOCKER=0`, `MAJOR=0`, `MINOR=0`). WP-22 covers
+  exactly nine V1 templates; WP-24 covers timeout/budget/concurrency/cleanup
+  and setup-failure cleanup; WP-25 covers descriptive source-backed metrics.
+- **Current evidence:** targeted G27 suite and full Core rerun are recorded in
+  `artifacts/verification/g27-workflow-guards-metrics-20260903/`; no G28 work
+  has started.
+- **ADR impact/scope deviation:** `NONE` / `NONE`. No new persisted entity,
+  workflow node, vendor integration, migration, secret, or external send was
+  introduced.
+
 ## Current G26 Candidate State — 2026-09-03
 
 This is the current G26 accepted checkpoint. The product checkpoint is

@@ -9,6 +9,7 @@ def _run(run_id: str, state: RunState) -> Run:
     project = Project(name="WP25")
     context = ContextPackage(project_id=project.id, version=1)
     task = Task(
+        id=f"task-{run_id}",
         project_id=project.id,
         title="metrics fixture",
         workflow_id="review-minimal",
@@ -25,9 +26,9 @@ def _run(run_id: str, state: RunState) -> Run:
     )
 
 
-def _evidence(run_id: str, **metadata: str) -> Evidence:
+def _evidence(run_id: str, *, task_id: str | None = None, **metadata: str) -> Evidence:
     return Evidence(
-        task_id="task_wp25",
+        task_id=task_id or f"task-{run_id}",
         run_id=run_id,
         actor_id="fixture",
         source="fixture",
@@ -108,3 +109,36 @@ def test_empty_input_has_no_zero_claim_for_unobservable_rates() -> None:
     assert metrics.evidence_coverage_rate is None
     assert metrics.fallback_run_count is None
     assert metrics.fallback_rate is None
+
+
+def test_metrics_exclude_cross_task_evidence_even_when_run_id_matches() -> None:
+    runs = [_run("run-a", RunState.COMPLETED)]
+
+    metrics = calculate_evaluation_metrics(
+        runs,
+        [_evidence("run-a", task_id="other-task", fallback_used="true")],
+    )
+
+    assert metrics.evidence_count == 0
+    assert metrics.runs_with_evidence == 0
+    assert metrics.evidence_coverage_rate == 0.0
+    assert metrics.fallback_run_count is None
+
+
+def test_metrics_are_stable_after_reloading_equivalent_records() -> None:
+    runs = [_run("run-a", RunState.COMPLETED), _run("run-b", RunState.FAILED)]
+    evidence = [
+        _evidence("run-a", fallback_used="true", manual_operation_count="2"),
+        _evidence("run-b", manual_operation_count="1"),
+    ]
+
+    first = calculate_evaluation_metrics(runs, evidence)
+    # The metrics function is intentionally non-persistent; this models a
+    # fresh repository reload by rebuilding equivalent domain records.
+    reloaded_runs = [_run("run-a", RunState.COMPLETED), _run("run-b", RunState.FAILED)]
+    reloaded_evidence = [
+        _evidence("run-a", fallback_used="true", manual_operation_count="2"),
+        _evidence("run-b", manual_operation_count="1"),
+    ]
+
+    assert calculate_evaluation_metrics(reloaded_runs, reloaded_evidence) == first

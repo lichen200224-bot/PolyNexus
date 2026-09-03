@@ -69,6 +69,14 @@ class _ResourceBudgetExceeded(Exception):
     """Internal marker for a bounded per-run operation budget."""
 
 
+class _WorkflowExecutionFailure(Exception):
+    """Runtime workflow setup failed after optionally allocating a runtime."""
+
+    def __init__(self, runtime_ref: str | None) -> None:
+        super().__init__("workflow execution failed")
+        self.runtime_ref = runtime_ref
+
+
 @dataclass
 class _RunResourceBudget:
     operations: int = 0
@@ -232,7 +240,35 @@ class RunSupervisor:
             )
         except (asyncio.TimeoutError, _ResourceTimeout, _ResourceBudgetExceeded):
             return None, guarded_adapter.runtime_ref, True
+        except Exception as exc:
+            # Preserve the allocated reference so callers can run the same
+            # cleanup verification path even when submit/executor fails.
+            raise _WorkflowExecutionFailure(guarded_adapter.runtime_ref) from exc
         return execution, guarded_adapter.runtime_ref, False
+
+    async def _failure_cleanup(
+        self,
+        run: Run,
+        runtime_ref: str | None,
+        budget: _RunResourceBudget,
+    ) -> bool:
+        """Stop partially-created runtime work before recording setup failure."""
+        if runtime_ref is None:
+            run.transition(RunState.FAILED, reason=_RUNTIME_FAILURE_REASON)
+            return True
+
+        cleanup_ok = await self._cleanup_and_verify(
+            runtime_ref, expected_state=RunState.CANCELLED, budget=budget
+        )
+        if cleanup_ok:
+            run.transition(RunState.FAILED, reason=_RUNTIME_FAILURE_REASON)
+            return True
+
+        if run.state in {RunState.STARTING, RunState.RUNNING}:
+            run.transition(RunState.CANCEL_REQUESTED)
+        if run.state is RunState.CANCEL_REQUESTED:
+            run.transition(RunState.ORPHANED, reason=_CLEANUP_FAILED_REASON)
+        return False
 
     async def _timeout_cleanup(
         self,
@@ -287,6 +323,10 @@ class RunSupervisor:
             execution, runtime_ref, guard_tripped = await self._execute_workflow(
                 task, context, workflow, budget
             )
+        except _WorkflowExecutionFailure as exc:
+            cleanup_ok = await self._failure_cleanup(run, exc.runtime_ref, budget)
+            reason = _RUNTIME_FAILURE_REASON if cleanup_ok else _CLEANUP_FAILED_REASON
+            raise RuntimeError(reason) from None
         except Exception as exc:
             reason = redact_exception(exc, fallback=_RUNTIME_FAILURE_REASON)
             run.transition(RunState.FAILED, reason=reason)
@@ -342,6 +382,15 @@ class RunSupervisor:
         try:
             execution, runtime_ref, guard_tripped = await self._execute_workflow(
                 task, context, workflow, budget
+            )
+        except _WorkflowExecutionFailure as exc:
+            await self._failure_cleanup(run, exc.runtime_ref, budget)
+            return RunExecution(
+                run=run,
+                result=None,
+                findings=(),
+                evidence=(),
+                artifacts=(),
             )
         except Exception:
             run.transition(RunState.FAILED, reason=_RUNTIME_FAILURE_REASON)
@@ -516,6 +565,10 @@ class RunSupervisor:
             execution, runtime_ref, guard_tripped = await self._execute_workflow(
                 task, context, workflow, budget
             )
+        except _WorkflowExecutionFailure as exc:
+            cleanup_ok = await self._failure_cleanup(run, exc.runtime_ref, budget)
+            reason = _RUNTIME_FAILURE_REASON if cleanup_ok else _CLEANUP_FAILED_REASON
+            raise RuntimeError(reason) from None
         except Exception as exc:
             reason = redact_exception(exc, fallback=_RUNTIME_FAILURE_REASON)
             run.transition(RunState.FAILED, reason=reason)
