@@ -1,5 +1,17 @@
 # G24–G30 Development Completion Routing
 
+## Current Human routing override — G29 external work moved to G30 (2026-09-03)
+
+The current routing decision moves authenticated external ChatGPT / Claude /
+Gemini Web verification from G29 to G30. G29 completes its preflight,
+sanitized operator materials, and truthful handoff checkpoint; it does not
+claim WP-20 PASS or add the `+5` points. G30's future start gate must include the deferred
+WP-20 operator verification before final 100-point reconciliation. This update
+does not start G30 and does not change D02, ADR-006/010, the explicit Human
+confirmation boundary, the secret boundary, or the no-automatic-send rule.
+The earlier G29/G30 prompts and goal map below are retained as historical
+planning material and are superseded only for this current routing assignment.
+
 ## G24 execution record — CURRENT
 
 - `TASK_ID`: `G24-DEVELOPMENT-LEDGER-AND-EVIDENCE-RECONCILIATION`
@@ -425,11 +437,12 @@ MODEL PROFILE
 Use gpt-5.6-luna with reasoning effort high. Stop on profile mismatch.
 
 GOAL AND SCORE
-Validate WP-20 Level 3A Assisted Automation for ChatGPT, Claude and Gemini using
-an authorized external operator: launch, detect, fill, explicit Human-confirmed
-send, capture, normalize and mandatory manual fallback. Maximum delta +5;
-expected accepted project score 100/100. This is compatibility evidence, not
-permission for autonomous send or blanket vendor certification.
+Prepare the WP-20 Level 3A Assisted Automation handoff for ChatGPT, Claude and
+Gemini. Under the current Human routing override, G29 performs preflight and
+sanitized material preparation only; the authorized external operator run is
+deferred to G30. G29 has no score delta and does not claim WP-20 PASS. This is
+compatibility evidence, not permission for autonomous send or blanket vendor
+certification.
 
 START GATE
 - Read AGENTS.md, current state/handoff, execution standard (especially external
@@ -438,9 +451,9 @@ START GATE
 - Verify approved G28 ref equals G28_OUTPUT_SHA, internal score is 95/100, and
   the G28 clean clone is valid.
 - Use an isolated branch from that SHA. Preserve primary.
-- Confirm the operator has authorized test accounts and understands that no
-  credentials may be shared. If no operator/account exists, do not improvise;
-  return NEED_EXTERNAL_ACTION using the required 95/100 block.
+- Confirm that the future G30 owner will use an authorized operator and test
+  account. Do not run login/send in G29; carry the sanitized pack forward and
+  record `DEFERRED_TO_G30`.
 
 CODEX AUTONOMOUS RESPONSIBILITIES
 1. Create a sanitized operator runbook and harmless test payload containing no
@@ -526,12 +539,11 @@ BLOCKER or MAJOR. A vendor-specific limitation may remain if the maturity matrix
 states it precisely; unavailable mandatory baseline evidence is NEED_ACTION.
 
 FINAL GATE
-Return the standard final decision block with WP-20=5, maximum delta +5 and
-expected total 100/100. Include every operator report/artifact reference and
-redaction result. Ask once for ACCEPT_AND_COMMIT_PUSH / REJECT / NEED_ACTION.
-After acceptance, record, exact-allowlist commit, non-force push, remote SHA and
-clean-clone verify, publish G29_OUTPUT_SHA and NEXT_GOAL_READY=G30. Do not start
-G30.
+Return a completed handoff block with WP-20=0/5, no G29 score delta, the exact
+operator-pack references, and `NEXT_GOAL_READY=G30` only after the G29
+documentation/checkpoint gate is accepted. Do not claim live verification.
+The future G30 gate must execute the deferred operator run, validate all
+reports, and then reconcile the final score. Do not start G30 in G29.
 ```
 
 ## 10. System prompt — G30 final development acceptance
@@ -544,17 +556,26 @@ MODEL PROFILE
 Use gpt-5.6-luna with reasoning effort high. Stop on profile mismatch.
 
 GOAL
-Perform the final repository-backed reconciliation of the development-only
-100-point ledger, all G24–G29 terminal checkpoints, current deterministic
-evidence, compatibility labels, known limitations, delivery package and
-cross-machine continuation. Do not add points. Confirm 100/100 only if every
-scored WP is Human-accepted/checkpointed under the execution standard.
+Execute the deferred WP-20 authorized Human-operated Level 3A external Web
+verification inherited from G29, then perform the repository-backed
+reconciliation of the development-only 100-point ledger, all G24–G29 terminal
+checkpoints, current deterministic evidence, compatibility labels, known
+limitations, delivery package and cross-machine continuation. Confirm 100/100
+only if WP-20 and every other scored WP are Human-accepted/checkpointed under
+the execution standard.
 
 START GATE
 - Read AGENTS.md, current Project State/Handoff, Scope Baseline, Decision Log,
   Master Roadmap, execution standard, this routing file, compatibility matrix,
   known limitations and all G24–G29 terminal task records.
-- Verify approved G29 ref equals exact G29_OUTPUT_SHA and ledger reports 100/100.
+- Verify the approved G29 ref equals the exact G29 output/checkpoint SHA, the
+  current ledger is 95/100 with WP-20=0/5, and the G29 handoff explicitly marks
+  the external work `DEFERRED_TO_G30`. The 100/100 condition is a G30 exit
+  condition, not a G30 start condition.
+- Verify the sanitized G29 operator pack is present and use it as the only
+  external-test procedure. Require an authorized Human operator for login and
+  every real send; do not accept credentials, cookies, tokens, raw page data,
+  or automatic-send traces in the task.
 - Resolve and verify every G24–G29 predecessor/output SHA from the approved
   remote. Verify clean-clone evidence and no contradictory current status.
 - Work in a final isolated verification lane. Preserve primary.

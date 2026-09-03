@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PolyNexus G29 Human Operator Test Manual</title>
+  <style>
+    :root {
+      --ink: #16202a;
+      --muted: #5b6875;
+      --line: #d7dee6;
+      --paper: #ffffff;
+      --canvas: #eef2f6;
+      --navy: #12304a;
+      --blue: #2166a5;
+      --teal: #147d79;
+      --amber: #9b5d00;
+      --amber-bg: #fff6df;
+      --red: #a23030;
+      --red-bg: #fff0f0;
+      --green: #216d4c;
+      --green-bg: #edf8f1;
+      --code: #f3f6f8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--canvas);
+      font: 15px/1.55 system-ui, -apple-system, "Segoe UI", "Noto Sans TC", sans-serif;
+    }
+    .page { max-width: 1460px; margin: 0 auto; background: var(--paper); min-height: 100vh; }
+    header { padding: 42px 52px 34px; color: #fff; background: linear-gradient(135deg, #102d45, #1b5576); }
+    header .eyebrow { margin: 0 0 10px; color: #bfe4f4; font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+    h1 { margin: 0; max-width: 920px; font-size: clamp(28px, 4vw, 48px); line-height: 1.1; letter-spacing: -.03em; }
+    header p { max-width: 920px; margin: 16px 0 0; color: #e3f0f6; font-size: 17px; }
+    .meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    .pill { display: inline-block; padding: 5px 10px; border: 1px solid rgba(255,255,255,.3); border-radius: 999px; color: #fff; font-size: 12px; }
+    main { padding: 30px 52px 70px; }
+    h2 { margin: 42px 0 14px; padding-bottom: 8px; border-bottom: 2px solid var(--navy); color: var(--navy); font-size: 27px; line-height: 1.2; }
+    h3 { margin: 26px 0 8px; color: var(--navy); font-size: 19px; }
+    h4 { margin: 18px 0 6px; color: var(--blue); font-size: 16px; }
+    p { margin: 8px 0; }
+    ul, ol { margin-top: 8px; padding-left: 24px; }
+    li { margin: 5px 0; }
+    .notice, .danger, .success, .info { margin: 18px 0; padding: 15px 18px; border-left: 5px solid; border-radius: 5px; }
+    .notice { border-color: var(--amber); background: var(--amber-bg); }
+    .danger { border-color: var(--red); background: var(--red-bg); }
+    .success { border-color: var(--green); background: var(--green-bg); }
+    .info { border-color: var(--blue); background: #edf6ff; }
+    .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .card { padding: 17px 18px; border: 1px solid var(--line); border-radius: 9px; background: #fbfcfd; }
+    .card h3 { margin-top: 0; }
+    .step { display: grid; grid-template-columns: 44px 1fr; gap: 13px; margin: 12px 0; }
+    .step-no { width: 34px; height: 34px; padding-top: 5px; border-radius: 50%; color: white; background: var(--blue); font-weight: 750; text-align: center; }
+    .step strong { display: block; color: var(--navy); }
+    code, pre { font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace; }
+    code { padding: 1px 4px; border-radius: 3px; background: var(--code); color: #263b4b; }
+    pre { overflow-x: auto; margin: 12px 0; padding: 15px 17px; border: 1px solid var(--line); border-radius: 7px; background: var(--code); white-space: pre-wrap; }
+    table { width: 100%; margin: 12px 0 20px; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 9px 10px; border: 1px solid var(--line); vertical-align: top; text-align: left; }
+    th { color: #fff; background: var(--navy); font-weight: 700; }
+    tbody tr:nth-child(even) { background: #f7f9fb; }
+    .nowrap { white-space: nowrap; }
+    .checklist { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px 22px; margin: 12px 0; }
+    .check { display: flex; gap: 8px; align-items: flex-start; }
+    .check input { margin-top: 4px; accent-color: var(--teal); }
+    .small { color: var(--muted); font-size: 13px; }
+    .route-live { color: var(--green); font-weight: 700; }
+    .route-fixture { color: var(--blue); font-weight: 700; }
+    .route-manual { color: var(--amber); font-weight: 700; }
+    .field-table td:first-child { width: 260px; color: var(--navy); font-weight: 700; }
+    .footer { margin-top: 52px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+    @media (max-width: 900px) {
+      header, main { padding-right: 22px; padding-left: 22px; }
+      .grid, .checklist { grid-template-columns: 1fr; }
+      table { display: block; overflow-x: auto; }
+    }
+    @media print {
+      body, .page { background: #fff; }
+      header { padding: 25px 30px; break-after: avoid; }
+      main { padding: 12px 30px 30px; }
+      h2 { break-after: avoid; }
+      .card, table, pre, .notice, .danger, .success, .info { break-inside: avoid; }
+      a { color: inherit; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <p class="eyebrow">PolyNexus · G29 → G30 handoff material</p>
+    <h1>Human Operator Test Manual<br>WP-20 Level 3A External Web Verification</h1>
+    <p>給已授權 Human operator 的 ChatGPT、Claude、Gemini Web 操作、failure-path 測試、證據整理與驗收手冊。</p>
+    <div class="meta">
+      <span class="pill">Version: 2026-09-03</span>
+      <span class="pill">Owner: authorized Human operator</span>
+      <span class="pill">Status: G29 handoff / execute in G30</span>
+      <span class="pill">WP-20 allocation: +5</span>
+    </div>
+  </header>
+
+  <main>
+    <div class="notice"><strong>重要狀態：</strong>本手冊是 G29 準備、G30 執行用的操作材料，不代表 G29 或 G30 已通過。G30 只有在三個必要 vendor 都有完整 sanitized report、failure/fallback evidence、無 security/egress BLOCKER 或 MAJOR，且完成獨立 review 與 Human acceptance 後，才可將 WP-20 從 <code>0/5</code> 提升為 <code>5/5</code>。</div>
+
+    <h2>1. 目的、角色與不可違反的界線</h2>
+    <div class="grid">
+      <section class="card">
+        <h3>Human operator 責任</h3>
+        <ul>
+          <li>使用指定的非 production 測試帳號，並確保帳號 owner 在場。</li>
+          <li>每次真實送出前，親自確認 exact payload 與 target conversation。</li>
+          <li>操作 live route 或明確標籤的 <code>CONTROLLED_FIXTURE</code>。</li>
+          <li>只回傳 sanitized report 與遮罩後的 screenshot/trace reference。</li>
+        </ul>
+      </section>
+      <section class="card">
+        <h3>Codex / 系統邊界</h3>
+        <ul>
+          <li>不得取得、要求、保存或輸出 password、cookie、token、recovery code。</li>
+          <li>不得保存 private conversation、account identifier 或 raw page data。</li>
+          <li>不得自動登入、自動送出或繞過帳號 controls。</li>
+          <li>AI opinion 不得被寫成 verified evidence 或 vendor certification。</li>
+        </ul>
+      </section>
+      <section class="card">
+        <h3>停止條件</h3>
+        <ul>
+          <li>沒有 safe test account、owner consent 或 supported browser。</li>
+          <li>頁面要求不在批准範圍的資料、權限或登入操作。</li>
+          <li>無法遮罩 screenshot/trace，或看到 secret/account data。</li>
+          <li>任何不確定的 send target、payload 或 external request。</li>
+        </ul>
+      </section>
+    </div>
+
+    <h2>2. 測試前置檢核</h2>
+    <div class="checklist">
+      <label class="check"><input type="checkbox"> 已確認帳號 owner 在場並明確同意本次測試。</label>
+      <label class="check"><input type="checkbox"> 使用 designated non-production test account。</label>
+      <label class="check"><input type="checkbox"> 使用 supported browser 與已核准的 companion/extension。</label>
+      <label class="check"><input type="checkbox"> 已建立 fresh tab 或 isolated test conversation。</label>
+      <label class="check"><input type="checkbox"> 已知道當前 route 是 <code>LIVE</code> 或 <code>CONTROLLED_FIXTURE</code>。</label>
+      <label class="check"><input type="checkbox"> 已準備 sanitized artifact destination。</label>
+      <label class="check"><input type="checkbox"> 已確認不會把 credentials、cookies、tokens 貼入任何欄位。</label>
+      <label class="check"><input type="checkbox"> 已約定 local observation time（UTC）。</label>
+    </div>
+    <div class="danger"><strong>不要測試：</strong>production account、真實 project context、customer data、private conversation、帳號設定變更、強制 logout、credential export、DevTools network body/header 或 browser storage。</div>
+
+    <h2>3. 唯一批准的安全測試 payload</h2>
+    <p>除非帳號 owner 另行批准等價的非敏感 payload，請逐字使用下列內容。不要加入專案內容或個人資料。</p>
+    <pre>PolyNexus G29 compatibility check. Reply with the single word CHECKED.
+Do not include personal, confidential, production, or account data.</pre>
+    <p class="small">成功結果只需記錄 bounded summary，例如 <code>CHECKED received</code>。不得複製或回傳整個 raw response。</p>
+
+    <h2>4. 每家 vendor 的 Level 3A 主流程</h2>
+    <p>對 ChatGPT、Claude、Gemini 各執行一次。每家使用獨立 tab/session，並各填一份 report。成功主流程是：<strong>Launch → Detect → Fill → Human inspect/confirm → Send → Capture → Normalize → Cleanup</strong>。</p>
+    <div class="step"><div class="step-no">1</div><div><strong>Record context</strong>記錄 vendor、browser version、extension version、UTC time、route label。只寫版本與類型，不寫帳號識別值。</div></div>
+    <div class="step"><div class="step-no">2</div><div><strong>Launch</strong>從 companion 開啟該 vendor 的核准 origin。檢查 tab 是否是正確 vendor route；不開啟不明 redirect 或其他 tab。</div></div>
+    <div class="step"><div class="step-no">3</div><div><strong>Detect</strong>執行 composer/readiness check。只記錄 <code>PASS</code>、<code>FAIL</code> 或 bounded blocker；不要貼 raw DOM、selector value 或頁面 dump。</div></div>
+    <div class="step"><div class="step-no">4</div><div><strong>Fill</strong>只填入上方安全 payload。停止並目視檢查畫面：文字完全正確、沒有額外內容、target conversation 正確。</div></div>
+    <div class="step"><div class="step-no">5</div><div><strong>Human-confirmed Send</strong>帳號 owner 必須明確確認 exact payload 與 target。只有確認後才可按 send；report 才能寫 <code>HUMAN_CONFIRMED_SEND=YES</code>。</div></div>
+    <div class="step"><div class="step-no">6</div><div><strong>Capture</strong>只記錄 bounded result，例如 <code>CHECKED received</code>。不要保存 raw page、raw response、request body 或 headers。</div></div>
+    <div class="step"><div class="step-no">7</div><div><strong>Normalize</strong>透過 companion 產生 bounded <code>AI_OPINION</code> summary。這只是外部模型意見，不是 verified evidence、PASS certification 或安全判定。</div></div>
+    <div class="step"><div class="step-no">8</div><div><strong>Cleanup</strong>關閉 test tab；若使用 temporary profile，清除 profile、downloads、certificates 與 session exports；確認只留下 sanitized artifacts。</div></div>
+
+    <h3>每個主流程 phase 的檢核標準</h3>
+    <table>
+      <thead><tr><th>Phase</th><th>可寫 PASS 的條件</th><th>不可寫成 PASS 的情況</th><th>應記錄的 bounded evidence</th></tr></thead>
+      <tbody>
+        <tr><td>Launch</td><td>核准 vendor origin 成功開啟，route 清楚。</td><td>redirect 不明、頁面不是指定 vendor、帳號狀態不明。</td><td>route、時間、launch outcome。</td></tr>
+        <tr><td>Detect</td><td>composer/readiness 可被安全辨識。</td><td>selector mismatch、頁面狀態不確定、需改 vendor page。</td><td>PASS/FAIL 與 bounded blocker。</td></tr>
+        <tr><td>Fill</td><td>畫面只呈現批准的安全 payload。</td><td>混入 private data、無法確認內容、填入額外文字。</td><td>FILL_RESULT 與「exact payload verified」類型描述。</td></tr>
+        <tr><td>Send</td><td>owner 先確認 exact payload + target，且確實送出。</td><td>沒有確認、確認被取消、target 不明。不得自動送出。</td><td>HUMAN_CONFIRMED_SEND、不可含 message/account value。</td></tr>
+        <tr><td>Capture</td><td>取得 bounded、遮罩後的結果。</td><td>只能取得 raw page/response，或會暴露 private data。</td><td>例如 <code>CHECKED received</code>；必要時 FALLBACK。</td></tr>
+        <tr><td>Normalize</td><td>結果轉成 bounded <code>AI_OPINION</code>。</td><td>失敗後自行猜測、補寫、或把 opinion 當 verified evidence。</td><td>NORMALIZE_RESULT 與 bounded outcome。</td></tr>
+        <tr><td>Cleanup</td><td>tab/profile/temporary artifacts 已清理。</td><td>仍留存 session、download、raw capture 或未遮罩檔案。</td><td>CLEANUP_RESULT + sanitized refs。</td></tr>
+      </tbody>
+    </table>
+
+    <h2>5. 完整測試案例矩陣（24 cases）</h2>
+    <p>每一列都要在對應 vendor report 的 <code>FAILURE_PATH_RESULTS</code> 或主流程欄位留下結果。Failure case 原則上<strong>不得送出</strong>；除 CG/CL/GM-01 外，不得因測試 failure path 而新增 external send。</p>
+    <table>
+      <thead><tr><th class="nowrap">ID</th><th>Vendor</th><th>Route</th><th>情境與操作</th><th>通過檢核 / 必須證據</th><th>Send rule</th></tr></thead>
+      <tbody>
+        <tr><td>CG-01</td><td>ChatGPT</td><td class="route-live">LIVE</td><td>Launch → Detect → Fill → owner confirm → Send → Capture → Normalize</td><td>完整 Level 3A report；bounded result 是 <code>AI_OPINION</code>；記錄 external request observation。</td><td>owner 確認 exact payload + target 後才送。</td></tr>
+        <tr><td>CL-01</td><td>Claude</td><td class="route-live">LIVE</td><td>同上，使用獨立 tab/conversation。</td><td>完整 Level 3A report；bounded <code>AI_OPINION</code>；記錄 external request observation。</td><td>owner 確認 exact payload + target 後才送。</td></tr>
+        <tr><td>GM-01</td><td>Gemini</td><td class="route-live">LIVE</td><td>同上，使用獨立 tab/conversation。</td><td>完整 Level 3A report；bounded <code>AI_OPINION</code>；記錄 external request observation。</td><td>owner 確認 exact payload + target 後才送。</td></tr>
+        <tr><td>CG-02</td><td>ChatGPT</td><td>LIVE / fixture</td><td>使用既有 expired/non-authenticated safe state；只做 readiness。</td><td>Bounded unavailable/degraded result；無 secret/account data。</td><td>不得送出。</td></tr>
+        <tr><td>CL-02</td><td>Claude</td><td>LIVE / fixture</td><td>同上；不要強制 logout 或揭露 session data。</td><td>Bounded unavailable/degraded result；無 secret/account data。</td><td>不得送出。</td></tr>
+        <tr><td>GM-02</td><td>Gemini</td><td>LIVE / fixture</td><td>同上；不要強制 logout 或揭露 session data。</td><td>Bounded unavailable/degraded result；無 secret/account data。</td><td>不得送出。</td></tr>
+        <tr><td>CG-03</td><td>ChatGPT</td><td>LIVE / fixture</td><td>以 controlled page state 或觀察 live page 不提供預期 composer/button，驗證 selector mismatch。</td><td>Driver failure isolated；manual/clipboard fallback 有記錄。</td><td>不得送出。</td></tr>
+        <tr><td>CL-03</td><td>Claude</td><td>LIVE / fixture</td><td>同上；不得修改 vendor page 來繞過 mismatch。</td><td>Driver failure isolated；manual/clipboard fallback 有記錄。</td><td>不得送出。</td></tr>
+        <tr><td>GM-03</td><td>Gemini</td><td>LIVE / fixture</td><td>同上；不得修改 vendor page 來繞過 mismatch。</td><td>Driver failure isolated；manual/clipboard fallback 有記錄。</td><td>不得送出。</td></tr>
+        <tr><td>CG-04</td><td>ChatGPT</td><td>LIVE / fixture</td><td>Fill 後拒絕 Human confirmation，或在 send 前取消。</td><td><code>user_confirmation_required</code> 或 equivalent；無 external send。</td><td>必須不送。</td></tr>
+        <tr><td>CL-04</td><td>Claude</td><td>LIVE / fixture</td><td>同上；確認 dialog 出現時選 cancel/decline。</td><td><code>user_confirmation_required</code> 或 equivalent；無 external send。</td><td>必須不送。</td></tr>
+        <tr><td>GM-04</td><td>Gemini</td><td>LIVE / fixture</td><td>同上；確認 dialog 出現時選 cancel/decline。</td><td><code>user_confirmation_required</code> 或 equivalent；無 external send。</td><td>必須不送。</td></tr>
+        <tr><td>CG-05</td><td>ChatGPT</td><td>LIVE / fixture</td><td>在 agreed local timeout 內停止等待。</td><td>Bounded timeout/degraded result、cleanup 完成、無 unintended send。</td><td>不得送出。</td></tr>
+        <tr><td>CL-05</td><td>Claude</td><td>LIVE / fixture</td><td>同上；不要無限等待或重複提交。</td><td>Bounded timeout/degraded result、cleanup 完成、無 unintended send。</td><td>不得送出。</td></tr>
+        <tr><td>GM-05</td><td>Gemini</td><td>LIVE / fixture</td><td>同上；不要無限等待或重複提交。</td><td>Bounded timeout/degraded result、cleanup 完成、無 unintended send。</td><td>不得送出。</td></tr>
+        <tr><td>CG-06</td><td>ChatGPT</td><td>LIVE / fixture</td><td>讓 capture 失敗，改走 manual/clipboard fallback。</td><td>Fallback 結果被安全匯入；raw response 沒有被複製或保存。</td><td>不得新增 send。</td></tr>
+        <tr><td>CL-06</td><td>Claude</td><td>LIVE / fixture</td><td>同上；只匯入已遮罩的 bounded summary。</td><td>Fallback 結果被安全匯入；raw response 沒有被複製或保存。</td><td>不得新增 send。</td></tr>
+        <tr><td>GM-06</td><td>Gemini</td><td>LIVE / fixture</td><td>同上；只匯入已遮罩的 bounded summary。</td><td>Fallback 結果被安全匯入；raw response 沒有被複製或保存。</td><td>不得新增 send。</td></tr>
+        <tr><td>CG-07</td><td>ChatGPT</td><td>LIVE / fixture</td><td>讓 normalization 失敗，記錄 bounded fallback/error。</td><td>沒有 fabricated <code>AI_OPINION</code>；error 不含 raw response/secret。</td><td>不得新增 send。</td></tr>
+        <tr><td>CL-07</td><td>Claude</td><td>LIVE / fixture</td><td>同上；不可把 fallback 改寫成 PASS。</td><td>沒有 fabricated <code>AI_OPINION</code>；error 不含 raw response/secret。</td><td>不得新增 send。</td></tr>
+        <tr><td>GM-07</td><td>Gemini</td><td>LIVE / fixture</td><td>同上；不可把 fallback 改寫成 PASS。</td><td>沒有 fabricated <code>AI_OPINION</code>；error 不含 raw response/secret。</td><td>不得新增 send。</td></tr>
+        <tr><td>CG-08</td><td>ChatGPT</td><td>LIVE / fixture</td><td>驗證 clipboard/manual paste/import 可完成 handoff。</td><td>Manual handoff 完成且 sanitized；記錄實際 fallback route。</td><td>除非另行確認，否則不送。</td></tr>
+        <tr><td>CL-08</td><td>Claude</td><td>LIVE / fixture</td><td>同上；不得把 clipboard 內容中的敏感資料回傳。</td><td>Manual handoff 完成且 sanitized；記錄實際 fallback route。</td><td>除非另行確認，否則不送。</td></tr>
+        <tr><td>GM-08</td><td>Gemini</td><td>LIVE / fixture</td><td>同上；不得把 clipboard 內容中的敏感資料回傳。</td><td>Manual handoff 完成且 sanitized；記錄實際 fallback route。</td><td>除非另行確認，否則不送。</td></tr>
+      </tbody>
+    </table>
+    <div class="info"><strong>Route rule：</strong><code>LIVE</code> 代表真實 vendor page；<code>CONTROLLED_FIXTURE</code> 代表 synthetic/local safe state。Fixture 結果不可標成 live compatibility 或 certification。若 driver 失敗後由人手操作，report 的 <code>ROUTE</code> 應寫 <code>MANUAL_FALLBACK</code>，並保留 underlying <code>FIXTURE_OR_LIVE</code> 真實來源。</div>
+
+    <h2>6. Failure-path 詳細操作與檢核</h2>
+    <div class="grid">
+      <section class="card"><h3>Expired login</h3><ol><li>使用預先準備的 expired/non-authenticated safe state，或明確標示 unavailable。</li><li>只檢查 bounded readiness result。</li><li>不要 force logout、讀 session、取 cookie 或 screenshot storage。</li></ol><p><strong>Pass evidence：</strong> <code>LOGIN_STATUS=EXPIRED</code> 或 <code>UNAVAILABLE</code>，無 send。</p></section>
+      <section class="card"><h3>Selector mismatch</h3><ol><li>使用 controlled page state，或記錄 live page 沒有 expected composer/button。</li><li>不要修改 vendor page、注入繞過程式或改 selector 來製造 PASS。</li><li>切到 manual/clipboard fallback。</li></ol><p><strong>Pass evidence：</strong> driver failure isolated + fallback recorded。</p></section>
+      <section class="card"><h3>Cancelled send</h3><ol><li>Fill 後讓 confirmation 出現。</li><li>確認 owner 選 cancel/decline，或不作確認。</li><li>檢查沒有 external request/send。</li></ol><p><strong>Pass evidence：</strong> <code>HUMAN_CONFIRMED_SEND=NO</code>，bounded confirmation-required outcome。</p></section>
+      <section class="card"><h3>Timeout</h3><ol><li>使用事先約定的 local timeout。</li><li>到時停止等待，不重試、不重複提交。</li><li>確認 cleanup 與無 unintended send。</li></ol><p><strong>Pass evidence：</strong> bounded timeout/degraded result + cleanup。</p></section>
+      <section class="card"><h3>Capture failure</h3><ol><li>不要複製 raw response。</li><li>改用已遮罩的 manual/clipboard summary。</li><li>記錄 fallback 是否成功匯入。</li></ol><p><strong>Pass evidence：</strong> <code>CAPTURE_RESULT=FALLBACK</code>，raw data 未保存。</p></section>
+      <section class="card"><h3>Normalization failure</h3><ol><li>記錄 bounded fallback/error。</li><li>不猜測結果、不補寫 AI opinion。</li><li>保留 no-additional-send。</li></ol><p><strong>Pass evidence：</strong> <code>NORMALIZE_RESULT=FALLBACK</code> 或 <code>FAIL</code>，沒有 fabricated claim。</p></section>
+    </div>
+
+    <h2>7. Screenshot、trace、clipboard 與 cleanup 檢核</h2>
+    <h3>只保留最小必要證據</h3>
+    <div class="checklist">
+      <label class="check"><input type="checkbox"> Screenshot 只顯示必要 route/result UI。</label>
+      <label class="check"><input type="checkbox"> 已遮罩 account name、email、avatar、conversation title、private content。</label>
+      <label class="check"><input type="checkbox"> 已遮罩含 identifier 的 URL、token、cookie、header 與 unrelated tabs。</label>
+      <label class="check"><input type="checkbox"> 沒有 capture browser storage、network body、request header 或 full page dump。</label>
+      <label class="check"><input type="checkbox"> 檔名只含 vendor、scenario、UTC date，例如 <code>chatgpt-live-success-20260903.png</code>。</label>
+      <label class="check"><input type="checkbox"> 證據只放在 <code>artifacts/verification/g29-external-20260903/</code>。</label>
+      <label class="check"><input type="checkbox"> 已檢查 report/evidence 沒有 password、cookie、token、authorization、bearer、api_key。</label>
+      <label class="check"><input type="checkbox"> 已刪除 browser profile、certificates、downloads、temporary session exports。</label>
+    </div>
+    <div class="danger"><strong>分享前最後一次掃描：</strong>若發現任何 secret、email、account identifier、raw response、private text、request body/header 或未遮罩 screenshot，先移除並在 report 只記錄「已移除的類別」，不要把原值貼回 Codex。</div>
+
+    <h2>8. Vendor report 填寫表</h2>
+    <p>每家 vendor 一份 report。手動觀察沒有 local process exit code 時，必須寫 <code>EXIT_CODE: N/A</code>，不可捏造 <code>0</code> 或 <code>1</code>。</p>
+    <table class="field-table">
+      <tbody>
+        <tr><td>TEST_TARGET</td><td>ChatGPT | Claude | Gemini</td></tr>
+        <tr><td>TEST_ACCOUNT_TYPE</td><td>designated non-production test account | no account available</td></tr>
+        <tr><td>OBSERVED_AT</td><td>UTC timestamp，例如 <code>2026-09-03T00:00:00Z</code></td></tr>
+        <tr><td>EXIT_CODE</td><td><code>0</code> | <code>1</code> | <code>N/A</code>（純 Human 操作通常是 N/A）</td></tr>
+        <tr><td>BROWSER_VERSION / EXTENSION_VERSION</td><td>遮罩後版本字串；不可含帳號資料。</td></tr>
+        <tr><td>ROUTE / FIXTURE_OR_LIVE</td><td><code>LIVE</code> | <code>CONTROLLED_FIXTURE</code> | <code>MANUAL_FALLBACK</code>；兩者必須一致且能說明 fallback 的 underlying route。</td></tr>
+        <tr><td>LOGIN_STATUS</td><td><code>READY</code> | <code>EXPIRED</code> | <code>UNAVAILABLE</code> | <code>NOT_TESTED</code></td></tr>
+        <tr><td>LAUNCH_RESULT / DETECT_RESULT / FILL_RESULT</td><td><code>PASS</code> | <code>FAIL</code> | <code>NOT_TESTED</code></td></tr>
+        <tr><td>HUMAN_CONFIRMED_SEND</td><td><code>YES</code> 只限 owner 確認 exact safe payload + target；否則 <code>NO</code> 或 <code>NOT_APPLICABLE</code>。</td></tr>
+        <tr><td>CAPTURE_RESULT / NORMALIZE_RESULT</td><td><code>PASS</code> | <code>FAIL</code> | <code>FALLBACK</code> | <code>NOT_TESTED</code></td></tr>
+        <tr><td>FALLBACK_RESULT</td><td><code>PASS</code> | <code>FAIL</code> | <code>NOT_TESTED</code></td></tr>
+        <tr><td>FAILURE_PATH_RESULTS</td><td>逐項寫 <code>scenario=outcome</code>；例如 <code>cancelled_send=no_external_send</code>。</td></tr>
+        <tr><td>EXTERNAL_REQUESTS</td><td>寫 observed count 或 <code>NOT_OBSERVED</code>；不要附 request body/header。</td></tr>
+        <tr><td>CLEANUP_RESULT</td><td><code>PASS</code> | <code>FAIL</code> | <code>NOT_TESTED</code>；缺少 cleanup 不可 PASS。</td></tr>
+        <tr><td>SCREENSHOT_REFS / TRACE_REFS</td><td>sanitized relative refs 或 <code>NONE</code>。</td></tr>
+        <tr><td>SECRETS_REDACTED</td><td><code>YES</code> | <code>NO</code>；只能寫類別，不可寫 secret value。</td></tr>
+        <tr><td>ACTUAL_RESULT / BLOCKERS</td><td>bounded observation 或 concise blocker；不寫 certification。</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Report validation checklist</h3>
+    <div class="checklist">
+      <label class="check"><input type="checkbox"> 每一個 required field 都存在且使用 allowed value。</label>
+      <label class="check"><input type="checkbox"> <code>ROUTE</code> 與 <code>FIXTURE_OR_LIVE</code> 一致。</label>
+      <label class="check"><input type="checkbox"> <code>HUMAN_CONFIRMED_SEND=YES</code> 有 owner confirmation evidence。</label>
+      <label class="check"><input type="checkbox"> 手動觀察使用 <code>EXIT_CODE: N/A</code>。</label>
+      <label class="check"><input type="checkbox"> Screenshot/trace 是 relative、sanitized、無 account data/secrets。</label>
+      <label class="check"><input type="checkbox"> External request 是實際 observation，不是常數或猜測。</label>
+      <label class="check"><input type="checkbox"> Cleanup 明確寫出結果。</label>
+      <label class="check"><input type="checkbox"> Fixture 結果沒有被 relabel 成 live vendor compatibility。</label>
+    </div>
+
+    <h2>9. G30 acceptance / scoring 檢核</h2>
+    <table>
+      <thead><tr><th>判定項目</th><th>PASS 所需條件</th><th>缺少時</th></tr></thead>
+      <tbody>
+        <tr><td>三家 vendor</td><td>ChatGPT、Claude、Gemini 各一份完整 sanitized report。</td><td><code>NEED_ACTION</code>；不可用單一 vendor 成功代表三家。</td></tr>
+        <tr><td>主流程</td><td>Launch/Detect/Fill/Send/Capture/Normalize/Cleanup 可追溯。</td><td>該 vendor 不通過；不得計 WP-20。</td></tr>
+        <tr><td>Fallback/failure paths</td><td>expired login、selector mismatch、cancelled send、timeout、capture failure、normalization failure、clipboard/manual fallback 均有 evidence。</td><td><code>NEED_ACTION</code>；不可用「未發生」替代測試結果。</td></tr>
+        <tr><td>Security / egress</td><td>無 secret leakage、無 auto-send、無 unauthorized egress BLOCKER/MAJOR。</td><td>hard gate failure；AI review 不可抵銷。</td></tr>
+        <tr><td>Route provenance</td><td>LIVE 與 CONTROLLED_FIXTURE 清楚分開。</td><td>該 report 不可接受。</td></tr>
+        <tr><td>Score</td><td>全部 acceptance、independent review、checkpoint、clean-clone 與 Human acceptance 完成後，WP-20=5/5，score=100/100。</td><td>維持 WP-20=0/5、current score=95/100。</td></tr>
+      </tbody>
+    </table>
+    <div class="success"><strong>可提出 G30 acceptance 的最終條件：</strong>所有 evidence 與 independent review 都完成，Human 明確接受結果；此時才可提出 <code>G30_DECISION=ACCEPT_AND_COMMIT_PUSH</code>。本手冊本身不授權 stage、commit、push，也不授權任何自動送出。</div>
+
+    <h2>10. Computer / browser 工具說明</h2>
+    <p>若 Codex session 有可用的 Browser/Chrome companion，Human operator 可在確認安全 payload 與 target 後使用它協助 Launch/Detect/Fill/Capture；send 仍必須由 Human 明確確認。工具不得代替登入控制、帳號 owner consent 或安全檢查。</p>
+    <div class="notice"><strong>目前 G30 session 的狀態：</strong>已嘗試 computer/browser probe，但沒有可用的 browser/page/computer binding，Playwright 與 local Chrome CDP 也不可用。因此本手冊應由授權 Human 直接在 supported browser 執行；若要讓 Codex 協助，請先啟用/連接 Codex Browser 或 Chrome companion，再重新開始同一套流程。</div>
+    <ol>
+      <li>啟用 Codex Browser/Chrome companion，確認只連接指定 browser profile。</li>
+      <li>由 Human 在畫面上確認 vendor route、safe payload 與 target。</li>
+      <li>逐家執行本手冊第 4–6 節與第 5 節矩陣。</li>
+      <li>送出前再次由 owner 明確確認；不確認就取消，不得代送。</li>
+      <li>只回傳第 8 節的 sanitized reports 與遮罩後 refs。</li>
+    </ol>
+
+    <h2>11. 交付清單</h2>
+    <div class="checklist">
+      <label class="check"><input type="checkbox"> ChatGPT sanitized report 完成。</label>
+      <label class="check"><input type="checkbox"> Claude sanitized report 完成。</label>
+      <label class="check"><input type="checkbox"> Gemini sanitized report 完成。</label>
+      <label class="check"><input type="checkbox"> 三家 report 都標明 LIVE / CONTROLLED_FIXTURE。</label>
+      <label class="check"><input type="checkbox"> 三家 report 都有 fallback/failure-path 結果。</label>
+      <label class="check"><input type="checkbox"> 所有 screenshot/trace 已遮罩。</label>
+      <label class="check"><input type="checkbox"> 所有 temporary profile/session/export 已清除。</label>
+      <label class="check"><input type="checkbox"> 未傳送任何 credential、cookie、token、raw page data 或 request body/header。</label>
+    </div>
+    <p><strong>交付位置：</strong><code>artifacts/verification/g29-external-20260903/</code>（只放 sanitized artifacts）。Report 應與 [G29-EXTERNAL-REPORT-TEMPLATE.md] 的欄位相容。</p>
+
+    <h2>12. Cross-machine Agent onboarding</h2>
+    <div class="info"><strong>推薦分工：</strong>其他電腦 Agent 可負責專案讀取、依賴安裝、deterministic checks、controlled-fixture failure paths 與 report 格式檢查；Live vendor 的登入、帳號 consent、exact payload/target confirmation 與真實送出仍由授權 Human 負責。Agent 可以導航並準備畫面，但不可代替 Human click send。</div>
+
+    <h3>12.1 先取得 Git</h3>
+    <p>Windows 新電腦先安裝 Git for Windows。可使用 <a href="https://git-scm.com/install/windows">官方安裝頁</a>下載安裝程式，或在有 winget 的 PowerShell 執行：</p>
+    <pre>winget install --id Git.Git -e --source winget
+git --version</pre>
+    <p>安裝完成後關閉並重新開啟 Agent 的 terminal，再確認：</p>
+    <pre>where.exe git
+git --version</pre>
+    <p class="small">若 approved remote 需要權限，請由 Human 依組織規範在本機完成 Git authentication。不要把 password、personal access token、SSH private key 或 credential-helper 輸出給 Agent；Agent 只可使用已授權且不暴露 secret 的 Git 操作。</p>
+
+    <h3>12.2 取得專案與建立隔離 lane</h3>
+    <p>在其他電腦使用 approved remote clone URL 或 Human 提供的 clean Git bundle；不要猜測 remote URL，也不要直接在個人正在使用的 dirty checkout 操作。G29 handoff 使用的 continuation ref 與 SHA 如下：</p>
+    <pre>REF: feature/g24-g30-development-completion-routing
+SHA: 2bbcb0cb2cc6bc39e5a5770f91b9c58c03fed762</pre>
+    <p>在目標電腦的 PowerShell（將 <code>&lt;APPROVED_CLONE_URL&gt;</code> 換成實際核准的 clone URL）：</p>
+    <pre>git clone --branch feature/g24-g30-development-completion-routing &lt;APPROVED_CLONE_URL&gt; PolyNexus-g29-agent
+Set-Location .\PolyNexus-g29-agent
+git switch --detach 2bbcb0cb2cc6bc39e5a5770f91b9c58c03fed762
+git status --short --branch</pre>
+    <p class="small"><strong>目前已核對的現況：</strong>approved Git checkpoint <code>2bbcb0cb2cc6bc39e5a5770f91b9c58c03fed762</code> 能取得 tracked 專案、WP-19 與 G21，但目前 G29 operator pack、本手冊、G30 task 與 G30 evidence 尚未進入 remote；它們在 G30 lane 是 untracked/ignored。請另行把本手冊、四份 G29 operator-pack 文件與 G30 handoff/task 文件以 sanitized bundle 複製到 clone；不要為了取得它們而改寫、commit 或 push branch。</p>
+
+    <h3>12.3 Agent 的最小讀取順序</h3>
+    <ol>
+      <li><code>AGENTS.md</code></li>
+      <li><code>docs/00_SCOPE_BASELINE.md</code>、<code>docs/10_DECISION_LOG.md</code></li>
+      <li><code>docs/11_PROJECT_STATE.md</code>、<code>docs/12_HANDOFF_CURRENT.md</code></li>
+      <li><code>docs/28_MASTER_DEVELOPMENT_ROADMAP.md</code>、<code>docs/31_COMPATIBILITY_MATRIX.md</code>、<code>docs/32_KNOWN_LIMITATIONS.md</code>、<code>docs/33_DEVELOPMENT_PROGRESS_AND_GOAL_EXECUTION_STANDARD.md</code></li>
+      <li><code>docs/tasks/G24-G30-DEVELOPMENT-COMPLETION-ROUTING.md</code></li>
+      <li><code>docs/tasks/G29-EXTERNAL-OPERATOR-RUNBOOK.md</code>、<code>G29-EXTERNAL-TEST-MATRIX.md</code>、<code>G29-EXTERNAL-REPORT-TEMPLATE.md</code>、<code>G29-EXTERNAL-OPERATOR-PROMPT.md</code> 與本 HTML 手冊</li>
+      <li><code>docs/tasks/WP-19.md</code>、<code>docs/tasks/G21-WP21-REAL-BROWSER-JOURNEY-AND-FAILURE-PATH.md</code>、<code>extensions/browser-companion/README.md</code>、source 與 tests</li>
+    </ol>
+    <p>只讀取與任務直接相關的檔案；不要先掃完整 repository、完整歷史 log 或整個 browser profile。</p>
+
+    <h3>12.4 Windows 安裝</h3>
+    <p>需求：Python <code>3.12+</code>、Node.js <code>22.12+</code>、npm 與 Git。從 clone 的 repository root 執行既有 setup script：</p>
+    <pre>python --version
+node --version
+npm --version
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\setup_dev.ps1</pre>
+    <p>此 script 會建立 repository-local <code>.venv</code>、安裝 <code>services/core[dev]</code>，並安裝 <code>apps/web</code> dependencies。安裝產物（<code>.venv</code>、<code>node_modules</code>、build output）只留在該 isolated clone，不要加入 stage。</p>
+    <p>若需要完全依照 lockfile 的 Web 安裝，可在 <code>apps/web</code> 使用：</p>
+    <pre>Set-Location .\apps\web
+npm ci
+Set-Location ..\..</pre>
+    <p class="small">網路、registry、權限或 Python launcher 失敗時，保留 exact command 與 actual exit code，標成 environment blocker；不要以歷史 PASS 取代本機結果。</p>
+
+    <h3>12.5 安裝後 deterministic verification</h3>
+    <pre>powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\preflight.ps1
+& .\.venv\Scripts\python.exe -m pytest -q services\core
+node --test extensions\browser-companion\tests\test_websurface_drivers.mjs
+Set-Location .\apps\web
+npm test
+npm run build
+Set-Location ..\..
+git diff --check</pre>
+    <p>每一行都要記錄 command、actual exit code、passed/failed/skipped 與 environment failure。Browser companion 的 controlled tests 不等於 live vendor verification。</p>
+
+    <h3>12.6 載入 Browser Companion（需要 Human 控制的電腦）</h3>
+    <ol>
+      <li>在乾淨的 browser profile 開啟 <code>chrome://extensions</code>。</li>
+      <li>開啟 Developer mode，選擇 Load unpacked。</li>
+      <li>選取 clone 內的 <code>extensions/browser-companion/</code>。</li>
+      <li>確認 extension version，將版本寫入每家 report；不要截取 storage、cookies、headers 或 network bodies。</li>
+      <li>若要執行 LIVE case，Human owner 必須在場；Agent 只能執行 Launch/Detect/Fill 後停在 confirmation boundary。</li>
+    </ol>
+
+    <h3>12.7 可直接貼給其他 Agent 的啟動指令</h3>
+    <pre>Role: PolyNexus G29/G30 read-only external-operator simulator.
+
+1. Confirm repository root and run `git status --short --branch`.
+2. Do not modify the primary checkout. Work only in this isolated clone.
+3. Read the listed baseline, handoff, G29 operator pack, WP-19, G21, and browser-companion files. Do not read the whole repository pre-emptively.
+4. Install with `scripts/setup_dev.ps1`, then run the named deterministic checks. Report exact commands and actual exit codes.
+5. You may execute CONTROLLED_FIXTURE cases and manual/clipboard fallback checks. Label every route truthfully.
+6. For LIVE ChatGPT/Claude/Gemini cases, never request, store, or reveal credentials, cookies, tokens, private page data, request bodies, or headers. Stop before send unless the authorized Human owner has explicitly confirmed the exact safe payload and target.
+7. Use only this safe payload: “PolyNexus G29 compatibility check. Reply with the single word CHECKED. Do not include personal, confidential, production, or account data.”
+8. Produce one sanitized report per vendor using G29-EXTERNAL-REPORT-TEMPLATE.md. Use `EXIT_CODE: N/A` for manual observations without a process exit code.
+9. Store only sanitized artifacts under `artifacts/verification/g29-external-20260903/`; clean temporary profiles and artifacts before handoff.
+10. Return: changed files (including untracked), commands/results, route labels, report paths, redaction/cleanup confirmation, blockers, and next action. Do not stage, commit, push, or start G31.</pre>
+
+    <h3>12.8 Agent handoff 回傳格式</h3>
+    <pre>TASK_ID: G29-AUTHENTICATED-EXTERNAL-WEB-VERIFICATION
+ROLE: external-operator-simulator | Human-assisted-live-operator
+BRANCH_OR_CHECKOUT: &lt;repo-relative or approved ref&gt;
+READ_FILES: &lt;exact list&gt;
+INSTALL_COMMANDS_AND_EXIT_CODES: &lt;exact results&gt;
+TEST_COMMANDS_AND_EXIT_CODES: &lt;exact results&gt;
+REPORTS: ChatGPT=&lt;path/status&gt;; Claude=&lt;path/status&gt;; Gemini=&lt;path/status&gt;
+ROUTES: LIVE | CONTROLLED_FIXTURE | MANUAL_FALLBACK
+SECRETS_REDACTED: YES | NO
+CLEANUP_RESULT: PASS | FAIL | NOT_TESTED
+BLOCKERS: &lt;concise, no secret values&gt;
+NEXT_OWNER: Human | Codex
+DO_NOT_CHANGE: primary checkout, secrets, frozen contracts, automatic send, G31</pre>
+
+    <div class="footer">
+      Source records: G29-EXTERNAL-OPERATOR-RUNBOOK.md · G29-EXTERNAL-TEST-MATRIX.md · G29-EXTERNAL-REPORT-TEMPLATE.md · G29-EXTERNAL-OPERATOR-PROMPT.md<br>
+      PolyNexus routing: G29 handoff complete / external verification deferred to G30 · Do not start G31.
+    </div>
+  </main>
+</div>
+</body>
+</html>

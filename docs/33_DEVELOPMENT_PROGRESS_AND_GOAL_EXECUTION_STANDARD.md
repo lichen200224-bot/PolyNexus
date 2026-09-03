@@ -1,5 +1,16 @@
 # PolyNexus Development Progress and Goal Execution Standard
 
+## Current routing override — G29 external work deferred to G30 (2026-09-03)
+
+By the current Human instruction, G29 performs no live external vendor run.
+Its sanitized operator materials and preflight evidence are carried forward to
+G30, where authorized Human-operated WP-20 verification must occur before the
+final 100-point reconciliation. The historical G29 external-verification
+procedure below remains the evidence standard for that deferred work; it does
+not authorize starting G30, login, credential handling, automatic send, or Git
+operations. `G29_STATUS=HANDOFF_COMPLETE / DEFERRED_TO_G30`; current accepted score remains
+`95/100` until valid WP-20 evidence is accepted.
+
 ## 1. Decision status
 
 - Status: `HUMAN_CONFIRMED / READY_FOR_CHECKPOINT`

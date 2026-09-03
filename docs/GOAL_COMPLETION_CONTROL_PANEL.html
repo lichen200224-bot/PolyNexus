@@ -22,15 +22,19 @@
   <body>
     <main>
       <section>
+        <h2>G29 handoff — HANDOFF_COMPLETE / DEFERRED_TO_G30</h2>
+        <div class="callout"><strong>G29: HANDOFF_COMPLETE / DEFERRED_TO_G30</strong><br />Development score: <strong>95/100</strong> · WP-20: <strong>0/5</strong><br />Exact predecessor: <code>2bbcb0cb2cc6bc39e5a5770f91b9c58c03fed762</code> · Approved remote: <code>D:/GitBackup/PolyNexus_Backup.git</code> / <code>feature/g24-g30-development-completion-routing</code><br />G29 preflight and sanitized operator handoff are complete. External operator verification is deferred to G30. No login, credential, cookie, token, or external send was used. G30 is prepared but not started.</div>
+      </section>
+      <section>
         <h2>G28 checkpoint — HUMAN_ACCEPTED / PASS / COMPLETE</h2>
-        <div class="callout"><strong>G28: HUMAN_ACCEPTED / PASS / COMPLETE</strong><br />Branch: <code>feature/g28-ux-feature-freeze</code> · Exact predecessor: <code>56c941a6077802e326284f1b70fd9719f146e5b4</code><br />G27 product output: <code>27ff09c224344821868dd8fd36ec2c0eb11504df</code> · Approved remote tip: <code>56c941a...</code><br />Development score: <strong>95/100</strong> · Accepted G28 delta: <strong>+5</strong><br />WP-26: <strong>2 points accepted</strong> · WP-27: <strong>3 points accepted</strong><br />Independent review: <strong>PASS · 0/0/0</strong> · Human decision: <strong>ACCEPT_AND_COMMIT_PUSH</strong> · G29: <strong>GATED / NOT STARTED</strong><br />Evidence: <code>artifacts/verification/g28-ux-feature-freeze-20260903/</code> · Live vendor/login/send remains deferred.</div>
+        <div class="callout"><strong>G28: HUMAN_ACCEPTED / PASS / COMPLETE</strong><br />Branch: <code>feature/g28-ux-feature-freeze</code> · Exact predecessor: <code>56c941a6077802e326284f1b70fd9719f146e5b4</code><br />G27 product output: <code>27ff09c224344821868dd8fd36ec2c0eb11504df</code> · Approved remote tip: <code>56c941a...</code><br />Development score: <strong>95/100</strong> · Accepted G28 delta: <strong>+5</strong><br />WP-26: <strong>2 points accepted</strong> · WP-27: <strong>3 points accepted</strong><br />Independent review: <strong>PASS · 0/0/0</strong> · Human decision: <strong>ACCEPT_AND_COMMIT_PUSH</strong> · G29: <strong>NEED_EXTERNAL_ACTION</strong><br />Evidence: <code>artifacts/verification/g28-ux-feature-freeze-20260903/</code> · Live vendor/login/send remains blocked pending operator.</div>
       </section>
       <header class="hero">
         <p class="eyebrow">PolyNexus · execution control</p>
         <h1>G24–G30 已核准 · 開發完成路線</h1>
         <p class="muted">狀態快照：2026-09-02（Asia/Taipei）。開發專用 100 分制；競賽為人工備註軌，不納入進度。每個 Goal 在新的 Codex task 以 GPT-5.6 Luna / High 執行。</p>
         <div class="meta">
-          <div class="metric"><span class="muted">正式進度</span><strong>90 / 100</strong></div>
+          <div class="metric"><span class="muted">正式進度</span><strong>95 / 100</strong></div>
           <div class="metric"><span class="muted">G24–G30 plan</span><strong class="ready">HUMAN CONFIRMED</strong></div>
           <div class="metric"><span class="muted">G26 status</span><strong class="ready">HUMAN ACCEPTED · PASS · COMPLETE</strong></div>
           <div class="metric"><span class="muted">外部驗證</span><strong class="gated">G29 · LATE</strong></div>
@@ -57,7 +61,7 @@
           <tr><td>WP-17</td><td>4</td><td>HUMAN_ACCEPTED / CHECKPOINTED</td><td>G26</td><td><code>4fd73b5ac3b59ae1f948f8d95ad795112552b1b2</code></td></tr>
           <tr><td>WP-18</td><td>4</td><td>HUMAN_ACCEPTED / CHECKPOINTED</td><td>G26</td><td><code>4fd73b5ac3b59ae1f948f8d95ad795112552b1b2</code></td></tr>
           <tr><td>WP-19</td><td>4</td><td>HUMAN_ACCEPTED / CHECKPOINTED</td><td>G26</td><td><code>4fd73b5ac3b59ae1f948f8d95ad795112552b1b2</code></td></tr>
-          <tr><td>WP-20</td><td>5</td><td>IMPLEMENTED_PENDING_REVIEW</td><td>G29 · EXTERNAL LATE</td><td><code>PENDING</code></td></tr>
+          <tr><td>WP-20</td><td>5</td><td>DEFERRED_TO_G30</td><td>G30 · EXTERNAL DEFERRED</td><td><code>PENDING</code></td></tr>
           <tr><td>WP-21</td><td>3</td><td>HUMAN_ACCEPTED</td><td>G23 predecessor; bounded browser fixture scope</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
           <tr><td>WP-22</td><td>3</td><td>HUMAN_ACCEPTED / PASS / CHECKPOINTED</td><td>G27</td><td><code>27ff09c224344821868dd8fd36ec2c0eb11504df</code></td></tr>
           <tr><td>WP-23</td><td>2</td><td>HUMAN_ACCEPTED</td><td>G23 predecessor</td><td><code>0eb56a986e97a45854bd6ddd419c114845ce51f4</code></td></tr>
@@ -81,8 +85,8 @@
           <tr><td>G26</td><td><code>f4168c31592ac5c886b49d8878f60b99016fdcaf</code></td><td><code>PENDING</code></td><td>Approved G25</td><td>+12</td><td>READY</td></tr>
           <tr><td>G27</td><td><code>7a7dee67395c8a07f2e5b055a306e63190bbd1f8</code></td><td><code>56c941a6077802e326284f1b70fd9719f146e5b4</code></td><td>Approved G26 continuation tip; later docs-only state-sync</td><td>+6</td><td>HUMAN_ACCEPTED / PASS / COMPLETE</td></tr>
           <tr><td>G28</td><td><code>56c941a6077802e326284f1b70fd9719f146e5b4</code></td><td><code>PENDING</code></td><td>Approved G27 exact remote tip</td><td>+5</td><td>VERIFIED_PASS_PENDING_HUMAN</td></tr>
-          <tr><td>G29</td><td><code>G28_OUTPUT_SHA</code></td><td><code>PENDING</code></td><td>Approved G28 + Human operator</td><td>+5</td><td>GATED / EXTERNAL_LATE</td></tr>
-          <tr><td>G30</td><td><code>G29_OUTPUT_SHA</code></td><td><code>PENDING</code></td><td>Approved G29</td><td>0</td><td>GATED</td></tr>
+          <tr><td>G29</td><td><code>2bbcb0cb2cc6bc39e5a5770f91b9c58c03fed762</code></td><td><code>PENDING</code></td><td>Approved G28; completed external-work handoff to G30</td><td>+0</td><td>HANDOFF_COMPLETE / DEFERRED_TO_G30</td></tr>
+          <tr><td>G30</td><td><code>G29_OUTPUT_SHA</code></td><td><code>PENDING</code></td><td>Approved G29; execute WP-20 then reconcile</td><td>0 (WP-20 +5)</td><td>GATED</td></tr>
         </tbody></table></div>
       </section>
 
@@ -119,8 +123,8 @@
           <article class="goal"><span class="badge ready">READY</span><h3>G26 · Internal integration</h3><p>WP-17/18/19 local, policy, WebSurface. Target 84. Predecessor f4168c3.</p></article>
           <article class="goal"><span class="badge gated">GATED</span><h3>G27 · Product breadth</h3><p>WP-22/24/25 workflows, guards, metrics. Target 90.</p></article>
           <article class="goal"><span class="badge ready">ACCEPTED</span><h3>G28 · Feature freeze</h3><p>WP-26/27 UX and Golden Workflow evidence. Score 95.</p></article>
-          <article class="goal"><span class="badge warning">EXTERNAL · LATE</span><h3>G29 · Vendor</h3><p>WP-20 Human-operated authenticated journeys. Target 100.</p></article>
-          <article class="goal"><span class="badge gated">GATED</span><h3>G30 · Final</h3><p>Final score/provenance reconciliation. Confirm 100.</p></article>
+          <article class="goal"><span class="badge warning">DEFERRED</span><h3>G29 · Handoff</h3><p>Preflight and sanitized operator pack. External WP-20 work moves to G30; score remains 95.</p></article>
+          <article class="goal"><span class="badge gated">GATED</span><h3>G30 · External + final</h3><p>Run deferred WP-20 Human-operated verification, then reconcile and confirm 100.</p></article>
         </div>
       </section>
 
@@ -150,11 +154,11 @@
           <li><code>docs/31_COMPATIBILITY_MATRIX.md</code> remains the promoted file; primary <code>docs/31_PROJECT_CONTENT_MAP.md</code> was excluded without overwrite.</li>
           <li>G21 verifies only a controlled synthetic-host browser fixture. Live vendor login, DOM compatibility, and external send remain <strong class="warning">DEFERRED / UNVERIFIED</strong> until G29.</li>
           <li>Credential, cookie, token, and automatic external send remain prohibited. Human confirms every send in G29.</li>
-          <li>ADR-001–010 remain frozen; ADR-011 is unchanged; formal development progress is 72/100.</li>
+          <li>ADR-001–010 remain frozen; ADR-011 is unchanged; current formal development progress is 95/100 and G29 remains blocked.</li>
         </ul>
       </section>
 
-      <footer>G28 is Human-accepted at score 95/100; its exact output SHA will be recorded after the authorized checkpoint and state-sync. G29 is gated; external verification is deliberately deferred. Do not claim vendor certification.</footer>
+      <footer>G28 is Human-accepted at score 95/100. Current Human routing defers G29 external verification to G30. No vendor certification is claimed, and this update does not start G30.</footer>
     </main>
   </body>
 </html>

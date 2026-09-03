@@ -1,5 +1,18 @@
 # GOAL Completion Control Panel
 
+## G29 handoff — HANDOFF_COMPLETE / DEFERRED_TO_G30 (2026-09-03)
+
+- `G29_STATUS`: `HANDOFF_COMPLETE / DEFERRED_TO_G30`; `PROJECT_PROGRESS=95/100`;
+  `WP-20=0/5`; `LIVE_VENDOR_VERIFICATION=DEFERRED_TO_G30`.
+- `G29_PREDECESSOR_SHA`: `2bbcb0cb2cc6bc39e5a5770f91b9c58c03fed762`;
+  approved remote/ref is `D:/GitBackup/PolyNexus_Backup.git` /
+  `feature/g24-g30-development-completion-routing`; G28 clean clone matches.
+- `G28_PRODUCT_OUTPUT_SHA`: `789717fbf4a6b4a36aa71ec1cf7d36f344eccdf7`;
+  terminal state-sync tip used for G29 is the exact predecessor above.
+- `EXTERNAL_ACTION`: no qualified operator/account is available; use the
+  sanitized G29 runbook, matrix, report template, and communication prompt.
+- `G30_STATUS`: `GATED`; do not start G30.
+
 Browser-readable companion: [GOAL_COMPLETION_CONTROL_PANEL.html](GOAL_COMPLETION_CONTROL_PANEL.html).
 
 ## G28 checkpoint — HUMAN_ACCEPTED / PASS / COMPLETE (2026-09-03)
@@ -86,7 +99,7 @@ Browser-readable companion: [GOAL_COMPLETION_CONTROL_PANEL.html](GOAL_COMPLETION
 | CP-03: WP-11/12/13 | 14 | 14 | Complete |
 | CP-03: WP-14/15/16 | 13 | 13 | G25 (Human accepted; Carver review PASS; checkpointed) |
 | CP-04: WP-17/18/19 | 12 | 12 | G26 (HUMAN_ACCEPTED / PASS / COMPLETE) |
-| CP-04: WP-20 | 0 | 5 | G29 (IMPLEMENTED_PENDING_REVIEW; external/Human-operated) |
+| CP-04: WP-20 | 0 | 5 | G30 (IMPLEMENTED_PENDING_REVIEW; external/Human-operated, deferred from G29) |
 | CP-04: WP-21 | 3 | 3 | Complete, bounded fixture scope |
 | CP-05: WP-22/24/25 | 6 | 6 | G27 (HUMAN_ACCEPTED / PASS / CHECKPOINTED) |
 | CP-05: WP-23 | 2 | 2 | Complete |
@@ -104,7 +117,7 @@ Browser-readable companion: [GOAL_COMPLETION_CONTROL_PANEL.html](GOAL_COMPLETION
 | G26 | `HUMAN_ACCEPTED / PASS / COMPLETE` | WP-17/18/19 local/policy/WebSurface; output `4fd73b5ac3b59ae1f948f8d95ad795112552b1b2` | 84 |
 | G27 | `HUMAN_ACCEPTED / PASS / COMPLETE` | WP-22/24/25 workflows/guards/metrics | 90 |
 | G28 | `HUMAN_ACCEPTED / PASS / COMPLETE` | WP-26/27 UX + Golden Workflow freeze | 95 |
-| G29 | `GATED_BY_G28` | WP-20 authenticated external-vendor verification | 100 |
+| G29 | `HANDOFF_COMPLETE / DEFERRED_TO_G30` | WP-20 operator-pack handoff and preflight only | 95 |
 | G30 | `GATED_BY_G29` | Final score/provenance reconciliation | 100 confirmed |
 
 ### Independent WP ledger — CURRENT
@@ -127,7 +140,7 @@ Every WP-11–WP-32 record contains `WP_ID`, `CHECKPOINT`, `POINT_WEIGHT`,
 | WP-17 | 4 | `HUMAN_ACCEPTED / PASS / CHECKPOINTED` | G26 | `4fd73b5ac3b59ae1f948f8d95ad795112552b1b2` |
 | WP-18 | 4 | `HUMAN_ACCEPTED / PASS / CHECKPOINTED` | G26 | `4fd73b5ac3b59ae1f948f8d95ad795112552b1b2` |
 | WP-19 | 4 | `HUMAN_ACCEPTED / PASS / CHECKPOINTED` | G26 | `4fd73b5ac3b59ae1f948f8d95ad795112552b1b2` |
-| WP-20 | 5 | `IMPLEMENTED_PENDING_REVIEW` | G29 | `PENDING` |
+| WP-20 | 5 | `DEFERRED_TO_G30` | G30 | `PENDING` |
 | WP-21 | 3 | `HUMAN_ACCEPTED` | G23 predecessor; bounded browser fixture scope | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
 | WP-22 | 3 | `HUMAN_ACCEPTED / PASS / CHECKPOINTED` | G27 | `27ff09c224344821868dd8fd36ec2c0eb11504df` |
 | WP-23 | 2 | `HUMAN_ACCEPTED` | G23 predecessor | `0eb56a986e97a45854bd6ddd419c114845ce51f4` |
@@ -150,8 +163,8 @@ Every WP-11–WP-32 record contains `WP_ID`, `CHECKPOINT`, `POINT_WEIGHT`,
 | G26 | `f4168c31592ac5c886b49d8878f60b99016fdcaf` | `4fd73b5ac3b59ae1f948f8d95ad795112552b1b2` | Approved G25 checkpoint | +12 | `HUMAN_ACCEPTED / PASS / COMPLETE` |
 | G27 | `7a7dee67395c8a07f2e5b055a306e63190bbd1f8` | `56c941a6077802e326284f1b70fd9719f146e5b4` | Approved G26 continuation tip; later docs-only state-sync | +6 | `HUMAN_ACCEPTED / PASS / COMPLETE` |
 | G28 | `56c941a6077802e326284f1b70fd9719f146e5b4` | `789717fbf4a6b4a36aa71ec1cf7d36f344eccdf7` | Approved G27 exact remote tip | +5 | `HUMAN_ACCEPTED / PASS / COMPLETE` |
-| G29 | `G28_OUTPUT_SHA` | `PENDING` | Approved G28 + external operator | +5 | `GATED / EXTERNAL_LATE` |
-| G30 | `G29_OUTPUT_SHA` | `PENDING` | Approved G29 checkpoint | 0 | `GATED` |
+| G29 | `2bbcb0cb2cc6bc39e5a5770f91b9c58c03fed762` | `PENDING` | Approved G28; completed external-work handoff to G30 | +0 | `HANDOFF_COMPLETE / DEFERRED_TO_G30` |
+| G30 | `G29_OUTPUT_SHA` | `PENDING` | Approved G29; execute WP-20 then reconcile | 0 (WP-20 +5) | `GATED` |
 
 Authoritative standard: [Development Progress and Goal Execution Standard](33_DEVELOPMENT_PROGRESS_AND_GOAL_EXECUTION_STANDARD.md).
 Copy-ready prompts: [G24–G30 Development Completion Routing](tasks/G24-G30-DEVELOPMENT-COMPLETION-ROUTING.md).

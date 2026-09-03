@@ -1,5 +1,17 @@
 # PolyNexus Decision Log
 
+## Current Human routing override — external verification moved to G30 (2026-09-03)
+
+The Human changed the current Goal routing: authenticated external ChatGPT /
+Claude / Gemini Web verification is deferred from G29 to G30. G29 retains only
+the isolated-lane preflight, sanitized operator pack, and truthful handoff of
+unverified WP-20 evidence. G30 must not be started by this update; its future
+start gate must include the deferred external verification before final
+reconciliation. This is a governance/routing change only:
+`ADR_IMPACT=NONE`, `SCOPE_DEVIATION=NONE`; D02, ADR-006, ADR-010, the explicit
+Human-confirmed-send boundary, secret boundary, and no-automatic-send rule are
+unchanged.
+
 Status: Development Baseline v1.0
 
 ## Product / Scope Decisions

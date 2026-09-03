@@ -1,5 +1,19 @@
 # PolyNexus Master Development Roadmap & Checkpoint Register
 
+## G29 handoff — HANDOFF_COMPLETE / DEFERRED_TO_G30 (2026-09-03)
+
+- G28 is `HUMAN_ACCEPTED / PASS / COMPLETE` at `95/100`.
+- Approved remote `D:/GitBackup/PolyNexus_Backup.git`, ref
+  `feature/g24-g30-development-completion-routing`, resolves to the exact G29
+  predecessor/terminal G28 state-sync tip
+  `2bbcb0cb2cc6bc39e5a5770f91b9c58c03fed762`; the clean clone matches.
+- Current Human routing moves the external operator verification to G30. The
+  G29 sanitized operator pack is ready; the G29 handoff is complete, WP-20
+  remains `0/5`, G29 must not be marked PASS, and this update does not start
+  G30. The deferred WP-20 `+5`
+  remains an item score; G30 itself adds no new Goal points and only confirms
+  the final 100 after WP-20 acceptance.
+
 ## G28 checkpoint — HUMAN_ACCEPTED / PASS / COMPLETE (2026-09-03)
 
 - Branch: `feature/g28-ux-feature-freeze`.

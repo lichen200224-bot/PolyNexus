@@ -1,5 +1,91 @@
 # Current Handoff
 
+## Current Task — G30 final external verification and reconciliation (2026-09-03)
+
+**Result:** `NEED_ACTION` — G29 handoff is accepted as a deferred predecessor,
+but no authorized Human vendor reports were supplied and no live browser session
+was available. G30 does not claim WP-20 completion or a 100/100 score.
+
+- `TASK_ID`: `G30-FINAL-EXTERNAL-VERIFICATION-AND-100-POINT-RECONCILIATION`
+- `ATTEMPT`: `1`
+- `STATUS`: `NEED_ACTION`
+- `BRANCH`: `feature/g30-final-external-verification-g29-tip`
+- `WRITER`: `Codex`; `REVIEWER`: `UNVERIFIED` — independent review not completed
+- `G29_HANDOFF`: `ACCEPTED`
+- `G29_EXTERNAL_VERIFICATION`: `DEFERRED_TO_G30`
+- `G29_OUTPUT_SHA`: `2bbcb0cb2cc6bc39e5a5770f91b9c58c03fed762`, freshly resolved from
+  `D:/GitBackup/PolyNexus_Backup.git` ref
+  `feature/g24-g30-development-completion-routing`
+- `PROJECT_PROGRESS`: `95/100`; `WP-20=0/5`; `G30_SCORE_DELTA=0`
+- `DETERMINISTIC_RESULT`: browser companion `10/10`, exit `0`; baseline and
+  governance validators exit `0`; `git diff --check`, exit `0`; Core pytest
+  exit `0` with one accepted Windows-policy symlink skip and non-fatal temp
+  cleanup warning
+- `EXTERNAL_REPORTS`: `NONE`; no live/fixture vendor evidence is claimed
+- `COMPUTER_TOOL_RESULT`: browser binding unavailable; Playwright unavailable;
+  local Chrome CDP `127.0.0.1:9222` unreachable; no login or send occurred
+- `CLEAN_CLONE_RESULT`: `NOT_RUN` — no accepted G30 checkpoint exists
+- `GITHUB_CONTINUATION`: `NEED_ACTION / HUMAN_DECISION_REQUIRED`; current remotes
+  are local `backup` and `baseline` only, with no GitHub `origin`; see
+  `docs/tasks/G30-CROSS-MACHINE-GITHUB-CONTINUATION.md`
+- `ADR_IMPACT`: `NONE`; `SCOPE_DEVIATION`: `NONE`
+- `TASK_DOC`: `docs/tasks/G30-FINAL-EXTERNAL-VERIFICATION-AND-100-POINT-RECONCILIATION.md`
+- `OPERATOR_MANUAL`: `docs/tasks/G29-HUMAN-OPERATOR-TEST-MANUAL.html` — self-contained
+  Human steps, 24-case matrix, report fields, redaction, fallback, cleanup,
+  acceptance checks, and cross-machine Agent onboarding/install instructions
+- `EVIDENCE`: `artifacts/verification/g30-external-20260903/start-gate-report.md`
+- `INDEPENDENT_REVIEW_EVIDENCE`: `artifacts/verification/g30-external-20260903/independent-review.md`
+- `NEXT_OWNER`: authorized Human operator, then Codex for bounded report validation
+  and independent read-only review
+- `HUMAN_ACTION_REQUIRED`: run the sanitized operator prompt for ChatGPT, Claude,
+  and Gemini and return one sanitized report per vendor; confirm payload and
+  target before every real send
+- `DO_NOT_START`: G31; do not stage, commit, or push before fresh PASS and Human
+  acceptance
+
+## Current Task — G29 authenticated external Web verification (2026-09-03)
+
+**Result:** `HANDOFF_COMPLETE / DEFERRED_TO_G30` — internal preflight and sanitized operator pack
+are complete; current Human routing moves live vendor verification to G30.
+No external run is claimed for G29.
+
+- `HUMAN_ROUTING_DECISION`: `AGREED` — G29 remains handoff-only and deferred
+  WP-20 external verification belongs to G30. This does not authorize
+  `G29_DECISION=ACCEPT_AND_COMMIT_PUSH`.
+
+- `TASK_ID`: `G29-AUTHENTICATED-EXTERNAL-WEB-VERIFICATION`
+- `ATTEMPT`: 1
+- `WRITER`: Codex, sole writer in isolated lane
+- `REVIEWER`: independent read-only review was dispatched but did not return
+  before interruption; `INDEPENDENT_REVIEW=UNVERIFIED`; no independent PASS is
+  claimed. Bounded local self-check is recorded in the preflight evidence.
+- `ANTIGRAVITY_STATUS`: `NOT_REQUIRED_FOR_G29 / DEFERRED_TO_G30` — no live
+  browser login/send is performed in G29; the future G30 gate owns that work
+- `BRANCH`: `feature/g29-authenticated-external-web-verification`
+- `PREDECESSOR_SHA`: `2bbcb0cb2cc6bc39e5a5770f91b9c58c03fed762`
+- `APPROVED_REMOTE_REF`: `D:/GitBackup/PolyNexus_Backup.git` /
+  `feature/g24-g30-development-completion-routing`, exact SHA matched
+- `G28_SCORE`: `95/100`; G28 product output is
+  `789717fbf4a6b4a36aa71ec1cf7d36f344eccdf7`; terminal docs/state-sync tip
+  used as G29 predecessor is `2bbcb0cb2cc6bc39e5a5770f91b9c58c03fed762`
+- `STATUS`: `HANDOFF_COMPLETE / DEFERRED_TO_G30`; `WP-20=0/5`; no score delta awarded
+- `CHANGED_FILES`: the four G29 operator-pack files, this handoff/state/
+  roadmap/control-panel updates, and the ignored preflight evidence file
+- `TESTS`: browser companion `10/10`, exit `0`; `git diff --check`, exit `0`;
+  Web `npm test -- --run`, exit `1` (`vitest` unavailable); Web `npm run build`,
+  exit `1` (`tsc` unavailable)
+- `KNOWN_LIMITATIONS`: no standalone `docs/tasks/WP-20.md` or `WP-21.md`; G21
+  task record is the available WP-21 predecessor; no external report yet
+- `ADR_IMPACT`: `NONE`; `SCOPE_DEVIATION`: `NONE`
+- `NEXT_OWNER`: future G30 owner; carry forward the authorized Human operator
+  verification pack, then Codex validates reports and performs bounded
+  remediation/review
+- `HUMAN_ACTION_REQUIRED`: no G29 external action is requested; when G30 starts,
+  use the sanitized operator prompt and provide only reports without
+  credentials, cookies, tokens, or raw page data
+- `DO_NOT_CHANGE`: primary checkout, frozen ADR/contracts, secrets, remote
+  configuration, automatic send, G30, stage/commit/push before explicit decision
+
 ## Current Task — G28 UX and deterministic feature freeze (2026-09-03)
 
 - `TASK_ID`: `G28-UX-AND-DETERMINISTIC-FEATURE-FREEZE`

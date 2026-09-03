@@ -1,5 +1,39 @@
 # Project State
 
+## Current G29 Candidate State — HANDOFF_COMPLETE / DEFERRED_TO_G30 (2026-09-03)
+
+G29 preflight is complete in an isolated lane. By current Human routing,
+authenticated external Web verification is deferred to G30 and is not run in
+this Goal.
+
+- **Human routing decision:** `AGREED` — G29 is a handoff-only checkpoint;
+  deferred external verification is assigned to G30. This is not a
+  `G29_DECISION=ACCEPT_AND_COMMIT_PUSH` authorization.
+
+- **Goal:** `G29-AUTHENTICATED-EXTERNAL-WEB-VERIFICATION`.
+- **Branch:** `feature/g29-authenticated-external-web-verification`.
+- **Predecessor / isolated-lane HEAD:** `2bbcb0cb2cc6bc39e5a5770f91b9c58c03fed762`.
+- **Approved remote/ref:** `D:/GitBackup/PolyNexus_Backup.git` /
+  `feature/g24-g30-development-completion-routing`; fresh remote resolution
+  matches the predecessor exactly.
+- **G28 gate:** `HUMAN_ACCEPTED / PASS / COMPLETE`, score `95/100`;
+  product output `789717fbf4a6b4a36aa71ec1cf7d36f344eccdf7`; terminal
+  docs/state-sync tip `2bbcb0cb2cc6bc39e5a5770f91b9c58c03fed762` is the G29
+  continuation predecessor and its clean clone is verified.
+- **G29 status:** `HANDOFF_COMPLETE / DEFERRED_TO_G30`; WP-20 remains `0/5`,
+  `IMPLEMENTED_PENDING_EXTERNAL_REVIEW`; no live vendor result is claimed.
+- **Materials:** `docs/tasks/G29-EXTERNAL-OPERATOR-RUNBOOK.md`,
+  `G29-EXTERNAL-TEST-MATRIX.md`, `G29-EXTERNAL-REPORT-TEMPLATE.md`,
+  `G29-EXTERNAL-OPERATOR-PROMPT.md`.
+- **Evidence:** `artifacts/verification/g29-external-20260903/preflight.md`.
+- **Document limitation:** standalone `docs/tasks/WP-20.md` and
+  `docs/tasks/WP-21.md` are absent; the available WP-21 predecessor record is
+  the G21 task document. No acceptance claims were invented.
+- **Security boundary:** no login, credentials, cookies, tokens, external send,
+  browser profile, or vendor data was accessed or retained by Codex.
+- **Next action:** G29 handoff is complete; carry the sanitized operator pack
+  into the future G30 start gate. G30 is prepared but not started.
+
 ## Current G28 Candidate State — HUMAN_ACCEPTED / PASS / COMPLETE (2026-09-03)
 
 This isolated candidate starts from the exact approved G27 continuation tip.
