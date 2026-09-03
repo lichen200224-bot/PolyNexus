@@ -9,7 +9,7 @@
 - Score: `95/100` (`90/100` plus the accepted bounded `+5`).
 - Scope: WP-26 UX/accessibility/states; WP-27 Golden Workflow regressions and
   feature-freeze evidence. Independent review PASS with zero findings.
-- `G28_DECISION=ACCEPT_AND_COMMIT_PUSH`; `G28_PRODUCT_OUTPUT_SHA` is pending
+- `G28_DECISION=ACCEPT_AND_COMMIT_PUSH`; `G28_PRODUCT_OUTPUT_SHA=789717fbf4a6b4a36aa71ec1cf7d36f344eccdf7`
   the first checkpoint commit and `G28_OUTPUT_SHA` the later state-sync.
 - `NEXT_GOAL_READY=G29`; G29 is not started in this task.
 

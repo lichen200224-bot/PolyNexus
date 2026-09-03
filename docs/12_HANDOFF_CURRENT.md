@@ -19,8 +19,10 @@
   UX/accessibility/states and WP-27 four-Golden-Workflow deterministic
   feature-freeze evidence. Web `85/85`, build `0`, affected Core `40`,
   browser-companion `10/10`, controlled browser `4/4`, baseline/governance and
-  diff checks all exit `0`. `G28_PRODUCT_OUTPUT_SHA=PENDING_FIRST_CHECKPOINT`;
-  `G28_OUTPUT_SHA=PENDING_STATE_SYNC`. `NEXT_GOAL_READY=G29`; do not start G29
+  diff checks all exit `0`. `G28_PRODUCT_OUTPUT_SHA=789717fbf4a6b4a36aa71ec1cf7d36f344eccdf7`;
+  `G28_OUTPUT_SHA=789717fbf4a6b4a36aa71ec1cf7d36f344eccdf7` (product checkpoint;
+  docs-only state-sync is recorded in the completion evidence).
+  `NEXT_GOAL_READY=G29`; do not start G29
   in this task.
 - `CHANGED_FILES`: Web source/UI files `apps/web/src/App.tsx`,
   `apps/web/src/components/StatusMessage.tsx`, `ProjectList.tsx`,

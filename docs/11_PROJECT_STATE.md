@@ -19,8 +19,9 @@ This isolated candidate starts from the exact approved G27 continuation tip.
 - **Status:** `HUMAN_ACCEPTED / PASS / COMPLETE`; Human decision recorded as
   `G28_DECISION=ACCEPT_AND_COMMIT_PUSH`. WP-26 and WP-27 are accepted with
   independent read-only review `PASS` and zero blocker/major/minor findings.
-- **G28_PRODUCT_OUTPUT_SHA:** `PENDING_FIRST_CHECKPOINT` until the authorized
-  commit is created; the later state-sync output SHA will be recorded after it.
+- **G28_PRODUCT_OUTPUT_SHA:** `789717fbf4a6b4a36aa71ec1cf7d36f344eccdf7`;
+  this is the authorized G28 product checkpoint. The later docs-only state-sync
+  checkpoint is recorded in the completion evidence.
 - **NEXT_GOAL_READY:** `G29`; G29 is not started by this task.
 
 ## Current G27 Candidate State — 2026-09-03
