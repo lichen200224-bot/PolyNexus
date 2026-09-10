@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "goal_id": "TA-LR-01",
+  "result_type": "GOVERNANCE_REPOSITORY_RECONCILIATION",
+  "checkpoint_type": "ACCEPTED",
+  "reviewed_product_sha": "944711b2d8db956d811e15c550171e268f572a68",
+  "acceptance_receipt_sha": "SELF_RECEIPT",
+  "parent_rule": "DIRECT_SINGLE_PARENT_C",
+  "independent_review_status": "PASS",
+  "push_recommendation": "APPROVE_TO_PUSH",
+  "human_acceptance": "APPROVED",
+  "one_bounded_acceptance_receipt_closure": "AUTHORIZED",
+  "hd_l1": "ACCEPTED",
+  "hd_l2": "ACCEPTED_WITH_PRESERVATION",
+  "hd_l3": "ACCEPTED_WITH_CLARIFICATION",
+  "latest_human_accepted_product_output_sha": "789717fbf4a6b4a36aa71ec1cf7d36f344eccdf7",
+  "track_a_product_lineage_base_sha": "f34e6b29ae9e7326d1d44b9b03756b450809928f",
+  "g08": "PRESERVE / NEXT / REQUIRES_REVALIDATION",
+  "g09": "PRESERVE / NEXT / REQUIRES_REVALIDATION",
+  "dirty_untracked": "PRESERVE / NOT_AUTO_ADOPTED",
+  "product_implementation": "HOLD",
+  "independent_review": {
+    "path": "docs/reviews/TA-LR-01/independent-review.md",
+    "sha256": "44bd7694f7611f7f941b2cb708505056b9a6911ce9ad93b3d2b322ac7ff293b5",
+    "size": 1560,
+    "target": "944711b2d8db956d811e15c550171e268f572a68"
+  },
+  "human_decision": {
+    "path": "docs/reviews/TA-LR-01/human-decision.md",
+    "sha256": "2431018092f69fc4f2c2e84338db0d6cd18b5b71954b6d132f4dc8d1e333749d",
+    "size": 2263,
+    "target": "944711b2d8db956d811e15c550171e268f572a68"
+  },
+  "remote_c_proof": {
+    "path": "docs/reviews/TA-LR-01/remote-c-proof.json",
+    "sha256": "c17a2b833e7e5c1f789b7267c2ef03cea6312b97a5e556dc63fc0f66411e966e",
+    "size": 1187,
+    "local_sha": "944711b2d8db956d811e15c550171e268f572a68",
+    "remote_sha": "944711b2d8db956d811e15c550171e268f572a68"
+  },
+  "handoff": {
+    "path": "docs/handoffs/TA-LR-01/accepted.md",
+    "sha256": "15907ffa803b51afd808df0d0537a21bc1af683b2e75a4785f47a4b2e2b62850",
+    "size": 1588
+  },
+  "changed_files": [
+    "docs/handoffs/TA-LR-01/accepted.md",
+    "docs/reviews/TA-LR-01/acceptance-receipt.json",
+    "docs/reviews/TA-LR-01/human-decision.md",
+    "docs/reviews/TA-LR-01/independent-review.md",
+    "docs/reviews/TA-LR-01/remote-c-proof.json"
+  ],
+  "payload_manifest": [
+    {
+      "path": "docs/handoffs/TA-LR-01/accepted.md",
+      "size": 1588,
+      "sha256": "15907ffa803b51afd808df0d0537a21bc1af683b2e75a4785f47a4b2e2b62850"
+    },
+    {
+      "path": "docs/reviews/TA-LR-01/human-decision.md",
+      "size": 2263,
+      "sha256": "2431018092f69fc4f2c2e84338db0d6cd18b5b71954b6d132f4dc8d1e333749d"
+    },
+    {
+      "path": "docs/reviews/TA-LR-01/independent-review.md",
+      "size": 1560,
+      "sha256": "44bd7694f7611f7f941b2cb708505056b9a6911ce9ad93b3d2b322ac7ff293b5"
+    },
+    {
+      "path": "docs/reviews/TA-LR-01/remote-c-proof.json",
+      "size": 1187,
+      "sha256": "c17a2b833e7e5c1f789b7267c2ef03cea6312b97a5e556dc63fc0f66411e966e"
+    }
+  ],
+  "reviewed_scope_hashes": {
+    "docs/goals/TA-LR-01.md": "100644:2167208d253531dcfe055b50036a47217ada11de",
+    "docs/handoffs/TA-LR-01/review-ready.md": "100644:5e007c4b84d90c5edf3307289b76956d750c2234",
+    "docs/reviews/TA-LR-01/decision-packet.md": "100644:ec357162ff8a54d8177ef2faa92bf0be09448a93",
+    "docs/reviews/TA-LR-01/evidence-manifest.json": "100644:5c7bbc3deda4ecbe10d6925d82480af90b393863",
+    "docs/reviews/TA-LR-01/evidence/git-topology.json": "100644:86713a62d4a51d18c1f711dbc7ed332c28c39811",
+    "docs/reviews/TA-LR-01/evidence/predecessor-comparison-r2.json": "100644:d8753bbac8017c7d097759a4c52a57dde5ad8ecd",
+    "docs/reviews/TA-LR-01/legacy-items.json": "100644:68e4624be2dba63a6a6577d1f21f5a7a143fba36",
+    "docs/reviews/TA-LR-01/safe-lane-proposal.md": "100644:7ff36a722152b54df8be33d6d3f3e38a206a2706",
+    "docs/reviews/TA-LR-01/self-validation.json": "100644:45909dba2975d965af71a2d39bfa35cd51bbc0cf"
+  },
+  "next_goal": "TA-F1",
+  "next_goal_record": {
+    "path": "docs/goals/TA-F1.md",
+    "sha256": "1f29f76e7f69d5bd97e953d23e30af3b98651260f8eb5c06500b9171ef885aec",
+    "size": 5744
+  },
+  "next_governance_predecessor": "SELF_RECEIPT",
+  "next_reviewed_result": "944711b2d8db956d811e15c550171e268f572a68",
+  "next_goal_authorized": false,
+  "next_goal_authorization": "CONDITIONAL_ON_REMOTE_R_READY"
+}

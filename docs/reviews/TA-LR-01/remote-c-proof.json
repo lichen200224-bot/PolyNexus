@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "goal_id": "TA-LR-01",
+  "observed_at": "2026-09-10T18:09:50.4176062+08:00",
+  "repository_path": "isolated TA-LR-01 closure clone",
+  "remote_name": "origin",
+  "remote_url": "https://github.com/lichen200224-bot/PolyNexus.git",
+  "remote_ref": "refs/heads/codex/ta-lr-01",
+  "local_branch": "codex/ta-lr-01",
+  "upstream": "origin/codex/ta-lr-01",
+  "local_c": "944711b2d8db956d811e15c550171e268f572a68",
+  "remote_c": "944711b2d8db956d811e15c550171e268f572a68",
+  "match": true,
+  "push": {
+    "exact_command": "git -C <verified-isolated-candidate-repository> -c safe.directory=<verified-isolated-candidate-repository> push origin 944711b2d8db956d811e15c550171e268f572a68:refs/heads/codex/ta-lr-01",
+    "cwd": "isolated TA-LR-01 candidate repository",
+    "actual_exit_code": 0,
+    "bounded_output": "[new branch] 944711b2d8db956d811e15c550171e268f572a68 -> codex/ta-lr-01"
+  },
+  "remote_verification": {
+    "exact_command": "git ls-remote --heads origin refs/heads/codex/ta-lr-01",
+    "cwd": "isolated TA-LR-01 closure clone",
+    "actual_exit_code": 0,
+    "bounded_output": "944711b2d8db956d811e15c550171e268f572a68 refs/heads/codex/ta-lr-01"
+  }
+}
