@@ -1,0 +1,115 @@
+{
+  "project": "PolyNexus",
+  "track": "Track A V1",
+  "goal": "TA-OPERATING-MODEL-R2",
+  "checkpoint_type": "ACCEPTANCE_RECEIPT",
+  "status": "HUMAN_ACCEPTED",
+  "generated_at": "2026-09-10T12:45:00+08:00",
+  "reviewed_product_sha": "a82c9addaf37d8a5b659ac121f4b8f2787da8e76",
+  "acceptance_receipt_sha": "SELF_RECEIPT",
+  "parent_rule": "DIRECT_SINGLE_PARENT_C",
+  "reviewed_branch": "codex/ta-operating-model-r2",
+  "remote": "origin",
+  "remote_url": "https://github.com/lichen200224-bot/PolyNexus.git",
+  "remote_ref": "refs/heads/codex/ta-operating-model-r2",
+  "independent_review_verdict": "PASS",
+  "push_recommendation": "APPROVE_TO_PUSH",
+  "human_decision": "ACCEPTED",
+  "remote_c_verification": "PASS",
+  "remote_c_sha": "a82c9addaf37d8a5b659ac121f4b8f2787da8e76",
+  "product_implementation": "HOLD",
+  "ta_lr_01": "DEFINED_NOT_EXECUTED",
+  "f1": "NOT_EXECUTED",
+  "s0": "NOT_AUTHORIZED",
+  "next_goal": "TA-LR-01",
+  "next_goal_authorization": "NOT_YET_GRANTED",
+  "next_governance_predecessor": "SELF_RECEIPT",
+  "next_reviewed_result": "a82c9addaf37d8a5b659ac121f4b8f2787da8e76",
+  "receipt_exact_allowlist": [
+    "docs/handoffs/TA-OPERATING-MODEL-R2/accepted.md",
+    "docs/reviews/TA-OPERATING-MODEL-R2/acceptance-receipt.json",
+    "docs/reviews/TA-OPERATING-MODEL-R2/human-decision.md",
+    "docs/reviews/TA-OPERATING-MODEL-R2/independent-review.md",
+    "docs/reviews/TA-OPERATING-MODEL-R2/remote-c-proof.json"
+  ],
+  "changed_files": [
+    "docs/handoffs/TA-OPERATING-MODEL-R2/accepted.md",
+    "docs/reviews/TA-OPERATING-MODEL-R2/acceptance-receipt.json",
+    "docs/reviews/TA-OPERATING-MODEL-R2/human-decision.md",
+    "docs/reviews/TA-OPERATING-MODEL-R2/independent-review.md",
+    "docs/reviews/TA-OPERATING-MODEL-R2/remote-c-proof.json"
+  ],
+  "independent_review": {
+    "path": "docs/reviews/TA-OPERATING-MODEL-R2/independent-review.md",
+    "sha256": "064c6f28171dd96dfb74ef0edd6002a3f1b40841ff0a40362dde60227f0aeedd",
+    "size": 1719,
+    "target": "a82c9addaf37d8a5b659ac121f4b8f2787da8e76"
+  },
+  "human_decision_ref": {
+    "path": "docs/reviews/TA-OPERATING-MODEL-R2/human-decision.md",
+    "sha256": "2cec1eff9b3555b98c77911c7868d0fc7cb0981188f6276f3fc9304e1fac8f59",
+    "size": 1909,
+    "target": "a82c9addaf37d8a5b659ac121f4b8f2787da8e76"
+  },
+  "remote_c_proof": {
+    "path": "docs/reviews/TA-OPERATING-MODEL-R2/remote-c-proof.json",
+    "sha256": "456c9f8b48004481be6f3d9197a0a3888185a1594ae94f4b0bd2a7040f4da6dc",
+    "size": 1860,
+    "local_sha": "a82c9addaf37d8a5b659ac121f4b8f2787da8e76",
+    "remote_sha": "a82c9addaf37d8a5b659ac121f4b8f2787da8e76"
+  },
+  "handoff": {
+    "path": "docs/handoffs/TA-OPERATING-MODEL-R2/accepted.md",
+    "sha256": "c6a49105ed67d4831661e67fcc4dcf307f734699871d7ef0f41aabfebdb0f535",
+    "size": 3104
+  },
+  "payload_manifest": [
+    {
+      "path": "docs/handoffs/TA-OPERATING-MODEL-R2/accepted.md",
+      "sha256": "c6a49105ed67d4831661e67fcc4dcf307f734699871d7ef0f41aabfebdb0f535",
+      "size": 3104
+    },
+    {
+      "path": "docs/reviews/TA-OPERATING-MODEL-R2/human-decision.md",
+      "sha256": "2cec1eff9b3555b98c77911c7868d0fc7cb0981188f6276f3fc9304e1fac8f59",
+      "size": 1909
+    },
+    {
+      "path": "docs/reviews/TA-OPERATING-MODEL-R2/independent-review.md",
+      "sha256": "064c6f28171dd96dfb74ef0edd6002a3f1b40841ff0a40362dde60227f0aeedd",
+      "size": 1719
+    },
+    {
+      "path": "docs/reviews/TA-OPERATING-MODEL-R2/remote-c-proof.json",
+      "sha256": "456c9f8b48004481be6f3d9197a0a3888185a1594ae94f4b0bd2a7040f4da6dc",
+      "size": 1860
+    }
+  ],
+  "reviewed_scope_hashes": {
+    ".agents/skills/polynexus-cross-machine-handoff/SKILL.md": "6e63ac80f7a2f0e212379e5dc159dcd4eadd9d6674c3bad4262a02297d7b87e2",
+    ".agents/skills/polynexus-goal-execution/SKILL.md": "18bc53b074d4f3e4cfea5058b1d23f3f80caf2a26d61078c64b02215bfddfbc4",
+    ".agents/skills/polynexus-independent-acceptance/SKILL.md": "8ff2fb34875d2242d432606d29c0d37f12e1921b478a91a1324e748076898dc6",
+    "AGENTS.md": "379c1281ba49f1eac2efc70f3502a7315ad5e1f4404b1ae5b43cf519432fd26d",
+    "docs/12_HANDOFF_CURRENT.md": "f9ca22cf83f41c615d23283141215b5a884f2345e711be9a79e2dea74b2c51e4",
+    "docs/IMPLEMENTATION_CURRENT_GOAL.md": "e4e39070897f35b2a292857de72d72db1155147de3863e82c1b81e22528055e0",
+    "docs/goals/TA-F1.md": "6a27137edbf317de0ef65c2a95ad43d7cd5bc382972554de6ed9164467c772be",
+    "docs/goals/TA-LR-01.md": "c37b6e23525b1f224015a37859dec3c7073cc6b12900b47006fe4e901972f4bf",
+    "docs/goals/_GOAL_TEMPLATE.md": "83d3918382556b4132314b93e47f5e81001cc877c5a708c36caeee98ee2eea2e",
+    "docs/governance/POLYNEXUS_LEGACY_OPEN_WORK_RECONCILIATION.md": "4230f4cfff01bc69a46c31e6459b39204a33303df71ab07515e59c153c58aa54",
+    "docs/governance/POLYNEXUS_TRACK_A_GOAL_EXECUTION_FRAMEWORK.md": "66e3b73fc26011b2aba002b9867bb20ead3904f601c6408ca3f5670e58a821fe",
+    "docs/handoffs/_HANDOFF_TEMPLATE.md": "b9517f52bc22f4d8399e0a0d90b2d24f0c8973f01ddd9c4c8e8cd0d92b50e49c",
+    "docs/reviews/TA-OPERATING-MODEL/NEED_FIX_R2.md": "0f962579b9b109158ff797f78c82c1908a61373a82cf2ed51bdc1a1f77838a55",
+    "docs/reviews/_REVIEW_PACKET_TEMPLATE.md": "eb0692e2001c24b7d2159214eca994563f83cc6a6f29f697aca4f13367e30a80"
+  },
+  "next_goal_record": {
+    "path": "docs/goals/TA-LR-01.md",
+    "sha256": "c37b6e23525b1f224015a37859dec3c7073cc6b12900b47006fe4e901972f4bf",
+    "size": 10297
+  },
+  "known_limitations": [
+    "This is an isolated governance review history, not a product implementation predecessor.",
+    "TA-LR-01 is defined but not authorized or executed.",
+    "Formal sync F1 and product implementation S0 remain not executed or not authorized.",
+    "The original independent review context is external; this receipt persists its exact target, verdict, package identity, evidence summary, and Human confirmation."
+  ]
+}
