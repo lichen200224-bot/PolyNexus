@@ -1,0 +1,25 @@
+{
+  "goal_id": "TA-F1",
+  "formalization_base": "f34e6b29ae9e7326d1d44b9b03756b450809928f",
+  "accepted_ta_lr_receipt": "fe2eb2318dc6558afe1aa6c5361756b082c90c74",
+  "formal_sources": [
+    {"path":"AGENTS.md","sha256":"f73612dfc58aeb5e3a08f887d5fe1e6724cdbfe44391c82aa4ee464d5d76c618","git_blob":"9834d5134f6cafe903d149301b88d6e575c08f10"},
+    {"path":"docs/00_SCOPE_BASELINE.md","sha256":"407eeb39b938a599963d87f3c72589bd9a3252832be1b09bcf8982f4b1bbeecc","git_blob":"9df9ac9bca08482714fcda27c5bb6f26826c9e2e"},
+    {"path":"docs/01_PRD.md","sha256":"41d77d37e7e5ca0b5a6c8ea840381ad815f168914c3db30054bc217c6d32f62c","git_blob":"ebf62727e4120e668803d19049457fec629072df"},
+    {"path":"docs/02_SA.md","sha256":"61fa4049e9a4d00c5272e579df5aef9bc6f15fec991a8587b496d54e58a61b03","git_blob":"cd6ac68dffeb2a49392262d33c1c0ed9a56df704"},
+    {"path":"docs/03_SD.md","sha256":"fd0782ab9c33b75921d81e22aa526191a60688e14f55192b42994f7feba6ba98","git_blob":"45082dee6b729c462336818b30dd177e64626cf5"},
+    {"path":"docs/10_DECISION_LOG.md","sha256":"3855b2724100213694472059c2a1706875d793aaa7bd0390b2fee2cd0493a741","git_blob":"0571a8d5b4ce9571afd5952d752f3e2ec2b36c09"},
+    {"path":"docs/18_ARCHITECTURE_DECISIONS.md","sha256":"c2cfdfecae36b473afecfb1d4472641f8aaefee598feb09c3bd6d319f8629b66","git_blob":"0e33a5c0ea8c082cf1be60103ca57cca19263c2f"},
+    {"path":"docs/29_ADR_011_RUNTIME_BINDING_AND_TRANSPORT.md","sha256":"a6f9329ad2b26c3b438a8c731d360ecaeed65ad39b8da8293eaa34ac384be4e0","git_blob":"6d444c1a9eb2e60759d0b6dd60089623f54f6ae4"}
+  ],
+  "receipt_lineage_sources": [
+    "docs/reviews/POLYNEXUS_TRACK_A_V1_ARCHITECTURE_FREEZE_RECORD.md",
+    "docs/reviews/GATE_2_CONTRACT_ARCHITECTURE_PACKAGE_REV1.md",
+    "docs/reviews/POLYNEXUS_FORMAL_CONTRACT_ADR_CHANGE_PLAN.md",
+    "docs/reviews/POLYNEXUS_TRACK_A_IMPLEMENTATION_WORK_PACKAGES.md",
+    "docs/reviews/TA-LR-01/acceptance-receipt.json",
+    "docs/reviews/TA-LR-01/legacy-items.json",
+    "docs/reviews/TA-LR-01/decision-packet.md",
+    "docs/handoffs/TA-LR-01/accepted.md"
+  ]
+}

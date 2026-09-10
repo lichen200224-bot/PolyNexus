@@ -1,0 +1,23 @@
+{
+  "goal_id": "TA-F1",
+  "phase": "pre_commit_self_validation",
+  "base": "f34e6b29ae9e7326d1d44b9b03756b450809928f",
+  "result": "PASS",
+  "actual_exit_code": 0,
+  "checks": [
+    "exact_predecessor",
+    "changed_file_allowlist",
+    "formal_targets_unchanged",
+    "product_tree_unchanged",
+    "required_25_sections",
+    "invariant_mapping_i01_i23",
+    "required_contract_coverage",
+    "nine_per_file_records_and_fields",
+    "receipt_references_exist",
+    "proposal_internal_repo_paths",
+    "future_f3_files_absent",
+    "git_diff_check"
+  ],
+  "failed": [],
+  "mandatory_skipped": []
+}
