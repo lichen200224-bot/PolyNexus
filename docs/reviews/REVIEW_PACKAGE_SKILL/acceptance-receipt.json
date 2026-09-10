@@ -1,0 +1,101 @@
+{
+  "project": "PolyNexus",
+  "track": "Track A V1",
+  "goal": "REVIEW_PACKAGE_SKILL",
+  "result_type": "GOVERNANCE",
+  "checkpoint_type": "ACCEPTANCE_RECEIPT",
+  "status": "HUMAN_ACCEPTED",
+  "generated_at": "2026-09-10T15:55:59+08:00",
+  "reviewed_product_sha": "2c17aaaea9d40066fe51414f7178375df1974aa9",
+  "acceptance_receipt_sha": "SELF_RECEIPT",
+  "parent_rule": "DIRECT_SINGLE_PARENT_C",
+  "reviewed_branch": "codex/review-package-skill-r2",
+  "remote_url": "https://github.com/lichen200224-bot/PolyNexus.git",
+  "remote_ref": "refs/heads/codex/review-package-skill-r2",
+  "independent_review_verdict": "PASS",
+  "push_recommendation": "APPROVE_TO_PUSH",
+  "human_decision": "APPROVED",
+  "remote_c_verification": "PASS",
+  "remote_c_sha": "2c17aaaea9d40066fe51414f7178375df1974aa9",
+  "product_implementation": "HOLD",
+  "next_goal": "TA-LR-01",
+  "next_goal_authorization": "CONDITIONAL_ON_REMOTE_R_MATCH",
+  "next_governance_predecessor": "SELF_RECEIPT",
+  "next_reviewed_result": "2c17aaaea9d40066fe51414f7178375df1974aa9",
+  "f1": "NOT_STARTED",
+  "s0": "NOT_STARTED",
+  "receipt_exact_allowlist": [
+    "docs/handoffs/REVIEW_PACKAGE_SKILL/accepted.md",
+    "docs/reviews/REVIEW_PACKAGE_SKILL/acceptance-receipt.json",
+    "docs/reviews/REVIEW_PACKAGE_SKILL/human-decision.md",
+    "docs/reviews/REVIEW_PACKAGE_SKILL/independent-review.md",
+    "docs/reviews/REVIEW_PACKAGE_SKILL/remote-c-proof.json"
+  ],
+  "changed_files": [
+    "docs/handoffs/REVIEW_PACKAGE_SKILL/accepted.md",
+    "docs/reviews/REVIEW_PACKAGE_SKILL/acceptance-receipt.json",
+    "docs/reviews/REVIEW_PACKAGE_SKILL/human-decision.md",
+    "docs/reviews/REVIEW_PACKAGE_SKILL/independent-review.md",
+    "docs/reviews/REVIEW_PACKAGE_SKILL/remote-c-proof.json"
+  ],
+  "independent_review": {
+    "path": "docs/reviews/REVIEW_PACKAGE_SKILL/independent-review.md",
+    "sha256": "f1105aedb6ea55ff5fa1a0670320d7d8ce3544b7ba59781d92803bd0b9f28ef1",
+    "size": 1002,
+    "target": "2c17aaaea9d40066fe51414f7178375df1974aa9"
+  },
+  "human_decision_ref": {
+    "path": "docs/reviews/REVIEW_PACKAGE_SKILL/human-decision.md",
+    "sha256": "078ec2ecee54adae4848c52c9beb5216ea158ef0abf33ff61f31d6926d2ba357",
+    "size": 1434,
+    "target": "2c17aaaea9d40066fe51414f7178375df1974aa9"
+  },
+  "remote_c_proof": {
+    "path": "docs/reviews/REVIEW_PACKAGE_SKILL/remote-c-proof.json",
+    "sha256": "e48f2e4d4505380bb470449208616c0b8704bf7f1eed3534dd20d821eea32e87",
+    "size": 2015,
+    "local_sha": "2c17aaaea9d40066fe51414f7178375df1974aa9",
+    "remote_sha": "2c17aaaea9d40066fe51414f7178375df1974aa9"
+  },
+  "handoff": {
+    "path": "docs/handoffs/REVIEW_PACKAGE_SKILL/accepted.md",
+    "sha256": "42ecce80a8f7bccbd5e6dc0ae9d21510db818399b68bb9522440d19559d74b3d",
+    "size": 2151
+  },
+  "payload_manifest": [
+    {
+      "path": "docs/handoffs/REVIEW_PACKAGE_SKILL/accepted.md",
+      "sha256": "42ecce80a8f7bccbd5e6dc0ae9d21510db818399b68bb9522440d19559d74b3d",
+      "size": 2151
+    },
+    {
+      "path": "docs/reviews/REVIEW_PACKAGE_SKILL/human-decision.md",
+      "sha256": "078ec2ecee54adae4848c52c9beb5216ea158ef0abf33ff61f31d6926d2ba357",
+      "size": 1434
+    },
+    {
+      "path": "docs/reviews/REVIEW_PACKAGE_SKILL/independent-review.md",
+      "sha256": "f1105aedb6ea55ff5fa1a0670320d7d8ce3544b7ba59781d92803bd0b9f28ef1",
+      "size": 1002
+    },
+    {
+      "path": "docs/reviews/REVIEW_PACKAGE_SKILL/remote-c-proof.json",
+      "sha256": "e48f2e4d4505380bb470449208616c0b8704bf7f1eed3534dd20d821eea32e87",
+      "size": 2015
+    }
+  ],
+  "reviewed_scope_hashes": {
+    ".agents/skills/polynexus-review-package/SKILL.md": "d4d90bce5b10ebc75d0838b2cb920c234c7025363ef7ebe1bbed2caedfe2e96e"
+  },
+  "next_goal_record": {
+    "path": "docs/goals/TA-LR-01.md",
+    "sha256": "71986faaae8b6c6787e93dcb979a06b1dabcad1e7aa4f36bb010744925a16b76",
+    "size": 11303
+  },
+  "known_limitations": [
+    "This accepted checkpoint is Governance / Skill work, not Product Implementation.",
+    "The governance branch is not the future Track A implementation predecessor or lane.",
+    "TA-LR-01 authorization becomes effective only after receipt integrity and remote R match.",
+    "F1 and S0 remain not started."
+  ]
+}

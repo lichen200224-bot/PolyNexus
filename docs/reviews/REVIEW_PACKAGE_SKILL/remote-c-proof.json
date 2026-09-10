@@ -1,0 +1,38 @@
+{
+  "goal_id": "REVIEW_PACKAGE_SKILL",
+  "result_type": "GOVERNANCE",
+  "reviewed_product_sha": "2c17aaaea9d40066fe51414f7178375df1974aa9",
+  "remote_url": "https://github.com/lichen200224-bot/PolyNexus.git",
+  "remote_ref": "refs/heads/codex/review-package-skill-r2",
+  "observed_at": "2026-09-10T15:55:59+08:00",
+  "local_c": "2c17aaaea9d40066fe51414f7178375df1974aa9",
+  "remote_c": "2c17aaaea9d40066fe51414f7178375df1974aa9",
+  "remote_match": true,
+  "push_attempts": [
+    {
+      "command": "git push https://github.com/lichen200224-bot/PolyNexus.git 2c17aaaea9d40066fe51414f7178375df1974aa9:refs/heads/codex/review-package-skill-r2",
+      "cwd": "isolated REVIEW_PACKAGE_SKILL repository",
+      "actual_exit_code": 1,
+      "bounded_output": "Credential prompt launcher unavailable; no remote update."
+    },
+    {
+      "command": "git -c safe.directory=<exact-isolated-repository> push https://github.com/lichen200224-bot/PolyNexus.git 2c17aaaea9d40066fe51414f7178375df1974aa9:refs/heads/codex/review-package-skill-r2",
+      "cwd": "isolated REVIEW_PACKAGE_SKILL repository",
+      "actual_exit_code": 1,
+      "bounded_output": "Human-user execution rejected dubious ownership; no remote update."
+    },
+    {
+      "command": "git -c safe.directory=<exact-isolated-repository> push https://github.com/lichen200224-bot/PolyNexus.git 2c17aaaea9d40066fe51414f7178375df1974aa9:refs/heads/codex/review-package-skill-r2",
+      "cwd": "isolated REVIEW_PACKAGE_SKILL repository",
+      "actual_exit_code": 0,
+      "bounded_output": "[new branch] 2c17aaaea9d40066fe51414f7178375df1974aa9 -> codex/review-package-skill-r2"
+    }
+  ],
+  "verification": {
+    "command": "git ls-remote --heads https://github.com/lichen200224-bot/PolyNexus.git refs/heads/codex/review-package-skill-r2",
+    "cwd": "isolated REVIEW_PACKAGE_SKILL repository",
+    "actual_exit_code": 0,
+    "bounded_output": "2c17aaaea9d40066fe51414f7178375df1974aa9 refs/heads/codex/review-package-skill-r2"
+  },
+  "secrets_recorded": false
+}
