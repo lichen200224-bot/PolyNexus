@@ -1,18 +1,18 @@
 {
   "schema_version": 1,
   "goal_id": "TA-LR-01",
-  "executed_utc": "2026-09-10T08:29:22.303256+00:00",
+  "executed_utc": "2026-09-10T09:21:09.184550+00:00",
   "status": "PASS",
   "checks": [
     {
       "check_id": "ITEM_LEDGER_SCHEMA",
       "status": "PASS",
-      "detail": "51 items complete"
+      "detail": "56 items complete"
     },
     {
       "check_id": "INVENTORY_EQUALS_CLASSIFIED",
       "status": "PASS",
-      "detail": "51"
+      "detail": "56"
     },
     {
       "check_id": "UNIQUE_ITEM_IDS",
@@ -28,6 +28,11 @@
       "check_id": "UNKNOWN_PRESERVED",
       "status": "PASS",
       "detail": "all uncertain items have preservation refs"
+    },
+    {
+      "check_id": "ACCEPTED_OUTPUTS_PRESERVED_SEPARATELY",
+      "status": "PASS",
+      "detail": "routing superseded; G23/G25/G26/G27/G28 outputs retained"
     },
     {
       "check_id": "NEGATIVE_DUPLICATE_REJECTED",
@@ -47,7 +52,7 @@
     {
       "check_id": "EXACT_WRITE_SCOPE",
       "status": "PASS",
-      "detail": "10 changed files within allowlist"
+      "detail": "8 changed files within allowlist"
     },
     {
       "check_id": "NO_PRODUCT_CODE_CHANGE",
@@ -60,9 +65,34 @@
       "detail": "none"
     },
     {
+      "check_id": "PREDECESSOR_COMPARISON_COMPLETE",
+      "status": "PASS",
+      "detail": "compared=9"
+    },
+    {
+      "check_id": "LATEST_ACCEPTED_PRODUCT_OUTPUT_EXACT",
+      "status": "PASS",
+      "detail": "789717fbf4a6b4a36aa71ec1cf7d36f344eccdf7"
+    },
+    {
+      "check_id": "F34_RECOMMENDATION_CONDITIONAL",
+      "status": "PASS",
+      "detail": "PROPOSED_REQUIRES_HUMAN_PROMOTION_FROM_DESIGN_READ"
+    },
+    {
+      "check_id": "PRODUCT_TREE_PRESERVATION",
+      "status": "PASS",
+      "detail": "789717fb to f34 product subtrees match"
+    },
+    {
       "check_id": "SAFE_PREDECESSOR_REMOTE_REPRODUCIBLE",
       "status": "PASS",
-      "detail": "730912b5a3e19449c355975485f1fe77350a458a"
+      "detail": "feature/g24-g30-development-completion-routing"
+    },
+    {
+      "check_id": "GOAL_WRITER_METADATA_CONSISTENT",
+      "status": "PASS",
+      "detail": "Codex governance Writer authorized; product Writer NONE"
     },
     {
       "check_id": "DIRTY_INVENTORY_CAPTURED",

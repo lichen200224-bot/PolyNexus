@@ -1,0 +1,1400 @@
+{
+  "schema_version": 1,
+  "goal_id": "TA-LR-01",
+  "repair_round": "SAFE_PREDECESSOR_RECONCILIATION_R2",
+  "old_review_candidate_sha": "d60da1537f4d93bab10bf325cd4f69f13dec075b",
+  "latest_human_accepted_product_output_sha": "789717fbf4a6b4a36aa71ec1cf7d36f344eccdf7",
+  "recommended_safe_implementation_predecessor_sha": "f34e6b29ae9e7326d1d44b9b03756b450809928f",
+  "remote_carrier_branch": "feature/g24-g30-development-completion-routing",
+  "recommendation_status": "PROPOSED_REQUIRES_HUMAN_PROMOTION_FROM_DESIGN_READ",
+  "product_tree_check": {
+    "from": "789717fbf4a6b4a36aa71ec1cf7d36f344eccdf7",
+    "to": "f34e6b29ae9e7326d1d44b9b03756b450809928f",
+    "commits_after_product_output": 3,
+    "product_name_status": [],
+    "subtree_checks": [
+      {
+        "path": "apps",
+        "sha_at_latest_product": "0e4f2d9886484237ca607493fb47bcd5a4ec7438",
+        "sha_at_frozen_tip": "0e4f2d9886484237ca607493fb47bcd5a4ec7438",
+        "match": true
+      },
+      {
+        "path": "services",
+        "sha_at_latest_product": "4299b98463b5aec08132119b224291ebfa18ec7b",
+        "sha_at_frozen_tip": "4299b98463b5aec08132119b224291ebfa18ec7b",
+        "match": true
+      },
+      {
+        "path": "schemas",
+        "sha_at_latest_product": "e812e543eb5b8442539d2ed796c8fad080803780",
+        "sha_at_frozen_tip": "e812e543eb5b8442539d2ed796c8fad080803780",
+        "match": true
+      },
+      {
+        "path": "workflows",
+        "sha_at_latest_product": "1d9e70249e6eaeaa2186940f18fd142385e2116d",
+        "sha_at_frozen_tip": "1d9e70249e6eaeaa2186940f18fd142385e2116d",
+        "match": true
+      },
+      {
+        "path": "extensions",
+        "sha_at_latest_product": "62e11987a54ee96bcbd221cd908c4290874e18a7",
+        "sha_at_frozen_tip": "62e11987a54ee96bcbd221cd908c4290874e18a7",
+        "match": true
+      }
+    ],
+    "product_tree_preservation": "PASS",
+    "conclusion": "No product source, production tests, schema, workflow, extension, or runtime implementation changed after accepted G28 product output; all differences are docs."
+  },
+  "formal_doc_reconciliation_required": "YES",
+  "fresh_revalidation_required_by_stage": {
+    "S0": "startup/health/CREATED/cancel-timeout and affected foundation regressions",
+    "W1": "repository/workspace identity, bindings, dirty snapshot and ownership",
+    "W2": "real executor, adapters, policy, redaction, local endpoint and process lifecycle",
+    "W3": "Core-derived ChangeSet/Candidate/artifact identities and capture",
+    "W4": "deterministic verification, evidence, workflow guards and metrics",
+    "W5": "trusted Human decision, exact view, history, revoke/supersede and secret boundaries",
+    "W6": "working product UX, accepted result opening, portable package and recovery"
+  },
+  "comparison": [
+    {
+      "sha": "730912b5a3e19449c355975485f1fe77350a458a",
+      "goal_meaning": "CP06 provisional RC acceptance",
+      "human_acceptance_status": "PROVISIONALLY_ACCEPTED_WITH_LIMITATIONS",
+      "subject": "docs: record CP06 provisional RC acceptance",
+      "commit_date": "2026-09-01T21:13:59+08:00",
+      "parents": [
+        "af46ddfe032829b43f5b4ced43288c2104e96b36"
+      ],
+      "changed_paths": [
+        "docs/11_PROJECT_STATE.md",
+        "docs/12_HANDOFF_CURRENT.md",
+        "docs/31_COMPATIBILITY_MATRIX.md",
+        "docs/32_KNOWN_LIMITATIONS.md"
+      ],
+      "product_code_paths": [],
+      "docs_evidence_paths": [
+        "docs/11_PROJECT_STATE.md",
+        "docs/12_HANDOFF_CURRENT.md",
+        "docs/31_COMPATIBILITY_MATRIX.md",
+        "docs/32_KNOWN_LIMITATIONS.md"
+      ],
+      "docs_evidence_only": true,
+      "known_limitations": "WP21/browser/vendor remained DEFERRED_UNVERIFIED",
+      "remote_availability": {
+        "fresh_clone_object_present": true,
+        "carrier_refs": [
+          "legacy/feature/first-vertical-slice",
+          "legacy/feature/g19-canonical-workspace-provenance",
+          "legacy/feature/g20-web-reproducible-dependency-test-build-gate",
+          "legacy/feature/g21-wp21-real-browser-journey-failure-path",
+          "legacy/feature/g22-rc-hardening-cross-machine-delivery-closeout",
+          "legacy/feature/g24-g30-development-completion-routing",
+          "origin/HEAD -> origin/feature/g24-g30-development-completion-routing",
+          "origin/feature/g24-g30-development-completion-routing"
+        ]
+      },
+      "relation_to_frozen_track_a": "ANCESTOR_OF_FROZEN_BY_26_COMMITS",
+      "lost_if_implementation_starts_before_this_checkpoint": "Starting here would omit all later G19-G28 accepted product and provenance commits."
+    },
+    {
+      "sha": "0eb56a986e97a45854bd6ddd419c114845ce51f4",
+      "goal_meaning": "G23 final Human acceptance / G22 terminal checkpoint",
+      "human_acceptance_status": "HUMAN_ACCEPTED_PASS_COMPLETE",
+      "subject": "docs(g22): reconcile remaining WP-21 evidence count",
+      "commit_date": "2026-09-02T11:19:52+08:00",
+      "parents": [
+        "d095447f315f0984be8afdaecf036a52882423c4"
+      ],
+      "changed_paths": [
+        "docs/28_MASTER_DEVELOPMENT_ROADMAP.md"
+      ],
+      "product_code_paths": [],
+      "docs_evidence_paths": [
+        "docs/28_MASTER_DEVELOPMENT_ROADMAP.md"
+      ],
+      "docs_evidence_only": true,
+      "known_limitations": "Vendor certification NOT_CLAIMED; historical score 59/100",
+      "remote_availability": {
+        "fresh_clone_object_present": true,
+        "carrier_refs": [
+          "legacy/feature/g22-rc-hardening-cross-machine-delivery-closeout",
+          "legacy/feature/g24-g30-development-completion-routing",
+          "origin/HEAD -> origin/feature/g24-g30-development-completion-routing",
+          "origin/feature/g24-g30-development-completion-routing"
+        ]
+      },
+      "relation_to_frozen_track_a": "ANCESTOR_OF_FROZEN_BY_13_COMMITS",
+      "lost_if_implementation_starts_before_this_checkpoint": "Starting here would omit accepted G25 runtime, G26 local policy/WebSurface, G27 workflow/metrics, and G28 UX product work."
+    },
+    {
+      "sha": "f4168c31592ac5c886b49d8878f60b99016fdcaf",
+      "goal_meaning": "G25 runtime adapters and Doctor product output",
+      "human_acceptance_status": "HUMAN_ACCEPTED_PASS_COMPLETE",
+      "subject": "feat(runtime): add conformance adapters and doctor reporting",
+      "commit_date": "2026-09-02T23:35:31+08:00",
+      "parents": [
+        "61cc7420e290cd93eda787c30b54a93edf4ca9a0"
+      ],
+      "changed_paths": [
+        "artifacts/verification/g25-runtime-adapters-doctor-20260902/G25_EVIDENCE_SUMMARY.md",
+        "artifacts/verification/g25-runtime-adapters-doctor-20260902/ledger.json",
+        "docs/10_DECISION_LOG.md",
+        "docs/11_PROJECT_STATE.md",
+        "docs/12_HANDOFF_CURRENT.md",
+        "docs/28_MASTER_DEVELOPMENT_ROADMAP.md",
+        "docs/31_ADR_012_RUNTIME_DOCTOR_REPORTING.md",
+        "docs/31_COMPATIBILITY_MATRIX.md",
+        "docs/32_KNOWN_LIMITATIONS.md",
+        "docs/GOAL_COMPLETION_CONTROL_PANEL.html",
+        "docs/GOAL_COMPLETION_CONTROL_PANEL.md",
+        "docs/tasks/WP-14.md",
+        "docs/tasks/WP-15.md",
+        "docs/tasks/WP-16.md",
+        "services/core/src/polynexus_core/runtime/codex.py",
+        "services/core/src/polynexus_core/runtime/doctor.py",
+        "services/core/src/polynexus_core/runtime/doctor_legacy.py",
+        "services/core/src/polynexus_core/runtime/opencode.py",
+        "services/core/src/polynexus_core/runtime/registry.py",
+        "services/core/tests/test_wp14_codex_runtime.py",
+        "services/core/tests/test_wp15_opencode_runtime.py",
+        "services/core/tests/test_wp16_runtime_doctor.py"
+      ],
+      "product_code_paths": [
+        "services/core/src/polynexus_core/runtime/codex.py",
+        "services/core/src/polynexus_core/runtime/doctor.py",
+        "services/core/src/polynexus_core/runtime/doctor_legacy.py",
+        "services/core/src/polynexus_core/runtime/opencode.py",
+        "services/core/src/polynexus_core/runtime/registry.py",
+        "services/core/tests/test_wp14_codex_runtime.py",
+        "services/core/tests/test_wp15_opencode_runtime.py",
+        "services/core/tests/test_wp16_runtime_doctor.py"
+      ],
+      "docs_evidence_paths": [
+        "artifacts/verification/g25-runtime-adapters-doctor-20260902/G25_EVIDENCE_SUMMARY.md",
+        "artifacts/verification/g25-runtime-adapters-doctor-20260902/ledger.json",
+        "docs/10_DECISION_LOG.md",
+        "docs/11_PROJECT_STATE.md",
+        "docs/12_HANDOFF_CURRENT.md",
+        "docs/28_MASTER_DEVELOPMENT_ROADMAP.md",
+        "docs/31_ADR_012_RUNTIME_DOCTOR_REPORTING.md",
+        "docs/31_COMPATIBILITY_MATRIX.md",
+        "docs/32_KNOWN_LIMITATIONS.md",
+        "docs/GOAL_COMPLETION_CONTROL_PANEL.html",
+        "docs/GOAL_COMPLETION_CONTROL_PANEL.md",
+        "docs/tasks/WP-14.md",
+        "docs/tasks/WP-15.md",
+        "docs/tasks/WP-16.md"
+      ],
+      "docs_evidence_only": false,
+      "known_limitations": "Adapters remain EXPERIMENTAL; controlled fixtures do not prove live provider sessions",
+      "remote_availability": {
+        "fresh_clone_object_present": true,
+        "carrier_refs": [
+          "legacy/feature/g24-g30-development-completion-routing",
+          "origin/HEAD -> origin/feature/g24-g30-development-completion-routing",
+          "origin/feature/g24-g30-development-completion-routing"
+        ]
+      },
+      "relation_to_frozen_track_a": "ANCESTOR_OF_FROZEN_BY_10_COMMITS",
+      "lost_if_implementation_starts_before_this_checkpoint": "Starting here would omit accepted G26, G27, and G28 product work."
+    },
+    {
+      "sha": "4fd73b5ac3b59ae1f948f8d95ad795112552b1b2",
+      "goal_meaning": "G26 local policy and WebSurface internal acceptance product output",
+      "human_acceptance_status": "HUMAN_ACCEPTED_PASS_COMPLETE",
+      "subject": "feat:G26-local-policy-and-WebSurface-internal-acceptance",
+      "commit_date": "2026-09-03T07:48:40+08:00",
+      "parents": [
+        "04d37291d45ebbda8453f1b39e30fca523ee1548"
+      ],
+      "changed_paths": [
+        "artifacts/verification/g26-local-policy-acceptance-20260903/commands-and-exit-codes.md",
+        "artifacts/verification/g26-local-policy-acceptance-20260903/ledger.json",
+        "artifacts/verification/g26-local-policy-acceptance-20260903/summary.md",
+        "docs/11_PROJECT_STATE.md",
+        "docs/12_HANDOFF_CURRENT.md",
+        "docs/28_MASTER_DEVELOPMENT_ROADMAP.md",
+        "docs/31_COMPATIBILITY_MATRIX.md",
+        "docs/32_KNOWN_LIMITATIONS.md",
+        "docs/GOAL_COMPLETION_CONTROL_PANEL.html",
+        "docs/GOAL_COMPLETION_CONTROL_PANEL.md",
+        "docs/tasks/WP-17.md",
+        "docs/tasks/WP-18.md",
+        "docs/tasks/WP-19.md",
+        "extensions/browser-companion/README.md",
+        "extensions/browser-companion/src/service-worker.js",
+        "extensions/browser-companion/tests/test_websurface_drivers.mjs",
+        "services/core/src/polynexus_core/api/dependencies.py",
+        "services/core/src/polynexus_core/runtime/local_endpoint.py",
+        "services/core/src/polynexus_core/runtime/routing_policy.py",
+        "services/core/tests/test_cp04_wp17_wp18_local_routing.py"
+      ],
+      "product_code_paths": [
+        "extensions/browser-companion/README.md",
+        "extensions/browser-companion/src/service-worker.js",
+        "extensions/browser-companion/tests/test_websurface_drivers.mjs",
+        "services/core/src/polynexus_core/api/dependencies.py",
+        "services/core/src/polynexus_core/runtime/local_endpoint.py",
+        "services/core/src/polynexus_core/runtime/routing_policy.py",
+        "services/core/tests/test_cp04_wp17_wp18_local_routing.py"
+      ],
+      "docs_evidence_paths": [
+        "artifacts/verification/g26-local-policy-acceptance-20260903/commands-and-exit-codes.md",
+        "artifacts/verification/g26-local-policy-acceptance-20260903/ledger.json",
+        "artifacts/verification/g26-local-policy-acceptance-20260903/summary.md",
+        "docs/11_PROJECT_STATE.md",
+        "docs/12_HANDOFF_CURRENT.md",
+        "docs/28_MASTER_DEVELOPMENT_ROADMAP.md",
+        "docs/31_COMPATIBILITY_MATRIX.md",
+        "docs/32_KNOWN_LIMITATIONS.md",
+        "docs/GOAL_COMPLETION_CONTROL_PANEL.html",
+        "docs/GOAL_COMPLETION_CONTROL_PANEL.md",
+        "docs/tasks/WP-17.md",
+        "docs/tasks/WP-18.md",
+        "docs/tasks/WP-19.md"
+      ],
+      "docs_evidence_only": false,
+      "known_limitations": "Full Core had unrelated exit-1 failures; no live provider certification",
+      "remote_availability": {
+        "fresh_clone_object_present": true,
+        "carrier_refs": [
+          "legacy/feature/g24-g30-development-completion-routing",
+          "origin/HEAD -> origin/feature/g24-g30-development-completion-routing",
+          "origin/feature/g24-g30-development-completion-routing"
+        ]
+      },
+      "relation_to_frozen_track_a": "ANCESTOR_OF_FROZEN_BY_8_COMMITS",
+      "lost_if_implementation_starts_before_this_checkpoint": "Starting here would omit accepted G27 and G28 product work."
+    },
+    {
+      "sha": "27ff09c224344821868dd8fd36ec2c0eb11504df",
+      "goal_meaning": "G27 workflow guards and metrics product output",
+      "human_acceptance_status": "HUMAN_ACCEPTED_PASS_COMPLETE_VIA_LATER_PROVENANCE_CHECKPOINT",
+      "subject": "feat: accept G27 workflow guards and metrics",
+      "commit_date": "2026-09-03T10:01:22+08:00",
+      "parents": [
+        "7a7dee67395c8a07f2e5b055a306e63190bbd1f8"
+      ],
+      "changed_paths": [
+        "artifacts/verification/g27-workflow-guards-metrics-20260903/commands-and-exit-codes.md",
+        "artifacts/verification/g27-workflow-guards-metrics-20260903/independent-review.md",
+        "artifacts/verification/g27-workflow-guards-metrics-20260903/ledger.json",
+        "artifacts/verification/g27-workflow-guards-metrics-20260903/summary.md",
+        "docs/11_PROJECT_STATE.md",
+        "docs/12_HANDOFF_CURRENT.md",
+        "docs/28_MASTER_DEVELOPMENT_ROADMAP.md",
+        "docs/GOAL_COMPLETION_CONTROL_PANEL.html",
+        "docs/GOAL_COMPLETION_CONTROL_PANEL.md",
+        "docs/tasks/WP-22.md",
+        "docs/tasks/WP-24.md",
+        "docs/tasks/WP-25.md",
+        "services/core/src/polynexus_core/evaluation/metrics.py",
+        "services/core/src/polynexus_core/runtime/supervisor.py",
+        "services/core/tests/test_workflow_loader.py",
+        "services/core/tests/test_wp24_resource_guards.py",
+        "services/core/tests/test_wp25_evaluation_metrics.py"
+      ],
+      "product_code_paths": [
+        "services/core/src/polynexus_core/evaluation/metrics.py",
+        "services/core/src/polynexus_core/runtime/supervisor.py",
+        "services/core/tests/test_workflow_loader.py",
+        "services/core/tests/test_wp24_resource_guards.py",
+        "services/core/tests/test_wp25_evaluation_metrics.py"
+      ],
+      "docs_evidence_paths": [
+        "artifacts/verification/g27-workflow-guards-metrics-20260903/commands-and-exit-codes.md",
+        "artifacts/verification/g27-workflow-guards-metrics-20260903/independent-review.md",
+        "artifacts/verification/g27-workflow-guards-metrics-20260903/ledger.json",
+        "artifacts/verification/g27-workflow-guards-metrics-20260903/summary.md",
+        "docs/11_PROJECT_STATE.md",
+        "docs/12_HANDOFF_CURRENT.md",
+        "docs/28_MASTER_DEVELOPMENT_ROADMAP.md",
+        "docs/GOAL_COMPLETION_CONTROL_PANEL.html",
+        "docs/GOAL_COMPLETION_CONTROL_PANEL.md",
+        "docs/tasks/WP-22.md",
+        "docs/tasks/WP-24.md",
+        "docs/tasks/WP-25.md"
+      ],
+      "docs_evidence_only": false,
+      "known_limitations": "Bounded deterministic scope; no fresh Track A verification",
+      "remote_availability": {
+        "fresh_clone_object_present": true,
+        "carrier_refs": [
+          "legacy/feature/g24-g30-development-completion-routing",
+          "origin/HEAD -> origin/feature/g24-g30-development-completion-routing",
+          "origin/feature/g24-g30-development-completion-routing"
+        ]
+      },
+      "relation_to_frozen_track_a": "ANCESTOR_OF_FROZEN_BY_5_COMMITS",
+      "lost_if_implementation_starts_before_this_checkpoint": "Starting here would omit accepted G28 UX product work and later acceptance provenance."
+    },
+    {
+      "sha": "56c941a6077802e326284f1b70fd9719f146e5b4",
+      "goal_meaning": "G27 docs/evidence acceptance-provenance checkpoint",
+      "human_acceptance_status": "HUMAN_ACCEPTED_PASS_COMPLETE",
+      "subject": "docs: checkpoint G27 acceptance provenance",
+      "commit_date": "2026-09-03T10:05:45+08:00",
+      "parents": [
+        "27ff09c224344821868dd8fd36ec2c0eb11504df"
+      ],
+      "changed_paths": [
+        "artifacts/verification/g27-workflow-guards-metrics-20260903/commands-and-exit-codes.md",
+        "artifacts/verification/g27-workflow-guards-metrics-20260903/ledger.json",
+        "artifacts/verification/g27-workflow-guards-metrics-20260903/summary.md",
+        "docs/11_PROJECT_STATE.md",
+        "docs/12_HANDOFF_CURRENT.md",
+        "docs/28_MASTER_DEVELOPMENT_ROADMAP.md",
+        "docs/GOAL_COMPLETION_CONTROL_PANEL.html",
+        "docs/GOAL_COMPLETION_CONTROL_PANEL.md",
+        "docs/tasks/WP-22.md",
+        "docs/tasks/WP-24.md",
+        "docs/tasks/WP-25.md"
+      ],
+      "product_code_paths": [],
+      "docs_evidence_paths": [
+        "artifacts/verification/g27-workflow-guards-metrics-20260903/commands-and-exit-codes.md",
+        "artifacts/verification/g27-workflow-guards-metrics-20260903/ledger.json",
+        "artifacts/verification/g27-workflow-guards-metrics-20260903/summary.md",
+        "docs/11_PROJECT_STATE.md",
+        "docs/12_HANDOFF_CURRENT.md",
+        "docs/28_MASTER_DEVELOPMENT_ROADMAP.md",
+        "docs/GOAL_COMPLETION_CONTROL_PANEL.html",
+        "docs/GOAL_COMPLETION_CONTROL_PANEL.md",
+        "docs/tasks/WP-22.md",
+        "docs/tasks/WP-24.md",
+        "docs/tasks/WP-25.md"
+      ],
+      "docs_evidence_only": true,
+      "known_limitations": "Docs/evidence checkpoint; product bytes are the preceding G27 output",
+      "remote_availability": {
+        "fresh_clone_object_present": true,
+        "carrier_refs": [
+          "legacy/feature/g24-g30-development-completion-routing",
+          "origin/HEAD -> origin/feature/g24-g30-development-completion-routing",
+          "origin/feature/g24-g30-development-completion-routing"
+        ]
+      },
+      "relation_to_frozen_track_a": "ANCESTOR_OF_FROZEN_BY_4_COMMITS",
+      "lost_if_implementation_starts_before_this_checkpoint": "Starting here would omit accepted G28 UX product work."
+    },
+    {
+      "sha": "789717fbf4a6b4a36aa71ec1cf7d36f344eccdf7",
+      "goal_meaning": "G28 UX and golden-workflow product output",
+      "human_acceptance_status": "HUMAN_ACCEPTED_PASS_COMPLETE",
+      "subject": "G28-UX-workflow-freeze",
+      "commit_date": "2026-09-03T11:06:38+08:00",
+      "parents": [
+        "56c941a6077802e326284f1b70fd9719f146e5b4"
+      ],
+      "changed_paths": [
+        "apps/web/src/App.tsx",
+        "apps/web/src/WP26.test.tsx",
+        "apps/web/src/components/CreateProjectForm.tsx",
+        "apps/web/src/components/CreateTaskForm.tsx",
+        "apps/web/src/components/ProjectList.tsx",
+        "apps/web/src/components/RunDetail.tsx",
+        "apps/web/src/components/RunPreparation.tsx",
+        "apps/web/src/components/StatusMessage.tsx",
+        "apps/web/src/components/TaskList.tsx",
+        "apps/web/src/styles.css",
+        "docs/11_PROJECT_STATE.md",
+        "docs/12_HANDOFF_CURRENT.md",
+        "docs/28_MASTER_DEVELOPMENT_ROADMAP.md",
+        "docs/31_COMPATIBILITY_MATRIX.md",
+        "docs/32_KNOWN_LIMITATIONS.md",
+        "docs/GOAL_COMPLETION_CONTROL_PANEL.html",
+        "docs/GOAL_COMPLETION_CONTROL_PANEL.md",
+        "docs/tasks/WP-26.md",
+        "docs/tasks/WP-27.md"
+      ],
+      "product_code_paths": [
+        "apps/web/src/App.tsx",
+        "apps/web/src/WP26.test.tsx",
+        "apps/web/src/components/CreateProjectForm.tsx",
+        "apps/web/src/components/CreateTaskForm.tsx",
+        "apps/web/src/components/ProjectList.tsx",
+        "apps/web/src/components/RunDetail.tsx",
+        "apps/web/src/components/RunPreparation.tsx",
+        "apps/web/src/components/StatusMessage.tsx",
+        "apps/web/src/components/TaskList.tsx",
+        "apps/web/src/styles.css"
+      ],
+      "docs_evidence_paths": [
+        "docs/11_PROJECT_STATE.md",
+        "docs/12_HANDOFF_CURRENT.md",
+        "docs/28_MASTER_DEVELOPMENT_ROADMAP.md",
+        "docs/31_COMPATIBILITY_MATRIX.md",
+        "docs/32_KNOWN_LIMITATIONS.md",
+        "docs/GOAL_COMPLETION_CONTROL_PANEL.html",
+        "docs/GOAL_COMPLETION_CONTROL_PANEL.md",
+        "docs/tasks/WP-26.md",
+        "docs/tasks/WP-27.md"
+      ],
+      "docs_evidence_only": false,
+      "known_limitations": "Browser/vendor automatic send and external certification remain unverified",
+      "remote_availability": {
+        "fresh_clone_object_present": true,
+        "carrier_refs": [
+          "legacy/feature/g24-g30-development-completion-routing",
+          "origin/HEAD -> origin/feature/g24-g30-development-completion-routing",
+          "origin/feature/g24-g30-development-completion-routing"
+        ]
+      },
+      "relation_to_frozen_track_a": "ANCESTOR_OF_FROZEN_BY_3_COMMITS",
+      "lost_if_implementation_starts_before_this_checkpoint": "No accepted product bytes are lost, but later docs/state-sync and cross-machine provenance are absent."
+    },
+    {
+      "sha": "2bbcb0cb2cc6bc39e5a5770f91b9c58c03fed762",
+      "goal_meaning": "G28 docs/state-sync terminal continuation checkpoint",
+      "human_acceptance_status": "HUMAN_ACCEPTED_PASS_COMPLETE",
+      "subject": "G28-docs-state-sync",
+      "commit_date": "2026-09-03T11:08:20+08:00",
+      "parents": [
+        "789717fbf4a6b4a36aa71ec1cf7d36f344eccdf7"
+      ],
+      "changed_paths": [
+        "docs/11_PROJECT_STATE.md",
+        "docs/12_HANDOFF_CURRENT.md",
+        "docs/28_MASTER_DEVELOPMENT_ROADMAP.md",
+        "docs/GOAL_COMPLETION_CONTROL_PANEL.html",
+        "docs/GOAL_COMPLETION_CONTROL_PANEL.md"
+      ],
+      "product_code_paths": [],
+      "docs_evidence_paths": [
+        "docs/11_PROJECT_STATE.md",
+        "docs/12_HANDOFF_CURRENT.md",
+        "docs/28_MASTER_DEVELOPMENT_ROADMAP.md",
+        "docs/GOAL_COMPLETION_CONTROL_PANEL.html",
+        "docs/GOAL_COMPLETION_CONTROL_PANEL.md"
+      ],
+      "docs_evidence_only": true,
+      "known_limitations": "Docs-only after G28 product output; external G29/G30 remained deferred/NEED_ACTION",
+      "remote_availability": {
+        "fresh_clone_object_present": true,
+        "carrier_refs": [
+          "legacy/feature/g24-g30-development-completion-routing",
+          "origin/HEAD -> origin/feature/g24-g30-development-completion-routing",
+          "origin/feature/g24-g30-development-completion-routing"
+        ]
+      },
+      "relation_to_frozen_track_a": "ANCESTOR_OF_FROZEN_BY_2_COMMITS",
+      "lost_if_implementation_starts_before_this_checkpoint": "No accepted product bytes are lost; later GitHub delivery/cross-machine provenance is absent."
+    },
+    {
+      "sha": "f34e6b29ae9e7326d1d44b9b03756b450809928f",
+      "goal_meaning": "G30 GitHub continuation verification tip / Track A frozen DESIGN-READ baseline",
+      "human_acceptance_status": "PRESERVES_LATEST_HUMAN_ACCEPTED_PRODUCT_OUTPUT",
+      "subject": "docs(g30): record GitHub continuation verification",
+      "commit_date": "2026-09-03T19:17:11+08:00",
+      "parents": [
+        "e65c19bc6df8dd0362749d9016feabacf8acf6dc"
+      ],
+      "changed_paths": [
+        "docs/12_HANDOFF_CURRENT.md",
+        "docs/tasks/G30-CROSS-MACHINE-GITHUB-CONTINUATION.md"
+      ],
+      "product_code_paths": [],
+      "docs_evidence_paths": [
+        "docs/12_HANDOFF_CURRENT.md",
+        "docs/tasks/G30-CROSS-MACHINE-GITHUB-CONTINUATION.md"
+      ],
+      "docs_evidence_only": true,
+      "known_limitations": "DESIGN_READ_ONLY until Human explicitly promotes it; G30 external certification remains HISTORICAL_NEED_ACTION",
+      "remote_availability": {
+        "fresh_clone_object_present": true,
+        "carrier_refs": [
+          "origin/HEAD -> origin/feature/g24-g30-development-completion-routing",
+          "origin/feature/g24-g30-development-completion-routing"
+        ]
+      },
+      "relation_to_frozen_track_a": "IS_FROZEN_TIP",
+      "lost_if_implementation_starts_before_this_checkpoint": "Nothing in the accepted product lineage or its later provenance is lost."
+    }
+  ],
+  "commands": [
+    {
+      "command": [
+        "git",
+        "ls-remote",
+        "--heads",
+        "https://github.com/lichen200224-bot/PolyNexus.git",
+        "refs/heads/feature/g24-g30-development-completion-routing"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:17:57.748150+00:00",
+      "ended_utc": "2026-09-10T09:17:58.906787+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "f34e6b29ae9e7326d1d44b9b03756b450809928f\trefs/heads/feature/g24-g30-development-completion-routing\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--name-status",
+        "789717fbf4a6b4a36aa71ec1cf7d36f344eccdf7",
+        "f34e6b29ae9e7326d1d44b9b03756b450809928f"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:17:58.906787+00:00",
+      "ended_utc": "2026-09-10T09:17:59.010026+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "M\tdocs/10_DECISION_LOG.md\nM\tdocs/11_PROJECT_STATE.md\nM\tdocs/12_HANDOFF_CURRENT.md\nM\tdocs/28_MASTER_DEVELOPMENT_ROADMAP.md\nM\tdocs/33_DEVELOPMENT_PROGRESS_AND_GOAL_EXECUTION_STANDARD.md\nM\tdocs/GOAL_COMPLETION_CONTROL_PANEL.html\nM\tdocs/GOAL_COMPLETION_CONTROL_PANEL.md\nM\tdocs/tasks/G24-G30-DEVELOPMENT-COMPLETION-ROUTING.md\nA\tdocs/tasks/G29-EXTERNAL-OPERATOR-PROMPT.md\nA\tdocs/tasks/G29-EXTERNAL-OPERATOR-RUNBOOK.md\nA\tdocs/tasks/G29-EXTERNAL-REPORT-TEMPLATE.md\nA\tdocs/tasks/G29-EXTERNAL-TEST-MATRIX.md\nA\tdocs/tasks/G29-HUMAN-OPERATOR-TEST-MANUAL.html\nA\tdocs/tasks/G30-CROSS-MACHINE-GITHUB-CONTINUATION.md\nA\tdocs/tasks/G30-FINAL-EXTERNAL-VERIFICATION-AND-100-POINT-RECONCILIATION.md\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--name-status",
+        "789717fbf4a6b4a36aa71ec1cf7d36f344eccdf7",
+        "f34e6b29ae9e7326d1d44b9b03756b450809928f",
+        "--",
+        "apps/",
+        "services/",
+        "schemas/",
+        "workflows/",
+        "extensions/"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:17:59.010026+00:00",
+      "ended_utc": "2026-09-10T09:17:59.118914+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "rev-list",
+        "--left-right",
+        "--count",
+        "789717fbf4a6b4a36aa71ec1cf7d36f344eccdf7...f34e6b29ae9e7326d1d44b9b03756b450809928f"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:17:59.118914+00:00",
+      "ended_utc": "2026-09-10T09:17:59.277219+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "0\t3\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "merge-base",
+        "--is-ancestor",
+        "789717fbf4a6b4a36aa71ec1cf7d36f344eccdf7",
+        "f34e6b29ae9e7326d1d44b9b03756b450809928f"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:17:59.277219+00:00",
+      "ended_utc": "2026-09-10T09:17:59.390787+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repro-730",
+      "started_utc": "2026-09-10T09:17:59.390787+00:00",
+      "ended_utc": "2026-09-10T09:17:59.490706+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "730912b5a3e19449c355975485f1fe77350a458a\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "--no-patch",
+        "--format=%H%x00%P%x00%s%x00%cI",
+        "730912b5a3e19449c355975485f1fe77350a458a"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:17:59.490706+00:00",
+      "ended_utc": "2026-09-10T09:17:59.590330+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "730912b5a3e19449c355975485f1fe77350a458a\u0000af46ddfe032829b43f5b4ced43288c2104e96b36\u0000docs: record CP06 provisional RC acceptance\u00002026-09-01T21:13:59+08:00\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "--format=",
+        "--name-only",
+        "730912b5a3e19449c355975485f1fe77350a458a"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:17:59.590330+00:00",
+      "ended_utc": "2026-09-10T09:17:59.702544+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "docs/11_PROJECT_STATE.md\ndocs/12_HANDOFF_CURRENT.md\ndocs/31_COMPATIBILITY_MATRIX.md\ndocs/32_KNOWN_LIMITATIONS.md\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "branch",
+        "-r",
+        "--contains",
+        "730912b5a3e19449c355975485f1fe77350a458a"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:17:59.702544+00:00",
+      "ended_utc": "2026-09-10T09:17:59.866663+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "  legacy/feature/first-vertical-slice\n  legacy/feature/g19-canonical-workspace-provenance\n  legacy/feature/g20-web-reproducible-dependency-test-build-gate\n  legacy/feature/g21-wp21-real-browser-journey-failure-path\n  legacy/feature/g22-rc-hardening-cross-machine-delivery-closeout\n  legacy/feature/g24-g30-development-completion-routing\n  origin/HEAD -> origin/feature/g24-g30-development-completion-routing\n  origin/feature/g24-g30-development-completion-routing\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "rev-list",
+        "--count",
+        "730912b5a3e19449c355975485f1fe77350a458a..f34e6b29ae9e7326d1d44b9b03756b450809928f"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:17:59.866663+00:00",
+      "ended_utc": "2026-09-10T09:17:59.966012+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "26\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "cat-file",
+        "-e",
+        "730912b5a3e19449c355975485f1fe77350a458a^{commit}"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repro-730",
+      "started_utc": "2026-09-10T09:17:59.966012+00:00",
+      "ended_utc": "2026-09-10T09:18:00.075761+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "--no-patch",
+        "--format=%H%x00%P%x00%s%x00%cI",
+        "0eb56a986e97a45854bd6ddd419c114845ce51f4"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:00.075761+00:00",
+      "ended_utc": "2026-09-10T09:18:00.182668+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "0eb56a986e97a45854bd6ddd419c114845ce51f4\u0000d095447f315f0984be8afdaecf036a52882423c4\u0000docs(g22): reconcile remaining WP-21 evidence count\u00002026-09-02T11:19:52+08:00\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "--format=",
+        "--name-only",
+        "0eb56a986e97a45854bd6ddd419c114845ce51f4"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:00.182668+00:00",
+      "ended_utc": "2026-09-10T09:18:00.283114+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "docs/28_MASTER_DEVELOPMENT_ROADMAP.md\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "branch",
+        "-r",
+        "--contains",
+        "0eb56a986e97a45854bd6ddd419c114845ce51f4"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:00.283114+00:00",
+      "ended_utc": "2026-09-10T09:18:00.400704+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "  legacy/feature/g22-rc-hardening-cross-machine-delivery-closeout\n  legacy/feature/g24-g30-development-completion-routing\n  origin/HEAD -> origin/feature/g24-g30-development-completion-routing\n  origin/feature/g24-g30-development-completion-routing\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "rev-list",
+        "--count",
+        "0eb56a986e97a45854bd6ddd419c114845ce51f4..f34e6b29ae9e7326d1d44b9b03756b450809928f"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:00.400704+00:00",
+      "ended_utc": "2026-09-10T09:18:00.500606+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "13\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "cat-file",
+        "-e",
+        "0eb56a986e97a45854bd6ddd419c114845ce51f4^{commit}"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repro-730",
+      "started_utc": "2026-09-10T09:18:00.500606+00:00",
+      "ended_utc": "2026-09-10T09:18:00.604799+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "--no-patch",
+        "--format=%H%x00%P%x00%s%x00%cI",
+        "f4168c31592ac5c886b49d8878f60b99016fdcaf"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:00.604799+00:00",
+      "ended_utc": "2026-09-10T09:18:00.706575+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "f4168c31592ac5c886b49d8878f60b99016fdcaf\u000061cc7420e290cd93eda787c30b54a93edf4ca9a0\u0000feat(runtime): add conformance adapters and doctor reporting\u00002026-09-02T23:35:31+08:00\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "--format=",
+        "--name-only",
+        "f4168c31592ac5c886b49d8878f60b99016fdcaf"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:00.706575+00:00",
+      "ended_utc": "2026-09-10T09:18:00.813478+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "artifacts/verification/g25-runtime-adapters-doctor-20260902/G25_EVIDENCE_SUMMARY.md\nartifacts/verification/g25-runtime-adapters-doctor-20260902/ledger.json\ndocs/10_DECISION_LOG.md\ndocs/11_PROJECT_STATE.md\ndocs/12_HANDOFF_CURRENT.md\ndocs/28_MASTER_DEVELOPMENT_ROADMAP.md\ndocs/31_ADR_012_RUNTIME_DOCTOR_REPORTING.md\ndocs/31_COMPATIBILITY_MATRIX.md\ndocs/32_KNOWN_LIMITATIONS.md\ndocs/GOAL_COMPLETION_CONTROL_PANEL.html\ndocs/GOAL_COMPLETION_CONTROL_PANEL.md\ndocs/tasks/WP-14.md\ndocs/tasks/WP-15.md\ndocs/tasks/WP-16.md\nservices/core/src/polynexus_core/runtime/codex.py\nservices/core/src/polynexus_core/runtime/doctor.py\nservices/core/src/polynexus_core/runtime/doctor_legacy.py\nservices/core/src/polynexus_core/runtime/opencode.py\nservices/core/src/polynexus_core/runtime/registry.py\nservices/core/tests/test_wp14_codex_runtime.py\nservices/core/tests/test_wp15_opencode_runtime.py\nservices/core/tests/test_wp16_runtime_doctor.py\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "branch",
+        "-r",
+        "--contains",
+        "f4168c31592ac5c886b49d8878f60b99016fdcaf"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:00.813478+00:00",
+      "ended_utc": "2026-09-10T09:18:00.935863+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "  legacy/feature/g24-g30-development-completion-routing\n  origin/HEAD -> origin/feature/g24-g30-development-completion-routing\n  origin/feature/g24-g30-development-completion-routing\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "rev-list",
+        "--count",
+        "f4168c31592ac5c886b49d8878f60b99016fdcaf..f34e6b29ae9e7326d1d44b9b03756b450809928f"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:00.935863+00:00",
+      "ended_utc": "2026-09-10T09:18:01.042073+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "10\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "cat-file",
+        "-e",
+        "f4168c31592ac5c886b49d8878f60b99016fdcaf^{commit}"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repro-730",
+      "started_utc": "2026-09-10T09:18:01.042073+00:00",
+      "ended_utc": "2026-09-10T09:18:01.143050+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "--no-patch",
+        "--format=%H%x00%P%x00%s%x00%cI",
+        "4fd73b5ac3b59ae1f948f8d95ad795112552b1b2"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:01.143050+00:00",
+      "ended_utc": "2026-09-10T09:18:01.242504+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "4fd73b5ac3b59ae1f948f8d95ad795112552b1b2\u000004d37291d45ebbda8453f1b39e30fca523ee1548\u0000feat:G26-local-policy-and-WebSurface-internal-acceptance\u00002026-09-03T07:48:40+08:00\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "--format=",
+        "--name-only",
+        "4fd73b5ac3b59ae1f948f8d95ad795112552b1b2"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:01.242504+00:00",
+      "ended_utc": "2026-09-10T09:18:01.346012+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "artifacts/verification/g26-local-policy-acceptance-20260903/commands-and-exit-codes.md\nartifacts/verification/g26-local-policy-acceptance-20260903/ledger.json\nartifacts/verification/g26-local-policy-acceptance-20260903/summary.md\ndocs/11_PROJECT_STATE.md\ndocs/12_HANDOFF_CURRENT.md\ndocs/28_MASTER_DEVELOPMENT_ROADMAP.md\ndocs/31_COMPATIBILITY_MATRIX.md\ndocs/32_KNOWN_LIMITATIONS.md\ndocs/GOAL_COMPLETION_CONTROL_PANEL.html\ndocs/GOAL_COMPLETION_CONTROL_PANEL.md\ndocs/tasks/WP-17.md\ndocs/tasks/WP-18.md\ndocs/tasks/WP-19.md\nextensions/browser-companion/README.md\nextensions/browser-companion/src/service-worker.js\nextensions/browser-companion/tests/test_websurface_drivers.mjs\nservices/core/src/polynexus_core/api/dependencies.py\nservices/core/src/polynexus_core/runtime/local_endpoint.py\nservices/core/src/polynexus_core/runtime/routing_policy.py\nservices/core/tests/test_cp04_wp17_wp18_local_routing.py\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "branch",
+        "-r",
+        "--contains",
+        "4fd73b5ac3b59ae1f948f8d95ad795112552b1b2"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:01.346012+00:00",
+      "ended_utc": "2026-09-10T09:18:01.468388+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "  legacy/feature/g24-g30-development-completion-routing\n  origin/HEAD -> origin/feature/g24-g30-development-completion-routing\n  origin/feature/g24-g30-development-completion-routing\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "rev-list",
+        "--count",
+        "4fd73b5ac3b59ae1f948f8d95ad795112552b1b2..f34e6b29ae9e7326d1d44b9b03756b450809928f"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:01.468388+00:00",
+      "ended_utc": "2026-09-10T09:18:01.577583+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "8\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "cat-file",
+        "-e",
+        "4fd73b5ac3b59ae1f948f8d95ad795112552b1b2^{commit}"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repro-730",
+      "started_utc": "2026-09-10T09:18:01.577583+00:00",
+      "ended_utc": "2026-09-10T09:18:01.708396+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "--no-patch",
+        "--format=%H%x00%P%x00%s%x00%cI",
+        "27ff09c224344821868dd8fd36ec2c0eb11504df"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:01.708396+00:00",
+      "ended_utc": "2026-09-10T09:18:01.812428+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "27ff09c224344821868dd8fd36ec2c0eb11504df\u00007a7dee67395c8a07f2e5b055a306e63190bbd1f8\u0000feat: accept G27 workflow guards and metrics\u00002026-09-03T10:01:22+08:00\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "--format=",
+        "--name-only",
+        "27ff09c224344821868dd8fd36ec2c0eb11504df"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:01.812428+00:00",
+      "ended_utc": "2026-09-10T09:18:01.914540+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "artifacts/verification/g27-workflow-guards-metrics-20260903/commands-and-exit-codes.md\nartifacts/verification/g27-workflow-guards-metrics-20260903/independent-review.md\nartifacts/verification/g27-workflow-guards-metrics-20260903/ledger.json\nartifacts/verification/g27-workflow-guards-metrics-20260903/summary.md\ndocs/11_PROJECT_STATE.md\ndocs/12_HANDOFF_CURRENT.md\ndocs/28_MASTER_DEVELOPMENT_ROADMAP.md\ndocs/GOAL_COMPLETION_CONTROL_PANEL.html\ndocs/GOAL_COMPLETION_CONTROL_PANEL.md\ndocs/tasks/WP-22.md\ndocs/tasks/WP-24.md\ndocs/tasks/WP-25.md\nservices/core/src/polynexus_core/evaluation/metrics.py\nservices/core/src/polynexus_core/runtime/supervisor.py\nservices/core/tests/test_workflow_loader.py\nservices/core/tests/test_wp24_resource_guards.py\nservices/core/tests/test_wp25_evaluation_metrics.py\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "branch",
+        "-r",
+        "--contains",
+        "27ff09c224344821868dd8fd36ec2c0eb11504df"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:01.914540+00:00",
+      "ended_utc": "2026-09-10T09:18:02.033154+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "  legacy/feature/g24-g30-development-completion-routing\n  origin/HEAD -> origin/feature/g24-g30-development-completion-routing\n  origin/feature/g24-g30-development-completion-routing\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "rev-list",
+        "--count",
+        "27ff09c224344821868dd8fd36ec2c0eb11504df..f34e6b29ae9e7326d1d44b9b03756b450809928f"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:02.033154+00:00",
+      "ended_utc": "2026-09-10T09:18:02.137522+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "5\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "cat-file",
+        "-e",
+        "27ff09c224344821868dd8fd36ec2c0eb11504df^{commit}"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repro-730",
+      "started_utc": "2026-09-10T09:18:02.137522+00:00",
+      "ended_utc": "2026-09-10T09:18:02.232956+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "--no-patch",
+        "--format=%H%x00%P%x00%s%x00%cI",
+        "56c941a6077802e326284f1b70fd9719f146e5b4"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:02.232956+00:00",
+      "ended_utc": "2026-09-10T09:18:02.383851+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "56c941a6077802e326284f1b70fd9719f146e5b4\u000027ff09c224344821868dd8fd36ec2c0eb11504df\u0000docs: checkpoint G27 acceptance provenance\u00002026-09-03T10:05:45+08:00\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "--format=",
+        "--name-only",
+        "56c941a6077802e326284f1b70fd9719f146e5b4"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:02.383851+00:00",
+      "ended_utc": "2026-09-10T09:18:02.486448+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "artifacts/verification/g27-workflow-guards-metrics-20260903/commands-and-exit-codes.md\nartifacts/verification/g27-workflow-guards-metrics-20260903/ledger.json\nartifacts/verification/g27-workflow-guards-metrics-20260903/summary.md\ndocs/11_PROJECT_STATE.md\ndocs/12_HANDOFF_CURRENT.md\ndocs/28_MASTER_DEVELOPMENT_ROADMAP.md\ndocs/GOAL_COMPLETION_CONTROL_PANEL.html\ndocs/GOAL_COMPLETION_CONTROL_PANEL.md\ndocs/tasks/WP-22.md\ndocs/tasks/WP-24.md\ndocs/tasks/WP-25.md\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "branch",
+        "-r",
+        "--contains",
+        "56c941a6077802e326284f1b70fd9719f146e5b4"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:02.486448+00:00",
+      "ended_utc": "2026-09-10T09:18:02.609185+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "  legacy/feature/g24-g30-development-completion-routing\n  origin/HEAD -> origin/feature/g24-g30-development-completion-routing\n  origin/feature/g24-g30-development-completion-routing\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "rev-list",
+        "--count",
+        "56c941a6077802e326284f1b70fd9719f146e5b4..f34e6b29ae9e7326d1d44b9b03756b450809928f"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:02.609185+00:00",
+      "ended_utc": "2026-09-10T09:18:02.711927+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "4\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "cat-file",
+        "-e",
+        "56c941a6077802e326284f1b70fd9719f146e5b4^{commit}"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repro-730",
+      "started_utc": "2026-09-10T09:18:02.711927+00:00",
+      "ended_utc": "2026-09-10T09:18:02.823097+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "--no-patch",
+        "--format=%H%x00%P%x00%s%x00%cI",
+        "789717fbf4a6b4a36aa71ec1cf7d36f344eccdf7"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:02.823097+00:00",
+      "ended_utc": "2026-09-10T09:18:02.924750+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "789717fbf4a6b4a36aa71ec1cf7d36f344eccdf7\u000056c941a6077802e326284f1b70fd9719f146e5b4\u0000G28-UX-workflow-freeze\u00002026-09-03T11:06:38+08:00\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "--format=",
+        "--name-only",
+        "789717fbf4a6b4a36aa71ec1cf7d36f344eccdf7"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:02.924750+00:00",
+      "ended_utc": "2026-09-10T09:18:03.029563+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "apps/web/src/App.tsx\napps/web/src/WP26.test.tsx\napps/web/src/components/CreateProjectForm.tsx\napps/web/src/components/CreateTaskForm.tsx\napps/web/src/components/ProjectList.tsx\napps/web/src/components/RunDetail.tsx\napps/web/src/components/RunPreparation.tsx\napps/web/src/components/StatusMessage.tsx\napps/web/src/components/TaskList.tsx\napps/web/src/styles.css\ndocs/11_PROJECT_STATE.md\ndocs/12_HANDOFF_CURRENT.md\ndocs/28_MASTER_DEVELOPMENT_ROADMAP.md\ndocs/31_COMPATIBILITY_MATRIX.md\ndocs/32_KNOWN_LIMITATIONS.md\ndocs/GOAL_COMPLETION_CONTROL_PANEL.html\ndocs/GOAL_COMPLETION_CONTROL_PANEL.md\ndocs/tasks/WP-26.md\ndocs/tasks/WP-27.md\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "branch",
+        "-r",
+        "--contains",
+        "789717fbf4a6b4a36aa71ec1cf7d36f344eccdf7"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:03.029563+00:00",
+      "ended_utc": "2026-09-10T09:18:03.150650+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "  legacy/feature/g24-g30-development-completion-routing\n  origin/HEAD -> origin/feature/g24-g30-development-completion-routing\n  origin/feature/g24-g30-development-completion-routing\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "rev-list",
+        "--count",
+        "789717fbf4a6b4a36aa71ec1cf7d36f344eccdf7..f34e6b29ae9e7326d1d44b9b03756b450809928f"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:03.150650+00:00",
+      "ended_utc": "2026-09-10T09:18:03.255624+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "3\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "cat-file",
+        "-e",
+        "789717fbf4a6b4a36aa71ec1cf7d36f344eccdf7^{commit}"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repro-730",
+      "started_utc": "2026-09-10T09:18:03.255624+00:00",
+      "ended_utc": "2026-09-10T09:18:03.359307+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "--no-patch",
+        "--format=%H%x00%P%x00%s%x00%cI",
+        "2bbcb0cb2cc6bc39e5a5770f91b9c58c03fed762"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:03.359307+00:00",
+      "ended_utc": "2026-09-10T09:18:03.459952+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "2bbcb0cb2cc6bc39e5a5770f91b9c58c03fed762\u0000789717fbf4a6b4a36aa71ec1cf7d36f344eccdf7\u0000G28-docs-state-sync\u00002026-09-03T11:08:20+08:00\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "--format=",
+        "--name-only",
+        "2bbcb0cb2cc6bc39e5a5770f91b9c58c03fed762"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:03.459952+00:00",
+      "ended_utc": "2026-09-10T09:18:03.565782+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "docs/11_PROJECT_STATE.md\ndocs/12_HANDOFF_CURRENT.md\ndocs/28_MASTER_DEVELOPMENT_ROADMAP.md\ndocs/GOAL_COMPLETION_CONTROL_PANEL.html\ndocs/GOAL_COMPLETION_CONTROL_PANEL.md\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "branch",
+        "-r",
+        "--contains",
+        "2bbcb0cb2cc6bc39e5a5770f91b9c58c03fed762"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:03.565782+00:00",
+      "ended_utc": "2026-09-10T09:18:03.694798+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "  legacy/feature/g24-g30-development-completion-routing\n  origin/HEAD -> origin/feature/g24-g30-development-completion-routing\n  origin/feature/g24-g30-development-completion-routing\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "rev-list",
+        "--count",
+        "2bbcb0cb2cc6bc39e5a5770f91b9c58c03fed762..f34e6b29ae9e7326d1d44b9b03756b450809928f"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:03.694798+00:00",
+      "ended_utc": "2026-09-10T09:18:03.797636+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "2\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "cat-file",
+        "-e",
+        "2bbcb0cb2cc6bc39e5a5770f91b9c58c03fed762^{commit}"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repro-730",
+      "started_utc": "2026-09-10T09:18:03.797636+00:00",
+      "ended_utc": "2026-09-10T09:18:03.902655+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "--no-patch",
+        "--format=%H%x00%P%x00%s%x00%cI",
+        "f34e6b29ae9e7326d1d44b9b03756b450809928f"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:03.902655+00:00",
+      "ended_utc": "2026-09-10T09:18:04.002651+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "f34e6b29ae9e7326d1d44b9b03756b450809928f\u0000e65c19bc6df8dd0362749d9016feabacf8acf6dc\u0000docs(g30): record GitHub continuation verification\u00002026-09-03T19:17:11+08:00\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "show",
+        "--format=",
+        "--name-only",
+        "f34e6b29ae9e7326d1d44b9b03756b450809928f"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:04.002651+00:00",
+      "ended_utc": "2026-09-10T09:18:04.138939+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "docs/12_HANDOFF_CURRENT.md\ndocs/tasks/G30-CROSS-MACHINE-GITHUB-CONTINUATION.md\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "branch",
+        "-r",
+        "--contains",
+        "f34e6b29ae9e7326d1d44b9b03756b450809928f"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:04.138939+00:00",
+      "ended_utc": "2026-09-10T09:18:04.255874+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "  origin/HEAD -> origin/feature/g24-g30-development-completion-routing\n  origin/feature/g24-g30-development-completion-routing\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "rev-list",
+        "--count",
+        "f34e6b29ae9e7326d1d44b9b03756b450809928f..f34e6b29ae9e7326d1d44b9b03756b450809928f"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:04.255874+00:00",
+      "ended_utc": "2026-09-10T09:18:04.359926+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "0\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "cat-file",
+        "-e",
+        "f34e6b29ae9e7326d1d44b9b03756b450809928f^{commit}"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repro-730",
+      "started_utc": "2026-09-10T09:18:04.359926+00:00",
+      "ended_utc": "2026-09-10T09:18:04.458816+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "789717fbf4a6b4a36aa71ec1cf7d36f344eccdf7:apps"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:04.458816+00:00",
+      "ended_utc": "2026-09-10T09:18:04.555867+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "0e4f2d9886484237ca607493fb47bcd5a4ec7438\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "f34e6b29ae9e7326d1d44b9b03756b450809928f:apps"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:04.555867+00:00",
+      "ended_utc": "2026-09-10T09:18:04.658849+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "0e4f2d9886484237ca607493fb47bcd5a4ec7438\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "789717fbf4a6b4a36aa71ec1cf7d36f344eccdf7:services"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:04.658849+00:00",
+      "ended_utc": "2026-09-10T09:18:04.779408+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "4299b98463b5aec08132119b224291ebfa18ec7b\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "f34e6b29ae9e7326d1d44b9b03756b450809928f:services"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:04.779408+00:00",
+      "ended_utc": "2026-09-10T09:18:04.880746+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "4299b98463b5aec08132119b224291ebfa18ec7b\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "789717fbf4a6b4a36aa71ec1cf7d36f344eccdf7:schemas"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:04.880746+00:00",
+      "ended_utc": "2026-09-10T09:18:04.981043+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "e812e543eb5b8442539d2ed796c8fad080803780\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "f34e6b29ae9e7326d1d44b9b03756b450809928f:schemas"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:04.981043+00:00",
+      "ended_utc": "2026-09-10T09:18:05.082532+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "e812e543eb5b8442539d2ed796c8fad080803780\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "789717fbf4a6b4a36aa71ec1cf7d36f344eccdf7:workflows"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:05.082532+00:00",
+      "ended_utc": "2026-09-10T09:18:05.181334+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "1d9e70249e6eaeaa2186940f18fd142385e2116d\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "f34e6b29ae9e7326d1d44b9b03756b450809928f:workflows"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:05.181334+00:00",
+      "ended_utc": "2026-09-10T09:18:05.278932+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "1d9e70249e6eaeaa2186940f18fd142385e2116d\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "789717fbf4a6b4a36aa71ec1cf7d36f344eccdf7:extensions"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:05.278932+00:00",
+      "ended_utc": "2026-09-10T09:18:05.380179+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "62e11987a54ee96bcbd221cd908c4290874e18a7\n",
+      "output_truncated": false
+    },
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "f34e6b29ae9e7326d1d44b9b03756b450809928f:extensions"
+      ],
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T09:18:05.380179+00:00",
+      "ended_utc": "2026-09-10T09:18:05.481862+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "62e11987a54ee96bcbd221cd908c4290874e18a7\n",
+      "output_truncated": false
+    }
+  ],
+  "mandatory_skipped": []
+}

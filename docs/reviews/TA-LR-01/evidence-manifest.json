@@ -2,20 +2,21 @@
   "schema_version": 1,
   "goal_id": "TA-LR-01",
   "review_level": "L2_HIGH_RISK_GOAL",
-  "predecessor_sha": "a9c6b4d4486fa522912c3fe6c65de70faa1e8132",
+  "predecessor_sha": "d60da1537f4d93bab10bf325cd4f69f13dec075b",
+  "goal_execution_predecessor_sha": "a9c6b4d4486fa522912c3fe6c65de70faa1e8132",
   "candidate_binding": "RESOLVED_BY_POST_COMMIT_REVIEW_PACKAGE_DELIVERY_JSON",
   "fresh_evidence": [
     {
       "path": "docs/reviews/TA-LR-01/legacy-items.json",
-      "sha256": "80eca1ef3a07a39577926f9c5fdfa4a4146d5b9e3047bd35cd28fbb68cd34a77"
+      "sha256": "8f20253e40b51cbd7d7046ec6c1234edd2dc131b2a77631d1f725f6dfdc6eff0"
     },
     {
       "path": "docs/reviews/TA-LR-01/decision-packet.md",
-      "sha256": "34f0603883399b36b56e62a30acc90d55dfd3082fa4d0c53a0e8db14ff4423cf"
+      "sha256": "ee0277d80da1bd2cdc82d6a18a8113fcf9a38af3fcdf5c38c9f369b0c4ed171f"
     },
     {
       "path": "docs/reviews/TA-LR-01/safe-lane-proposal.md",
-      "sha256": "5fc400608235a08d147640fc5d0af95b7a3d9dd8f6fbb79b6bed6369fc3f27b2"
+      "sha256": "cd4a9d4c1874ac76628ad2e09d2ebfb212b37a0d43dd4d452b1e24aecb17b3b9"
     },
     {
       "path": "docs/reviews/TA-LR-01/commands-and-exit-codes.md",
@@ -23,19 +24,23 @@
     },
     {
       "path": "docs/reviews/TA-LR-01/evidence/git-topology.json",
-      "sha256": "189d73594bb79bffae0bb8e9eabea27ab3f364bf09577a37d2cd7f0ee36d8b55"
+      "sha256": "efd836c8b2d158be3c103d757a066981b8f0d4007c5a78e3e056366825d96b64"
     },
     {
       "path": "docs/reviews/TA-LR-01/evidence/dirty-inventory.json",
       "sha256": "af44fa9a90b0022cb384e2db91457bef7d2ccd6ee511f15fd98aa9fbdd94fc24"
     },
     {
+      "path": "docs/reviews/TA-LR-01/evidence/predecessor-comparison-r2.json",
+      "sha256": "68c330672d186da444ba4533cf178bc394b0955ef4e81c99ab544efdcaf85f4d"
+    },
+    {
       "path": "docs/handoffs/TA-LR-01/review-ready.md",
-      "sha256": "5367b96e71116c98704af24841b2b55f2fed089c05ea0bcff809120bcb1ba7ee"
+      "sha256": "2ee0d22b9f2f18c93b7cb5b24a0c8fa47b8fc364d3b06765b45c58ff9c8e9c76"
     },
     {
       "path": "docs/reviews/TA-LR-01/self-validation.json",
-      "sha256": "9a7d5ed2867dcc6eff0193c2eccdaa67677644837fc314551706315cf54fc682"
+      "sha256": "d27408824316573760a3094be4551a7998e57525fcaebe6aed00a6ac8d00d485"
     }
   ],
   "mandatory_checks": [
@@ -46,6 +51,12 @@
     "INVENTORY_EQUALS_CLASSIFIED",
     "ONE_PRIMARY_DESTINATION",
     "UNKNOWN_PRESERVED",
+    "ACCEPTED_OUTPUTS_PRESERVED_SEPARATELY",
+    "PREDECESSOR_COMPARISON_COMPLETE",
+    "LATEST_ACCEPTED_PRODUCT_OUTPUT_EXACT",
+    "F34_RECOMMENDATION_CONDITIONAL",
+    "PRODUCT_TREE_PRESERVATION",
+    "GOAL_WRITER_METADATA_CONSISTENT",
     "SAFE_PREDECESSOR_REMOTE_REPRODUCIBLE",
     "NO_PRODUCT_CHANGE",
     "NO_FROZEN_DOC_CHANGE",

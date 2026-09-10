@@ -1,6 +1,6 @@
 # TA-LR-01 — Legacy Open Work Closure & Safe Lane Preparation
 
-AUTHORIZED / IN_PROGRESS → REVIEW_CANDIDATE。Human 於 2026-09-10 明確授權在 Phase A remote closure READY 後連續執行；產品實作維持 HOLD。
+AUTHORIZED / NEED_FIX_REPAIR → REVIEW_CANDIDATE。Human 於 2026-09-10 明確授權在 Phase A remote closure READY 後連續執行；產品實作維持 HOLD。
 
 [Framework](../governance/POLYNEXUS_TRACK_A_GOAL_EXECUTION_FRAMEWORK.md) · [Legacy register / HD-L1–L3](../governance/POLYNEXUS_LEGACY_OPEN_WORK_RECONCILIATION.md) · [Goal template](_GOAL_TEMPLATE.md)
 
@@ -28,8 +28,8 @@ AUTHORIZED / IN_PROGRESS → REVIEW_CANDIDATE。Human 於 2026-09-10 明確授�
 | INTEGRATION_DEPENDENCIES | SEQUENTIAL_REQUIRED；無parallel legacy merger；F1須本Goal accepted receipt及Human HD-L決策 |
 | PREFERRED_GOAL_OWNER / GOAL_OWNER | CODEX |
 | PREFERRED_IMPLEMENTATION_WRITER | CODEX（此Goal是governance Writer，非產品Writer） |
-| AUTHORIZED_WRITER / AUTHORIZED_IMPLEMENTATION_WRITER | NONE |
-| WRITER_AUTHORIZATION_SOURCE / ACTIVE_WRITER_SCOPE | NONE / NOT_ACQUIRED |
+| AUTHORIZED_WRITER / AUTHORIZED_IMPLEMENTATION_WRITER | CODEX / NONE（governance Writer only；非產品實作授權） |
+| WRITER_AUTHORIZATION_SOURCE / ACTIVE_WRITER_SCOPE | Human 2026-09-10 continuous bounded Goal + current bounded NEED_FIX / TA-LR-01 governance/evidence/handoff only |
 | RECOMMENDED_REASONING_MODEL | SOL MEDIUM |
 | MODEL_FALLBACK | LUNA MAX僅bounded inventory/classification |
 | ESCALATION / MODEL_ESCALATION_RULE | 僅architecture conflict、security issue、migration ambiguity、Frozen risk、formal authority conflict升ASTRA MEDIUM；required unavailable HOLD |
@@ -81,8 +81,7 @@ inventory總數必等於分類總數；每relevant item有唯一ID，缺項或�
 
 RECOMMENDED_HUMAN_DISPOSITION（不是Agent approval）：HD-L1保留G30 historical NEED_ACTION，route NEXT/separate external release verification，不阻B01、不external certify。HD-L2逐項bounded reconciliation，不bulk merge/delete/reset/clean/absorb；未知最後列NEEDS_HUMAN_DECISION。HD-L3 b87 dirty不是實作predecessor，f34只design/read；推薦真正Human-approved remote-verifiable exact checkpoint/lane。
 
-RECOMMENDED_IMPLEMENTATION_PREDECESSOR_SHA: UNASSIGNED / 待本Goal調查；本R2不得編造SHA。
-RECOMMENDED_IMPLEMENTATION_BRANCH_LANE: UNASSIGNED / 待本Goal調查與Human批准。
+PLANNING_PLACEHOLDER_HISTORY: original recommendation fields were UNASSIGNED before execution；current investigated recommendation is recorded in the execution record and review packet, subject to Human approval.
 最終packet須填可驗證SHA/remote/ref或明確blocking缺口、dirty保全與跨機重現證據，不能以這兩個placeholder結案為accepted ready。
 
 不允許bulk merge/adopt old branches、destructive checkout、reset、clean、prune、rebase、刪unknown untracked、overwrite dirtytree、auto repair production data或stage/commit/push legacy code。一般比較/分類/修正可自行完成；真正Frozen/安全/authority/不可恢復資料問題才HOLD。
@@ -118,8 +117,10 @@ REVIEW_READY_GATE: NO_REVIEW_PACKAGE = NOT_REVIEW_READY
 - REVIEW_LEVEL: `L2_HIGH_RISK_GOAL`.
 - EXACT_WRITE_SCOPE: this Goal execution metadata; `docs/reviews/TA-LR-01/**`; `docs/handoffs/TA-LR-01/review-ready.md`.
 - RESULT_TYPE: `GOVERNANCE_REPOSITORY_RECONCILIATION`.
-- INVENTORY: 51 items, each with one classification and one primary destination; unresolved Human-owned choices are preserved in the decision packet.
-- RECOMMENDED_SAFE_IMPLEMENTATION_PREDECESSOR_SHA: `730912b5a3e19449c355975485f1fe77350a458a`.
+- INVENTORY: 56 items, each with one classification and one primary destination; accepted G23/G25/G26/G27/G28 implementation provenance is separate from superseded routing, and unresolved Human-owned choices are preserved in the decision packet.
+- OLD_REVIEW_CANDIDATE_SHA / VERDICT: `d60da1537f4d93bab10bf325cd4f69f13dec075b` / `NEED_FIX`.
+- LATEST_HUMAN_ACCEPTED_PRODUCT_OUTPUT_SHA: `789717fbf4a6b4a36aa71ec1cf7d36f344eccdf7`.
+- RECOMMENDED_SAFE_IMPLEMENTATION_PREDECESSOR_SHA: `f34e6b29ae9e7326d1d44b9b03756b450809928f` (`PROPOSED_REQUIRES_HUMAN_PROMOTION_FROM_DESIGN_READ`).
 - RECOMMENDED_IMPLEMENTATION_LANE: `codex/track-a-implementation` (`PROPOSED_NOT_APPROVED`).
 - PRODUCT_CODE_CHANGED: NO.
 - FORMAL_FROZEN_DOCS_CHANGED: NO.

@@ -6,7 +6,10 @@
   "remote": "https://github.com/lichen200224-bot/PolyNexus.git",
   "phase_a_receipt_sha": "a9c6b4d4486fa522912c3fe6c65de70faa1e8132",
   "governance_candidate_sha": "2c17aaaea9d40066fe51414f7178375df1974aa9",
-  "candidate_product_predecessor_sha": "730912b5a3e19449c355975485f1fe77350a458a",
+  "old_candidate_product_predecessor_sha": "730912b5a3e19449c355975485f1fe77350a458a",
+  "latest_human_accepted_product_output_sha": "789717fbf4a6b4a36aa71ec1cf7d36f344eccdf7",
+  "recommended_safe_implementation_predecessor_sha": "f34e6b29ae9e7326d1d44b9b03756b450809928f",
+  "recommended_predecessor_status": "PROPOSED_REQUIRES_HUMAN_PROMOTION_FROM_DESIGN_READ",
   "frozen_design_read_sha": "f34e6b29ae9e7326d1d44b9b03756b450809928f",
   "dirty_checkout_head": "b87a0dc780e5d9a3bba083dbaf9552ca52508f9a",
   "findings": {
