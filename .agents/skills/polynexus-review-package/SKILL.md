@@ -8,11 +8,11 @@ REVIEW_PACKAGE_CANONICAL_AUTHORITY。適用所有Codex及Human-authorized OpenCo
 
 ## 1. Hard gate and owner
 
-**NO_REVIEW_PACKAGE = NOT_REVIEW_READY**。每個Goal到REVIEW_READY前，Active Writer須自動產生完整Review ZIP並驗證，不需Human逐步確認。流程：bounded work → positive/negative tests → repair → final fresh rerun → evidence → local candidate commit → exact SHA verification → package generation → package self-validation → REVIEW_READY → STOP WRITING。
+**NO_REVIEW_PACKAGE = NOT_REVIEW_READY**。每個Goal到REVIEW_READY前，Active Writer須自動產生完整Review ZIP並驗證，不需Human逐步確認。流程：bounded work → positive/negative tests → repair → final fresh rerun → evidence → local candidate commit → exact SHA verification → package generation → package self-validation → STOP WRITING / REVIEW_READY → Independent Review。Package generation/validation是REVIEW_READY gate內部步驟，不建立PACKAGE_GENERATED、PACKAGE_VALIDATED等新formal lifecycle states。
 
 缺candidate、package incomplete/invalid/stale、mandatory evidence缺漏或unexpected scope：GOAL_STATUS=IN_PROGRESS（可自行修復）或HOLD（真正blocker），REVIEW_READY=NO；不得交Independent Review、要求Human Acceptance、建議APPROVE_TO_PUSH或push accepted checkpoint。已授權Goal包含此收尾工作，不授予新的外部服務/secret傳輸或push權。
 
-只有全部成立才REVIEW_READY：bounded work完成、candidate存在/full SHA正確、allowlist/patch/changed bytes一致、mandatory evidence fresh、negative evidence有記錄、mandatory SKIPPED none（可信contract-defined N/A除外）、environment已記、manifest valid、全部parts完整、required bundle valid、檢查未偵測secret洩漏。結構validator PASS只是必要機械證據；Writer仍須查AC/oracle/freshness/secret scope，不得宣稱工具證明所有語意。
+只有全部成立才可設定REVIEW_READY=YES並開始Independent Review：bounded work完成、exact immutable Review Candidate SHA正確、validated mandatory Review Package、required changed-file bytes與allowlist/patch一致、valid manifest、required fresh evidence、negative tests已記錄、no blocking mandatory SKIPPED（可信contract-defined N/A除外）、complete handoff、complete Review Packet、Writer stopped、environment已記、全部parts完整、required bundle valid、檢查未偵測secret洩漏。結構validator PASS只是必要機械證據；Writer仍須查AC/oracle/freshness/secret scope，不得宣稱工具證明所有語意。
 
 ## 2. Identity and immutable delivery
 
@@ -22,7 +22,7 @@ candidate reviewed bytes改變 → new SHA + fresh required evidence + new ZIP�
 
 命名：`PolyNexus_<GOAL_ID>_External_Review_<YYYYMMDD_HHMMSS>.zip`，Goal ID安全字元可簡化但可辨認，timestamp註明timezone。預設ONE ZIP；不是backup。
 
-自引用：C內Goal記package-required/level與completion receipt locator，生成前dynamic path/hash為PENDING，不先標REVIEW_READY。C後在**ZIP外**生成delivery.json，實填GOAL_ID、C、predecessor、branch、REVIEW_LEVEL、REVIEW_PACKAGE_PATH、REVIEW_PACKAGE_SHA256、PACKAGE_VALIDATION_STATUS、GOAL_STATUS。此為Goal completion metadata，不修改C；Human上傳時提供ZIP及其hash/sidecar。ZIP內REVIEW_PACKET可記候選READY待gate核對，只有ZIP驗證成功才發布該包與REVIEW_READY final。失敗包不得交付或自稱ready。C/R acceptance receipt仍依[Framework §5](../../../docs/governance/POLYNEXUS_TRACK_A_GOAL_EXECUTION_FRAMEWORK.md)，接受後的R可在既定allowlist收錄package ref/hash，不為填ZIP hash改C或造循環。
+自引用：C內Goal記package-required/level與completion receipt locator，生成前dynamic path/hash為PENDING，不先標REVIEW_READY。C後在**ZIP外**生成delivery.json，實填GOAL_ID、C、predecessor、branch、REVIEW_LEVEL、REVIEW_PACKAGE_PATH、REVIEW_PACKAGE_SHA256、PACKAGE_VALIDATION_STATUS、GOAL_STATUS。此為Goal completion metadata，不修改C；Human只需上傳Review ZIP，Writer須在final response另行明列`REVIEW_PACKAGE_SHA256: <actual full SHA256>`。delivery.json/sidecar只作內部machine record，不是Human另行管理或上傳的必要檔案。ZIP內REVIEW_PACKET可記候選READY待gate核對，只有ZIP驗證成功且Writer停止寫入才發布該包與REVIEW_READY final並進入Independent Review。失敗包不得交付或自稱ready。C/R acceptance receipt仍依[Framework §5](../../../docs/governance/POLYNEXUS_TRACK_A_GOAL_EXECUTION_FRAMEWORK.md)，接受後的R可在既定allowlist收錄package ref/hash，不為填ZIP hash改C或造循環。
 
 ## 3. Standard content and first read
 
@@ -82,6 +82,6 @@ manifest不能hash自身。唯一例外是manifest本身不列自身SHA；其byt
 
 Goal contract必有REVIEW_LEVEL、REVIEW_PACKAGE_REQUIRED=YES、FORMAT=ZIP、PATH、SHA256、C、PACKAGE_VALIDATION_STATUS及minimum content/bundle/fresh evidence/environment/completeness/REVIEW_READY_GATE。Planning欄位可PENDING；Independent Review前dynamic值必以外部delivery record實填，不能用placeholder完成gate。
 
-Writer final至少：GOAL_ID、GOAL_STATUS REVIEW_READY、REVIEW_LEVEL、BRANCH、PREDECESSOR_SHA、C、REVIEW_PACKAGE exact path、SHA256、PACKAGE_MANIFEST PASS、PACKAGE_COMPLETENESS PASS、MANDATORY_SKIPPED NONE、UNEXPECTED_CHANGED_FILES NONE、GIT_BUNDLE path/NOT_REQUIRED/NOT_AVAILABLE_WITH_REASON、PRODUCT_IMPLEMENTATION_SCOPE、GIT_PUSH NO、NEXT UPLOAD_REVIEW_PACKAGE_FOR_INDEPENDENT_REVIEW。提供Human可直接上傳ZIP與hash，STOP；不自行做Independent PASS。
+Writer final至少：GOAL_ID、GOAL_STATUS REVIEW_READY、REVIEW_LEVEL、BRANCH、PREDECESSOR_SHA、C、REVIEW_PACKAGE exact path、`REVIEW_PACKAGE_SHA256: <actual full SHA256>`、PACKAGE_MANIFEST PASS、PACKAGE_COMPLETENESS PASS、MANDATORY_SKIPPED NONE、UNEXPECTED_CHANGED_FILES NONE、GIT_BUNDLE path/NOT_REQUIRED/NOT_AVAILABLE_WITH_REASON、PRODUCT_IMPLEMENTATION_SCOPE、GIT_PUSH NO、NEXT UPLOAD_REVIEW_PACKAGE_FOR_INDEPENDENT_REVIEW。Human只需上傳Review ZIP；Writer另行回報完整REVIEW_PACKAGE_SHA256，STOP；不自行做Independent PASS。
 
 Reviewer第一動作READ START_HERE.md，再核對外部hash、manifest/parts、C/P、allowlist/diff/actual bytes/fresh evidence/limitations，必要時重跑。Writer != Independent Reviewer；final VERDICT PASS/NEED_FIX/HOLD，recommendation APPROVE_TO_PUSH/DO_NOT_PUSH；Human仍FINAL_ACCEPTANCE_AUTHORITY/FINAL_PUSH_AUTHORITY。Package validation PASS不授權push。Accepted跨機handoff仍要求independently reviewed + Human accepted + remote verified的C/R closure，不能用ZIP取代。
