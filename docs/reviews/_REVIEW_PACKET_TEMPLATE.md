@@ -1,0 +1,47 @@
+# Review packet and independent verdict
+
+依 [Framework](../governance/POLYNEXUS_TRACK_A_GOAL_EXECUTION_FRAMEWORK.md) §4–5。Writer 在 REVIEW_READY 停寫；Reviewer review exact SHA。以下第一段由 Writer 填，第二段由獨立 Reviewer 填，不得以 self-check 冒充獨立 verdict。
+
+```yaml
+GOAL_ID: REQUIRED
+PARENT_WP: REQUIRED
+REVIEW_CANDIDATE_SHA: REQUIRED
+PREDECESSOR_SHA: REQUIRED
+BRANCH: REQUIRED
+WRITER: REQUIRED
+HARNESS: REQUIRED
+MODEL: UNKNOWN
+CHANGED_FILES: []
+DIFF_SUMMARY: REQUIRED
+ACTUAL_TEST_COMMANDS: []
+ACTUAL_EXIT_CODES: []
+NEGATIVE_TESTS: []
+SKIPPED: [] # each reason, requirement, blocking
+EVIDENCE_REFS: [] # source SHA / file hash, argv/cwd/start/end/output/hash
+FROZEN_INVARIANT_MAPPING: []
+OUT_OF_SCOPE_CHANGE: NONE
+KNOWN_LIMITATIONS: []
+ENVIRONMENT_FINGERPRINT: {}
+HANDOFF_STATUS: REQUIRED
+REVIEW_READY: NO
+```
+
+```yaml
+GOAL_ID: REQUIRED
+REVIEW_CANDIDATE_SHA: REQUIRED
+PREDECESSOR_SHA: REQUIRED
+SCOPE_REVIEWED: REQUIRED
+ACTUAL_TEST_RESULT: REQUIRED
+ACTUAL_EXIT_CODES: REQUIRED
+NEGATIVE_TEST_RESULT: REQUIRED
+SKIPPED: REQUIRED
+EVIDENCE_STATUS: REQUIRED
+FROZEN_INVARIANT_CHECK: REQUIRED
+OUT_OF_SCOPE_CHANGE: REQUIRED
+KNOWN_LIMITATIONS: REQUIRED
+BLOCKERS: REQUIRED
+VERDICT: PASS / NEED_FIX / HOLD
+PUSH_RECOMMENDATION: APPROVE_TO_PUSH / DO_NOT_PUSH
+```
+
+每 finding 附 severity、file/line、actual evidence、bounded FIX_PROMPT 與實際適用 commands。Mandatory SKIPPED/missing/stale/wrong-SHA/unknown-exit/untrusted oracle 不能 PASS；optional skip 記限制不自動 FAIL。Mock/simulator 只能證明相應範圍；real executor gate 必有真實 process/changes/cleanup。NEED_FIX 新 SHA 重 review，保留舊 packet。不把 Reviewer recommendation 當 Human push authority。
