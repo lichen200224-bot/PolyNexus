@@ -89,5 +89,5 @@ GIT_BUNDLE_REQUIREMENT: canonical skill review-level policy
 FRESH_EVIDENCE_REQUIREMENT: candidate-bound actual evidence; historical reference only
 ENVIRONMENT_FINGERPRINT_REQUIREMENT: canonical skill environment fields
 PACKAGE_COMPLETENESS_CRITERIA: all mandatory payloads and required parts; hashes valid
-REVIEW_READY_GATE: NO_REVIEW_PACKAGE = NOT_REVIEW_READY
+REVIEW_READY_GATE: NO_REVIEW_PACKAGE = NOT_REVIEW_READY; REVIEW_CANDIDATE -> validated package with complete packet/handoff -> Writer stopped / REVIEW_READY -> INDEPENDENT_REVIEW; full predicates in Framework 4
 ```

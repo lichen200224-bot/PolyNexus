@@ -117,6 +117,6 @@ Repo skills：
 
 Track A goal-level skills：`polynexus-goal-execution`、`polynexus-cross-machine-handoff`、`polynexus-independent-acceptance`。既有 specialized skills 仍供實作/contract檢查，不能覆蓋Framework。
 
-R2限定修復：Acceptance Receipt依Framework §5，Human批准reviewed C可同次授權一次bounded metadata R closure；R direct parent C、strict allowlist/integrity PASS後push R，remote R match才跨機接續。R不修改C reviewed內容、不需第二次完整product review；WIP不產R。NEXT_PROPOSED_GOAL=TA-LR-01（DEFINED_NOT_EXECUTED），LR accepted/Human decisions後才F1；產品HOLD。
+Operating Model R2 current status（Human本輪確認）：R2_INDEPENDENT_REVIEW=PASS；R2_HUMAN_ACCEPTANCE=ACCEPTED；R2_REMOTE_CLOSURE=PENDING；CROSS_MACHINE_CHECKPOINT=NOT_READY。Acceptance Receipt依Framework §5，Human批准reviewed C可同次授權一次bounded metadata R closure；R direct parent C、strict allowlist/integrity PASS後push R，remote R match才跨機接續。R不修改C reviewed內容、不需第二次完整product review；WIP不產R。NEXT_PROPOSED_GOAL=TA-LR-01（DEFINED_NOT_EXECUTED / NOT_AUTHORIZED），LR accepted/Human decisions後才F1；產品HOLD。
 
 Mandatory Goal delivery: [polynexus-review-package](.agents/skills/polynexus-review-package/SKILL.md) is REVIEW_PACKAGE_CANONICAL_AUTHORITY. NO_REVIEW_PACKAGE = NOT_REVIEW_READY. This Human-authorized REVIEW_PACKAGE_SKILL governance Goal permits local candidate commit and package generation; no push.

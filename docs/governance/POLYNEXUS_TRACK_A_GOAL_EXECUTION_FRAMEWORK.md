@@ -1,10 +1,10 @@
 # Track A Goal Execution Framework
 
-2026-09-10 · TA-OPERATING-MODEL · NEED_FIX R2 → exact-SHA re-review；只修 FINDING-01 / FINDING-02
+2026-09-10 · Operating Model R2獨立PASS / Human ACCEPTED；remote closure PENDING。現行修正：REVIEW_PACKAGE_SKILL bounded NEED_FIX（status / lifecycle only）。
 
 ## 1. Authority and current boundary
 
-Human 本輪明確決定 GOAL-BASED DEVELOPMENT / BOUNDED GOAL AUTONOMY；Codex 是 PRIMARY_IMPLEMENTATION_AGENT、DEFAULT_GOAL_OWNER、DEFAULT_IMPLEMENTATION_WRITER。本文件保存此決策與供獨立審查的 operating model，不宣稱已獲獨立 PASS。
+Human 本輪明確決定 GOAL-BASED DEVELOPMENT / BOUNDED GOAL AUTONOMY；Codex 是 PRIMARY_IMPLEMENTATION_AGENT、DEFAULT_GOAL_OWNER、DEFAULT_IMPLEMENTATION_WRITER。本文件保存此決策與供獨立審查的 operating model，Operating Model R2已由Human確認獨立PASS及Human ACCEPTED；remote closure仍PENDING，CROSS_MACHINE_CHECKPOINT=NOT_READY。此確認不代表本次REVIEW_PACKAGE_SKILL修復已獨立PASS。
 
 權威順序：Current explicit Human instruction → Frozen I-01..I-23 → approved architecture/governance records → current authorized Goal contract → canonical AGENTS/governance → project-local SKILL → tool adapter → model defaults。較低層不得覆蓋較高層；衝突 STOP / REPORT / ESCALATE。Human 新指示若涉及架構變更，仍須明確 Change Control，不能把一般 Goal 授權推論為解凍。
 
@@ -48,13 +48,13 @@ HOLD 輸出 BLOCKER、WHY_HUMAN_DECISION_REQUIRED、OPTIONS、RECOMMENDATION、I
 
 ## 4. Goal lifecycle and review identity
 
-PLANNED → AUTHORIZED → IN_PROGRESS → REVIEW_CANDIDATE → INDEPENDENT_REVIEW；REVIEW_READY 是 candidate、已通過mandatory Review ZIP gate、handoff完備且停止寫入的交付旗標。Reviewer NEED_FIX → IN_PROGRESS；HOLD 等所需決策；PASS 等 Human。Human APPROVED exact C → PUSH_AUTHORIZED_C → PUSHED_C → REMOTE_C_VERIFIED → RECEIPT_CREATED_R → RECEIPT_INTEGRITY_PASS → PUSHED_R → REMOTE_R_VERIFIED → CROSS_MACHINE_READY（intake gate另驗）→ INTEGRATED（適用時）→ CLOSED。
+PLANNED → AUTHORIZED → IN_PROGRESS → REVIEW_CANDIDATE → REVIEW_READY → INDEPENDENT_REVIEW。REVIEW_READY 必須具備 exact immutable Review Candidate SHA、已驗證mandatory Review Package、required changed-file bytes、valid manifest、required fresh evidence、已記錄negative tests、無blocking mandatory SKIPPED、完整handoff/review packet及Writer已停止寫入。Package generation/validation是此gate內部步驟，不新增formal lifecycle states；未達REVIEW_READY不得交Independent Review。Reviewer NEED_FIX → IN_PROGRESS；HOLD 等所需決策；PASS 等 Human。Human APPROVED exact C → PUSH_AUTHORIZED_C → PUSHED_C → REMOTE_C_VERIFIED → RECEIPT_CREATED_R → RECEIPT_INTEGRITY_PASS → PUSHED_R → REMOTE_R_VERIFIED → CROSS_MACHINE_READY（intake gate另驗）→ INTEGRATED（適用時）→ CLOSED。
 
 PASS != HUMAN_APPROVED；HUMAN_APPROVED != PUSHED；PUSHED != REMOTE_VERIFIED；REMOTE_VERIFIED != INTEGRATED；WIP != ACCEPTED。不需 integration 的 Goal 可在 REMOTE_R_VERIFIED、receipt integrity與acceptance/handoff完備後 CLOSED；需 integration 的 component 等 integration checkpoint 建立才關閉其整合依賴。
 
 已授權 implementation Goal 包含 explicit-allowlist staging 及 local REVIEW_CANDIDATE commit，不需另問；每次先核對 branch/HEAD/index/完整 dirty+untracked，避免吸收他人內容。混合已修改檔案需能確定逐 hunk 歸屬，否則 HOLD；禁用 blanket add。**R2 Human已授權限定修正的local review commit；仍禁止push**。R1 no-commit限制是歷史，不延伸阻擋本次明確授權。不得吸收原主checkout的舊dirty內容。
 
-Future normal flow：先測試固定內容並保存 file/tree hashes → local commit → resolve full SHA → 驗證測試 bytes 與 commit tree 一致（不一致則重測）→ 產 packet → STOP WRITING → independent review exact SHA。Reviewer 必要時重跑；資料來源、oracle、exit、negative、freshness、scope、invariants、mock boundary 和 cross-machine readiness 全部核對。
+Future normal flow：先測試固定內容並保存 file/tree hashes → local commit → resolve full SHA → 驗證測試 bytes 與 commit tree 一致（不一致則重測）→ 產mandatory Review Package與完整packet/handoff → package validation → STOP WRITING / REVIEW_READY → independent review exact SHA。Reviewer 必要時重跑；資料來源、oracle、exit、negative、freshness、scope、invariants、mock boundary 和 cross-machine readiness 全部核對。
 
 Self verification 不是 Independent PASS。Reviewer 輸出 PASS / NEED_FIX / HOLD 與 APPROVE_TO_PUSH / DO_NOT_PUSH；PASS 不自動授權 push。NEED_FIX 在原 Goal/allowlist/contract 內沿用原 authorization，修復後新 commit B、新測試、新 packet，保留 A evidence；A 的 PASS 不證明 B。
 
@@ -177,7 +177,7 @@ S0/W1 子 Goal 逐一 checkpoint 串接，最後一個需驗證整個 WP accumul
 
 [Legacy reconciliation](POLYNEXUS_LEGACY_OPEN_WORK_RECONCILIATION.md) 是唯一 legacy→Track A routing；舊 Gxx/CP/roadmap 不再派工。未解 decisions 保留，由TA-LR-01在F1前準備完整packet，Human批准disposition後才能進F1；不刪歷史或把 bounded PASS 重算為 Working Product PASS。
 
-R2交付為local REVIEW_CANDIDATE / NOT_ACCEPTED / NOT_PUSHED，exact SHA列外部R2 package；R1 [review packet](../reviews/TA-OPERATING-MODEL-REVIEW.md)僅歷史。R2 Human已授權限定local commit，不授權push或實際Acceptance Receipt。R2獨立review及Human acceptance/receipt closure後 NEXT_PROPOSED_GOAL=TA-LR-01，尚未授權也未執行。順序 Operating Model Accepted → TA-LR-01 → F1 → F2 → F3 → F4 → S0 → W1…；F1前必須有LR accepted outcome/Human disposition。不能從NEED_FIX R2授權推論LR已開工；本輪STOP。
+Operating Model R2 reviewed C=`a82c9addaf37d8a5b659ac121f4b8f2787da8e76`：R2_INDEPENDENT_REVIEW=PASS；R2_HUMAN_ACCEPTANCE=ACCEPTED（本輪Human明確確認，原文隨REVIEW_PACKAGE_SKILL修復ZIP HUMAN_REQUEST.txt）；R2_REMOTE_CLOSURE=PENDING；CROSS_MACHINE_CHECKPOINT=NOT_READY。不宣稱Acceptance Receipt R已存在或remote proof已完成。R1/R2原始review records保留當時語意。本輪僅允許REVIEW_PACKAGE_SKILL兩項治理修復/new local commit/ZIP，不授權push、R closure或LR執行。NEXT_PROPOSED_GOAL=TA-LR-01，DEFINED_NOT_EXECUTED / NOT_AUTHORIZED；Operating Model Accepted → TA-LR-01 → F1 → F2 → F3 → F4 → S0 → W1…；跨機開工仍需remote receipt closure，LR須另行Human授權，F1前須LR accepted outcome/Human disposition。
 
 ## Mandatory external review package
 

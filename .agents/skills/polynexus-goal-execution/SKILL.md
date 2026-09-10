@@ -12,4 +12,4 @@ For FINDING-01 follow Framework §5 exactly: REVIEWED_PRODUCT_SHA=C; metadata AC
 
 For FINDING-02 next proposed Goal is TA-LR-01 (governance-only, not authorized/executed), then F1. Its authorized Owner Codex completes inventory/classification/HD-L1-L3 packet without per-item Human interruptions. Do not perform LR inventory or lane changes under R2 repair authorization.
 
-Before REVIEW_READY: local Review Candidate → mandatory Review ZIP → package self-validation → REVIEW_READY → STOP. No package means IN_PROGRESS/HOLD, never request acceptance or push recommendation. All packaging details are canonical in [polynexus-review-package](../polynexus-review-package/SKILL.md); do not copy another packaging schema here.
+Before REVIEW_READY: local Review Candidate → mandatory Review ZIP → package self-validation → STOP WRITING / REVIEW_READY → Independent Review. No package means IN_PROGRESS/HOLD, never request acceptance or push recommendation. All packaging details are canonical in [polynexus-review-package](../polynexus-review-package/SKILL.md); do not copy another packaging schema here.

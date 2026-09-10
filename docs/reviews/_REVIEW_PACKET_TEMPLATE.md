@@ -1,6 +1,6 @@
 # Review packet and independent verdict
 
-依 [Framework](../governance/POLYNEXUS_TRACK_A_GOAL_EXECUTION_FRAMEWORK.md) §4–5。Writer 在 REVIEW_READY 停寫；Reviewer review exact SHA。以下第一段由 Writer 填，第二段由獨立 Reviewer 填，不得以 self-check 冒充獨立 verdict。
+依 [Framework](../governance/POLYNEXUS_TRACK_A_GOAL_EXECUTION_FRAMEWORK.md) §4–5。REVIEW_CANDIDATE → mandatory package/validation及完整handoff/packet → Writer停寫 / REVIEW_READY → INDEPENDENT_REVIEW exact SHA；未達gate不得送審。以下第一段由 Writer 填，第二段由獨立 Reviewer 填，不得以 self-check 冒充獨立 verdict。
 
 ```yaml
 REVIEWED_PRODUCT_SHA: UNASSIGNED # C, exact independent-review/Human target
