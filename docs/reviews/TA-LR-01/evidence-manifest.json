@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "goal_id": "TA-LR-01",
+  "review_level": "L2_HIGH_RISK_GOAL",
+  "predecessor_sha": "a9c6b4d4486fa522912c3fe6c65de70faa1e8132",
+  "candidate_binding": "RESOLVED_BY_POST_COMMIT_REVIEW_PACKAGE_DELIVERY_JSON",
+  "fresh_evidence": [
+    {
+      "path": "docs/reviews/TA-LR-01/legacy-items.json",
+      "sha256": "80eca1ef3a07a39577926f9c5fdfa4a4146d5b9e3047bd35cd28fbb68cd34a77"
+    },
+    {
+      "path": "docs/reviews/TA-LR-01/decision-packet.md",
+      "sha256": "34f0603883399b36b56e62a30acc90d55dfd3082fa4d0c53a0e8db14ff4423cf"
+    },
+    {
+      "path": "docs/reviews/TA-LR-01/safe-lane-proposal.md",
+      "sha256": "5fc400608235a08d147640fc5d0af95b7a3d9dd8f6fbb79b6bed6369fc3f27b2"
+    },
+    {
+      "path": "docs/reviews/TA-LR-01/commands-and-exit-codes.md",
+      "sha256": "00bde49b73b373db8f3ddba99e6a23d3dbe1d1088c93eab05f46e9ed86259dfd"
+    },
+    {
+      "path": "docs/reviews/TA-LR-01/evidence/git-topology.json",
+      "sha256": "189d73594bb79bffae0bb8e9eabea27ab3f364bf09577a37d2cd7f0ee36d8b55"
+    },
+    {
+      "path": "docs/reviews/TA-LR-01/evidence/dirty-inventory.json",
+      "sha256": "af44fa9a90b0022cb384e2db91457bef7d2ccd6ee511f15fd98aa9fbdd94fc24"
+    },
+    {
+      "path": "docs/handoffs/TA-LR-01/review-ready.md",
+      "sha256": "5367b96e71116c98704af24841b2b55f2fed089c05ea0bcff809120bcb1ba7ee"
+    },
+    {
+      "path": "docs/reviews/TA-LR-01/self-validation.json",
+      "sha256": "9a7d5ed2867dcc6eff0193c2eccdaa67677644837fc314551706315cf54fc682"
+    }
+  ],
+  "mandatory_checks": [
+    "TOPOLOGY_CURRENT",
+    "REMOTE_REFS_REFRESHED",
+    "DIRTY_BYTES_PRESERVED",
+    "ITEM_IDS_UNIQUE",
+    "INVENTORY_EQUALS_CLASSIFIED",
+    "ONE_PRIMARY_DESTINATION",
+    "UNKNOWN_PRESERVED",
+    "SAFE_PREDECESSOR_REMOTE_REPRODUCIBLE",
+    "NO_PRODUCT_CHANGE",
+    "NO_FROZEN_DOC_CHANGE",
+    "NEGATIVE_DUPLICATE_REJECTED",
+    "NEGATIVE_MISSING_DESTINATION_REJECTED",
+    "NEGATIVE_MULTI_DESTINATION_REJECTED"
+  ],
+  "mandatory_skipped": [],
+  "historical_evidence_policy": "REFERENCE_ONLY_NOT_FRESH_ACCEPTANCE"
+}

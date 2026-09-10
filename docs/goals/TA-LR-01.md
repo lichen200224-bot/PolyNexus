@@ -1,6 +1,6 @@
 # TA-LR-01 — Legacy Open Work Closure & Safe Lane Preparation
 
-DEFINED_NOT_EXECUTED / PLANNED / NOT_AUTHORIZED。本檔不是執行授權。
+AUTHORIZED / IN_PROGRESS → REVIEW_CANDIDATE。Human 於 2026-09-10 明確授權在 Phase A remote closure READY 後連續執行；產品實作維持 HOLD。
 
 [Framework](../governance/POLYNEXUS_TRACK_A_GOAL_EXECUTION_FRAMEWORK.md) · [Legacy register / HD-L1–L3](../governance/POLYNEXUS_LEGACY_OPEN_WORK_RECONCILIATION.md) · [Goal template](_GOAL_TEMPLATE.md)
 
@@ -108,3 +108,21 @@ ENVIRONMENT_FINGERPRINT_REQUIREMENT: canonical skill environment fields
 PACKAGE_COMPLETENESS_CRITERIA: all mandatory payloads and required parts; hashes valid
 REVIEW_READY_GATE: NO_REVIEW_PACKAGE = NOT_REVIEW_READY
 ```
+
+## Execution record — 2026-09-10
+
+- AUTHORIZATION_SOURCE: Human continuous bounded Goal instruction; effective condition satisfied after Governance C/R remote closure and `CROSS_MACHINE_CHECKPOINT: READY`.
+- AUTHORIZED_WRITER: CODEX, governance reconciliation only.
+- BRANCH: `codex/ta-lr-01`.
+- PREDECESSOR_SHA: `a9c6b4d4486fa522912c3fe6c65de70faa1e8132`.
+- REVIEW_LEVEL: `L2_HIGH_RISK_GOAL`.
+- EXACT_WRITE_SCOPE: this Goal execution metadata; `docs/reviews/TA-LR-01/**`; `docs/handoffs/TA-LR-01/review-ready.md`.
+- RESULT_TYPE: `GOVERNANCE_REPOSITORY_RECONCILIATION`.
+- INVENTORY: 51 items, each with one classification and one primary destination; unresolved Human-owned choices are preserved in the decision packet.
+- RECOMMENDED_SAFE_IMPLEMENTATION_PREDECESSOR_SHA: `730912b5a3e19449c355975485f1fe77350a458a`.
+- RECOMMENDED_IMPLEMENTATION_LANE: `codex/track-a-implementation` (`PROPOSED_NOT_APPROVED`).
+- PRODUCT_CODE_CHANGED: NO.
+- FORMAL_FROZEN_DOCS_CHANGED: NO.
+- TA-LR-01_PUSH: NO.
+- CANDIDATE_AND_PACKAGE: exact candidate SHA and external ZIP/hash are resolved after this immutable commit by the canonical Review Package workflow; they are not self-referential fields in this commit.
+- STOP_CONDITION: package self-validation PASS → `STOP_WRITING / REVIEW_READY` → Independent Review. Do not begin F1 or S0.

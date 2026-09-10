@@ -1,0 +1,206 @@
+{
+  "schema_version": 1,
+  "captured_utc": "2026-09-10T08:29:17.511145+00:00",
+  "ta_lr_repository": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+  "primary_repository": "D:\\AI_學習教材\\PolyNexus",
+  "remote": "https://github.com/lichen200224-bot/PolyNexus.git",
+  "phase_a_receipt_sha": "a9c6b4d4486fa522912c3fe6c65de70faa1e8132",
+  "governance_candidate_sha": "2c17aaaea9d40066fe51414f7178375df1974aa9",
+  "candidate_product_predecessor_sha": "730912b5a3e19449c355975485f1fe77350a458a",
+  "frozen_design_read_sha": "f34e6b29ae9e7326d1d44b9b03756b450809928f",
+  "dirty_checkout_head": "b87a0dc780e5d9a3bba083dbaf9552ca52508f9a",
+  "findings": {
+    "candidate_is_ancestor_of_frozen_read": true,
+    "candidate_to_frozen_read_left_right": [
+      0,
+      26
+    ],
+    "governance_history_has_no_merge_base_with_frozen_read": true,
+    "governance_import_root": "902c2719e5f6017f7f019284721f59b126f1375d",
+    "governance_import_vs_frozen_read_shortstat": "300 files changed, 4464 insertions(+), 83391 deletions(-)",
+    "candidate_remote_carrier": "origin/feature/g24-g30-development-completion-routing",
+    "fresh_remote_clone_detached_checkout_exact_candidate": true
+  },
+  "commands": [
+    {
+      "command": "git status --short --branch",
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T08:29:11.028367+00:00",
+      "ended_utc": "2026-09-10T08:29:11.188464+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "## codex/ta-lr-01\nM  docs/goals/TA-LR-01.md\nA  docs/handoffs/TA-LR-01/review-ready.md\nA  docs/reviews/TA-LR-01/commands-and-exit-codes.md\nA  docs/reviews/TA-LR-01/decision-packet.md\nA  docs/reviews/TA-LR-01/evidence-manifest.json\nA  docs/reviews/TA-LR-01/evidence/dirty-inventory.json\nA  docs/reviews/TA-LR-01/evidence/git-topology.json\nA  docs/reviews/TA-LR-01/legacy-items.json\nA  docs/reviews/TA-LR-01/safe-lane-proposal.md\nA  docs/reviews/TA-LR-01/self-validation.json\n",
+      "output_truncated": false
+    },
+    {
+      "command": "git rev-parse HEAD",
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T08:29:11.189954+00:00",
+      "ended_utc": "2026-09-10T08:29:11.282102+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "a9c6b4d4486fa522912c3fe6c65de70faa1e8132\n",
+      "output_truncated": false
+    },
+    {
+      "command": "git remote -v",
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T08:29:11.282102+00:00",
+      "ended_utc": "2026-09-10T08:29:11.381205+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "origin\thttps://github.com/lichen200224-bot/PolyNexus.git (fetch)\norigin\thttps://github.com/lichen200224-bot/PolyNexus.git (push)\n",
+      "output_truncated": false
+    },
+    {
+      "command": "git for-each-ref \"--format=%(refname:short) %(objectname) %(upstream:short)\" refs/remotes/origin refs/remotes/legacy",
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T08:29:11.381205+00:00",
+      "ended_utc": "2026-09-10T08:29:11.509964+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "legacy/codex/goal-governance-v1-2 5d1bd60767854d452fb055b0d7ba185e8ab8fa44\nlegacy/codex/goal-objective-v1 2552c454fd1ce1c6a6de384aa534627870448489\nlegacy/codex/phase-a-minimal-requirements 8750e7e704b6f2e37718bf4f652908c645004bed\nlegacy/codex/wp16-canonical-integration cf7923a18175b479c0d49a2ae2b4a9e5ea5a1efc\nlegacy/develop 3a38cc2ae55a83eb2ee77700b862ab0abb9973f3\nlegacy/feature/first-vertical-slice 730912b5a3e19449c355975485f1fe77350a458a\nlegacy/feature/g19-canonical-workspace-provenance 1799994514fc5dc46aef752ab61a3d96583ea3ad\nlegacy/feature/g20-web-reproducible-dependency-test-build-gate 48062f1cae608785a39539e1a7bfca5d6726a92e\nlegacy/feature/g21-wp21-real-browser-journey-failure-path ada5e9c8b4873aad4c53c74198171740d376d926\nlegacy/feature/g22-rc-hardening-cross-machine-delivery-closeout 0eb56a986e97a45854bd6ddd419c114845ce51f4\nlegacy/feature/g24-g30-development-completion-routing 2bbcb0cb2cc6bc39e5a5770f91b9c58c03fed762\nlegacy/g05-runtime-registry-exception-fix 78835f85ae0a8890d9cca3a67daf5c3145f02749\nlegacy/main fe6d78f6ee7d8e855101a7ffa766235d7dae4215\nlegacy/runtime-adapters-integration 431979e7fa005070b25d516e2ebc3b4f361a930d\nlegacy/runtime-registry-conformance f0b581d70f4009e681496555f79621371f44b3c7\nlegacy/wp14-codex-runtime 6a64ceb2ea8aa668fe0cc581ff5a54dea1a6481a\nlegacy/wp14-codex-runtime-fix 63212435d1f0030c50842f728a9615ca6306be47\nlegacy/wp15-opencode-runtime 05b263351662ce557e12f9cda4a89e7bd4f02aa9\nlegacy/wp16-runtime-doctor d5a0fe1545992fd82e52f8d4bc86935a8f3a921f\norigin f34e6b29ae9e7326d1d44b9b03756b450809928f\norigin/codex/review-package-skill-r2 a9c6b4d4486fa522912c3fe6c65de70faa1e8132\norigin/codex/ta-operating-model-r2 21f542d61bb6aa0bad3b2a96a74478bb8a3d1224\norigin/feature/g24-g30-development-completion-routing f34e6b29ae9e7326d1d44b9b03756b450809928f\n",
+      "output_truncated": false
+    },
+    {
+      "command": "git log --oneline --decorate --graph --all --boundary -40",
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T08:29:11.509964+00:00",
+      "ended_utc": "2026-09-10T08:29:11.644834+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "* a9c6b4d (HEAD -> codex/ta-lr-01, origin/codex/review-package-skill-r2, codex/review-package-skill-r2) docs: record REVIEW_PACKAGE_SKILL acceptance\n* 2c17aaa docs: align canonical review-ready lifecycle\n* 42b9987 docs: resolve review package lifecycle findings\n* 79e0b1c docs: require validated external review package before REVIEW_READY\n| * 21f542d (origin/codex/ta-operating-model-r2) docs: record TA operating model R2 acceptance\n|/\n* a82c9ad docs: close acceptance receipt and legacy goal gaps (R2)\n* 902c271 docs: import exact R1 review ZIP as unaccepted comparison snapshot\n* f34e6b2 (origin/feature/g24-g30-development-completion-routing, origin/HEAD) docs(g30): record GitHub continuation verification\n* e65c19b docs(g30): publish verification and cross-machine continuation pack\n* 2bbcb0c (legacy/feature/g24-g30-development-completion-routing) G28-docs-state-sync\n* 789717f G28-UX-workflow-freeze\n* 56c941a docs: checkpoint G27 acceptance provenance\n* 27ff09c feat: accept G27 workflow guards and metrics\n* 7a7dee6 docs:G26-product-state-sync-provenance-clarification\n* 07ebdb8 docs:G26-acceptance-provenance-state-sync\n* 4fd73b5 feat:G26-local-policy-and-WebSurface-internal-acceptance\n* 04d3729 docs(g25): finalize checkpoint provenance and route G26\n* f4168c3 feat(runtime): add conformance adapters and doctor reporting\n* 61cc742 docs(g24): reconcile development ledger and evidence\n* fde4c8f docs(governance): route G24-G30 development completion\n* 0eb56a9 (legacy/feature/g22-rc-hardening-cross-machine-delivery-closeout) docs(g22): reconcile remaining WP-21 evidence count\n* d095447 docs(g22): reconcile cross-machine provenance\n* 9a17716 docs(g22): reconcile delivery evidence limitation\n* c3b0e28 docs(g22): publish cross-machine verification state\n* 532ce8f chore(g22): harden rc delivery evidence\n* ada5e9c (legacy/feature/g21-wp21-real-browser-journey-failure-path) docs(g21): route next goal to G22\n* 7bdef0a test(g21): harden browser evidence harness\n* fb014ef docs(browser): fix G21 evidence links\n* 035088f docs(browser): record pending G21 independent review\n* 1f85ab1 feat(browser): verify bounded G21 browser journey\n* 48062f1 (legacy/feature/g20-web-reproducible-dependency-test-build-gate) docs: record G20 reproducible web gate\n* 1799994 (legacy/feature/g19-canonical-workspace-provenance) docs: publish G19 handoff continuation gate\n* cdc1583 docs: establish G19 canonical continuation lane\n* 730912b (legacy/feature/first-vertical-slice) docs: record CP06 provisional RC acceptance\n* af46ddf docs: clarify CP06 state provenance\n* ed4279c docs: reconcile CP06 RC current state\n* b42abc5 docs: sync current CP06 handoff\n* 8fa1388 fix(extension): redact POSIX and file URI paths\n* b824762 docs: finalize CP06 RC evidence handoff\n* 0db96b1 docs: record CP06 RC hardening handoff\no 175f7b3 test(core): harden CP06 policy migration and compatibility gates\n",
+      "output_truncated": false
+    },
+    {
+      "command": "git rev-list --left-right --count 730912b5a3e19449c355975485f1fe77350a458a...f34e6b29ae9e7326d1d44b9b03756b450809928f",
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T08:29:11.644834+00:00",
+      "ended_utc": "2026-09-10T08:29:11.784472+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "0\t26\n",
+      "output_truncated": false
+    },
+    {
+      "command": "git merge-base 730912b5a3e19449c355975485f1fe77350a458a f34e6b29ae9e7326d1d44b9b03756b450809928f",
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T08:29:11.784472+00:00",
+      "ended_utc": "2026-09-10T08:29:11.889613+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "730912b5a3e19449c355975485f1fe77350a458a\n",
+      "output_truncated": false
+    },
+    {
+      "command": "git merge-base f34e6b29ae9e7326d1d44b9b03756b450809928f a9c6b4d4486fa522912c3fe6c65de70faa1e8132",
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T08:29:11.889613+00:00",
+      "ended_utc": "2026-09-10T08:29:11.995003+00:00",
+      "actual_exit_code": 1,
+      "bounded_output": "",
+      "output_truncated": false
+    },
+    {
+      "command": "git diff --shortstat f34e6b29ae9e7326d1d44b9b03756b450809928f 902c2719e5f6017f7f019284721f59b126f1375d",
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T08:29:11.995003+00:00",
+      "ended_utc": "2026-09-10T08:29:12.143635+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": " 300 files changed, 4464 insertions(+), 83391 deletions(-)\n",
+      "output_truncated": false
+    },
+    {
+      "command": "git branch -r --contains 730912b5a3e19449c355975485f1fe77350a458a",
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T08:29:12.143635+00:00",
+      "ended_utc": "2026-09-10T08:29:12.256544+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "  legacy/feature/first-vertical-slice\n  legacy/feature/g19-canonical-workspace-provenance\n  legacy/feature/g20-web-reproducible-dependency-test-build-gate\n  legacy/feature/g21-wp21-real-browser-journey-failure-path\n  legacy/feature/g22-rc-hardening-cross-machine-delivery-closeout\n  legacy/feature/g24-g30-development-completion-routing\n  origin/HEAD -> origin/feature/g24-g30-development-completion-routing\n  origin/feature/g24-g30-development-completion-routing\n",
+      "output_truncated": false
+    },
+    {
+      "command": "git ls-remote --heads https://github.com/lichen200224-bot/PolyNexus.git",
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T08:29:12.256544+00:00",
+      "ended_utc": "2026-09-10T08:29:13.392716+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "a9c6b4d4486fa522912c3fe6c65de70faa1e8132\trefs/heads/codex/review-package-skill-r2\n21f542d61bb6aa0bad3b2a96a74478bb8a3d1224\trefs/heads/codex/ta-operating-model-r2\nf34e6b29ae9e7326d1d44b9b03756b450809928f\trefs/heads/feature/g24-g30-development-completion-routing\n",
+      "output_truncated": false
+    },
+    {
+      "command": "git -c safe.directory=D:/AI_學習教材/PolyNexus -C D:\\AI_學習教材\\PolyNexus status --short --branch",
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T08:29:13.392716+00:00",
+      "ended_utc": "2026-09-10T08:29:13.643355+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "## feature/first-vertical-slice...backup/feature/first-vertical-slice [behind 22]\n M .agents/rules/polynexus-core.md\n M .agents/skills/polynexus-acceptance/SKILL.md\n M .agents/skills/polynexus-architecture-gate/SKILL.md\n M .agents/skills/polynexus-handoff/SKILL.md\n M .agents/skills/polynexus-implement/SKILL.md\n M .agents/skills/polynexus-review/SKILL.md\n M .agents/skills/polynexus-runtime-conformance/SKILL.md\n M .agents/skills/polynexus-workflow-authoring/SKILL.md\n M AGENTS.md\n M README.md\n M docs/05_GIT_WORKFLOW.md\n M docs/06_AI_TOOL_COLLABORATION.md\n M docs/08_ACCEPTANCE_STRATEGY.md\n M docs/10_DECISION_LOG.md\n M docs/11_PROJECT_STATE.md\n M docs/12_HANDOFF_CURRENT.md\n M docs/15_DOCUMENT_INDEX.md\n M docs/28_MASTER_DEVELOPMENT_ROADMAP.md\n M docs/tasks/WP-12.md\n M services/core/src/polynexus_core/runtime/contracts.py\n M services/core/src/polynexus_core/runtime/registry.py\n?? .agents/skills/polynexus-cross-machine-handoff/\n?? .agents/skills/polynexus-goal-execution/\n?? .agents/skills/polynexus-independent-acceptance/\n?? .agents/skills/polynexus-review-package/\n?? apps/web/dist-review/\n?? competition/G03_SUBMISSION_REQUIREMENTS_AND_CHECKLIST.md\n?? competition/PolyNexus_預期功能簡報_v1.pptx\n?? competition/PolyNexus_預期功能簡報說明_v1.md\n?? docs.zip\n?? docs/31_PROJECT_CONTENT_MAP.md\n?? docs/GOAL_COMPLETION_CONTROL_PANEL.html\n?? docs/GOAL_COMPLETION_CONTROL_PANEL.md\n?? docs/IMPLEMENTATION_CURRENT_GOAL.md\n?? docs/goals/\n?? docs/governance/POLYNEXUS_DEVELOPMENT_AGENT_CAPABILITY_MATRIX.md\n?? docs/governance/POLYNEXUS_LEGACY_OPEN_WORK_RECONCILIATION.md\n?? docs/governance/POLYNEXUS_TRACK_A_GOAL_EXECUTION_FRAMEWORK.md\n?? docs/handoffs/\n?? docs/reviews/\n?? docs/tasks/G03-COMP-02-03-INITIAL-REVIEW-READINESS.md\n?? docs/tasks/G12-DOC-PROVENANCE-RECONCILIATION.md\n?? docs/tasks/G13-COUNCIL-RUN-BINDING-SAFETY-GATE.md\n?? docs/tasks/G14-RUNTIME-CANCELLATION-CLEANUP-GATE.md\n?? docs/tasks/G19-G23-FIVE-GOAL-EXECUTION-ROUTING.md\n?? docs/tasks/RUNTIME-ADAPTER-CONFORMANCE.md\n?? docs/tasks/WP-14.md\n?? initial-review-v1/\n?? initial-review-v2/\n?? output/\n?? review_work/\n?? scripts/build_initial_review_artifacts.js\n?? scripts/build_initial_review_v2.py\n?? scripts/gen_expected_ppt.py\n?? scripts/review_extract.js\n?? scripts/verify_initial_review_artifacts.js\n?? scripts/verify_initial_review_v2.py\n?? services/core/src/polynexus_core/runtime/codex.py\n?? services/core/tests/test_runtime_registry_conformance.py\n?? services/core/tests/test_wp14_codex_runtime.py\n",
+      "output_truncated": false
+    },
+    {
+      "command": "git -c safe.directory=D:/AI_學習教材/PolyNexus -C D:\\AI_學習教材\\PolyNexus rev-parse HEAD",
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T08:29:13.643355+00:00",
+      "ended_utc": "2026-09-10T08:29:13.744371+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "b87a0dc780e5d9a3bba083dbaf9552ca52508f9a\n",
+      "output_truncated": false
+    },
+    {
+      "command": "git -c safe.directory=D:/AI_學習教材/PolyNexus -C D:\\AI_學習教材\\PolyNexus branch -vv",
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T08:29:13.744371+00:00",
+      "ended_utc": "2026-09-10T08:29:14.021042+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "+ codex/goal-governance-v1-2                                 5d1bd60 (D:/AI學習教材/PolyNexus/artifacts/worktrees/goal-governance-v1-2) docs(governance): establish Codex goal governance v1.2\n+ codex/goal-objective-v1                                    2552c45 (D:/AI學習教材/PolyNexus/artifacts/worktrees/goal-objective-v1) docs(governance): add Codex Goal objective\n+ codex/phase-a-minimal-requirements                         8750e7e (D:/AI學習教材/PolyNexus/artifacts/worktrees/phase-a-minimal-requirements) docs: checkpoint Phase A foundation state\n  develop                                                    3a38cc2 [baseline/develop: ahead 4] docs: checkpoint shared development state\n+ docs/runtime-contract-foundation                           d6823d6 (D:/AI學習教材/PolyNexus-runtime-contract-docs) feat(core): accept WP-12 council orchestration\n* feature/first-vertical-slice                               b87a0dc [backup/feature/first-vertical-slice: behind 22] docs: record G02 checkpoint metadata\n+ feature/g30-final-external-verification-and-reconciliation b87a0dc (D:/AI學習教材/PolyNexus/artifacts/worktrees/g30-final-external-verification) [backup/feature/first-vertical-slice: behind 22] docs: record G02 checkpoint metadata\n+ feature/g30-final-external-verification-g29-tip            f34e6b2 (D:/AI學習教材/PolyNexus/artifacts/worktrees/g30-final-external-verification-g29-tip) [backup/feature/g24-g30-development-completion-routing: ahead 2] docs(g30): record GitHub continuation verification\n+ feature/wp22-workflow-templates                            b87a0dc (D:/AI學習教材/PolyNexus/artifacts/worktrees/wp22-templates) docs: record G02 checkpoint metadata\n+ g05-runtime-registry-exception-fix                         78835f8 (D:/AI學習教材/PolyNexus/artifacts/worktrees/g05-runtime-registry-exception-fix) docs(runtime): finalize G05 acceptance state\n  main                                                       fe6d78f [baseline/main] chore: align primary Windows workspace profile\n  opencode/shiny-planet                                      b87a0dc docs: record G02 checkpoint metadata\n+ runtime-registry-conformance                               f0b581d (D:/AI學習教材/PolyNexus-runtime-registry-conformance) docs(runtime): document final checkpoint convention\n+ wp14-codex-runtime                                         4504932 (D:/AI學習教材/PolyNexus/artifacts/worktrees/wp14-codex-runtime) docs(runtime): reconcile WP-14 factual checkpoint state\n+ wp14-codex-runtime-fix                                     6321243 (D:/AI學習教材/PolyNexus/artifacts/worktrees/wp14-codex-runtime-fix) docs(runtime): finalize WP-14 post-gate evidence\n+ wp15-opencode-readonly-fix                                 8692e2b (C:/Users/hikar/.local/share/opencode/worktree/d25c8a5c3c94666fcd1f997cd39c42c9b8ff8334/shiny-planet) fix(runtime): sanitize OpenCode runtime references\n+ wp15-opencode-runtime                                      05b2633 (D:/AI學習教材/PolyNexus/runtime-data/wp15-opencode-runtime) docs: record WP-15 acceptance checkpoint\n",
+      "output_truncated": false
+    },
+    {
+      "command": "git -c safe.directory=D:/AI_學習教材/PolyNexus -C D:\\AI_學習教材\\PolyNexus worktree list --porcelain",
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T08:29:14.021042+00:00",
+      "ended_utc": "2026-09-10T08:29:14.202047+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "worktree D:/AI_學習教材/PolyNexus\nHEAD b87a0dc780e5d9a3bba083dbaf9552ca52508f9a\nbranch refs/heads/feature/first-vertical-slice\n\nworktree C:/Users/hikar/.codex/worktrees/1e3d/PolyNexus\nHEAD 63212435d1f0030c50842f728a9615ca6306be47\ndetached\n\nworktree C:/Users/hikar/.codex/worktrees/4e1d/PolyNexus\nHEAD b87a0dc780e5d9a3bba083dbaf9552ca52508f9a\ndetached\n\nworktree C:/Users/hikar/.codex/worktrees/ef2e/PolyNexus\nHEAD 78835f85ae0a8890d9cca3a67daf5c3145f02749\ndetached\n\nworktree C:/Users/hikar/.local/share/opencode/worktree/d25c8a5c3c94666fcd1f997cd39c42c9b8ff8334/shiny-planet\nHEAD 8692e2b8cf19e2706c8f4bfe67822b600472506c\nbranch refs/heads/wp15-opencode-readonly-fix\n\nworktree D:/AI學習教材/PolyNexus-runtime-contract-docs\nHEAD d6823d6d7ab9a5cfbbe28b898cd642a189f3b29c\nbranch refs/heads/docs/runtime-contract-foundation\nprunable gitdir file points to non-existent location\n\nworktree D:/AI學習教材/PolyNexus-runtime-registry-conformance\nHEAD f0b581d70f4009e681496555f79621371f44b3c7\nbranch refs/heads/runtime-registry-conformance\nprunable gitdir file points to non-existent location\n\nworktree D:/AI學習教材/PolyNexus/artifacts/worktrees/g05-runtime-registry-exception-fix\nHEAD 78835f85ae0a8890d9cca3a67daf5c3145f02749\nbranch refs/heads/g05-runtime-registry-exception-fix\nprunable gitdir file points to non-existent location\n\nworktree D:/AI學習教材/PolyNexus/artifacts/worktrees/g30-final-external-verification\nHEAD b87a0dc780e5d9a3bba083dbaf9552ca52508f9a\nbranch refs/heads/feature/g30-final-external-verification-and-reconciliation\nprunable gitdir file points to non-existent location\n\nworktree D:/AI學習教材/PolyNexus/artifacts/worktrees/g30-final-external-verification-g29-tip\nHEAD f34e6b29ae9e7326d1d44b9b03756b450809928f\nbranch refs/heads/feature/g30-final-external-verification-g29-tip\nprunable gitdir file points to non-existent location\n\nworktree D:/AI學習教材/PolyNexus/artifacts/worktrees/goal-governance-v1-2\nHEAD 5d1bd60767854d452fb055b0d7ba185e8ab8fa44\nbranch refs/heads/codex/goal-governance-v1-2\nprunable gitdir file points to non-existent location\n\nworktree D:/AI學習教材/PolyNexus/artifacts/worktrees/goal-objective-v1\nHEAD 2552c454fd1ce1c6a6de384aa534627870448489\nbranch refs/heads/codex/goal-objective-v1\nprunable gitdir file points to non-existent location\n\nworktree D:/AI學習教材/PolyNexus/artifacts/worktrees/phase-a-minimal-requirements\nHEAD 8750e7e704b6f2e37718bf4f652908c645004bed\nbranch refs/heads/codex/phase-a-minimal-requirements\nprunable gitdir file points to non-existent location\n\nworktree D:/AI學習教材/PolyNexus/artifacts/worktrees/wp14-codex-runtime\nHEAD 4504932a1dfa35a70c2debbdbce963e3948a2f35\nbranch refs/heads/wp14-codex-runtime\nprunable gitdir file points to non-existent location\n\nworktree D:/AI學習教材/PolyNexus/artifacts/worktrees/wp14-codex-runtime-fix\nHEAD 63212435d1f0030c50842f728a9615ca6306be47\nbranch refs/heads/wp14-codex-runtime-fix\nprunable gitdir file points to non-existent location\n\nworktree D:/AI學習教材/PolyNexus/artifacts/worktrees/wp22-templates\nHEAD b87a0dc780e5d9a3bba083dbaf9552ca52508f9a\nbranch refs/heads/feature/wp22-workflow-templates\nprunable gitdir file points to non-existent location\n\nworktree D:/AI學習教材/PolyNexus/runtime-data/wp15-opencode-runtime\nHEAD 05b263351662ce557e12f9cda4a89e7bd4f02aa9\nbranch refs/heads/wp15-opencode-runtime\nprunable gitdir file points to non-existent location\n\n",
+      "output_truncated": false
+    },
+    {
+      "command": "git -c safe.directory=D:/AI_學習教材/PolyNexus -C D:\\AI_學習教材\\PolyNexus diff --name-only",
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T08:29:14.202047+00:00",
+      "ended_utc": "2026-09-10T08:29:14.342524+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": ".agents/rules/polynexus-core.md\n.agents/skills/polynexus-acceptance/SKILL.md\n.agents/skills/polynexus-architecture-gate/SKILL.md\n.agents/skills/polynexus-handoff/SKILL.md\n.agents/skills/polynexus-implement/SKILL.md\n.agents/skills/polynexus-review/SKILL.md\n.agents/skills/polynexus-runtime-conformance/SKILL.md\n.agents/skills/polynexus-workflow-authoring/SKILL.md\nAGENTS.md\nREADME.md\ndocs/05_GIT_WORKFLOW.md\ndocs/06_AI_TOOL_COLLABORATION.md\ndocs/08_ACCEPTANCE_STRATEGY.md\ndocs/10_DECISION_LOG.md\ndocs/11_PROJECT_STATE.md\ndocs/12_HANDOFF_CURRENT.md\ndocs/15_DOCUMENT_INDEX.md\ndocs/28_MASTER_DEVELOPMENT_ROADMAP.md\ndocs/tasks/WP-12.md\nservices/core/src/polynexus_core/runtime/contracts.py\nservices/core/src/polynexus_core/runtime/registry.py\nwarning: in the working copy of 'services/core/src/polynexus_core/runtime/registry.py', CRLF will be replaced by LF the next time Git touches it\n",
+      "output_truncated": false
+    },
+    {
+      "command": "git -c safe.directory=D:/AI_學習教材/PolyNexus -C D:\\AI_學習教材\\PolyNexus diff --cached --name-only",
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+      "started_utc": "2026-09-10T08:29:14.342524+00:00",
+      "ended_utc": "2026-09-10T08:29:14.451591+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "",
+      "output_truncated": false
+    },
+    {
+      "command": "git rev-parse HEAD",
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repro-730",
+      "started_utc": "2026-09-10T08:29:14.451591+00:00",
+      "ended_utc": "2026-09-10T08:29:14.535021+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "730912b5a3e19449c355975485f1fe77350a458a\n",
+      "output_truncated": false
+    },
+    {
+      "command": "git status --short --branch",
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repro-730",
+      "started_utc": "2026-09-10T08:29:14.535021+00:00",
+      "ended_utc": "2026-09-10T08:29:14.671190+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "## HEAD (no branch)\n",
+      "output_truncated": false
+    },
+    {
+      "command": "git remote -v",
+      "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repro-730",
+      "started_utc": "2026-09-10T08:29:14.671190+00:00",
+      "ended_utc": "2026-09-10T08:29:14.759705+00:00",
+      "actual_exit_code": 0,
+      "bounded_output": "origin\thttps://github.com/lichen200224-bot/PolyNexus.git (fetch)\norigin\thttps://github.com/lichen200224-bot/PolyNexus.git (push)\n",
+      "output_truncated": false
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "goal_id": "TA-LR-01",
+  "executed_utc": "2026-09-10T08:29:22.303256+00:00",
+  "status": "PASS",
+  "checks": [
+    {
+      "check_id": "ITEM_LEDGER_SCHEMA",
+      "status": "PASS",
+      "detail": "51 items complete"
+    },
+    {
+      "check_id": "INVENTORY_EQUALS_CLASSIFIED",
+      "status": "PASS",
+      "detail": "51"
+    },
+    {
+      "check_id": "UNIQUE_ITEM_IDS",
+      "status": "PASS",
+      "detail": "no duplicates"
+    },
+    {
+      "check_id": "ONE_PRIMARY_DESTINATION",
+      "status": "PASS",
+      "detail": "one enum value per item"
+    },
+    {
+      "check_id": "UNKNOWN_PRESERVED",
+      "status": "PASS",
+      "detail": "all uncertain items have preservation refs"
+    },
+    {
+      "check_id": "NEGATIVE_DUPLICATE_REJECTED",
+      "status": "PASS",
+      "detail": "forced duplicate fails"
+    },
+    {
+      "check_id": "NEGATIVE_MISSING_DESTINATION_REJECTED",
+      "status": "PASS",
+      "detail": "forced missing destination fails"
+    },
+    {
+      "check_id": "NEGATIVE_MULTI_DESTINATION_REJECTED",
+      "status": "PASS",
+      "detail": "forced list destination fails"
+    },
+    {
+      "check_id": "EXACT_WRITE_SCOPE",
+      "status": "PASS",
+      "detail": "10 changed files within allowlist"
+    },
+    {
+      "check_id": "NO_PRODUCT_CODE_CHANGE",
+      "status": "PASS",
+      "detail": "none"
+    },
+    {
+      "check_id": "NO_FORMAL_FROZEN_DOC_CHANGE",
+      "status": "PASS",
+      "detail": "none"
+    },
+    {
+      "check_id": "SAFE_PREDECESSOR_REMOTE_REPRODUCIBLE",
+      "status": "PASS",
+      "detail": "730912b5a3e19449c355975485f1fe77350a458a"
+    },
+    {
+      "check_id": "DIRTY_INVENTORY_CAPTURED",
+      "status": "PASS",
+      "detail": "tracked=21 untracked=2036 staged=0"
+    },
+    {
+      "check_id": "SENSITIVE_CORPUS_NOT_COPIED",
+      "status": "PASS",
+      "detail": "PATH_COUNTS_ONLY_NO_CONTENT_COPIED_OR_HASHED"
+    }
+  ],
+  "mandatory_skipped": [],
+  "failed_checks": [],
+  "command": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\validate_ta_lr.py . --write-result docs/reviews/TA-LR-01/self-validation.json",
+  "cwd": "C:\\Users\\hikar\\.codex\\visualizations\\2026\\09\\10\\01a08991-4685-77a0-8381-cf074788bd6c\\ta-lr-01\\repository",
+  "actual_exit_code": 0
+}

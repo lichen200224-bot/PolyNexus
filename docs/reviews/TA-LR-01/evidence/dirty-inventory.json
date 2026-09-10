@@ -1,0 +1,660 @@
+{
+  "schema_version": 1,
+  "captured_utc": "2026-09-10T08:29:17.504628+00:00",
+  "repository": "D:\\AI_學習教材\\PolyNexus",
+  "head": "b87a0dc780e5d9a3bba083dbaf9552ca52508f9a",
+  "tracked_modified_count": 21,
+  "staged_count": 0,
+  "untracked_count": 2036,
+  "tracked_modified": [
+    {
+      "path": ".agents/rules/polynexus-core.md",
+      "head_blob": "93e92771955037ab55b5bab6195c7e555246f5b2",
+      "working_sha256": "6aa713e24d3274615099a1de4d86130cc00240aa58bca9d0abb336869a27dd41",
+      "size_bytes": 578
+    },
+    {
+      "path": ".agents/skills/polynexus-acceptance/SKILL.md",
+      "head_blob": "c3dd2df4993b6569bbf53b2431211a266eed4b1e",
+      "working_sha256": "8b57f567a109f994989f48cdb70c7fa124f50b1a68a3e19d3208f072005bb527",
+      "size_bytes": 1540
+    },
+    {
+      "path": ".agents/skills/polynexus-architecture-gate/SKILL.md",
+      "head_blob": "ee38f659075f3b5c78be38ce34dddb3852a478c8",
+      "working_sha256": "eed6053994983233b528f46ffe2d080e2016e87bb2800f2ed901c80e487a300a",
+      "size_bytes": 1576
+    },
+    {
+      "path": ".agents/skills/polynexus-handoff/SKILL.md",
+      "head_blob": "9d8a5534a3df552f71939c1783e20db1684a8813",
+      "working_sha256": "f78e36b054f3b8cbd8bb40d92cd2080c21b81d9c62f044e6849a10403c81671f",
+      "size_bytes": 1340
+    },
+    {
+      "path": ".agents/skills/polynexus-implement/SKILL.md",
+      "head_blob": "a34b7276df33d69e5a85a471e5d9d668267ac0dc",
+      "working_sha256": "e72d33d2199b02d907c261dcdfe84f771812da5f7771714735e1ae0646d1bdfc",
+      "size_bytes": 1451
+    },
+    {
+      "path": ".agents/skills/polynexus-review/SKILL.md",
+      "head_blob": "5f706fc23915398563265803b7d6cffc5226c299",
+      "working_sha256": "fafc65c7fe6863ceca472f7021e829177a0043ca1cae5bc43bcd66965f67b14d",
+      "size_bytes": 1415
+    },
+    {
+      "path": ".agents/skills/polynexus-runtime-conformance/SKILL.md",
+      "head_blob": "2fe47db3522b475092e1329156c0ad045d8b4ecf",
+      "working_sha256": "00b3be3aa6cac4d20703ab4134583f7cb96e4a9bb1589b76a9ad417ff34821df",
+      "size_bytes": 1501
+    },
+    {
+      "path": ".agents/skills/polynexus-workflow-authoring/SKILL.md",
+      "head_blob": "506db90972913f5e6d9ab1e355c532718cf7c068",
+      "working_sha256": "6fce636553b2fa35f106191f9c2750de10a11633e4e00a13d3dac91536e6c226",
+      "size_bytes": 1400
+    },
+    {
+      "path": "AGENTS.md",
+      "head_blob": "9834d5134f6cafe903d149301b88d6e575c08f10",
+      "working_sha256": "cf56072d12868ecceeac70f08133eaadf1a82be0b3177848ec7b1abc3f4bb100",
+      "size_bytes": 10204
+    },
+    {
+      "path": "README.md",
+      "head_blob": "ac909e25232931d3c815bb3b294a99f66eb9a7af",
+      "working_sha256": "4b2d75cc4af06e6f08ce275e83d94d9f249dfd5739a1f19b1ad72626972933f5",
+      "size_bytes": 2921
+    },
+    {
+      "path": "docs/05_GIT_WORKFLOW.md",
+      "head_blob": "de2e5d69869103e79f0e5a1be62447cd672cb1a7",
+      "working_sha256": "0f4518f2fe47396678ae8791acbecd8cb774a1966751b7465e251ef4ee043f68",
+      "size_bytes": 9251
+    },
+    {
+      "path": "docs/06_AI_TOOL_COLLABORATION.md",
+      "head_blob": "bd585e80048d30a8ae55399d719a976a74c1a1b9",
+      "working_sha256": "1655ab9dfeebbbdd4855819357a5280cd0e35ce0409e2f848e62c92175333940",
+      "size_bytes": 8604
+    },
+    {
+      "path": "docs/08_ACCEPTANCE_STRATEGY.md",
+      "head_blob": "910b1f919331e38c8e7e909ff25470937470db6a",
+      "working_sha256": "90f29a1901ddcdf351ef68ad783cac0ae0af2b2befd7ba41a741f0f02d98dde2",
+      "size_bytes": 8379
+    },
+    {
+      "path": "docs/10_DECISION_LOG.md",
+      "head_blob": "618fc474ed794630d6ac341870feab566dafaeed",
+      "working_sha256": "340b09023c9de0d7fb9b8778785df68acf744a15470c0e4b31ac6978387b12dd",
+      "size_bytes": 6359
+    },
+    {
+      "path": "docs/11_PROJECT_STATE.md",
+      "head_blob": "8732ecf74ba13954c9d7489ebd6ae5425b86bdf7",
+      "working_sha256": "7424f6b84b0cabb3327bc4c7d5ee6e3ac97a531eb7b1502133eb143d577b1d60",
+      "size_bytes": 34676
+    },
+    {
+      "path": "docs/12_HANDOFF_CURRENT.md",
+      "head_blob": "6b61357f05d44f26876b515a151e919f7f5512f7",
+      "working_sha256": "fed5abe2859390f579f95797bf756a5fe124121980f8a469dbb005dd850d6c3c",
+      "size_bytes": 162378
+    },
+    {
+      "path": "docs/15_DOCUMENT_INDEX.md",
+      "head_blob": "f4166d0a43296d4756dd798eb24545a31e82a11f",
+      "working_sha256": "e861d339b686b8a1ce9ce45c4207c9dca349a0d7787c4bc3c8486ce396b4fce9",
+      "size_bytes": 3344
+    },
+    {
+      "path": "docs/28_MASTER_DEVELOPMENT_ROADMAP.md",
+      "head_blob": "4de9e972786e2a2b854879873a162c2fbe8a4984",
+      "working_sha256": "1a359c260dab43c87c43cbf84f64449cb91960a1903d82272f65b85ac72fc174",
+      "size_bytes": 25660
+    },
+    {
+      "path": "docs/tasks/WP-12.md",
+      "head_blob": "40b518315444fd2badae0d3f4eaaf65d5f5dca1b",
+      "working_sha256": "0ee9f8dab38a2c6c46edf6a5b7d35e448d0bd0caf1797144545026695a3ab6e7",
+      "size_bytes": 33121
+    },
+    {
+      "path": "services/core/src/polynexus_core/runtime/contracts.py",
+      "head_blob": "b344d26ca2a34ef7a27adb54d5db1c1d249b7c07",
+      "working_sha256": "6ceb67aee6e89cf28cf80edd1db032632154b3e3f83c77b6cea2e9092eee4b9b",
+      "size_bytes": 2583
+    },
+    {
+      "path": "services/core/src/polynexus_core/runtime/registry.py",
+      "head_blob": "c413e8f6e04c796632e9182e20e6d557d106b49e",
+      "working_sha256": "b4b67828e149b6ab732ec9feefa9d22f62cda33cbe6780526fe0100433509e84",
+      "size_bytes": 6847
+    }
+  ],
+  "non_review_work_untracked": [
+    {
+      "path": ".agents/skills/polynexus-cross-machine-handoff/SKILL.md",
+      "kind": "file",
+      "size_bytes": 2407,
+      "sha256": "0399446531489f58f6f12cf9f9fb57016adf3f1e8681f3bec4650f71f4ab6888"
+    },
+    {
+      "path": ".agents/skills/polynexus-goal-execution/SKILL.md",
+      "kind": "file",
+      "size_bytes": 2521,
+      "sha256": "43ad47b03acd84233e6b4da1ccde0074cead998b5b4135e8591459fe2fa42eca"
+    },
+    {
+      "path": ".agents/skills/polynexus-independent-acceptance/SKILL.md",
+      "kind": "file",
+      "size_bytes": 2649,
+      "sha256": "d09346da29c1122f71a0d5b9fed1d2d484ead2ae5f539ca705098d76547b692b"
+    },
+    {
+      "path": ".agents/skills/polynexus-review-package/SKILL.md",
+      "kind": "file",
+      "size_bytes": 12856,
+      "sha256": "d2f4d2a1275d4369fc7a186b20300ad2dafdb95f74837d6c8f03a67ba43f42cd"
+    },
+    {
+      "path": ".agents/skills/polynexus-review-package/references/package-fields.json",
+      "kind": "file",
+      "size_bytes": 2561,
+      "sha256": "bdac22d5fc0e0778090a49d58d0d2969ac3a61d836d680b72be103ce7b1362b4"
+    },
+    {
+      "path": ".agents/skills/polynexus-review-package/scripts/validate_package.py",
+      "kind": "file",
+      "size_bytes": 9417,
+      "sha256": "4cb4d9bef853d57adf88c038546eb9db8fbc9939b08d70d58f47c77aebb5be42"
+    },
+    {
+      "path": "apps/web/dist-review/assets/index-CtSFl1QP.css",
+      "kind": "file",
+      "size_bytes": 5156,
+      "sha256": "320e265cf60d8fa74933253062655d7a86fbffb98abc00647ffc2bf63464de7c"
+    },
+    {
+      "path": "apps/web/dist-review/assets/index-VnGdN0Oi.js",
+      "kind": "file",
+      "size_bytes": 215393,
+      "sha256": "79f66498b80c767c1e045167a103ef1a64a0e0922d6d5ca028b3a8945f8dba82"
+    },
+    {
+      "path": "apps/web/dist-review/index.html",
+      "kind": "file",
+      "size_bytes": 394,
+      "sha256": "8da961add54bca350d18985f458da48cb8f7bb8d1a333a22206c08fa1d9ab0ed"
+    },
+    {
+      "path": "competition/G03_SUBMISSION_REQUIREMENTS_AND_CHECKLIST.md",
+      "kind": "file",
+      "size_bytes": 13296,
+      "sha256": "2521f15b12b1666fdf6b5b176cf002c9e65e70d109b7acabcb1c76c1b073a2df"
+    },
+    {
+      "path": "competition/PolyNexus_預期功能簡報_v1.pptx",
+      "kind": "file",
+      "size_bytes": 69615,
+      "sha256": "46cebfe906ceb3d7b502511b63d52adaf9ee92193b2f9b6adb4d12466d2b76df"
+    },
+    {
+      "path": "competition/PolyNexus_預期功能簡報說明_v1.md",
+      "kind": "file",
+      "size_bytes": 28014,
+      "sha256": "723878987b09505025401315b96f8e469279cbbd96e9f4751f2583900fa20216"
+    },
+    {
+      "path": "docs.zip",
+      "kind": "file",
+      "size_bytes": 265115,
+      "sha256": "b2384150380461b01d30d5d86368460b3dbe4ff5a4092deeaf91dc5eeca9396b"
+    },
+    {
+      "path": "docs/31_PROJECT_CONTENT_MAP.md",
+      "kind": "file",
+      "size_bytes": 17992,
+      "sha256": "0eebb743443afd1f849b116a845dc18d83709c2c1002bffb12007c3cbbd11461"
+    },
+    {
+      "path": "docs/GOAL_COMPLETION_CONTROL_PANEL.html",
+      "kind": "file",
+      "size_bytes": 11660,
+      "sha256": "b006d3fe8f9a829a0ed468e047239ad67bb22b2c7999d714d56cc59bb1af0379"
+    },
+    {
+      "path": "docs/GOAL_COMPLETION_CONTROL_PANEL.md",
+      "kind": "file",
+      "size_bytes": 12160,
+      "sha256": "32edd1f70578c390bd3b1fdee1f4974d4531b4787716b4bac71ca1960942ecae"
+    },
+    {
+      "path": "docs/IMPLEMENTATION_CURRENT_GOAL.md",
+      "kind": "file",
+      "size_bytes": 3047,
+      "sha256": "d53b936881287236c9fa73adfcf01fcc088c423f834a7a04969f353b3db43a87"
+    },
+    {
+      "path": "docs/goals/REVIEW_PACKAGE_SKILL.md",
+      "kind": "file",
+      "size_bytes": 3687,
+      "sha256": "df42dae469294f191684c00f1763c682603ab42c1d1973f1e91056c3c8d39140"
+    },
+    {
+      "path": "docs/goals/TA-F1.md",
+      "kind": "file",
+      "size_bytes": 5744,
+      "sha256": "1f29f76e7f69d5bd97e953d23e30af3b98651260f8eb5c06500b9171ef885aec"
+    },
+    {
+      "path": "docs/goals/TA-F2.md",
+      "kind": "file",
+      "size_bytes": 5420,
+      "sha256": "05d23f6e2b2091a0ae45a4f5f45da95751ef637ff41a1d105d5e2b2b6af9df7b"
+    },
+    {
+      "path": "docs/goals/TA-F3.md",
+      "kind": "file",
+      "size_bytes": 5552,
+      "sha256": "1ebd3f39e93554dbe1a2766b6c4b169c08715c56ae37148f3b77e56da6d6363b"
+    },
+    {
+      "path": "docs/goals/TA-F4.md",
+      "kind": "file",
+      "size_bytes": 5586,
+      "sha256": "da420d204169d7839b42d12e1e9055e619fc57f515944d2fa7496d68dd20065d"
+    },
+    {
+      "path": "docs/goals/TA-LR-01.md",
+      "kind": "file",
+      "size_bytes": 11303,
+      "sha256": "71986faaae8b6c6787e93dcb979a06b1dabcad1e7aa4f36bb010744925a16b76"
+    },
+    {
+      "path": "docs/goals/TA-S0-G01.md",
+      "kind": "file",
+      "size_bytes": 5749,
+      "sha256": "2707acd5b6cae814b3b1ba9e60145ade92112a2ab5914966bf4c7f3237e28b95"
+    },
+    {
+      "path": "docs/goals/TA-S0-G02.md",
+      "kind": "file",
+      "size_bytes": 5536,
+      "sha256": "7df5fd727a70dbcda1b6b6d0300f168f69b0495a73d9abee3ab0116ba112c3ea"
+    },
+    {
+      "path": "docs/goals/TA-S0-G03.md",
+      "kind": "file",
+      "size_bytes": 5714,
+      "sha256": "d48478ccc4b1e40a52df5422ba26aff1c950d8c6dabb53763393a74b10be16cf"
+    },
+    {
+      "path": "docs/goals/TA-W1-G01.md",
+      "kind": "file",
+      "size_bytes": 5795,
+      "sha256": "59a0f27bbb58e081fa2daf9e9e578ff2e9d3ddc9efd6590dfe4011a3e8954fed"
+    },
+    {
+      "path": "docs/goals/TA-W1-G02.md",
+      "kind": "file",
+      "size_bytes": 5749,
+      "sha256": "d65545a2623f7720b00c3662c62669137d298dabe484faa5551a7f40c4d7f052"
+    },
+    {
+      "path": "docs/goals/TA-W1-G03.md",
+      "kind": "file",
+      "size_bytes": 5792,
+      "sha256": "fd563f37b00508048968f891b7366cdb12e98ab106f97a82f6e8b6f67cbe2d46"
+    },
+    {
+      "path": "docs/goals/_GOAL_TEMPLATE.md",
+      "kind": "file",
+      "size_bytes": 5120,
+      "sha256": "82ef4ce35604d21f71a86e0183488e4870584c630a2c9d7e1f5374f0cec53093"
+    },
+    {
+      "path": "docs/governance/POLYNEXUS_DEVELOPMENT_AGENT_CAPABILITY_MATRIX.md",
+      "kind": "file",
+      "size_bytes": 4562,
+      "sha256": "8ea0d988393e0cb36a635de862748eb74b536b5e5181f9b571cc26c0515d703b"
+    },
+    {
+      "path": "docs/governance/POLYNEXUS_LEGACY_OPEN_WORK_RECONCILIATION.md",
+      "kind": "file",
+      "size_bytes": 12730,
+      "sha256": "4230f4cfff01bc69a46c31e6459b39204a33303df71ab07515e59c153c58aa54"
+    },
+    {
+      "path": "docs/governance/POLYNEXUS_TRACK_A_GOAL_EXECUTION_FRAMEWORK.md",
+      "kind": "file",
+      "size_bytes": 26718,
+      "sha256": "760405d2cfa31db448b14a5aeedb871219a3aafd46a9fcd5820c53dee9e9f0bb"
+    },
+    {
+      "path": "docs/handoffs/_HANDOFF_TEMPLATE.md",
+      "kind": "file",
+      "size_bytes": 3480,
+      "sha256": "1fe21b42f06fb4268cf65f1c38fc8bdb6f8c77fba2a850a50117b047614c48a5"
+    },
+    {
+      "path": "docs/reviews/GATE_2_CONTRACT_ARCHITECTURE_PACKAGE.md",
+      "kind": "file",
+      "size_bytes": 59150,
+      "sha256": "4abb100df82f9475e244561491a1ffcb8662c16a4ad9bd3cc534237addd5d52d"
+    },
+    {
+      "path": "docs/reviews/GATE_2_CONTRACT_ARCHITECTURE_PACKAGE_REV1.md",
+      "kind": "file",
+      "size_bytes": 85938,
+      "sha256": "acb67374384bc2febff0ff288d739dba8c92ac93c8a709b43500fc5fa10ed1de"
+    },
+    {
+      "path": "docs/reviews/GATE_2_INPUT_BASELINE.md",
+      "kind": "file",
+      "size_bytes": 14038,
+      "sha256": "2befa66ee1d847f6b509589c10f3062922bcddaed5e097884687712a629b7264"
+    },
+    {
+      "path": "docs/reviews/GATE_2_TARGET_PRODUCT_ARCHITECTURE_PLANNING.md",
+      "kind": "file",
+      "size_bytes": 25390,
+      "sha256": "87091d55022fac4bb892a5990ace95b4aa42aba5f46098b25ce812acb718b235"
+    },
+    {
+      "path": "docs/reviews/POLYNEXUS_AS_IS_DISCOVERY_2026-09-09.md",
+      "kind": "file",
+      "size_bytes": 39363,
+      "sha256": "b06884fd242fc3cbd95be3373ef1a6bdaccced37cb8ae21998a6c89d4186c04b"
+    },
+    {
+      "path": "docs/reviews/POLYNEXUS_FORMAL_CONTRACT_ADR_CHANGE_PLAN.md",
+      "kind": "file",
+      "size_bytes": 17310,
+      "sha256": "eee3b34a39568dbf0c9197f4460b679f560a09666a467ecf39781eb1887c5a27"
+    },
+    {
+      "path": "docs/reviews/POLYNEXUS_GATE_1_5_HUMAN_DECISION_BASELINE_2026-09-09.md",
+      "kind": "file",
+      "size_bytes": 64935,
+      "sha256": "dde3de9b9c7941893122bf5c3019d205112e919f076208395af30fb3c128ce35"
+    },
+    {
+      "path": "docs/reviews/POLYNEXUS_TRACK_A_IMPLEMENTATION_WORK_PACKAGES.md",
+      "kind": "file",
+      "size_bytes": 39896,
+      "sha256": "1b5b92edd1bde84534b4e5b9081fe0a9c1a271aabc50688e8e43ee41e33f7cb5"
+    },
+    {
+      "path": "docs/reviews/POLYNEXUS_TRACK_A_V1_ARCHITECTURE_FREEZE_RECORD.md",
+      "kind": "file",
+      "size_bytes": 14486,
+      "sha256": "6ec3c547276d24e461d7e57b4a9ab0108538e188c38aadc8d319563bcd44519f"
+    },
+    {
+      "path": "docs/reviews/TA-OPERATING-MODEL-REVIEW.md",
+      "kind": "file",
+      "size_bytes": 16798,
+      "sha256": "f8ea63331d11d8d9d9e5b7fa1315afa6ffbf76f1b47309e932f5228a81b88039"
+    },
+    {
+      "path": "docs/reviews/TA-OPERATING-MODEL/NEED_FIX_R2.md",
+      "kind": "file",
+      "size_bytes": 1695,
+      "sha256": "0f962579b9b109158ff797f78c82c1908a61373a82cf2ed51bdc1a1f77838a55"
+    },
+    {
+      "path": "docs/reviews/_REVIEW_PACKET_TEMPLATE.md",
+      "kind": "file",
+      "size_bytes": 5261,
+      "sha256": "5a11597b9e2abfc9dc2ce864d26c6a79b0c6613ee85b8ecdd901e45947f41fbc"
+    },
+    {
+      "path": "docs/tasks/G03-COMP-02-03-INITIAL-REVIEW-READINESS.md",
+      "kind": "file",
+      "size_bytes": 53649,
+      "sha256": "067771182e1d6bf8010427e86b56aa145a9aeb70bf90af8abf95a055f96f1d89"
+    },
+    {
+      "path": "docs/tasks/G12-DOC-PROVENANCE-RECONCILIATION.md",
+      "kind": "file",
+      "size_bytes": 8489,
+      "sha256": "5c3c5f293275e2366a658ef2b11de8fcd071840386328c005d8a3ac1ba946925"
+    },
+    {
+      "path": "docs/tasks/G13-COUNCIL-RUN-BINDING-SAFETY-GATE.md",
+      "kind": "file",
+      "size_bytes": 9857,
+      "sha256": "d7a7032486a6a9c3a33fe56ca8e27695e5d67113ed7432b139f111d042b36614"
+    },
+    {
+      "path": "docs/tasks/G14-RUNTIME-CANCELLATION-CLEANUP-GATE.md",
+      "kind": "file",
+      "size_bytes": 6659,
+      "sha256": "1472eb56f6808132cfda4ecaa3f48c268bbaf3db2d880efce4eb94bc7c41be4e"
+    },
+    {
+      "path": "docs/tasks/G19-G23-FIVE-GOAL-EXECUTION-ROUTING.md",
+      "kind": "file",
+      "size_bytes": 19243,
+      "sha256": "ee37aee23c2c72b35400683399f9ee2592720520f9df38b6d23409db8bae5e7b"
+    },
+    {
+      "path": "docs/tasks/RUNTIME-ADAPTER-CONFORMANCE.md",
+      "kind": "file",
+      "size_bytes": 6447,
+      "sha256": "665f55a58d0a9a4cbcbe1b5763826794d5ac568b83e9e8aa4c5ad7e84c003661"
+    },
+    {
+      "path": "docs/tasks/WP-14.md",
+      "kind": "file",
+      "size_bytes": 9392,
+      "sha256": "4aa9645c1d2abf9a1e2de853a5546ae2684072848dbdbf55ec4c17f2e00f325f"
+    },
+    {
+      "path": "initial-review-v1/PolyNexus_Cyber4_Initial_Review_v1.0.docx",
+      "kind": "file",
+      "size_bytes": 147968,
+      "sha256": "ac01e174495d109138e4eea9070b5c79d20c69494ef1a9499f185c709d28f272"
+    },
+    {
+      "path": "initial-review-v1/PolyNexus_Initial_Review_Evidence_v1.0.html",
+      "kind": "file",
+      "size_bytes": 6831,
+      "sha256": "5c5e3b7bad5aed74b636256b33ecd4427fee48c039bbfa9767762547f23c288b"
+    },
+    {
+      "path": "initial-review-v2/PolyNexus_初審提案計畫書_v2.0.docx",
+      "kind": "file",
+      "size_bytes": 567176,
+      "sha256": "88203c325cf4066b5a93c4a19b35a37bc8a59f3b9891bedc1ba8ec9792c8a7e0"
+    },
+    {
+      "path": "initial-review-v2/PolyNexus_初審附件與證據說明_v2.0.html",
+      "kind": "file",
+      "size_bytes": 730032,
+      "sha256": "097c70763ce62374878486109f992644a5e78c6b4e1f2e30ab46ef2f5001f2ff"
+    },
+    {
+      "path": "initial-review-v2/assets/01_flow.png",
+      "kind": "file",
+      "size_bytes": 71528,
+      "sha256": "f46afcb4c79b48c6108ab8d69e2a50c1752c8b6763fbc9fc03ceb84ad79495de"
+    },
+    {
+      "path": "initial-review-v2/assets/02_scope.png",
+      "kind": "file",
+      "size_bytes": 136364,
+      "sha256": "613f300f225b2cfeeefce3efc7a50b6ca6fa2149d2af57946effa58402f70ee0"
+    },
+    {
+      "path": "initial-review-v2/assets/03_architecture.png",
+      "kind": "file",
+      "size_bytes": 98522,
+      "sha256": "968941670cabe138be2ffea853e939507f4fc18d2bf6d6823c16f095ad528418"
+    },
+    {
+      "path": "initial-review-v2/assets/04_evidence.png",
+      "kind": "file",
+      "size_bytes": 107363,
+      "sha256": "af4af2beb3871c80a206c0324eb32d14c26f29b1fe603988c505f5ced0dac049"
+    },
+    {
+      "path": "initial-review-v2/assets/05_test.png",
+      "kind": "file",
+      "size_bytes": 63761,
+      "sha256": "fde5042b7709e9d6d585803b58bb9617abdfcb7be1170bed5e84cfd222eea23c"
+    },
+    {
+      "path": "initial-review-v2/assets/06_roadmap.png",
+      "kind": "file",
+      "size_bytes": 61981,
+      "sha256": "46ec40eddab68ae3d800d8a3c7865d520a42109cfd38c71cef81bbcc847a022b"
+    },
+    {
+      "path": "output/playwright/.playwright-cli/Cyber4-0-AI-Innovation-Challenge-2026-簡章.docx",
+      "kind": "file",
+      "size_bytes": 43640,
+      "sha256": "efbb80a1f8d86cd3e496df633d80f7bb2b5b08a139f1477ad31e8d9509cd8a42"
+    },
+    {
+      "path": "output/playwright/.playwright-cli/console-2026-08-27T14-01-12-297Z.log",
+      "kind": "file",
+      "size_bytes": 192,
+      "sha256": "fdb575c428e94b2e405eb07b0d6bfe1f35b3185c754b2a09efb200844813acc6"
+    },
+    {
+      "path": "output/playwright/.playwright-cli/page-2026-08-27T14-01-14-532Z.yml",
+      "kind": "file",
+      "size_bytes": 16172,
+      "sha256": "25e343fc11716546d5899f475514a162f420466c8f33a1e75e929b6a0bd2fc4f"
+    },
+    {
+      "path": "output/playwright/.playwright-cli/page-2026-08-27T14-01-45-528Z.png",
+      "kind": "file",
+      "size_bytes": 400777,
+      "sha256": "f13018e20a8b3956309b0cd2f89f1cc1993d2f567bac1f7894f02e4f36f10071"
+    },
+    {
+      "path": "output/playwright/.playwright-cli/page-2026-08-27T14-03-48-235Z.yml",
+      "kind": "file",
+      "size_bytes": 16181,
+      "sha256": "513d745fecb6d77f7880e7ff129570331619ef934f5c14b038e4ba53dab9e209"
+    },
+    {
+      "path": "output/playwright/.playwright-cli/page-2026-08-27T14-04-21-362Z.png",
+      "kind": "file",
+      "size_bytes": 269982,
+      "sha256": "754e97020d4cb6f15d5ec5d7d4b74c7db3a0a062e88cec403a4d62550055330b"
+    },
+    {
+      "path": "output/playwright/.playwright-cli/page-2026-08-27T14-05-39-644Z.yml",
+      "kind": "file",
+      "size_bytes": 16181,
+      "sha256": "e04ba0da5b60c441fec6e6a95d3e6d749d1ea1dd35302ccce4a2106d15b50f79"
+    },
+    {
+      "path": "output/playwright/.playwright-cli/page-2026-08-27T14-08-04-474Z.png",
+      "kind": "file",
+      "size_bytes": 400777,
+      "sha256": "f13018e20a8b3956309b0cd2f89f1cc1993d2f567bac1f7894f02e4f36f10071"
+    },
+    {
+      "path": "output/playwright/.playwright-cli/page-2026-08-27T14-08-25-039Z.png",
+      "kind": "file",
+      "size_bytes": 369727,
+      "sha256": "1f2222f0d88bb3ef748180b49aa9d1bb6a17af960539ffa6fe776485610c8874"
+    },
+    {
+      "path": "output/playwright/.playwright-cli/page-2026-08-27T14-09-14-453Z.png",
+      "kind": "file",
+      "size_bytes": 667858,
+      "sha256": "69ded712df9a8099cee09d8f958c4589574a829b56f737dda2b2b585f3027704"
+    },
+    {
+      "path": "output/playwright/.playwright-cli/page-2026-08-27T14-10-08-836Z.png",
+      "kind": "file",
+      "size_bytes": 245183,
+      "sha256": "f75ad39952c17ba81d48dea72433255cb39ce55562cd3caa81540104c00f31e0"
+    },
+    {
+      "path": "scripts/build_initial_review_artifacts.js",
+      "kind": "file",
+      "size_bytes": 37916,
+      "sha256": "07a4a13aee4ecb85a8aedf26a7038982fd8676c46ba68295dfba32aeeaed5e6a"
+    },
+    {
+      "path": "scripts/build_initial_review_v2.py",
+      "kind": "file",
+      "size_bytes": 49130,
+      "sha256": "d24a7fdbf8f0fb3fc2ec90e49d6e50ca8f3f0dad38b2eb599f68f8bd68c9766b"
+    },
+    {
+      "path": "scripts/gen_expected_ppt.py",
+      "kind": "file",
+      "size_bytes": 43574,
+      "sha256": "8b7b042f115e09004c22486f9085e908368ac63ca7c75e3e983dd0816997e26b"
+    },
+    {
+      "path": "scripts/review_extract.js",
+      "kind": "file",
+      "size_bytes": 1248,
+      "sha256": "3e17d48be5e7cc79e873102a2fe868be99be149562ad4ee03106d3fac431b580"
+    },
+    {
+      "path": "scripts/verify_initial_review_artifacts.js",
+      "kind": "file",
+      "size_bytes": 2422,
+      "sha256": "d7ec62a34dae62f6755e14650fd2666ddbfa69eff2684ed77a94a29596851a81"
+    },
+    {
+      "path": "scripts/verify_initial_review_v2.py",
+      "kind": "file",
+      "size_bytes": 4269,
+      "sha256": "950a40e259e09527c64ce5dc5744c145f8c15b029f4145f051686bdaa6f1d958"
+    },
+    {
+      "path": "services/core/src/polynexus_core/runtime/codex.py",
+      "kind": "file",
+      "size_bytes": 6080,
+      "sha256": "fbae26b2493c490475f105d4ceb2bf3390ccfccf98b8f59bc70223d5cdd199aa"
+    },
+    {
+      "path": "services/core/tests/test_runtime_registry_conformance.py",
+      "kind": "file",
+      "size_bytes": 24709,
+      "sha256": "f0150bb10c202d814f3930b225b4fa2d97f5905a011af50ba664d91eaa874cdc"
+    },
+    {
+      "path": "services/core/tests/test_wp14_codex_runtime.py",
+      "kind": "file",
+      "size_bytes": 16759,
+      "sha256": "0c56a481134bc81af186e1a17dee0a7b65204e2479d10e0fad484584feba424f"
+    }
+  ],
+  "review_work_policy": "PATH_COUNTS_ONLY_NO_CONTENT_COPIED_OR_HASHED",
+  "review_work_group_counts": {
+    "review_work/docx-stage": 8,
+    "review_work/get-pip.py": 1,
+    "review_work/old_docx": 18,
+    "review_work/python-3.12.10-amd64.exe": 1,
+    "review_work/python-3.12.10-embed-amd64.zip": 1,
+    "review_work/python-embed": 1593,
+    "review_work/python-install.log": 1,
+    "review_work/python-install_000_core_AllUsers.log": 1,
+    "review_work/python-install_001_core_JustForMe.log": 1,
+    "review_work/python-install_001_core_JustForMe_rollback.log": 1,
+    "review_work/python-install_002_exe_AllUsers.log": 1,
+    "review_work/python-install_003_exe_JustForMe.log": 1,
+    "review_work/python-install_003_exe_JustForMe_rollback.log": 1,
+    "review_work/python-install_004_dev_AllUsers.log": 1,
+    "review_work/python-repair.log": 1,
+    "review_work/python-repair_000_dev_JustForMe.log": 1,
+    "review_work/python-repair_001_doc_JustForMe.log": 1,
+    "review_work/python-repair_002_tcltk_JustForMe.log": 1,
+    "review_work/v2-render": 319
+  },
+  "preservation": "NO_DELETE_NO_RESET_NO_CLEAN_NO_MERGE_NO_STAGE"
+}
