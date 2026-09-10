@@ -70,3 +70,5 @@ STOP_CONDITION: REQUIRED
 Receiving evidence：fetch command/exit、expected/actual branch/SHA、safe lane、HEAD/index/dirty/untracked、可讀 governance/Goal/refs、lock hashes/dependency checks、writer transfer。任一 identity/ownership 缺失 FAIL / DO_NOT_START_IMPLEMENTATION。WIP 必加 NOT_ACCEPTED / NOT_REVIEWED / DO_NOT_MERGE；accepted 必附 independent verdict + Human decision + verified remote refs。
 
 Acceptance closure依[Framework §5](../governance/POLYNEXUS_TRACK_A_GOAL_EXECUTION_FRAMEWORK.md#5-acceptance-receipt--cross-machine-closure-finding-01)：C已review且Human接受，remote C verified後才能建立R。R不含自身literal SHA/hash；SELF_RECEIPT由固定R解釋，R proof外部保存/接方重驗，避免第三層循環。WIP不產R。Next Goal intake同時保存(R,C)，routing不授權執行；目前next proposed TA-LR-01未執行。
+
+Review delivery引用[canonical package skill](../../.agents/skills/polynexus-review-package/SKILL.md)；handoff應引用validated ZIP、SHA256及C，不能以handoff文字取代Review Package或C/R accepted remote gate。

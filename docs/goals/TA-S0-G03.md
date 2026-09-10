@@ -51,3 +51,23 @@
 ## Authorization-time elaboration
 
 此為具體行為與責任拆分，尚非實作授權。讀 predecessor actual files 後填 exact branch/SHA、allowlist/new-file責任、現存runner及測試command、必需fixtures、owner/成本/外部權限。不存在的test不捏造命令；未解關鍵欄位不得AUTHORIZED。普通實作配置不必逐步Human確認。S0 aggregate criteria以Work Packages S0完整正負例為準。
+
+## Mandatory review package delivery
+
+依[canonical package skill](../../.agents/skills/polynexus-review-package/SKILL.md)，此contract的動態交付值在C後external delivery.json填實，不修改C以填自己的ZIP hash。未填/未驗證不能REVIEW_READY。
+
+```yaml
+REVIEW_LEVEL: UNASSIGNED # choose L1/L2/L3 by risk before execution
+REVIEW_PACKAGE_REQUIRED: YES
+REVIEW_PACKAGE_FORMAT: ZIP
+REVIEW_PACKAGE_PATH: PENDING_EXTERNAL_DELIVERY_RECORD
+REVIEW_PACKAGE_SHA256: PENDING_EXTERNAL_DELIVERY_RECORD
+REVIEW_CANDIDATE_SHA: PENDING
+PACKAGE_VALIDATION_STATUS: NOT_RUN
+REVIEW_PACKAGE_MINIMUM_CONTENT: canonical skill standard package
+GIT_BUNDLE_REQUIREMENT: canonical skill review-level policy
+FRESH_EVIDENCE_REQUIREMENT: candidate-bound actual evidence; historical reference only
+ENVIRONMENT_FINGERPRINT_REQUIREMENT: canonical skill environment fields
+PACKAGE_COMPLETENESS_CRITERIA: all mandatory payloads and required parts; hashes valid
+REVIEW_READY_GATE: NO_REVIEW_PACKAGE = NOT_REVIEW_READY
+```

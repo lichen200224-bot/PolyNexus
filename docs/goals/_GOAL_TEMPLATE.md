@@ -71,3 +71,23 @@ NEXT_GOAL: REQUIRED
 Batch authorization 另列 batch ID、每 Goal exact scope/branch/writer、dependency-safe 判斷與最大並發，不取代逐 Goal review/acceptance。Integration Goal 必須列 accepted A/B SHAs、預期 C、衝突處理與 affected regression。
 
 Acceptance closure依[Framework §5](../governance/POLYNEXUS_TRACK_A_GOAL_EXECUTION_FRAMEWORK.md#5-acceptance-receipt--cross-machine-closure-finding-01)：C已review且Human接受，remote C verified後才能建立R。R不含自身literal SHA/hash；SELF_RECEIPT由固定R解釋，R proof外部保存/接方重驗，避免第三層循環。WIP不產R。Next Goal intake同時保存(R,C)，routing不授權執行；目前next proposed TA-LR-01未執行。
+
+## Mandatory review package delivery
+
+依[canonical package skill](../../.agents/skills/polynexus-review-package/SKILL.md)，此contract的動態交付值在C後external delivery.json填實，不修改C以填自己的ZIP hash。未填/未驗證不能REVIEW_READY。
+
+```yaml
+REVIEW_LEVEL: UNASSIGNED # choose L1/L2/L3 by risk before execution
+REVIEW_PACKAGE_REQUIRED: YES
+REVIEW_PACKAGE_FORMAT: ZIP
+REVIEW_PACKAGE_PATH: PENDING_EXTERNAL_DELIVERY_RECORD
+REVIEW_PACKAGE_SHA256: PENDING_EXTERNAL_DELIVERY_RECORD
+REVIEW_CANDIDATE_SHA: PENDING
+PACKAGE_VALIDATION_STATUS: NOT_RUN
+REVIEW_PACKAGE_MINIMUM_CONTENT: canonical skill standard package
+GIT_BUNDLE_REQUIREMENT: canonical skill review-level policy
+FRESH_EVIDENCE_REQUIREMENT: candidate-bound actual evidence; historical reference only
+ENVIRONMENT_FINGERPRINT_REQUIREMENT: canonical skill environment fields
+PACKAGE_COMPLETENESS_CRITERIA: all mandatory payloads and required parts; hashes valid
+REVIEW_READY_GATE: NO_REVIEW_PACKAGE = NOT_REVIEW_READY
+```

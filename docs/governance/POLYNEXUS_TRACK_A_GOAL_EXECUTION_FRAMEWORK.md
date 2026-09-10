@@ -48,7 +48,7 @@ HOLD 輸出 BLOCKER、WHY_HUMAN_DECISION_REQUIRED、OPTIONS、RECOMMENDATION、I
 
 ## 4. Goal lifecycle and review identity
 
-PLANNED → AUTHORIZED → IN_PROGRESS → REVIEW_CANDIDATE → INDEPENDENT_REVIEW；REVIEW_READY 是 candidate、packet、handoff 完備且停止寫入的交付旗標。Reviewer NEED_FIX → IN_PROGRESS；HOLD 等所需決策；PASS 等 Human。Human APPROVED exact C → PUSH_AUTHORIZED_C → PUSHED_C → REMOTE_C_VERIFIED → RECEIPT_CREATED_R → RECEIPT_INTEGRITY_PASS → PUSHED_R → REMOTE_R_VERIFIED → CROSS_MACHINE_READY（intake gate另驗）→ INTEGRATED（適用時）→ CLOSED。
+PLANNED → AUTHORIZED → IN_PROGRESS → REVIEW_CANDIDATE → INDEPENDENT_REVIEW；REVIEW_READY 是 candidate、已通過mandatory Review ZIP gate、handoff完備且停止寫入的交付旗標。Reviewer NEED_FIX → IN_PROGRESS；HOLD 等所需決策；PASS 等 Human。Human APPROVED exact C → PUSH_AUTHORIZED_C → PUSHED_C → REMOTE_C_VERIFIED → RECEIPT_CREATED_R → RECEIPT_INTEGRITY_PASS → PUSHED_R → REMOTE_R_VERIFIED → CROSS_MACHINE_READY（intake gate另驗）→ INTEGRATED（適用時）→ CLOSED。
 
 PASS != HUMAN_APPROVED；HUMAN_APPROVED != PUSHED；PUSHED != REMOTE_VERIFIED；REMOTE_VERIFIED != INTEGRATED；WIP != ACCEPTED。不需 integration 的 Goal 可在 REMOTE_R_VERIFIED、receipt integrity與acceptance/handoff完備後 CLOSED；需 integration 的 component 等 integration checkpoint 建立才關閉其整合依賴。
 
@@ -178,3 +178,7 @@ S0/W1 子 Goal 逐一 checkpoint 串接，最後一個需驗證整個 WP accumul
 [Legacy reconciliation](POLYNEXUS_LEGACY_OPEN_WORK_RECONCILIATION.md) 是唯一 legacy→Track A routing；舊 Gxx/CP/roadmap 不再派工。未解 decisions 保留，由TA-LR-01在F1前準備完整packet，Human批准disposition後才能進F1；不刪歷史或把 bounded PASS 重算為 Working Product PASS。
 
 R2交付為local REVIEW_CANDIDATE / NOT_ACCEPTED / NOT_PUSHED，exact SHA列外部R2 package；R1 [review packet](../reviews/TA-OPERATING-MODEL-REVIEW.md)僅歷史。R2 Human已授權限定local commit，不授權push或實際Acceptance Receipt。R2獨立review及Human acceptance/receipt closure後 NEXT_PROPOSED_GOAL=TA-LR-01，尚未授權也未執行。順序 Operating Model Accepted → TA-LR-01 → F1 → F2 → F3 → F4 → S0 → W1…；F1前必須有LR accepted outcome/Human disposition。不能從NEED_FIX R2授權推論LR已開工；本輪STOP。
+
+## Mandatory external review package
+
+依Human最新Review Package決策，每個Goal在REVIEW_READY前須完成[canonical package skill](../../.agents/skills/polynexus-review-package/SKILL.md)。NO_REVIEW_PACKAGE = NOT_REVIEW_READY；詳細level/content/evidence/manifest/safety/final response只在該skill定義。本規則不改§5 C/R acceptance closure、LR授權或產品HOLD。

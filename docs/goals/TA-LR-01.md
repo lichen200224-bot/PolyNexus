@@ -88,3 +88,23 @@ RECOMMENDED_IMPLEMENTATION_BRANCH_LANE: UNASSIGNED / 待本Goal調查與Human批
 不允許bulk merge/adopt old branches、destructive checkout、reset、clean、prune、rebase、刪unknown untracked、overwrite dirtytree、auto repair production data或stage/commit/push legacy code。一般比較/分類/修正可自行完成；真正Frozen/安全/authority/不可恢復資料問題才HOLD。
 
 本Goal產生的是decision packet，不是Human決策。Independent review後Human可一次處理HD-L1/2/3與接受C及bounded receipt closure；缺批准維持HOLD，不能把建議當已批准。F1接方先fetch R，讀C與Human disposition，再確認F1本身授權。
+
+## Mandatory review package delivery
+
+依[canonical package skill](../../.agents/skills/polynexus-review-package/SKILL.md)，此contract的動態交付值在C後external delivery.json填實，不修改C以填自己的ZIP hash。未填/未驗證不能REVIEW_READY。
+
+```yaml
+REVIEW_LEVEL: UNASSIGNED # choose L1/L2/L3 by risk before execution
+REVIEW_PACKAGE_REQUIRED: YES
+REVIEW_PACKAGE_FORMAT: ZIP
+REVIEW_PACKAGE_PATH: PENDING_EXTERNAL_DELIVERY_RECORD
+REVIEW_PACKAGE_SHA256: PENDING_EXTERNAL_DELIVERY_RECORD
+REVIEW_CANDIDATE_SHA: PENDING
+PACKAGE_VALIDATION_STATUS: NOT_RUN
+REVIEW_PACKAGE_MINIMUM_CONTENT: canonical skill standard package
+GIT_BUNDLE_REQUIREMENT: canonical skill review-level policy
+FRESH_EVIDENCE_REQUIREMENT: candidate-bound actual evidence; historical reference only
+ENVIRONMENT_FINGERPRINT_REQUIREMENT: canonical skill environment fields
+PACKAGE_COMPLETENESS_CRITERIA: all mandatory payloads and required parts; hashes valid
+REVIEW_READY_GATE: NO_REVIEW_PACKAGE = NOT_REVIEW_READY
+```

@@ -37,6 +37,26 @@ KNOWN_LIMITATIONS: []
 ENVIRONMENT_FINGERPRINT: {}
 HANDOFF_STATUS: REQUIRED
 REVIEW_READY: NO
+GOAL_STATUS: IN_PROGRESS # set REVIEW_READY only after validated ZIP
+AUTHORIZED_SCOPE: REQUIRED
+OUT_OF_SCOPE: REQUIRED
+REVIEW_LEVEL: REQUIRED
+CREATED_FILES: REQUIRED
+MODIFIED_FILES: REQUIRED
+DELETED_FILES: REQUIRED
+UNEXPECTED_CHANGED_FILES: REQUIRED
+FROZEN_INVARIANTS_APPLICABLE: REQUIRED
+IMPLEMENTATION_SUMMARY: REQUIRED
+OPEN_FINDINGS: REQUIRED
+ARCHITECTURE_CONFLICT: REQUIRED
+SECURITY_IMPACT: REQUIRED
+MIGRATION_IMPACT: REQUIRED
+ROLLBACK_RECOVERY: REQUIRED
+ENVIRONMENT_FINGERPRINT_REF: REQUIRED
+GIT_BUNDLE_REF: REQUIRED
+CROSS_MACHINE_STATUS: REQUIRED
+REQUESTED_VERDICT: REQUIRED
+PUSH_RECOMMENDATION_REQUEST: REQUIRED
 ```
 
 ```yaml
@@ -84,3 +104,5 @@ next_goal_authorized: false
 ```
 
 R manifest不是Human authenticity證明；Verifier先核對C的批准來源/allowlist再驗payload hashes。RI-01..RI-10逐項輸出assertion/expected/actual/command/exit；任何FAIL或UNKNOWN不能push R。R後的integrity與remote proof保存closure log，不改R自身。
+
+本模板的Writer packet欄位投影自[canonical skill schema](../../.agents/skills/polynexus-review-package/references/package-fields.json)；所有packaging rules見[skill](../../.agents/skills/polynexus-review-package/SKILL.md)。不得另建不同REVIEW_PACKET schema。FIRST READ ZIP root START_HERE.md；無validated ZIP不能REQUEST Independent Review。

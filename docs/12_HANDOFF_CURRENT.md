@@ -1,3 +1,5 @@
+> Current governance delta: REVIEW_PACKAGE_SKILL，local candidate/mandatory ZIP授權；產品HOLD，R2/TA-LR-01狀態不變。Follow [Goal](goals/REVIEW_PACKAGE_SKILL.md) and [canonical packaging skill](../.agents/skills/polynexus-review-package/SKILL.md). Exact post-commit delivery record accompanies ZIP; no push.
+
 > 2026-09-10 Track A navigation override — CURRENT HANDOFF: TA-OPERATING-MODEL 文件交付，NEXT=INDEPENDENT_REVIEW_REQUIRED。Product HOLD；current authorized implementation NONE；R2只修Receipt C/R與TA-LR-01；NEXT_PROPOSED_GOAL=TA-LR-01，DEFINED_NOT_EXECUTED，LR接受後才F1。Writer Codex本輪文件scope，delivery後STOP。完整delta/tests/exit/limitations/changed-files見本輪review packet；以下保留歷史。
 >
 > Canonical: [Framework](governance/POLYNEXUS_TRACK_A_GOAL_EXECUTION_FRAMEWORK.md) · [Current Goal](IMPLEMENTATION_CURRENT_GOAL.md) · [Legacy reconciliation](governance/POLYNEXUS_LEGACY_OPEN_WORK_RECONCILIATION.md) · [Current R2 review delta](reviews/TA-OPERATING-MODEL/NEED_FIX_R2.md)
