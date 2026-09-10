@@ -3,6 +3,19 @@
 依 [Framework](../governance/POLYNEXUS_TRACK_A_GOAL_EXECUTION_FRAMEWORK.md) §5–7。送方停寫後接方取得 ownership。未知值如實記錄；WIP 不成為 accepted。記錄檔名使用 exact SHA 或明確 WIP-ID；自引用限制見 Framework §4。
 
 ```yaml
+REVIEWED_PRODUCT_SHA: UNASSIGNED # C, exact independent-review/Human target
+ACCEPTANCE_RECEIPT_SHA: UNASSIGNED # R after closure; in R use SELF_RECEIPT
+GOVERNANCE_PREDECESSOR_SHA: UNASSIGNED # accepted R for next Goal, not product C
+REVIEWED_PREDECESSOR_SHA: UNASSIGNED # C from predecessor receipt
+ONE_BOUNDED_ACCEPTANCE_RECEIPT_CLOSURE: NOT_AUTHORIZED
+RECEIPT_EXACT_ALLOWLIST: [] # Human-approved exact metadata paths; Framework 5.2
+REVIEWED_SCOPE_HASHES: {} # protected result bytes; not retroactively excluded
+RECEIPT_PARENT_RULE: DIRECT_SINGLE_PARENT_C
+RECEIPT_INTEGRITY: NOT_RUN
+REMOTE_C_PROOF_REF: NONE
+REMOTE_R_PROOF_REF: NONE # external after R; receiver independently verifies remote R
+CROSS_MACHINE_CHECKPOINT: NOT_READY
+
 PROJECT: PolyNexus
 TRACK: Track A V1
 WORK_PACKAGE: REQUIRED
@@ -55,3 +68,5 @@ STOP_CONDITION: REQUIRED
 ```
 
 Receiving evidence：fetch command/exit、expected/actual branch/SHA、safe lane、HEAD/index/dirty/untracked、可讀 governance/Goal/refs、lock hashes/dependency checks、writer transfer。任一 identity/ownership 缺失 FAIL / DO_NOT_START_IMPLEMENTATION。WIP 必加 NOT_ACCEPTED / NOT_REVIEWED / DO_NOT_MERGE；accepted 必附 independent verdict + Human decision + verified remote refs。
+
+Acceptance closure依[Framework §5](../governance/POLYNEXUS_TRACK_A_GOAL_EXECUTION_FRAMEWORK.md#5-acceptance-receipt--cross-machine-closure-finding-01)：C已review且Human接受，remote C verified後才能建立R。R不含自身literal SHA/hash；SELF_RECEIPT由固定R解釋，R proof外部保存/接方重驗，避免第三層循環。WIP不產R。Next Goal intake同時保存(R,C)，routing不授權執行；目前next proposed TA-LR-01未執行。

@@ -16,13 +16,13 @@
 | CURRENT_STATE | formal wording 尚未同步 |
 | TARGET_STATE | 可逐字 review 的 proposed diff、來源hash與 exact allowlist |
 | INPUT | Freeze Record / REV1 / Work Packages / Formal Change Plan；canonical design/read f34e6b29ae9e7326d1d44b9b03756b450809928f |
-| PREDECESSOR_CHECKPOINT | UNASSIGNED；operating model accepted checkpoint + explicit F1 authorization；授權前填 accepted exact SHA/remote/decision refs，不能用設計SHA冒充 |
+| PREDECESSOR_CHECKPOINT | UNASSIGNED；TA-LR-01 accepted (R,C) + HD-L1/L2/L3 Human disposition + explicit F1 authorization；授權前填 accepted exact SHA/remote/decision refs，不能用設計SHA冒充 |
 | IN_SCOPE | 準備 M-IDENTITY/M-HUMAN exact diff proposal，不套用正式檔案 |
 | OUT_OF_SCOPE | 產品code/tests/schema/migrations、未批准正式wording、架構重開 |
 | ALLOWED_FILES | NONE；PLANNED不授權寫入，按下列責任與predecessor diff形成exact allowlist後再Human授權 |
 | EXPECTED_FILE_AREAS | governance proposal 文件；正式 Scope/PRD/SA/SD/Decision Log/ADR 唯讀 |
 | FROZEN_INVARIANTS | 全部適用；重點 I-01 through I-23；原文 authority為Freeze Record §3與REV1 §24 |
-| DEPENDENCIES | operating model accepted checkpoint + explicit F1 authorization |
+| DEPENDENCIES | TA-LR-01 accepted (R,C) + HD-L1/L2/L3 Human disposition + explicit F1 authorization |
 | INTEGRATION_DEPENDENCIES | sequential accepted predecessor；若批准平行拆分，另需accepted integration SHA |
 | GOAL_OWNER | CODEX |
 | PREFERRED_IMPLEMENTATION_WRITER | CODEX；其他Writer須Human明確批准 |

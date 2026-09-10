@@ -1,6 +1,6 @@
 # Track A Goal Execution Framework
 
-2026-09-10 · TA-OPERATING-MODEL · READY_FOR_INDEPENDENT_REVIEW
+2026-09-10 · TA-OPERATING-MODEL · NEED_FIX R2 → exact-SHA re-review；只修 FINDING-01 / FINDING-02
 
 ## 1. Authority and current boundary
 
@@ -12,9 +12,9 @@ Human 本輪明確決定 GOAL-BASED DEVELOPMENT / BOUNDED GOAL AUTONOMY；Codex 
 
 - Architecture APPROVED / FROZEN；Gate 2 closure PASS；canonical design/read SHA `f34e6b29ae9e7326d1d44b9b03756b450809928f`。
 - PRODUCT_IMPLEMENTATION HOLD；FORMAL_CONTRACT_SYNC NOT YET EXECUTED；S0/W1–W6 NOT AUTHORIZED；REAL_EXECUTOR NOT YET VERIFIED；B01 NOT YET EXECUTED；WORKING_PRODUCT NOT YET ACCEPTED。
-- 本輪僅治理／規劃／skills／templates；禁止 checkout/reset/rebase/merge/prune/clean/stage/commit/push；不改產品、production tests、schema/migrations、Scope/PRD/SA/SD/Decision Log/Frozen ADR，也不執行 F1 exact diff。
+- 本輪僅治理／規劃／skills／templates；禁止破壞性 checkout/reset/rebase/merge/prune/clean 與 push；R2 Human 明確授權 self-validation 後 exact-allowlist local review commit；不改產品、production tests、schema/migrations、Scope/PRD/SA/SD/Decision Log/Frozen ADR，也不執行 F1 exact diff。
 - 開發治理 Goal、Git REVIEW_CANDIDATE_SHA 與產品 Task/Run/CandidateID 是不同層。此流程不新增產品 scheduler、parallel coding writers、DB enum 或自動 Accept/commit 功能；不改 I-02/I-16。
-- 本輪 working HEAD `b87a0dc780e5d9a3bba083dbaf9552ca52508f9a`、branch `feature/first-vertical-slice` 只承載文件 overlay。不得當成實作 predecessor。新治理尚未 commit/push，**新機器 checkout 尚不能取得本輪文件**；publish readiness 與文件 review readiness 分開。
+- 本輪 working HEAD `b87a0dc780e5d9a3bba083dbaf9552ca52508f9a`、branch `feature/first-vertical-slice` 只承載文件 overlay。不得當成實作 predecessor。原 checkout 保留不動；R2 在隔離的文件審查 repository 以 R1 ZIP 原bytes建立未接受的comparison predecessor，再commit限定修正。該比較SHA不是Human-accepted或product predecessor；exact C與branch見R2 package。未push，不宣稱cross-machine accepted readiness。
 
 ## 2. Intake and ownership
 
@@ -48,35 +48,87 @@ HOLD 輸出 BLOCKER、WHY_HUMAN_DECISION_REQUIRED、OPTIONS、RECOMMENDATION、I
 
 ## 4. Goal lifecycle and review identity
 
-PLANNED → AUTHORIZED → IN_PROGRESS → REVIEW_CANDIDATE → INDEPENDENT_REVIEW；REVIEW_READY 是 candidate、packet、handoff 完備且停止寫入的交付旗標。Reviewer NEED_FIX → IN_PROGRESS；HOLD 等所需決策；PASS 等 Human。Human APPROVED 且明確 exact-SHA push authorization → PUSH_AUTHORIZED → PUSHED → REMOTE_VERIFIED → INTEGRATED（適用時）→ CLOSED。
+PLANNED → AUTHORIZED → IN_PROGRESS → REVIEW_CANDIDATE → INDEPENDENT_REVIEW；REVIEW_READY 是 candidate、packet、handoff 完備且停止寫入的交付旗標。Reviewer NEED_FIX → IN_PROGRESS；HOLD 等所需決策；PASS 等 Human。Human APPROVED exact C → PUSH_AUTHORIZED_C → PUSHED_C → REMOTE_C_VERIFIED → RECEIPT_CREATED_R → RECEIPT_INTEGRITY_PASS → PUSHED_R → REMOTE_R_VERIFIED → CROSS_MACHINE_READY（intake gate另驗）→ INTEGRATED（適用時）→ CLOSED。
 
-PASS != HUMAN_APPROVED；HUMAN_APPROVED != PUSHED；PUSHED != REMOTE_VERIFIED；REMOTE_VERIFIED != INTEGRATED；WIP != ACCEPTED。不需 integration 的 Goal 可在 REMOTE_VERIFIED 且 acceptance/handoff 完備後 CLOSED；需 integration 的 component 等 integration checkpoint 建立才關閉其整合依賴。
+PASS != HUMAN_APPROVED；HUMAN_APPROVED != PUSHED；PUSHED != REMOTE_VERIFIED；REMOTE_VERIFIED != INTEGRATED；WIP != ACCEPTED。不需 integration 的 Goal 可在 REMOTE_R_VERIFIED、receipt integrity與acceptance/handoff完備後 CLOSED；需 integration 的 component 等 integration checkpoint 建立才關閉其整合依賴。
 
-已授權 implementation Goal 包含 explicit-allowlist staging 及 local REVIEW_CANDIDATE commit，不需另問；每次先核對 branch/HEAD/index/完整 dirty+untracked，避免吸收他人內容。混合已修改檔案需能確定逐 hunk 歸屬，否則 HOLD；禁用 blanket add。**本輪 NO STAGE/COMMIT 例外優先**，僅可提交未 commit 文件審查包，不能冒稱 exact-SHA independent final acceptance 已完成。
+已授權 implementation Goal 包含 explicit-allowlist staging 及 local REVIEW_CANDIDATE commit，不需另問；每次先核對 branch/HEAD/index/完整 dirty+untracked，避免吸收他人內容。混合已修改檔案需能確定逐 hunk 歸屬，否則 HOLD；禁用 blanket add。**R2 Human已授權限定修正的local review commit；仍禁止push**。R1 no-commit限制是歷史，不延伸阻擋本次明確授權。不得吸收原主checkout的舊dirty內容。
 
 Future normal flow：先測試固定內容並保存 file/tree hashes → local commit → resolve full SHA → 驗證測試 bytes 與 commit tree 一致（不一致則重測）→ 產 packet → STOP WRITING → independent review exact SHA。Reviewer 必要時重跑；資料來源、oracle、exit、negative、freshness、scope、invariants、mock boundary 和 cross-machine readiness 全部核對。
 
 Self verification 不是 Independent PASS。Reviewer 輸出 PASS / NEED_FIX / HOLD 與 APPROVE_TO_PUSH / DO_NOT_PUSH；PASS 不自動授權 push。NEED_FIX 在原 Goal/allowlist/contract 內沿用原 authorization，修復後新 commit B、新測試、新 packet，保留 A evidence；A 的 PASS 不證明 B。
 
-SHA 自引用規則：commit 內的 Goal/預備 handoff 不填自己的未來 SHA；commit 後產出 `docs/reviews/<GOAL_ID>/<SHA>.md` 與 `docs/handoffs/<GOAL_ID>/<SHA>.md` 或獨立 review artifact，引用該 SHA。packet 是 attestation，不是 candidate tree 一部分。不得為塞入 SHA 而 amend candidate。遠端可攜性需要後續另授權的 governance receipt checkpoint，明記 reviewed product SHA 與 receipt SHA；不以 receipt commit 冒充已 review 的 code。必要 code tests 依 exact candidate tree，receipt-only checks 依其新 tree；兩者不互相借 PASS。
+SHA 自引用採兩層 checkpoint，依 §5。C 是已 review 的內容；R 是之後形成的 metadata receipt。不得為補 verdict/approval/remote proof 而 amend C。
 
-## 5. Human push and immutable checkpoint
+## 5. Acceptance receipt / cross-machine closure (FINDING-01)
 
-Reviewer PASS + APPROVE_TO_PUSH → Human 明確批准 exact SHA、remote、branch → Writer 再核對 staged/dirty/HEAD，push 該 reviewed SHA（非另一新 commit）。在批准 lane 可用 `git push <remote> <reviewed-full-SHA>:refs/heads/<approved-branch>`，不 force。保存 command/exit，續以 `git rev-parse HEAD` 與 `git ls-remote --heads <remote> refs/heads/<approved-branch>` 取 actual remote SHA；LOCAL_HEAD_SHA = REVIEW_CANDIDATE_SHA = REMOTE_BRANCH_SHA 才記 MATCH YES，否則 NOT READY。push exit 0 不充分。
+### 5.1 C / R identity and authorization
 
-Independent PASS + Human approval + verified remote SHA 才是 ACCEPTED_GOAL_CHECKPOINT；不得 amend/rebase/force-push 改寫，不重用已接受 Goal ID 指向不同 bytes。後續修正用新 Goal/commit/checkpoint，歷史不刪。對新機器 continuation 另需 clean-clone/intake/dependency checks 與可攜 governance/evidence，單有 remote SHA 不等於已驗證 clone。
+`REVIEWED_PRODUCT_SHA=C`：Independent Reviewer實際review的exact implementation或governance content commit；Human acceptance主要target。`ACCEPTANCE_RECEIPT_SHA=R`：Human批准C且C push/remote verified後，由該Goal authorized Writer建立的metadata-only governance commit。R不是新implementation，不取代C，不使用產品CandidateID。
+
+Writer self verification → local Review Candidate C → Independent Review exact C（PASS/NEED_FIX/HOLD）→ Human approves exact C → push exact C → verify LOCAL_C=REMOTE_C → metadata receipt R → RECEIPT_INTEGRITY_CHECK → push exact R → verify LOCAL_R=REMOTE_R → cross-machine intake。Independent review PASS不取代Human批准。
+
+Human批准C時可**同一次**明確授權 `ONE_BOUNDED_ACCEPTANCE_RECEIPT_CLOSURE`，記Goal ID、C、Writer、remote/ref、R必須direct parent C、exact receipt file allowlist、受保護reviewed scope、next Goal及其授權狀態。這是條件式授權一次R closure，不是所有後續metadata修改的blanket approval。缺此授權則HOLD於receipt closure；不可推論R push權。正常closure不再增加完整第二轮人工產品驗收。
+
+R符合allowlist、C內容保全、deterministic integrity PASS才可使用該授權push exact R，不必再Product Independent Review。超scope/變更reviewed bytes/失敗gate → HOLD / HUMAN_REVIEW_REQUIRED / DO_NOT_PUSH；修正不可偷偷擴allowlist。尚未發送的失敗receipt可在原scope重新形成候選，保留失敗證據與新SHA；已發布receipt不可amend/rewrite，後續更正須新授權。C始終immutable。
+
+### 5.2 Strict receipt files and parent rule
+
+Reuse現有目錄，預先在Goal與Human批准記**exact paths**（以下`<GOAL_ID>`必須替換；不把glob當stage權）：
+
+- `docs/reviews/<GOAL_ID>/acceptance-receipt.json`
+- `docs/reviews/<GOAL_ID>/independent-review.md`
+- `docs/reviews/<GOAL_ID>/human-decision.md`
+- `docs/reviews/<GOAL_ID>/remote-c-proof.json`
+- `docs/handoffs/<GOAL_ID>/accepted.md`
+- 如需更新main/integration導航，另明列 `docs/IMPLEMENTATION_CURRENT_GOAL.md`、`docs/12_HANDOFF_CURRENT.md`；parallel Goal預設不改這兩檔。
+
+不修改Goal contract實作/AC、其他governance、產品source/tests/schema/migration/runtime/frontend、Candidate或accepted implementation bytes、Scope/PRD/SA/SD/Decision Log/Frozen ADR/I-01..I-23。不另建accepted index，receipt已提供索引。不得以路徑落docs內就當metadata。
+
+採 **R唯一parent=C**，不得merge parent、額外祖先commit或rebase；C所在remote ref先證明C，再由R fast-forward推進，同一approved branch。若中間ref被別人移動則HOLD，不能force推回。C保存為R^並可用exact SHA讀取。
+
+C中或Human批准的scope manifest明列可更新的導航metadata；它們不屬reviewed implementation/governance result內容。除了這些**事先**排除的metadata與新receipt files，R tree所有其他path的mode/blob SHA必須與C完全相同。不得事後把受review的Goal/Framework/skills文件塞入receipt allowlist以規避保全。原C Git object與其reviewed_scope hashes永遠保持原值。
+
+### 5.3 Deterministic RECEIPT_INTEGRITY_CHECK
+
+輸入：immutable Git objects C/R；Human approval的exact allowlist/scope/remote/next-goal授權；R tree內receipt與其引用；C push proof。Verifier用read-only `git cat-file -e <sha>^{commit}`、`git rev-list --parents -n 1 R`、`git diff-tree --no-commit-id --name-status -r C R`、`git ls-tree -r C/R`、`git show <sha>:<path>`，保存argv/cwd/exit/bounded output。參照固定R tree，不讀浮動working tree。
+
+| Check | Deterministic assertion / failure |
+|---|---|
+| RI-01 | receipt.reviewed_product_sha == full C；C/R object存在；WIP不得receipt |
+| RI-02 | human decision target == C，APPROVED；有Human來源ref/hash與ONE_BOUNDED closure授權；不是Writer自寫approved字串就具Human信任 |
+| RI-03 | independent-review target == C、PASS、APPROVE_TO_PUSH；reviewer context != writer；原review ref/hash可核對 |
+| RI-04 | remote-c-proof保存remote identity/ref、observed LOCAL_C/REMOTE_C==C、push與ls-remote exact command/exit/output/time；缺proof或push0但SHA不符FAIL |
+| RI-05 | R parent列表恰為[C]；approved remote/ref一致；發布R前fresh remote仍C，不為R偷合另一commit |
+| RI-06 | actual changed path集合等於manifest.changed_files，且subset of Human-approved exact receipt allowlist；無delete/rename/symlink/path escape，metadata fields only |
+| RI-07 | C reviewed_scope所有mode/blob/hash在R相同；全tree非approved metadata範圍完全相同；不可修改Goal content/contracts/tests |
+| RI-08 | review、Human decision、remote C proof、handoff與next Goal references在C/R明確tree可解析；不用chat ID/本機絕對路徑當唯一來源；secrets不進記錄 |
+| RI-09 | manifest對所有receipt payload refs記SHA-256/size，讀R blobs驗hash/size；重複path、缺ref、額外unlisted payload FAIL；receipt JSON本身由Git R blob/tree保護，不能自填自己的hash |
+| RI-10 | receipt/handoff next_goal一致且對應實際Goal record；governance_predecessor=SELF_RECEIPT（解析為R）、reviewed_result=C；next Goal未授權仍NOT_AUTHORIZED，不能由routing授權 |
+
+所有10項AND才 `RECEIPT_INTEGRITY: PASS`；任何缺失、UNKNOWN、SKIPPED或false → FAIL / CROSS_MACHINE_CHECKPOINT: NOT_READY。範例或mock gate不能證明真實remote proof、Human或receipt接受。Deterministic reference/hash檢查不代替Human attribution真實性；來源未受信任先HOLD。
+
+### 5.4 Self-reference termination and remote evidence
+
+receipt JSON不寫自身R literal SHA或自身hash；使用 `acceptance_receipt_sha: SELF_RECEIPT`，讀取者以明確checkout/fetched R解析（不可用浮動latest）。R內handoff也是此token；外部post-commit report可列literal R。manifest只hash其他payload；R Git tree保護manifest/receipt bytes，無循環。
+
+C remote proof是在R前形成並保存在R；R的gate結果與push proof在R後形成，保存於外部closure log（記literal R/command/time/exit/output/hash），**不為把R proof放入R再造第三個receipt**。新機器直接fetch並以 `git ls-remote --heads <remote> refs/heads/<approved-branch>` 取得actual R，核對local R；重跑R integrity與讀R內C proof即足够。若ref已前進，必須有另外明確approved可解析鏈，否則本最小規則HOLD，不能默認latest。Historical C proof加上R^=C與remote取得R可證C仍在鏈中，毋須要求同branch此時仍指C。
+
+Approved exact C push example：`git push <remote> <C>:refs/heads/<approved-branch>`；核對HEAD=C與ls-remote=C。Gate PASS後同法push exact R，核對HEAD=R與ls-remote=R。所有指令記actual exit；沒有Human R closure authority即不执行。
+
+ACCEPTED result identity=C；cross-machine closure anchor=R。Human接受C + C remote verified只是result acceptance；R integrity及remote verified之前CROSS_MACHINE_CHECKPOINT仍NOT_READY。C/R均不得amend/rebase/force-push覆寫；後續產品修正新Goal/commit。
 
 ## 6. Cross-machine, WIP and integration
 
-新機器：確認授權 remote → fetch（保存 exit）→ 核對 branch 與 handoff exact predecessor SHA/object → 先保全 dirty/index/untracked → 在允許且無競爭 writer 的 lane safe checkout/switch → verify HEAD/tree → 讀 project governance/Goal/handoff → dependency checks → acquire writer ownership → 才實作。任一 exact SHA 不符 HANDOFF_INTAKE FAIL / DO_NOT_START_IMPLEMENTATION；不要用浮動 latest 代替。若本機已有工作，建立批准的隔離 lane 或等待處置，不能 reset 解決。
+新機器：確認授權 remote → 先fetch governance predecessor ACCEPTANCE_RECEIPT_SHA=R（保存exit）→ 驗R存在、讀receipt找到C、C存在、R^=C、C remote proof/acceptance/handoff/next Goal有效、local R==remote R、重跑§5 integrity → 核對branch與handoff exact checkpoint pair(R,C) → 先保全 dirty/index/untracked → 在允許且無競爭 writer 的 lane safe checkout/switch → verify HEAD/tree → 讀 project governance/Goal/handoff → dependency checks → acquire writer ownership → 才實作。任一 exact SHA 不符 HANDOFF_INTAKE FAIL / DO_NOT_START_IMPLEMENTATION；不要用浮動 latest 代替。若本機已有工作，建立批准的隔離 lane 或等待處置，不能 reset 解決。
 
-WIP_REMOTE_CHECKPOINT 需 Human 明確批准 WIP branch/exact SHA/transfer scope；標 WIP / NOT_ACCEPTED / NOT_REVIEWED / DO_NOT_MERGE。送方先停寫、保存 incomplete tests/findings、確認 remote SHA，再釋放 ownership；接方 fetch exact WIP SHA、intake、Human/governance writer transfer 後延續同 Goal。Reviewer 未完成不能升為 Accepted。WIP 也不容許同 branch 兩台同時寫。
+WIP_REMOTE_CHECKPOINT 需 Human 明確批准 WIP branch/exact SHA/transfer scope；標 WIP / NOT_ACCEPTED / NOT_REVIEWED / DO_NOT_MERGE。送方先停寫、保存 incomplete tests/findings、確認 remote SHA，再釋放 ownership；接方 fetch exact WIP SHA、intake、Human/governance writer transfer 後延續同 Goal。Reviewer 未完成不能升為 Accepted。WIP 也不容許同 branch 兩台同時寫。WIP 不產生Acceptance Receipt；只有Human accepted C才能產R。
 
 每 Goal 分 SEQUENTIAL_REQUIRED / PARALLEL_SAFE / PARALLEL_WITH_CONSTRAINTS；判斷 schema/persistence/API/runtime/shared Git metadata/workspace/shared tests/dependency/evidence/integration，不只檔案交集。不確定 SEQUENTIAL_REQUIRED。初期 MAX_CONCURRENT_IMPLEMENTATION_GOALS=2 是 operational default，不是 frozen invariant。獨立 branch/managed workspace/scope/writer，工具支援不足則串行。共同 `.git` metadata 操作須序列化；獨立 clone 可減共享 metadata 風險。
 
 Human 可批准 dependency-safe Goal Batch，逐項列 branch、writer、scope、前置與 concurrency；不是批次驗收，也不自動授權 tools/subagents。每 Goal 各自 candidate/review/Human/push。現有 Goal map 保守串行，沒有任何平行 batch 被授權。
 
-A PASS + B PASS != A+B PASS。整合另建 INTEGRATION_GOAL（preferred writer Codex），輸入 accepted exact A/B SHAs；Human 授權整合 scope/操作；controlled integration、conflict review、affected regression、新 evidence → independent review → Human approval → exact checkpoint C。Dependent Goal 從 accepted C 開始，不从 A/B 任一 component tip 開工。
+A PASS + B PASS != A+B PASS。整合另建 INTEGRATION_GOAL（preferred writer Codex），輸入 accepted exact A/B SHAs；Human 授權整合 scope/操作；controlled integration、conflict review、affected regression、新 evidence → independent review → Human approval → reviewed integration result C_int → accepted receipt R_int。Dependent Goal以(R_int,C_int) intake，不从A/B任一component tip開工。
 
 ## 7. Records and model routing
 
@@ -100,7 +152,8 @@ Environment fingerprint：OS/version、Git/Python/Node/npm/shell version、實�
 
 | Goal | 目標 | Execution mode | Preferred owner / model | Dependencies / integration |
 |---|---|---|---|---|
-| [TA-F1](../goals/TA-F1.md) | formal exact diff proposal | SEQUENTIAL_REQUIRED | Codex / Astra Medium | operating model acceptance + F1授權；不套用 diff |
+| [TA-LR-01](../goals/TA-LR-01.md) | Legacy closure / safe lane proposal | SEQUENTIAL_REQUIRED | Codex / Sol Medium；bounded inventory Luna Max | operating model accepted (R,C) + separate LR authorization；HD-L1/L2/L3 decision packet，不操作lane |
+| [TA-F1](../goals/TA-F1.md) | formal exact diff proposal | SEQUENTIAL_REQUIRED | Codex / Astra Medium | TA-LR-01 accepted receipt + HD-L1/L2/L3 Human decision + F1授權；不套用 diff |
 | [TA-F2](../goals/TA-F2.md) | exact wording/allowlist Human decision | SEQUENTIAL_REQUIRED | Human；Codex整理 / Astra Medium | F1 exact proposal identity |
 | [TA-F3](../goals/TA-F3.md) | approved formal documentation sync | SEQUENTIAL_REQUIRED | Codex / Astra Medium | F2 explicit批准及安全lane |
 | [TA-F4](../goals/TA-F4.md) | independent doc consistency | SEQUENTIAL_REQUIRED | Human-designated reviewer / Astra Medium | exact F3 candidate；Human決定checkpoint/S0授權 |
@@ -122,6 +175,6 @@ S0/W1 子 Goal 逐一 checkpoint 串接，最後一個需驗證整個 WP accumul
 
 ## 9. Legacy, publication and review boundary
 
-[Legacy reconciliation](POLYNEXUS_LEGACY_OPEN_WORK_RECONCILIATION.md) 是唯一 legacy→Track A routing；舊 Gxx/CP/roadmap 不再派工。未解 decisions 保留，S0 前必須有 disposition；不刪歷史或把 bounded PASS 重算為 Working Product PASS。
+[Legacy reconciliation](POLYNEXUS_LEGACY_OPEN_WORK_RECONCILIATION.md) 是唯一 legacy→Track A routing；舊 Gxx/CP/roadmap 不再派工。未解 decisions 保留，由TA-LR-01在F1前準備完整packet，Human批准disposition後才能進F1；不刪歷史或把 bounded PASS 重算為 Working Product PASS。
 
-本輪交付只 READY_FOR_INDEPENDENT_REVIEW，非已接受 operating model、非 immutable candidate、非 remote-ready。審查目前文件可用 [本輪 review packet](../reviews/TA-OPERATING-MODEL-REVIEW.md) 的 hashes/delta；正式 SHA final gate 須另獲 Git 授權後建立 candidate 再 review exact SHA。Independent review 後下一步為 F1 proposal 授權，F1/F2/F3/F4 不得跳過；本輪 STOP。
+R2交付為local REVIEW_CANDIDATE / NOT_ACCEPTED / NOT_PUSHED，exact SHA列外部R2 package；R1 [review packet](../reviews/TA-OPERATING-MODEL-REVIEW.md)僅歷史。R2 Human已授權限定local commit，不授權push或實際Acceptance Receipt。R2獨立review及Human acceptance/receipt closure後 NEXT_PROPOSED_GOAL=TA-LR-01，尚未授權也未執行。順序 Operating Model Accepted → TA-LR-01 → F1 → F2 → F3 → F4 → S0 → W1…；F1前必須有LR accepted outcome/Human disposition。不能從NEED_FIX R2授權推論LR已開工；本輪STOP。

@@ -77,7 +77,7 @@ git status --short --branch
 
 禁止未經要求 `git reset --hard`、force push、刪 branch、覆寫他人未提交內容。
 
-每個 Git Gate 必須重新確認 branch、HEAD、working tree 與 staged state。禁止使用 `git add .`、`git add -A`、`git push --all`、`git checkout -- .` 或 `git clean -fd` 取代 explicit allowlist。已授權 implementation Goal 包含 explicit-allowlist stage 與 local REVIEW_CANDIDATE commit，不需逐次批准；本輪治理任務明確禁止 stage/commit/push，例外優先。Push 始終需 independent PASS + APPROVE_TO_PUSH + Human exact SHA/remote/branch批准；驗證remote SHA，不只exit 0。其他remote configuration/repository creation及高風險Git操作仍需明確授權；accepted SHA不可amend/rebase/force-push覆寫。
+每個 Git Gate 必須重新確認 branch、HEAD、working tree 與 staged state。禁止使用 `git add .`、`git add -A`、`git push --all`、`git checkout -- .` 或 `git clean -fd` 取代 explicit allowlist。已授權 implementation Goal 包含 explicit-allowlist stage 與 local REVIEW_CANDIDATE commit，不需逐次批准；R2本輪只允許FIX-01/FIX-02 self-validation後exact-allowlist local review commit，不push。Push 始終需 independent PASS + APPROVE_TO_PUSH + Human exact SHA/remote/branch批准；驗證remote SHA，不只exit 0。其他remote configuration/repository creation及高風險Git操作仍需明確授權；accepted SHA不可amend/rebase/force-push覆寫。
 
 ## 7. Verification
 
@@ -116,3 +116,5 @@ Repo skills：
 - `polynexus-workflow-authoring`
 
 Track A goal-level skills：`polynexus-goal-execution`、`polynexus-cross-machine-handoff`、`polynexus-independent-acceptance`。既有 specialized skills 仍供實作/contract檢查，不能覆蓋Framework。
+
+R2限定修復：Acceptance Receipt依Framework §5，Human批准reviewed C可同次授權一次bounded metadata R closure；R direct parent C、strict allowlist/integrity PASS後push R，remote R match才跨機接續。R不修改C reviewed內容、不需第二次完整product review；WIP不產R。NEXT_PROPOSED_GOAL=TA-LR-01（DEFINED_NOT_EXECUTED），LR accepted/Human decisions後才F1；產品HOLD。

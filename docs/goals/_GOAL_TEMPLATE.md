@@ -3,6 +3,19 @@
 依 [Framework](../governance/POLYNEXUS_TRACK_A_GOAL_EXECUTION_FRAMEWORK.md)。PLANNED 不授權執行；authorization 前所有影響 scope/safety/AC 的 UNKNOWN 必須解決。普通 implementation choices 由 Writer 處理。
 
 ```yaml
+REVIEWED_PRODUCT_SHA: UNASSIGNED # C, exact independent-review/Human target
+ACCEPTANCE_RECEIPT_SHA: UNASSIGNED # R after closure; in R use SELF_RECEIPT
+GOVERNANCE_PREDECESSOR_SHA: UNASSIGNED # accepted R for next Goal, not product C
+REVIEWED_PREDECESSOR_SHA: UNASSIGNED # C from predecessor receipt
+ONE_BOUNDED_ACCEPTANCE_RECEIPT_CLOSURE: NOT_AUTHORIZED
+RECEIPT_EXACT_ALLOWLIST: [] # Human-approved exact metadata paths; Framework 5.2
+REVIEWED_SCOPE_HASHES: {} # protected result bytes; not retroactively excluded
+RECEIPT_PARENT_RULE: DIRECT_SINGLE_PARENT_C
+RECEIPT_INTEGRITY: NOT_RUN
+REMOTE_C_PROOF_REF: NONE
+REMOTE_R_PROOF_REF: NONE # external after R; receiver independently verifies remote R
+CROSS_MACHINE_CHECKPOINT: NOT_READY
+
 GOAL_ID: REQUIRED
 TRACK: Track A V1
 PARENT_WP: REQUIRED
@@ -56,3 +69,5 @@ NEXT_GOAL: REQUIRED
 ```
 
 Batch authorization 另列 batch ID、每 Goal exact scope/branch/writer、dependency-safe 判斷與最大並發，不取代逐 Goal review/acceptance。Integration Goal 必須列 accepted A/B SHAs、預期 C、衝突處理與 affected regression。
+
+Acceptance closure依[Framework §5](../governance/POLYNEXUS_TRACK_A_GOAL_EXECUTION_FRAMEWORK.md#5-acceptance-receipt--cross-machine-closure-finding-01)：C已review且Human接受，remote C verified後才能建立R。R不含自身literal SHA/hash；SELF_RECEIPT由固定R解釋，R proof外部保存/接方重驗，避免第三層循環。WIP不產R。Next Goal intake同時保存(R,C)，routing不授權執行；目前next proposed TA-LR-01未執行。
