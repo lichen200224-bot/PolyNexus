@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "goal_id": "TA-F4",
+  "authorization_id": "TA-F4-HUMAN-AUTH-20260911-01",
+  "formal_predecessor_sha": "632b5e061c225e717e3ec0d5686a83f654858529",
+  "accepted_f3_sha": "c4c17924ad568e5ae279fa3632a9960421ba80cb",
+  "f3_receipt_sha": "284929a8f5a39df5524ccba7d733aa9161fc91e9",
+  "previous_f4_candidate": "a0bb7458bab95836c6af066b8d2d12a61917c195",
+  "previous_candidate_disposition": "ABANDONED_FOR_PROMOTION",
+  "result": "PASS",
+  "changed_file_count": 8,
+  "changes": [
+    {"status":"MODIFIED","path":"docs/00_SCOPE_BASELINE.md","before_blob":"9df9ac9bca08482714fcda27c5bb6f26826c9e2e","after_blob":"57558a3643ff37538d84fc560d23e0c9e28b6cee"},
+    {"status":"MODIFIED","path":"docs/01_PRD.md","before_blob":"ebf62727e4120e668803d19049457fec629072df","after_blob":"fc34c1a734d62e9025eea2f99aaca42bc655b22d"},
+    {"status":"MODIFIED","path":"docs/02_SA.md","before_blob":"cd6ac68dffeb2a49392262d33c1c0ed9a56df704","after_blob":"9193435bd43b4aed61109e63790fa7eaf5ca0ab1"},
+    {"status":"MODIFIED","path":"docs/03_SD.md","before_blob":"45082dee6b729c462336818b30dd177e64626cf5","after_blob":"bacfdcc8d9bace8b47849c62d77d1a4000c01027"},
+    {"status":"MODIFIED","path":"docs/10_DECISION_LOG.md","before_blob":"0571a8d5b4ce9571afd5952d752f3e2ec2b36c09","after_blob":"74185c6d38670ed5093c12ffa934d3f8b1b1fa5c"},
+    {"status":"MODIFIED","path":"docs/18_ARCHITECTURE_DECISIONS.md","before_blob":"0e33a5c0ea8c082cf1be60103ca57cca19263c2f","after_blob":"06efb5f1c88f5b77ad51b55bbbc0b9efc329fb32"},
+    {"status":"CREATED","path":"docs/34_ADR_013_WORK_GENERATION_CANDIDATE_AND_ACCEPTANCE.md","before_blob":null,"after_blob":"3fe42e09713381d9efa74072e5a1f1ae5809d4fb"},
+    {"status":"CREATED","path":"docs/35_D11_A_LP_LOCAL_HUMAN_DECISION_PROTOCOL.md","before_blob":null,"after_blob":"e8d143fe1e5e4166ba132a185130b22df54ebbb1"}
+  ],
+  "formal_targets_unchanged_after_f3": true,
+  "adr_011_unchanged": true,
+  "product_tree_unchanged_from_f34": true,
+  "migration_executed": false,
+  "mandatory_skipped": []
+}
