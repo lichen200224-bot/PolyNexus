@@ -23,7 +23,12 @@
 | `19_DEVELOPMENT_BASELINE.md` | 第一條 Vertical Slice 執行契約 | **下一個開發任務必讀** |
 | `20_FIRST_VERTICAL_SLICE_PLAN.md` | 第一條產品垂直切片詳細工作包 | Slice 開發必讀 |
 | `28_MASTER_DEVELOPMENT_ROADMAP.md` | 全專案開發順序、範圍、時程、權重與 Checkpoint | **專案進度監控／每次交接必讀** |
+| `29_ADR_011_RUNTIME_BINDING_AND_TRANSPORT.md` | Runtime/Profile/Adapter/Transport identity 與 immutable binding 架構 | **Runtime／Extension 架構必讀** |
+| `30_RUNTIME_CONTRACT_FOUNDATION_GATE.md` | Runtime contract foundation、registry/binding/cleanup 驗收基線 | **Runtime／Extension 實作前必讀** |
+| `31_ADR_012_RUNTIME_DOCTOR_REPORTING.md` | Runtime Doctor、capability/version/maturity truthfulness | Runtime inventory / conformance 任務 |
 | `33_DEVELOPMENT_PROGRESS_AND_GOAL_EXECUTION_STANDARD.md` | Development-only 100 分制、WP ledger、G24–G30 授權與驗收規範 | **G24–G30 每個新 task 必讀** |
+| `34_ADR_013_MODULAR_CORE_EXTENSION_ARCHITECTURE.md` | Modular Core、Module/Adapter 邊界、static extension contract 與未來外接 Runtime 方向 | **Extension／Plugin／Runtime 架構必讀** |
+| `tasks/ARCH-MODULAR-CORE-01.md` | MCF-01 static module contract 的 Codex 實作與獨立驗收工作包 | **MCF-01 Codex 啟動必讀** |
 | `tasks/G24-G30-DEVELOPMENT-COMPLETION-ROUTING.md` | Luna High 的 G24–G30 系統提示詞、外部驗證 prompt 與 stop condition | **執行對應 Goal 必讀** |
 | `../artifacts/verification/g24-development-ledger-20260902/ledger.json` | G24 current machine-readable WP-11–WP-32 ledger and score reconciliation | **G24 acceptance evidence** |
 | `../artifacts/verification/g24-development-ledger-20260902/summary.md` | G24 current ledger scope, boundaries, and limitations | **G24 acceptance evidence** |
