@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "goal_id": "TA-F1",
+  "result_type": "GOVERNANCE_FORMALIZATION_PROPOSAL",
+  "checkpoint_type": "ACCEPTED",
+  "reviewed_product_sha": "892fb43472bac561d42cfe3a9ee2511fe0e91586",
+  "acceptance_receipt_sha": "SELF_RECEIPT",
+  "parent_rule": "DIRECT_SINGLE_PARENT_C",
+  "independent_review_status": "PASS",
+  "push_recommendation": "DO_NOT_PUSH_OVERRIDDEN_BY_LATER_HUMAN_AUTHORIZATION",
+  "human_acceptance": "APPROVED",
+  "one_bounded_acceptance_receipt_closure": "AUTHORIZED",
+  "f2_decision": "APPROVE_EXACT_WORDING_AND_EIGHT_FILE_F3_ALLOWLIST",
+  "f3_authorization": "AUTHORIZED_AS_NEW_BOUNDED_GOAL",
+  "product_implementation": "HOLD",
+  "s0": "NOT_AUTHORIZED",
+  "s0_predecessor": "UNASSIGNED",
+  "independent_review": {"path":"docs/reviews/TA-F1/independent-review.md","sha256":"f66331989bfd5663ad44750d94ba412d089c091e89631fdda8bc37ae3046ad92","size":1717,"target":"892fb43472bac561d42cfe3a9ee2511fe0e91586"},
+  "human_decision": {"path":"docs/reviews/TA-F1/human-decision.md","sha256":"f2c23f70f08425c3bc382c5cb7f07c40179fd6d1cd1c89e4acb2e305ca18db4a","size":1641,"target":"892fb43472bac561d42cfe3a9ee2511fe0e91586"},
+  "remote_c_proof": {"path":"docs/reviews/TA-F1/remote-c-proof.json","sha256":"8fe1726473b35cc15db797d03716fa6be76e2d57008166ad9ce7b6fa38ddbfef","size":1654,"local_sha":"892fb43472bac561d42cfe3a9ee2511fe0e91586","remote_sha":"892fb43472bac561d42cfe3a9ee2511fe0e91586"},
+  "handoff": {"path":"docs/handoffs/TA-F1/accepted.md","sha256":"bf6f686db61117e036bbc8e3b969b42ab3ab86df2a537f72b8da04ef6e141b96","size":1290},
+  "changed_files": [
+    "docs/handoffs/TA-F1/accepted.md",
+    "docs/reviews/TA-F1/acceptance-receipt.json",
+    "docs/reviews/TA-F1/human-decision.md",
+    "docs/reviews/TA-F1/independent-review.md",
+    "docs/reviews/TA-F1/remote-c-proof.json"
+  ],
+  "payload_manifest": [
+    {"path":"docs/handoffs/TA-F1/accepted.md","size":1290,"sha256":"bf6f686db61117e036bbc8e3b969b42ab3ab86df2a537f72b8da04ef6e141b96"},
+    {"path":"docs/reviews/TA-F1/human-decision.md","size":1641,"sha256":"f2c23f70f08425c3bc382c5cb7f07c40179fd6d1cd1c89e4acb2e305ca18db4a"},
+    {"path":"docs/reviews/TA-F1/independent-review.md","size":1717,"sha256":"f66331989bfd5663ad44750d94ba412d089c091e89631fdda8bc37ae3046ad92"},
+    {"path":"docs/reviews/TA-F1/remote-c-proof.json","size":1654,"sha256":"8fe1726473b35cc15db797d03716fa6be76e2d57008166ad9ce7b6fa38ddbfef"}
+  ],
+  "reviewed_scope_hashes": {
+    "docs/goals/TA-F1.md":"100644:e49856de05aa606a26f2815e8c96c9ef4d9902c2",
+    "docs/handoffs/TA-F1/review-ready.md":"100644:d2017b146f7af5aabc831faa88d0ac5c12675a17",
+    "docs/reviews/POLYNEXUS_FORMAL_CONTRACT_ADR_SYNC_PROPOSAL.md":"100644:f24a244c01391c73cc96b743d8cdef1ecc74796d",
+    "docs/reviews/TA-F1/ENVIRONMENT_FINGERPRINT.md":"100644:6a0bffc5a54184ba56fb6a1be74b3acb36aec356",
+    "docs/reviews/TA-F1/REVIEW_PACKET.md":"100644:32b8fb6ab0ae49d192bd61f1460adf8705923d01",
+    "docs/reviews/TA-F1/VALIDATION_RESULTS.md":"100644:c8f80e7743fcdad4c4cb140e89762b238058b6c9",
+    "docs/reviews/TA-F1/evidence/source-inventory.json":"100644:d68fccb810b3c9c6c3ba10117a4c47e5c08d4ea0",
+    "docs/reviews/TA-F1/evidence/validation-report.json":"100644:071fa24f921defcdcde68888e2f2635af008cff8"
+  },
+  "next_goal": "TA-F3",
+  "next_goal_record": {"path":"docs/reviews/POLYNEXUS_FORMAL_CONTRACT_ADR_SYNC_PROPOSAL.md","section":"23. F3 execution prerequisites","sha256":"baa15639a6eb749c461d08178a6a233afbd0f18a668666a437ac049a519afe87","size":35354},
+  "next_governance_predecessor": "SELF_RECEIPT",
+  "next_reviewed_result": "892fb43472bac561d42cfe3a9ee2511fe0e91586",
+  "next_goal_authorized": true,
+  "next_goal_authorization": "AUTHORIZED_AS_NEW_BOUNDED_GOAL_CONDITIONAL_ON_REMOTE_R_READY"
+}

@@ -1,0 +1,32 @@
+{
+  "goal_id": "TA-F1",
+  "candidate": "892fb43472bac561d42cfe3a9ee2511fe0e91586",
+  "remote": "https://github.com/lichen200224-bot/PolyNexus.git",
+  "remote_name": "origin",
+  "remote_ref": "refs/heads/codex/track-a-formalization",
+  "observed_at": "2026-09-11T11:06:42.3454622+08:00",
+  "local_c": "892fb43472bac561d42cfe3a9ee2511fe0e91586",
+  "remote_c": "892fb43472bac561d42cfe3a9ee2511fe0e91586",
+  "match": true,
+  "push_attempts": [
+    {
+      "exact_command": "git -c safe.directory=D:/AI_學習教材/PolyNexus/artifacts/worktrees/track-a-formalization-20260910 -C D:/AI_學習教材/PolyNexus/artifacts/worktrees/track-a-formalization-20260910 push origin 892fb43472bac561d42cfe3a9ee2511fe0e91586:refs/heads/codex/track-a-formalization",
+      "actual_exit_code": 1,
+      "bounded_output": "sandbox credential prompt unavailable; remote unchanged"
+    },
+    {
+      "exact_command": "git -c safe.directory=D:/AI_學習教材/PolyNexus/artifacts/worktrees/track-a-formalization-20260910 -C D:/AI_學習教材/PolyNexus/artifacts/worktrees/track-a-formalization-20260910 push origin 892fb43472bac561d42cfe3a9ee2511fe0e91586:refs/heads/codex/track-a-formalization",
+      "actual_exit_code": 0,
+      "bounded_output": "new branch codex/track-a-formalization"
+    }
+  ],
+  "successful_push": {
+    "actual_exit_code": 0,
+    "force": false
+  },
+  "remote_verification": {
+    "exact_command": "git ls-remote --heads https://github.com/lichen200224-bot/PolyNexus.git refs/heads/codex/track-a-formalization",
+    "actual_exit_code": 0,
+    "bounded_output": "892fb43472bac561d42cfe3a9ee2511fe0e91586 refs/heads/codex/track-a-formalization"
+  }
+}
