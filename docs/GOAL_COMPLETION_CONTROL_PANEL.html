@@ -22,6 +22,12 @@
   <body>
     <main>
       <section>
+        <h2>Current bounded acceptance state — 2026-09-12</h2>
+        <div class="callout"><code>V1_BOUNDED_DEVELOPMENT_ACCEPTANCE_SCORE=95/100</code><br />G24–G30 DEVELOPMENT-ONLY / V1 BOUNDED DEVELOPMENT ACCEPTANCE SCORE<br /><code>OVERALL_PROJECT_COMPLETION=NOT_DEFINED</code><br /><code>WP20=NOT_COMPLETE</code> (0/5) · <code>G30=NEED_ACTION</code><br /><code>MCF01=CHECKPOINTED / ACCEPTED_WITH_PRE_EXISTING_BASELINE_DEBT</code><br />Checkpoint: <code>96ae53537e5501f1ef374182e7e1966b921a7883</code><br /><code>BASELINE-DEBT-01=IMPLEMENTATION_NOT_STARTED</code><br /><code>DIFFERENTIAL_REGRESSION=PASS</code> · <code>REGRESSION_SUITE_STATE=FAIL</code> · <code>FULL_CORE_REGRESSION=FAIL</code> · <code>BASELINE_DEBT=OPEN</code></div>
+        <p>95/100 不是 PolyNexus 整體完成率、roadmap 完成率、product readiness、MCF architecture 或 Plugin Platform 完成率。MCF-01 與 BASELINE-DEBT-01 均不加分。分母排除項目見 <a href="33_DEVELOPMENT_PROGRESS_AND_GOAL_EXECUTION_STANDARD.md">development acceptance standard</a>。</p>
+        <p>以下有日期的 checkpoint、測試結果與 forecast 保留為歷史紀錄；歷史 PROJECT_SCORE 是 legacy G24–G30 development-only acceptance score。當前狀態以上列欄位為準。</p>
+      </section>
+      <section>
         <h2>G29 handoff — HANDOFF_COMPLETE / DEFERRED_TO_G30</h2>
         <div class="callout"><strong>G29: HANDOFF_COMPLETE / DEFERRED_TO_G30</strong><br />Development score: <strong>95/100</strong> · WP-20: <strong>0/5</strong><br />Exact predecessor: <code>2bbcb0cb2cc6bc39e5a5770f91b9c58c03fed762</code> · Approved remote: <code>D:/GitBackup/PolyNexus_Backup.git</code> / <code>feature/g24-g30-development-completion-routing</code><br />G29 preflight and sanitized operator handoff are complete. External operator verification is deferred to G30. No login, credential, cookie, token, or external send was used. G30 is prepared but not started.</div>
       </section>
@@ -34,7 +40,7 @@
         <h1>G24–G30 已核准 · 開發完成路線</h1>
         <p class="muted">狀態快照：2026-09-02（Asia/Taipei）。開發專用 100 分制；競賽為人工備註軌，不納入進度。每個 Goal 在新的 Codex task 以 GPT-5.6 Luna / High 執行。</p>
         <div class="meta">
-          <div class="metric"><span class="muted">正式進度</span><strong>95 / 100</strong></div>
+          <div class="metric"><span class="muted">V1 bounded development acceptance score</span><strong>95 / 100</strong></div>
           <div class="metric"><span class="muted">G24–G30 plan</span><strong class="ready">HUMAN CONFIRMED</strong></div>
           <div class="metric"><span class="muted">G26 status</span><strong class="ready">HUMAN ACCEPTED · PASS · COMPLETE</strong></div>
           <div class="metric"><span class="muted">外部驗證</span><strong class="gated">G29 · LATE</strong></div>
@@ -42,7 +48,7 @@
       </header>
 
       <section>
-        <h2>目前正式狀態</h2>
+        <h2>G27 歷史 checkpoint 狀態</h2>
         <div class="callout"><strong>G27: HUMAN_ACCEPTED · PASS · COMPLETE</strong><br />G27 predecessor SHA: <code>7a7dee67395c8a07f2e5b055a306e63190bbd1f8</code><br />G27 product output SHA: <code>27ff09c224344821868dd8fd36ec2c0eb11504df</code><br />Branch: <code>feature/g27-workflow-guards-metrics</code> · Approved remote/ref: <code>D:/GitBackup/PolyNexus_Backup.git</code> / <code>feature/g24-g30-development-completion-routing</code><br />Development score: <strong>90/100</strong> · Accepted G27 delta: <strong>+6</strong><br />WP-22 templates: <strong>3/3</strong> · WP-24 guards: <strong>2/2</strong> · WP-25 metrics: <strong>1/1</strong><br />Full Core: <strong>720 passed · 1 skipped · exit 0</strong> · targeted G27 suite: <strong>40 passed · exit 0</strong><br />Independent review: <strong>PASS · 0/0/0</strong> · Remote/fresh clean clone: <strong>SHA matched · clean</strong><br />Human decision: <strong>G27_DECISION=ACCEPT_AND_COMMIT_PUSH</strong> · NEXT_GOAL_READY: <strong>G28</strong><br />Live vendor verification remains G29; no vendor certification or external send is claimed.</div>
         <p class="muted" style="margin-top:16px;">Codex 可在單一 Goal 核准範圍內實作、測試、修正、重驗與更新所有進度資料；Human 的一般介入點只有最後的 <code>&lt;GOAL&gt;_DECISION=ACCEPT_AND_COMMIT_PUSH</code>。這不授權 scope/ADR 變更、秘密資料、外部自動送出、force push、remote reconfiguration 或下一 Goal。</p>
         <p><a href="33_DEVELOPMENT_PROGRESS_AND_GOAL_EXECUTION_STANDARD.md">Execution standard</a> · <a href="tasks/G24-G30-DEVELOPMENT-COMPLETION-ROUTING.md">G24–G30 copy-ready prompts</a> · <a href="11_PROJECT_STATE.md">Project State</a> · <a href="12_HANDOFF_CURRENT.md">Current Handoff</a></p>
@@ -140,7 +146,7 @@
               <tr><td>CP-04</td><td>15 / 20</td><td>WP-19 +12 and WP-21 bounded fixture accepted; G29 +5</td></tr>
               <tr><td>CP-05</td><td>8 / 13</td><td>WP-23 accepted; G27 +6; G28 +5 pending Human</td></tr>
               <tr><td>CP-06</td><td>10 / 10</td><td>G19 provenance, G20 reproducibility, G22 hardening/delivery, G23 Human acceptance</td></tr>
-          <tr><td><strong>Total</strong></td><td><strong>95 / 100</strong></td><td>G29 +5 remains gated</td></tr>
+          <tr><td><strong>Total</strong></td><td><strong>95 / 100</strong></td><td>WP-20 +5 remains gated / deferred to G30</td></tr>
               <tr><td>Competition</td><td>—</td><td>NOTE_ONLY_NON_SCORING; Human-owned delivery</td></tr>
             </tbody>
           </table>
@@ -154,7 +160,7 @@
           <li><code>docs/31_COMPATIBILITY_MATRIX.md</code> remains the promoted file; primary <code>docs/31_PROJECT_CONTENT_MAP.md</code> was excluded without overwrite.</li>
           <li>G21 verifies only a controlled synthetic-host browser fixture. Live vendor login, DOM compatibility, and external send remain <strong class="warning">DEFERRED / UNVERIFIED</strong> until G29.</li>
           <li>Credential, cookie, token, and automatic external send remain prohibited. Human confirms every send in G29.</li>
-          <li>ADR-001–010 remain frozen; ADR-011 is unchanged; current formal development progress is 95/100 and G29 remains blocked.</li>
+          <li>ADR-001–010 remain frozen; ADR-011 is unchanged; V1 bounded development acceptance score is 95/100; overall project completion is NOT_DEFINED; G30 remains NEED_ACTION.</li>
         </ul>
       </section>
 

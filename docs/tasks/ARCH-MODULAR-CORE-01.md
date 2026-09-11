@@ -1,6 +1,6 @@
 # ARCH-MODULAR-CORE-01 — V1 Static Modular Contract Foundation
 
-- Status: `ACCEPTED_WITH_PRE_EXISTING_BASELINE_DEBT` — task-specific Human decision 2026-09-12; Git Gate pending
+- Status: `CHECKPOINTED / ACCEPTED_WITH_PRE_EXISTING_BASELINE_DEBT` — task-specific Human decision 2026-09-12
 - Human direction: `APPROVED` on 2026-09-11
 - Architecture source: `docs/34_ADR_013_MODULAR_CORE_EXTENSION_ARCHITECTURE.md`
 - Documentation branch: `architecture/modular-core-extension-contract`
@@ -337,6 +337,14 @@ The architecture documentation branch itself is a separate docs-only checkpoint 
 - 本次文件 gate 未重跑 pytest；上述為可定位的既有獨立 evidence。Writer 原始結果、Reviewer 原始結果與 Human acceptance 是三個不同紀錄。
 - Follow-up: [BASELINE-DEBT-01](BASELINE-DEBT-01.md), priority `P1`, scope proposal established; implementation not started。
 - 在 BASELINE-DEBT-01 完成並通過 Fresh Independent Review 前，不得啟動 holaOS/OpenHands production integration、dynamic plugin platform、MCF-02 external-runtime integration，或 Module Architecture production-ready promotion；可做文件規劃與 research，不得產生 production support claim。
-- Current truth unchanged: `G30=NEED_ACTION`; `WP-20=NOT COMPLETE`; `PROJECT DEVELOPMENT SCORE=95/100`; MCF-01 不加分。
-- Git authority: 目前只授權 exact staged-file proposal、proposed commit message、debt task proposal 與最小文件同步。`STAGE=NOT_EXECUTED`, `COMMIT=NOT_AUTHORIZED`, `PUSH=NOT_AUTHORIZED`。等待下一次 Human Git Gate；不得 merge/rebase/force push/remote reconfiguration。
+- Current truth unchanged: `G30=NEED_ACTION`; `WP-20=NOT COMPLETE`; `V1_BOUNDED_DEVELOPMENT_ACCEPTANCE_SCORE=95/100`; `OVERALL_PROJECT_COMPLETION=NOT_DEFINED`; MCF-01 不加分。
+- Git checkpoint: Human-authorized exact nine-file commit and push completed; see post-push checkpoint below. 本次 docs-only sync exact 8-file patch 已 staged，尚未 commit/push；Fresh Independent Docs Review 已執行，目前 verdict 仍為 `NEED_FIX`，待 re-review，等待 `HUMAN_DOC_GIT_GATE`；不得 merge/rebase/force push/remote reconfiguration。
 - Evidence: `artifacts/verification/mcf01-20260912/human-acceptance-git-proposal.md`, `independent-review-final-verbatim.md`, `human-gate-source-check.json`。Raw independent JUnit 保留於 Reviewer task 的 `mcf01-independent/` 目錄。
+
+## Post-push checkpoint — 2026-09-12
+
+- `CHECKPOINT_SHA=96ae53537e5501f1ef374182e7e1966b921a7883`; branch `feature/mcf-01-static-module-contract`。
+- `COMMIT_EXIT=0`; `PUSH_EXIT=0`; `REMOTE_SHA_MATCH=PASS`; `CLEAN_CLONE=PASS`。
+- Clean clone: `C:\Users\shawn\polynexus-mcf01-verify-7bbfac6ff21846bfa9b28aed43d267f4`；HEAD 與 remote exact checkpoint 相同，驗證前後 working tree 乾淨；確認 module imports 來自 clone。
+- Clean-clone verification: `MCF01_FOCUSED=50/50 / exit 0`（50 passed / 0 failed / 0 skipped）；`BASELINE_VALIDATOR=0`; `GOVERNANCE_VALIDATOR=0`。這是已完成的 post-push checkpoint evidence，本次 docs-only sync 未重跑 pytest。
+- `REGRESSION_SUITE_STATE=FAIL`; `FULL_CORE_REGRESSION=FAIL`; `DIFFERENTIAL_REGRESSION=PASS`; `BASELINE_DEBT=OPEN`。Focused clean-clone PASS 不取代 required regression suite 結果。

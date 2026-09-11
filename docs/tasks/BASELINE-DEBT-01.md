@@ -3,6 +3,7 @@
 - Priority: `P1`
 - Status: `SCOPE_PROPOSED / IMPLEMENTATION_NOT_STARTED`
 - Created by Human routing: 2026-09-12, `MCF01_DECISION=ACCEPT_WITH_PRE_EXISTING_BASELINE_DEBT`.
+- Predecessor/source checkpoint: `96ae53537e5501f1ef374182e7e1966b921a7883` (MCF-01 committed/pushed, remote SHA and clean clone verified).
 - Source task: [ARCH-MODULAR-CORE-01](ARCH-MODULAR-CORE-01.md).
 - Writer: to be assigned after start/scope gate; Reviewer: fresh independent Codex context (`Writer != Reviewer`).
 - 此文件建立獨立追蹤與實作 proposal；本次 Git proposal 不開始 debt implementation，也不預先授權 schema/migration/public contract 變更。
@@ -58,7 +59,7 @@ Required outcome:
 
 ## Start and verification gates
 
-- 從後续 Human-approved MCF-01 commit/checkpoint 開始，記錄 exact HEAD、branch、remote、working/staged state；不從仍未提交的 candidate 猜測接受 SHA。
+- 從 Human-approved MCF-01 checkpoint `96ae53537e5501f1ef374182e7e1966b921a7883` 開始，記錄 exact HEAD、branch、remote、working/staged state，核對 predecessor ancestry；本次僅同步前置 checkpoint，implementation remains NOT_STARTED。
 - 使用隔離 implementation lane，保護其他未提交修改；先建立最小 failing repro，再修根因。
 - Focused deterministic repro → 26-case debt matrix（按 testcase identity + failure semantics）→ affected persistence/lifecycle/council/API/resource regressions → MCF-01 focused、runtime skeleton/binding、WP-14/15/16 → Full Core pytest → baseline/governance validators → git diff --check。
 - 每條 command 記錄 actual exit code、passed/failed/errors/skipped、環境 blocker；同環境 baseline/candidate 比對只能協助診斷，不能沿用 MCF-01 例外取代本 task required suite 成功。
@@ -72,7 +73,7 @@ Required outcome:
 
 本 task 完成並通過 Fresh Independent Review 前，不得開始 holaOS/OpenHands production integration、dynamic plugin platform、MCF-02 external-runtime integration，或任何 Module Architecture production-ready promotion。可文件規劃與 research，不可建立 production support claim。
 
-Current truth: `G30=NEED_ACTION`; `WP-20=NOT COMPLETE`; `PROJECT DEVELOPMENT SCORE=95/100`。
+Current truth: `G30=NEED_ACTION`; `WP-20=NOT COMPLETE`; `V1_BOUNDED_DEVELOPMENT_ACCEPTANCE_SCORE=95/100`; `OVERALL_PROJECT_COMPLETION=NOT_DEFINED`; BASELINE-DEBT-01 不加分。
 
 ## Next owner
 

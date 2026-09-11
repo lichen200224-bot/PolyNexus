@@ -7,7 +7,9 @@
 - P1 follow-up: [BASELINE-DEBT-01](tasks/BASELINE-DEBT-01.md)：durable lifecycle event deterministic total ordering，以及 timeout/cancel/cleanup deterministic verification；不得靠放寬 assertion、retry 或任意提高 sleep 掩蓋。
 - 在該 task 完成且 Fresh Independent Review 通過前，禁止 holaOS/OpenHands production integration、dynamic plugin platform、MCF-02 external-runtime integration 及 Module Architecture production-ready promotion。僅可文件規劃/research，無 production support claim。
 - Module 層維持 static built-in、NO_CONFIG、EXPERIMENTAL；TOOL/SURFACE/INTEGRATION 僅 descriptor vocabulary。沒有 live vendor verification。
-- G30 維持 NEED_ACTION、WP-20 未完成、development score 95/100。Git commit/push 仍待獨立 Human Git Gate。
+- `G30=NEED_ACTION`; `WP20=NOT_COMPLETE`; `V1_BOUNDED_DEVELOPMENT_ACCEPTANCE_SCORE=95/100`; `OVERALL_PROJECT_COMPLETION=NOT_DEFINED`。MCF-01 與 BASELINE-DEBT-01 不加分。
+- MCF-01 checkpoint committed and pushed: `96ae53537e5501f1ef374182e7e1966b921a7883`。Remote exact SHA verified；clean-clone verification passed（focused 50/50, exit 0；baseline/governance validators exit 0）。
+- `BASELINE_DEBT=OPEN`; `BASELINE-DEBT-01=IMPLEMENTATION_NOT_STARTED`。本次 docs-only state sync 已依 exact allowlist staged，尚未 commit/push，等待 `HUMAN_DOC_GIT_GATE`。
 - Acceptance provenance 與原始結果見 [MCF-01 task](tasks/ARCH-MODULAR-CORE-01.md#current-human-acceptance--2026-09-12)；不覆寫下列歷史紀錄。
 
 

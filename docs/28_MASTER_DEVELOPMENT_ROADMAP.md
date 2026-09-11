@@ -1,5 +1,15 @@
 # PolyNexus Master Development Roadmap & Checkpoint Register
 
+## Current bounded acceptance state — 2026-09-12
+
+- `V1_BOUNDED_DEVELOPMENT_ACCEPTANCE_SCORE=95/100`: G24–G30 DEVELOPMENT-ONLY / V1 BOUNDED DEVELOPMENT ACCEPTANCE SCORE。
+- `OVERALL_PROJECT_COMPLETION=NOT_DEFINED`；95/100 不是 PolyNexus 整體完成率、roadmap 完成率、product readiness、MCF architecture 或 Plugin Platform 完成率。
+- `WP20=NOT_COMPLETE`（0/5）；`G30=NEED_ACTION`。
+- `MCF01=CHECKPOINTED / ACCEPTED_WITH_PRE_EXISTING_BASELINE_DEBT`；checkpoint `96ae53537e5501f1ef374182e7e1966b921a7883`。
+- `BASELINE-DEBT-01=IMPLEMENTATION_NOT_STARTED`；MCF-01 與 BASELINE-DEBT-01 均不增加 development points。
+- `DIFFERENTIAL_REGRESSION=PASS`；`REGRESSION_SUITE_STATE=FAIL`；`FULL_CORE_REGRESSION=FAIL`；`BASELINE_DEBT=OPEN`。
+- 以下有日期的既有 checkpoint、Writer／Reviewer 結果與 forecast 保留為歷史紀錄；其中 `PROJECT_SCORE` 是 legacy G24–G30 development-only acceptance score，不代表 overall completion。當前狀態以上列欄位為準。
+
 ## G29 handoff — HANDOFF_COMPLETE / DEFERRED_TO_G30 (2026-09-03)
 
 - G28 is `HUMAN_ACCEPTED / PASS / COMPLETE` at `95/100`.
@@ -96,7 +106,7 @@ This document is the project-level monitoring baseline. It defines sequence, sco
 
 ## 3. Progress model
 
-The project uses a 100-point checkpoint-weighted progress model. Only `ACCEPTED` or `CHECKPOINTED` work earns project progress. `IMPLEMENTING`, `READY_FOR_CODEX_REVIEW`, `NEED_ACTION`, and `UNVERIFIED` are reported as status but earn zero points until the acceptance condition is met.
+The G24–G30 program uses a bounded, development-only 100-point acceptance model. Only in-denominator `ACCEPTED` or `CHECKPOINTED` work earns bounded development acceptance points. Overall project completion is not defined. The denominator exclusions are defined in `docs/33_DEVELOPMENT_PROGRESS_AND_GOAL_EXECUTION_STANDARD.md`. `IMPLEMENTING`, `READY_FOR_CODEX_REVIEW`, `NEED_ACTION`, and `UNVERIFIED` are reported as status but earn zero points until the acceptance condition is met.
 
 ### G24–G30 Human-confirmed development completion program — 2026-09-02
 
@@ -138,7 +148,7 @@ The project uses a 100-point checkpoint-weighted progress model. Only `ACCEPTED`
 | WP-17 local endpoint profiles | 4 | 4 | G26 — HUMAN_ACCEPTED / PASS / CHECKPOINTED |
 | WP-18 classification/routing | 4 | 4 | G26 — HUMAN_ACCEPTED / PASS / CHECKPOINTED |
 | WP-19 WebSurface/MV3 boundary | 4 | 4 | G26 — HUMAN_ACCEPTED / PASS / CHECKPOINTED |
-| WP-20 authenticated Level 3A vendor flow | 5 | 0 | G29 — IMPLEMENTED_PENDING_REVIEW; external/Human-operated |
+| WP-20 authenticated Level 3A vendor flow | 5 | 0 | NOT_COMPLETE; 0/5; external/Human-operated verification deferred to G30 |
 | WP-21 bounded browser fixture | 3 | 3 | Accepted through G21–G23 |
 | WP-22 workflow templates | 3 | 3 | G27 — HUMAN_ACCEPTED / PASS / CHECKPOINTED |
 | WP-23 backup/restore/migration | 2 | 2 | Accepted through G17/G22/G23 |
@@ -147,7 +157,7 @@ The project uses a 100-point checkpoint-weighted progress model. Only `ACCEPTED`
 | WP-26 UX progressive disclosure | 2 | 2 | G28 — HUMAN_ACCEPTED / PASS / COMPLETE |
 | WP-27 Golden Workflow regression | 3 | 3 | G28 — HUMAN_ACCEPTED / PASS / COMPLETE |
 | CP-06 bounded RC hardening/closeout | 10 | 10 | Accepted through G19/G20/G22/G23 |
-| **Development total** | **100** | **90** | **10 points remain** |
+| **Development total** | **100** | **95** | **5 points remain** |
 | Competition | **—** | **—** | `NOTE_ONLY_NON_SCORING` |
 
 #### Ordered Goal forecast
@@ -415,7 +425,8 @@ After every completed item, report:
 TASK_ID:
 STATUS: PLANNED | IMPLEMENTING | READY_FOR_CODEX_REVIEW | NEED_ACTION | ACCEPTED | CHECKPOINTED
 ITEM_PROGRESS: 0% | 100% after acceptance
-PROJECT_PROGRESS: accepted_points/100
+V1_BOUNDED_DEVELOPMENT_ACCEPTANCE_SCORE: accepted_in_denominator_points/100
+OVERALL_PROJECT_COMPLETION: NOT_DEFINED
 PHASE_PROGRESS: accepted_phase_points/phase_weight
 CHECKPOINT:
 CHANGED_FILES:

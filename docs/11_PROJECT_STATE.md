@@ -1,5 +1,15 @@
 # Project State
 
+## Current bounded acceptance state — 2026-09-12
+
+- `V1_BOUNDED_DEVELOPMENT_ACCEPTANCE_SCORE=95/100`: G24–G30 DEVELOPMENT-ONLY / V1 BOUNDED DEVELOPMENT ACCEPTANCE SCORE。
+- `OVERALL_PROJECT_COMPLETION=NOT_DEFINED`；95/100 不是 PolyNexus 整體完成率、roadmap 完成率、product readiness、MCF architecture 或 Plugin Platform 完成率。
+- `WP20=NOT_COMPLETE`（0/5）；`G30=NEED_ACTION`。
+- `MCF01=CHECKPOINTED / ACCEPTED_WITH_PRE_EXISTING_BASELINE_DEBT`；checkpoint `96ae53537e5501f1ef374182e7e1966b921a7883`。
+- `BASELINE-DEBT-01=IMPLEMENTATION_NOT_STARTED`；MCF-01 與 BASELINE-DEBT-01 均不增加 development points。
+- `DIFFERENTIAL_REGRESSION=PASS`；`REGRESSION_SUITE_STATE=FAIL`；`FULL_CORE_REGRESSION=FAIL`；`BASELINE_DEBT=OPEN`。
+- 以下有日期的既有 checkpoint、Writer／Reviewer 結果與 forecast 保留為歷史紀錄；其中 `PROJECT_SCORE` 是 legacy G24–G30 development-only acceptance score，不代表 overall completion。當前狀態以上列欄位為準。
+
 ## Current G29 Candidate State — HANDOFF_COMPLETE / DEFERRED_TO_G30 (2026-09-03)
 
 G29 preflight is complete in an isolated lane. By current Human routing,
