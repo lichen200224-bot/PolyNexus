@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "goal_id": "TA-F3",
+  "result_type": "GOVERNANCE_FORMAL_CONTRACT_SYNC",
+  "checkpoint_type": "ACCEPTED",
+  "reviewed_product_sha": "c4c17924ad568e5ae279fa3632a9960421ba80cb",
+  "acceptance_receipt_sha": "SELF_RECEIPT",
+  "parent_rule": "DIRECT_SINGLE_PARENT_C",
+  "independent_review_status": "PASS",
+  "push_recommendation": "APPROVE_TO_PUSH",
+  "human_acceptance": "APPROVED",
+  "one_bounded_acceptance_receipt_closure": "AUTHORIZED",
+  "receipt_scope": "METADATA_ONLY",
+  "f2": "COMPLETED",
+  "f3": "COMPLETED",
+  "f4": "NOT_AUTHORIZED",
+  "product_implementation": "HOLD",
+  "s0": "NOT_AUTHORIZED",
+  "s0_predecessor": "UNASSIGNED",
+  "independent_review": {"path":"docs/reviews/TA-F3/independent-review.md","sha256":"9a5c7787dffd722e6af3e5cd9dc59d71bf93b421c56b43355e885e6f8557b1ed","size":1292,"target":"c4c17924ad568e5ae279fa3632a9960421ba80cb"},
+  "human_decision": {"path":"docs/reviews/TA-F3/human-decision.md","sha256":"6fbe4659df98683909b39c5d0f75b8cfc76115631396f4e881a42f946075a153","size":1400,"target":"c4c17924ad568e5ae279fa3632a9960421ba80cb"},
+  "remote_c_proof": {"path":"docs/reviews/TA-F3/remote-c-proof.json","sha256":"622352f71f6bebfeb67817e53a660c55e04b1473fa667ff9e7750f32d96e850e","size":1156,"local_sha":"c4c17924ad568e5ae279fa3632a9960421ba80cb","remote_sha":"c4c17924ad568e5ae279fa3632a9960421ba80cb"},
+  "handoff": {"path":"docs/handoffs/TA-F3/accepted.md","sha256":"f9fdfd7d68022cb14655ed903f89e7bb79d52e0780d44d4c3e1e36ade4749f92","size":1080},
+  "changed_files": [
+    "docs/handoffs/TA-F3/accepted.md",
+    "docs/reviews/TA-F3/acceptance-receipt.json",
+    "docs/reviews/TA-F3/human-decision.md",
+    "docs/reviews/TA-F3/independent-review.md",
+    "docs/reviews/TA-F3/remote-c-proof.json"
+  ],
+  "payload_manifest": [
+    {"path":"docs/handoffs/TA-F3/accepted.md","size":1080,"sha256":"f9fdfd7d68022cb14655ed903f89e7bb79d52e0780d44d4c3e1e36ade4749f92"},
+    {"path":"docs/reviews/TA-F3/human-decision.md","size":1400,"sha256":"6fbe4659df98683909b39c5d0f75b8cfc76115631396f4e881a42f946075a153"},
+    {"path":"docs/reviews/TA-F3/independent-review.md","size":1292,"sha256":"9a5c7787dffd722e6af3e5cd9dc59d71bf93b421c56b43355e885e6f8557b1ed"},
+    {"path":"docs/reviews/TA-F3/remote-c-proof.json","size":1156,"sha256":"622352f71f6bebfeb67817e53a660c55e04b1473fa667ff9e7750f32d96e850e"}
+  ],
+  "reviewed_scope_hashes": {
+    "docs/00_SCOPE_BASELINE.md":"100644:57558a3643ff37538d84fc560d23e0c9e28b6cee",
+    "docs/01_PRD.md":"100644:fc34c1a734d62e9025eea2f99aaca42bc655b22d",
+    "docs/02_SA.md":"100644:9193435bd43b4aed61109e63790fa7eaf5ca0ab1",
+    "docs/03_SD.md":"100644:bacfdcc8d9bace8b47849c62d77d1a4000c01027",
+    "docs/10_DECISION_LOG.md":"100644:74185c6d38670ed5093c12ffa934d3f8b1b1fa5c",
+    "docs/18_ARCHITECTURE_DECISIONS.md":"100644:06efb5f1c88f5b77ad51b55bbbc0b9efc329fb32",
+    "docs/34_ADR_013_WORK_GENERATION_CANDIDATE_AND_ACCEPTANCE.md":"100644:3fe42e09713381d9efa74072e5a1f1ae5809d4fb",
+    "docs/35_D11_A_LP_LOCAL_HUMAN_DECISION_PROTOCOL.md":"100644:e8d143fe1e5e4166ba132a185130b22df54ebbb1"
+  },
+  "next_goal": "TA-F4",
+  "next_goal_record": {"path":"docs/handoffs/TA-F3/accepted.md","section":"TA-F3 Accepted Handoff","sha256":"f9fdfd7d68022cb14655ed903f89e7bb79d52e0780d44d4c3e1e36ade4749f92","size":1080},
+  "next_governance_predecessor": "SELF_RECEIPT",
+  "next_reviewed_result": "c4c17924ad568e5ae279fa3632a9960421ba80cb",
+  "next_goal_authorized": false,
+  "next_goal_authorization": "HUMAN_AUTHORIZATION_REQUIRED"
+}
