@@ -1,5 +1,16 @@
 # V1 Known Limitations
 
+## MCF-01 accepted with pre-existing baseline debt — 2026-09-12
+
+- Human decision: `MCF01_DECISION=ACCEPT_WITH_PRE_EXISTING_BASELINE_DEBT`; 僅限 MCF-01 bounded implementation，不是全域 differential acceptance，也不是 release/production readiness。
+- `DIFFERENTIAL_REGRESSION=PASS`；`REGRESSION_SUITE_STATE=FAIL`；`FULL_CORE_REGRESSION=FAIL`；reason `PRE_EXISTING_BASELINE_REGRESSION_DEBT`。保留所有非零 exit code 與 Windows symlink skip。
+- P1 follow-up: [BASELINE-DEBT-01](tasks/BASELINE-DEBT-01.md)：durable lifecycle event deterministic total ordering，以及 timeout/cancel/cleanup deterministic verification；不得靠放寬 assertion、retry 或任意提高 sleep 掩蓋。
+- 在該 task 完成且 Fresh Independent Review 通過前，禁止 holaOS/OpenHands production integration、dynamic plugin platform、MCF-02 external-runtime integration 及 Module Architecture production-ready promotion。僅可文件規劃/research，無 production support claim。
+- Module 層維持 static built-in、NO_CONFIG、EXPERIMENTAL；TOOL/SURFACE/INTEGRATION 僅 descriptor vocabulary。沒有 live vendor verification。
+- G30 維持 NEED_ACTION、WP-20 未完成、development score 95/100。Git commit/push 仍待獨立 Human Git Gate。
+- Acceptance provenance 與原始結果見 [MCF-01 task](tasks/ARCH-MODULAR-CORE-01.md#current-human-acceptance--2026-09-12)；不覆寫下列歷史紀錄。
+
+
 ## G28 candidate limitations — 2026-09-03
 
 - Browser evidence is a local Vite app with an in-page deterministic fetch

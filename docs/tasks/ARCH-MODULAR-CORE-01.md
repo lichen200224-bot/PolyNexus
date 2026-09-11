@@ -1,6 +1,6 @@
 # ARCH-MODULAR-CORE-01 — V1 Static Modular Contract Foundation
 
-- Status: `READY_FOR_CODEX_START`
+- Status: `ACCEPTED_WITH_PRE_EXISTING_BASELINE_DEBT` — task-specific Human decision 2026-09-12; Git Gate pending
 - Human direction: `APPROVED` on 2026-09-11
 - Architecture source: `docs/34_ADR_013_MODULAR_CORE_EXTENSION_ARCHITECTURE.md`
 - Documentation branch: `architecture/modular-core-extension-contract`
@@ -310,3 +310,33 @@ It does **not** authorize:
 - final merge/push of the implementation candidate before independent review and Human acceptance.
 
 The architecture documentation branch itself is a separate docs-only checkpoint and must remain recoverable independently of the MCF-01 implementation candidate.
+
+## Historical Writer candidate — 2026-09-12 (Attempt 1)
+
+- RESULT: `NEED_FIX` — implementation candidate complete; required regression gate remains failing.
+- WRITER: Codex; REVIEWER: `UNVERIFIED / NOT_STARTED`; NEXT_OWNER: `FRESH_INDEPENDENT_CODEX_REVIEWER`.
+- Branch: `feature/mcf-01-static-module-contract`; MCF01_START_SHA / uncommitted CURRENT_HEAD: `a985a081beee67bc7abfaa0b6903b638ef9e5017`.
+- Scope: new `extensions/` manifest/registry/runtime bridge and `test_mcf01_static_modules.py`; existing `runtime/registry.py` adds atomic batch registration to avoid partial multi-profile composition. No other existing product source changed.
+- Current evidence: focused 50/0/0; skeleton 17/0/0; binding 83/1/0; WP-14 31/0/0; WP-15 36/0/0; WP-16 58/0/0; selection/workflow 253/18/0; Full Core 750/20/1 (passed/failed/skipped). Failing suites exit `1`; other pytest suites exit `0`.
+- All 26 distinct regression failures were reproduced on the unmodified start checkpoint (baseline runs: 22 failed/4 passed, then remaining 4 failed; both exit `1`). This does not waive the regression gate or constitute independent acceptance.
+- Baseline validator exit `0`; governance initial exit `1` (execution policy), process-only controlled rerun exit `0`; `git diff --check` exit `0`.
+- Exact commands, negative cases, exit codes, limitations and full changed-files: `artifacts/verification/mcf01-20260912/writer-handoff.md`, `regression-results.json`, JUnit and logs in the same gitignored evidence directory.
+- ANTIGRAVITY: `NOT_REQUIRED` (Core-only). ADR impact: bounded ADR-013 implementation; scope deviation: NONE.
+- G30 remains NEED_ACTION; WP-20 remains incomplete; score remains 95/100. No live vendor proof, commit, push, merge, migration, API/UI or dependency declaration change.
+- Next: independent read-only assessment; any persistence/timing repair outside this allowlist requires separate scope authorization.
+
+## Current Human acceptance — 2026-09-12
+
+- `MCF01_DECISION=ACCEPT_WITH_PRE_EXISTING_BASELINE_DEBT`.
+- `MCF01_ACCEPTANCE_STATE=ACCEPTED_WITH_PRE_EXISTING_BASELINE_DEBT`.
+- Scope: `MCF-01 TASK-SPECIFIC BOUNDED HUMAN ACCEPTANCE`. 僅接受本 task bounded implementation；不建立全域 Differential Acceptance 規則，不適用其他 Task/WP/Goal/Release Gate。
+- Acceptance authority: Human 在本輪審閱 Writer handoff、`ARCH-MODULAR-CORE-01-INDEPENDENT-REVIEW` 與 fresh independent differential evidence 後明確決策。
+- Independent review source: Codex task `審查 MCF-01 Candidate 回歸`, id `01a09292-b425-7570-a0ab-989365d9282e`。原 verdict `BLOCKED / PRE_EXISTING_BASELINE_REGRESSION_DEBT` 保留，不改寫成 Reviewer VERIFIED_PASS。
+- Independent evidence: focused `50 passed / 0 failed / 0 skipped`, exit `0`; architecture findings `BLOCKER=0 / MAJOR=0 / MINOR=0`; Writer 26-case claim `CONFIRMED`; candidate-only `0`, baseline-only `0`; `DIFFERENTIAL_REGRESSION=PASS`。
+- `REGRESSION_SUITE_STATE=FAIL`; reason `PRE_EXISTING_BASELINE_REGRESSION_DEBT`; `FULL_CORE_REGRESSION=FAIL`。Reviewer Full Core candidate `754 passed / 16 failed / 1 skipped`, exit `1`; baseline `697 passed / 23 failed / 1 skipped`, exit `1`。不得把 differential PASS 等同 suite PASS 或改寫非零 exit code。
+- 本次文件 gate 未重跑 pytest；上述為可定位的既有獨立 evidence。Writer 原始結果、Reviewer 原始結果與 Human acceptance 是三個不同紀錄。
+- Follow-up: [BASELINE-DEBT-01](BASELINE-DEBT-01.md), priority `P1`, scope proposal established; implementation not started。
+- 在 BASELINE-DEBT-01 完成並通過 Fresh Independent Review 前，不得啟動 holaOS/OpenHands production integration、dynamic plugin platform、MCF-02 external-runtime integration，或 Module Architecture production-ready promotion；可做文件規劃與 research，不得產生 production support claim。
+- Current truth unchanged: `G30=NEED_ACTION`; `WP-20=NOT COMPLETE`; `PROJECT DEVELOPMENT SCORE=95/100`; MCF-01 不加分。
+- Git authority: 目前只授權 exact staged-file proposal、proposed commit message、debt task proposal 與最小文件同步。`STAGE=NOT_EXECUTED`, `COMMIT=NOT_AUTHORIZED`, `PUSH=NOT_AUTHORIZED`。等待下一次 Human Git Gate；不得 merge/rebase/force push/remote reconfiguration。
+- Evidence: `artifacts/verification/mcf01-20260912/human-acceptance-git-proposal.md`, `independent-review-final-verbatim.md`, `human-gate-source-check.json`。Raw independent JUnit 保留於 Reviewer task 的 `mcf01-independent/` 目錄。

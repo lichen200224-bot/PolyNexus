@@ -208,22 +208,36 @@ class RuntimeRegistry:
 
     def register(self, profile: RuntimeProfile, factory: AdapterFactory) -> None:
         """Register a profile and its adapter factory (composition-root wiring)."""
-        if not callable(factory):
-            raise RuntimeBindingError(
-                "Adapter factory must be callable"
-            )
-        existing = self._profiles.get(profile.runtime_profile_ref)
-        if existing is not None and existing != profile:
-            raise RuntimeBindingError(
-                "Conflicting profile registration for an already-registered reference"
-            )
-        registered_factory = self._factories.get(profile.adapter_id)
-        if registered_factory is not None and registered_factory is not factory:
-            raise RuntimeBindingError(
-                "Conflicting adapter factory registration for an already-registered adapter"
-            )
-        self._profiles[profile.runtime_profile_ref] = profile
-        self._factories[profile.adapter_id] = factory
+        self.register_many(((profile, factory),))
+
+    def register_many(
+        self, registrations: Iterable[tuple[RuntimeProfile, AdapterFactory]]
+    ) -> None:
+        """Atomically publish static composition registrations or leave unchanged.
+
+        This is the existing registry's conflict policy applied to a whole
+        batch; no factories are invoked and no parallel runtime registry exists.
+        Composition remains single-threaded, before Run execution starts.
+        """
+        profiles = self._profiles.copy()
+        factories = self._factories.copy()
+        for profile, factory in registrations:
+            if not callable(factory):
+                raise RuntimeBindingError("Adapter factory must be callable")
+            existing = profiles.get(profile.runtime_profile_ref)
+            if existing is not None and existing != profile:
+                raise RuntimeBindingError(
+                    "Conflicting profile registration for an already-registered reference"
+                )
+            registered_factory = factories.get(profile.adapter_id)
+            if registered_factory is not None and registered_factory is not factory:
+                raise RuntimeBindingError(
+                    "Conflicting adapter factory registration for an already-registered adapter"
+                )
+            profiles[profile.runtime_profile_ref] = profile
+            factories[profile.adapter_id] = factory
+        self._profiles = profiles
+        self._factories = factories
 
     def resolve(self, profile_ref: str) -> RuntimeProfile:
         """Resolve a profile reference; unknown references fail closed.
