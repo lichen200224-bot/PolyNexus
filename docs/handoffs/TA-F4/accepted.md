@@ -1,0 +1,27 @@
+# TA-F4 Accepted Handoff
+
+```yaml
+GOAL_ID: TA-F4
+RESULT_TYPE: GOVERNANCE_FORMAL_SYNC_VERIFICATION
+STATUS: HUMAN_ACCEPTED
+REVIEWED_RESULT_SHA: f62d3ec1d0afa72191d1a63ae43f3bfb4089d296
+ACCEPTANCE_RECEIPT_SHA: SELF_RECEIPT
+INDEPENDENT_REVIEW: PASS
+PUSH_RECOMMENDATION: APPROVE_TO_PUSH
+HUMAN_ACCEPTANCE: APPROVED
+REMOTE_BRANCH: codex/track-a-formalization
+REMOTE_C_VERIFIED: YES
+F4: COMPLETED
+F5: NOT_AUTHORIZED
+S0: NOT_AUTHORIZED
+S0_PREDECESSOR: UNASSIGNED
+PRODUCT_IMPLEMENTATION: HOLD
+NEXT_GOAL: TA-F5
+NEXT_GOAL_AUTHORIZATION: HUMAN_AUTHORIZATION_REQUIRED
+ELIGIBLE_S0_PREDECESSOR_CANDIDATE: SELF_RECEIPT
+```
+
+`SELF_RECEIPT` only means that, after receipt remote verification, this receipt may be
+considered by the Human during TA-F5 for explicit S0-predecessor assignment. It does not
+assign the S0 predecessor and does not authorize F5, S0, W1, Product Implementation,
+migration, formal-contract changes, or product-code changes.
