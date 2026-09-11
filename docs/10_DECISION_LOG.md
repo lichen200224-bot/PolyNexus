@@ -110,6 +110,21 @@ send, or G26 start is authorized.
 - factory、probe、timeout、invalid inventory 均 fail closed；報告只保留固定 error category，不保留 raw exception、message、args、cause、context 或 traceback。factory failure 形成 partial row 並繼續其他 rows；inventory invalid 回報 `FAILED` 且 entries 為空。
 - Architecture record 與 implementation exact allowlist 見 `docs/31_ADR_012_RUNTIME_DOCTOR_REPORTING.md` 與 `docs/tasks/WP-16.md`。本決策只授權本輪 implementation；fresh independent Codex review、Human acceptance、stage、commit、named-ref push 與後續 WP-16 work 仍是分離 gates。
 
+### D13 — Modular Core Extension Architecture — HUMAN DIRECTION ACCEPTED (2026-09-11)
+
+- D07 `Plugin-ready now, Plugin Platform later` remains authoritative. This decision formalizes it into a concrete modular Core direction; it is not a product reset.
+- PolyNexus must retain a usable native Core baseline while allowing execution engines, tools, surfaces and integrations to be replaceable modules behind versioned contracts.
+- `Module` is the packaging/registration/configuration/lifecycle unit; `Adapter` is the normalized programmatic contract. A module may expose one or more adapters.
+- V1 remains static/built-in registration only. Dynamic loading, marketplace, remote install/update, signing, hot reload and dependency resolution remain future work.
+- Reserved module classes are `RUNTIME`, `TOOL`, `SURFACE`, and `INTEGRATION`; `MEMORY` remains future-only and does not authorize a new V1 Memory Domain or persistence subsystem.
+- Runtime modules must reuse ADR-011: Module Registry -> RuntimeProfile/RuntimeRegistry -> RuntimeBindingSnapshot -> RuntimeAdapter -> RunSupervisor. They must not introduce a parallel execution path or bypass immutable Run binding history.
+- Complete external agent runtimes/workspaces such as holaOS-like or OpenHands-like systems may be future compatibility targets only through documented/supported integration surfaces and PolyNexus governance. This is not a current support/certification claim.
+- PolyNexus Core retains Project/Task/Run, Workflow, lifecycle, ContextPackage, Artifact/Evidence/Finding/RunResult, Event Ledger, policy, SecretRef and validation truthfulness authority.
+- Formal architecture record: `docs/34_ADR_013_MODULAR_CORE_EXTENSION_ARCHITECTURE.md`.
+- First bounded implementation work item: `docs/tasks/ARCH-MODULAR-CORE-01.md` (`MCF-01`).
+- This is a parallel architecture track. G30 remains `NEED_ACTION`, WP-20 remains unchanged, and no development score is awarded by this docs-only decision.
+- ADR-013 is `HUMAN_DIRECTION_ACCEPTED / PENDING_INDEPENDENT_DOC_REVIEW`; implementation candidate must use an isolated branch/worktree, then fresh independent Codex review and a separate Human Git promotion gate.
+
 ## Architecture Decisions
 
 ADR-001～010 全部 CONFIRMED；詳見 `18_ARCHITECTURE_DECISIONS.md`。
@@ -124,3 +139,6 @@ ADR-001～010 全部 CONFIRMED；詳見 `18_ARCHITECTURE_DECISIONS.md`。
 - ADR-008 SQLite metadata + filesystem artifacts + hash + versioned ContextPackage.
 - ADR-009 YAML workflow + schema validation + canonical model + fixed nodes.
 - ADR-010 SecretRef + OS-backed SecretStore + least privilege/redaction.
+- ADR-011 Runtime Binding & Transport — `HUMAN_ACCEPTED`; vendor-neutral RuntimeProfile/Registry/Binding contract.
+- ADR-012 Runtime Doctor Reporting — `HUMAN_ACCEPTED / IMPLEMENTATION_AUTHORIZED`; truthful capability/version/maturity reporting.
+- ADR-013 Modular Core Extension Architecture — `HUMAN_DIRECTION_ACCEPTED / PENDING_INDEPENDENT_DOC_REVIEW`; static module contract foundation and future external-runtime compatibility.
