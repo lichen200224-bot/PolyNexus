@@ -122,6 +122,12 @@ Decision：ALLOW / APPROVAL_REQUIRED / DENY。
 Execution Mode：STANDARD / LOCAL_PREFERRED / LOCAL_ONLY。
 Assurance：FLEXIBLE / STANDARD / VERIFIED。
 
+### Identity / Outcome / Human Acceptance
+
+- **FR-IDENTITY**：產品必須依 REV1 Golden identity authority 保存穩定的 `TaskID`、`WorkGenerationRef`、`RunID`、`CandidateID` 與 `EvidenceSetID` reference。同一 WorkGeneration 的 writer activity 必須維持同一 writer lineage。Candidate publication 必須 freeze exact content 與 provenance；verification 與 evidence 必須綁定 exact Candidate。
+- **FR-OUTCOME**：Applicability（`REQUIRED` / `OPTIONAL` / `N/A`）必須與 outcome 分離；`N/A` 需要 trusted predicate。Pre-acceptance `Reject` 與 post-acceptance `Revoke` / `Supersede` 必須保存 append-only Human history。
+- **FR-HUMAN**：Accepted Human decision 必須具備 D11-A-LP Human-only principal eligibility、exact-view challenge binding、anti-replay/idempotency 與 CSRF/Origin protection。D11-C 持續作為 fallback；Agent credential 不能授權 Human acceptance，且不存在 `Override Accept`。
+
 ### Doctor / Compatibility
 Runtime version、Adapter version、Contract version、health、capabilities、certified matrix、maturity state。
 

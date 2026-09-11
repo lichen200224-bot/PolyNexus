@@ -46,7 +46,7 @@ Engineering Review & Validation 為主（70–80%），Executive/Web AI Decision
 ### D10 — Long-term Product — CONFIRMED
 Phase 1 必須是可用的 LOCAL_PERSONAL Product，且以同一 Domain/Contract 向 Personal Hub、部門／Team、Enterprise 演進；原始功能範圍保留，以成熟度分級控制深度。
 
-### D11 — WP-13 Human Gate Attribution — CONFIRMED (2026-08-21)
+### D11 — WP-13 Human Gate Attribution — CONFIRMED; A-LP HUMAN ACCEPTED; OPTION C FALLBACK PRESERVED
 WP-13 暫採 Option C：現有 `Evidence.actor_id` 與 authenticated loopback token
 不足以證明 Human principal。無法透過已批准 identity boundary 驗證的
 `HUMAN_EVIDENCE` 必須維持 `HUMAN_DECISION` / `NEED_ACTION`，不得產生
@@ -55,6 +55,23 @@ WP-13 暫採 Option C：現有 `Evidence.actor_id` 與 authenticated loopback to
 authenticated principal mapping（Option A）或 attestation/provenance contract
 （Option B）的 architecture decision；本決策不新增 model、migration、endpoint
 或 authentication subsystem。
+
+#### D11-A-LP — Local-Personal Human Decision Protocol Amendment (2026-09-11)
+
+For `LOCAL_PERSONAL`, an acceptance-eligible Human decision MUST be attributable to a
+Human-only principal and MUST NOT be authorized by an Agent/runtime credential. A
+pairing grant, a bounded/revocable Human session, and an exact-decision challenge are
+distinct records. The challenge binds the Human-visible decision to the exact Candidate,
+exact EvidenceSet, exact Verification result, exact view digest, decision kind, and
+applicable scope. Nonce consumption, anti-replay, idempotency, CSRF protection, and
+Origin validation are mandatory protocol properties. Human decisions are append-only:
+`Accept`, `Reject`, `Revoke`, and `Supersede`; `Override Accept` is not a decision kind.
+
+D11-C remains the fail-closed fallback whenever the approved Human identity boundary
+cannot prove an eligible Human principal or an exact-view-bound decision. This amendment
+does not freeze TTL values, mandatory restart re-pairing, a particular session-storage
+implementation, Enterprise IAM, or hardware attestation. The exact formal contract is
+recorded in `docs/35_D11_A_LP_LOCAL_HUMAN_DECISION_PROTOCOL.md`.
 
 ### Pre-WP14 Runtime Foundation Direction — ADR-011 HUMAN ACCEPTED (2026-08-25)
 
@@ -109,6 +126,21 @@ send, or G26 start is authorized.
 - health/readiness 是 `CURRENT_PROBE`；capabilities/version 是 adapter declaration；conformance evidence 另列 outcome、scope、checkpoint 與 test source。Codex/OpenCode 無獨立 runtime version 時回報 `None` / `UNAVAILABLE`，不得把 adapter version 冒充 runtime version。
 - factory、probe、timeout、invalid inventory 均 fail closed；報告只保留固定 error category，不保留 raw exception、message、args、cause、context 或 traceback。factory failure 形成 partial row 並繼續其他 rows；inventory invalid 回報 `FAILED` 且 entries 為空。
 - Architecture record 與 implementation exact allowlist 見 `docs/31_ADR_012_RUNTIME_DOCTOR_REPORTING.md` 與 `docs/tasks/WP-16.md`。本決策只授權本輪 implementation；fresh independent Codex review、Human acceptance、stage、commit、named-ref push 與後續 WP-16 work 仍是分離 gates。
+
+### D13 — Work Generation, Candidate, Verification, and Acceptance Identity (2026-09-11)
+
+`Task`, `WorkGeneration`, `Run`, and `Candidate` are distinct identities linked by
+`WorkGenerationRef`; no Attempt aggregate is introduced. Model B is adopted: Core derives
+`Snapshot` and `ChangeSet`, REV1 Golden is the identity authority, a Candidate freezes the
+exact reviewable output, and verification binds an exact Candidate to an exact EvidenceSet.
+Before Human acceptance, failure is `Reject`; after acceptance, invalidation is append-only
+`Revoke` or `Supersede`. Applicability is `REQUIRED`, `OPTIONAL`, or `N/A`, independently
+from verification outcome.
+
+This is a formal contract decision only. `M-EXECUTION` remains
+`NOT REQUIRED / IMPLEMENTATION MAPPING ONLY`; neither the `RuntimeAdapter` public contract
+nor `RuntimeBindingSnapshot` semantics are changed. See
+`docs/34_ADR_013_WORK_GENERATION_CANDIDATE_AND_ACCEPTANCE.md`.
 
 ## Architecture Decisions
 

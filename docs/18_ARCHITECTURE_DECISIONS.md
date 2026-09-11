@@ -1,4 +1,4 @@
-# PolyNexus Architecture Decision Baseline — ADR-001～010
+# PolyNexus Architecture Decision Baseline — ADR-001～013
 
 Status: CONFIRMED / FROZEN FOR V1 IMPLEMENTATION
 Date: 2026-08-17
@@ -55,6 +55,8 @@ Decision: SecretRef + OS-backed SecretStore + least privilege + redaction + auth
 
 Secret value is prohibited from ordinary Domain tables, Event Ledger, Evidence, Artifacts, logs, export/backup, Git, handoff, telemetry. Credential, permission, and data-routing policy remain separate concerns.
 
+D11-A-LP amends the Local-Personal Human decision boundary with a Human-only principal and exact-view-bound decision protocol while preserving D11-C as the mandatory fail-closed fallback; see `docs/35_D11_A_LP_LOCAL_HUMAN_DECISION_PROTOCOL.md`.
+
 ## V1 Architecture Guardrails
 
 - No vendor-specific Core branching for normal adapter differences.
@@ -71,3 +73,16 @@ Secret value is prohibited from ordinary Domain tables, Event Ledger, Evidence, 
 - Decision: Preserve independent Provider / TransportKind / Runtime / Adapter / ExecutionTarget semantics and plan a Run-owned immutable RuntimeBindingSnapshot through existing Supervisor/Adapter boundaries; see `docs/29_ADR_011_RUNTIME_BINDING_AND_TRANSPORT.md`.
 - A future Alembic migration, deterministic legacy backfill, rollback/restore, product source changes and each `PRE-WP14-A/B` implementation task require separate Human authorization; architecture acceptance is not Git, migration or implementation permission.
 - ADR-001 through ADR-010 remain unchanged, confirmed and frozen; `docs/30_RUNTIME_CONTRACT_FOUNDATION_GATE.md` separately defines `PRE-WP14-A` and `PRE-WP14-B`.
+
+## ADR-012 — Runtime Doctor Reporting
+
+- Decision status: `HUMAN_ACCEPTED`.
+- Decision: Runtime Doctor reporting preserves Provider / TransportKind / Runtime / Adapter / ExecutionTarget separation, truthful support maturity, fixed error categories, and redaction boundaries; see `docs/31_ADR_012_RUNTIME_DOCTOR_REPORTING.md`.
+
+## ADR-013 — Work Generation, Candidate, Verification, and Acceptance
+
+- Decision status: `HUMAN_ACCEPTED / FORMAL_SYNC` on 2026-09-11.
+- Implementation status: `NOT_IMPLEMENTED / NOT_AUTHORIZED`.
+- Decision: Separate Task / WorkGeneration / Run / Candidate identities through `WorkGenerationRef`; adopt Model B Core-derived Snapshot / ChangeSet, REV1 Golden identity authority, Candidate freeze, exact EvidenceSet / Verification binding, independent applicability and outcome, and append-only Human acceptance history; see `docs/34_ADR_013_WORK_GENERATION_CANDIDATE_AND_ACCEPTANCE.md`.
+- D11-A-LP defines the Local-Personal Human-only principal and exact-view-bound decision protocol while preserving D11-C fail-closed fallback; see `docs/35_D11_A_LP_LOCAL_HUMAN_DECISION_PROTOCOL.md`.
+- `M-EXECUTION` remains `NOT REQUIRED / IMPLEMENTATION MAPPING ONLY`; `RuntimeAdapter`, `RuntimeBindingSnapshot`, P0/N1, REST/WebSocket, and fixed workflow vocabulary remain unchanged.

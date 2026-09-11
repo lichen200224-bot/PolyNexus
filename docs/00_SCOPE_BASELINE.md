@@ -69,6 +69,10 @@ V1 僅保留 Domain / Contract 邊界，不實作完整產品。
 - Distributed Scheduler
 - Fully Autonomous Agent Team
 
+### V1 Contract Clarification
+
+`Task`、`WorkGeneration`、`Run` 與 `Candidate` 是分離的 identity；Candidate 與 Evidence 必須綁定 REV1 Golden identity authority。Human acceptance 必須通過 D11-A-LP eligible Human boundary，且 D11-C fail-closed fallback 持續有效。本澄清不改變既有 maturity classification、P0/N1 boundary、workflow vocabulary、runtime public contract 或 Product Scope。
+
 ## 3. Primary Work Modes
 
 1. Discuss：獨立分析 → Cross Review → Consensus / Disagreement / Risks / Missing Info → Human Decision。
