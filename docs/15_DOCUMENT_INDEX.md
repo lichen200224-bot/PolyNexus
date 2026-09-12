@@ -1,49 +1,54 @@
 # PolyNexus Document Index
 
+## Mandatory session entry
+
+New session reads in this order:
+
+1. `../AGENTS.md`
+2. `37_CURRENT_ROUTING_INDEX.md`
+3. current `tasks/<TASK>.md`
+4. relevant Project State / ADR / code/tests as needed
+
+Conversation history and local path are not Source of Truth.
+
 | 文件 | 用途 | Agent 預設載入 |
 |---|---|---|
-| `00_SCOPE_BASELINE.md` | V1 功能範圍與成熟度 | 架構／範圍任務才讀 |
-| `01_PRD.md` | Product Requirements Document v1.0 | 產品／UX／需求任務 |
-| `02_SA.md` | System Analysis v1.0 | 架構、Domain、整合任務 |
-| `03_SD.md` | System Design v1.0 | 核心模組、Contract、流程設計 |
-| `04_DEVELOPMENT_PLAN.md` | 8/17–10/31 開發計畫 | 規劃／進度任務 |
-| `05_GIT_WORKFLOW.md` | 同目錄多 AI Git 操作規範 | 開發／交接任務 |
-| `06_AI_TOOL_COLLABORATION.md` | Codex / OpenCode / Antigravity 分工 | 指派任務前 |
-| `07_SHARED_MEMORY.md` | 共用記憶與 Token 控制 | 新 session / 交接設計 |
-| `08_ACCEPTANCE_STRATEGY.md` | V1 驗收與 Evidence 規則 | 測試／RC 任務 |
-| `09_RISK_REGISTER.md` | 技術、時程、供應鏈風險 | 里程碑 Review |
-| `10_DECISION_LOG.md` | 已確認 Product + ADR 摘要 | 架構變更前 |
-| `11_PROJECT_STATE.md` | 目前版本、里程碑、阻塞 | **每個 session 先讀** |
-| `12_HANDOFF_CURRENT.md` | 當前 Task Delta Handoff | **每個 session 先讀** |
-| `13_COMPETITION_SUBMISSION_PLAN.md` | 9/7 初審交件計畫 | 競賽文件任務 |
-| `14_COMPETITION_SLIDE_OUTLINE.md` | AI Use Case 簡報骨架 | 簡報任務 |
-| `16_TOOLING_BOOTSTRAP.md` | Skills / Rules / Plugin/MCP 準備 | 首次環境建置 |
-| `17_DEFINITION_OF_DONE.md` | 各成熟度 DoD | 開發／驗收 |
-| `18_ARCHITECTURE_DECISIONS.md` | ADR-001～010 frozen baseline | **架構／核心開發必讀** |
-| `19_DEVELOPMENT_BASELINE.md` | 第一條 Vertical Slice 執行契約 | **下一個開發任務必讀** |
-| `20_FIRST_VERTICAL_SLICE_PLAN.md` | 第一條產品垂直切片詳細工作包 | Slice 開發必讀 |
-| `28_MASTER_DEVELOPMENT_ROADMAP.md` | 全專案開發順序、範圍、時程、權重與 Checkpoint | **專案進度監控／每次交接必讀** |
-| `29_ADR_011_RUNTIME_BINDING_AND_TRANSPORT.md` | Runtime/Profile/Adapter/Transport identity 與 immutable binding 架構 | **Runtime／Extension 架構必讀** |
-| `30_RUNTIME_CONTRACT_FOUNDATION_GATE.md` | Runtime contract foundation、registry/binding/cleanup 驗收基線 | **Runtime／Extension 實作前必讀** |
-| `31_ADR_012_RUNTIME_DOCTOR_REPORTING.md` | Runtime Doctor、capability/version/maturity truthfulness | Runtime inventory / conformance 任務 |
-| `33_DEVELOPMENT_PROGRESS_AND_GOAL_EXECUTION_STANDARD.md` | Development-only 100 分制、WP ledger、G24–G30 授權與驗收規範 | **G24–G30 每個新 task 必讀** |
-| `34_ADR_013_MODULAR_CORE_EXTENSION_ARCHITECTURE.md` | Modular Core、Module/Adapter 邊界、static extension contract 與未來外接 Runtime 方向 | **Extension／Plugin／Runtime 架構必讀** |
-| `tasks/ARCH-MODULAR-CORE-01.md` | MCF-01 static module contract 的 Codex 實作與獨立驗收工作包 | **MCF-01 Codex 啟動必讀** |
-| `tasks/G24-G30-DEVELOPMENT-COMPLETION-ROUTING.md` | Luna High 的 G24–G30 系統提示詞、外部驗證 prompt 與 stop condition | **執行對應 Goal 必讀** |
-| `../artifacts/verification/g24-development-ledger-20260902/ledger.json` | G24 current machine-readable WP-11–WP-32 ledger and score reconciliation | **G24 acceptance evidence** |
-| `../artifacts/verification/g24-development-ledger-20260902/summary.md` | G24 current ledger scope, boundaries, and limitations | **G24 acceptance evidence** |
-| `../artifacts/verification/g24-development-ledger-20260902/commands-and-exit-codes.md` | G24 current deterministic command evidence and exit codes | **G24 acceptance evidence** |
-| `tasks/WP-08A.md` | ContextPackage REST Contract implementation task | WP-08A Writer / Review handoff |
-| `tasks/WP-08B.md` | ContextPackage UI authoring / selection implementation task | Antigravity Writer / Codex Review handoff |
-| `tasks/WP-09A.md` | Execution command API contract and architecture gate proposal | Human decision / Codex architecture review |
-| `tasks/WP-09B.md` | Approved existing-Run execution command implementation task | OpenCode Writer / Codex Review handoff |
-| `21_DEPENDENCY_BASELINE.md` | 初始依賴版本與 lock 規則 | 環境/依賴更新任務 |
-| `22_BASELINE_VALIDATION_REPORT.md` | Baseline scaffold 實際驗證與 SKIP | Baseline/交接/驗收 |
+| `00_SCOPE_BASELINE.md` | V1 scope / maturity | Scope task |
+| `01_PRD.md` | Product requirements | Product/UX |
+| `02_SA.md` | System analysis | Architecture |
+| `03_SD.md` | System design | Core design |
+| `04_DEVELOPMENT_PLAN.md` | Development plan | Planning |
+| `05_GIT_WORKFLOW.md` | Remote-first / SHA-first Git workflow | **Git / cross-machine必讀** |
+| `06_AI_TOOL_COLLABORATION.md` | Role-first multi-AI collaboration | **Routing必讀** |
+| `07_SHARED_MEMORY.md` | Shared memory/token rules | Context design |
+| `08_ACCEPTANCE_STRATEGY.md` | Immutable Candidate / Evidence acceptance | **Review/acceptance必讀** |
+| `09_RISK_REGISTER.md` | Risk register | Milestone |
+| `10_DECISION_LOG.md` | Product/ADR decisions | Architecture change |
+| `11_PROJECT_STATE.md` | Project historical/current state ledger | Project status |
+| `12_HANDOFF_CURRENT.md` | Legacy/detailed handoff ledger | Deep handoff history |
+| `15_DOCUMENT_INDEX.md` | Document map | Navigation |
+| `17_DEFINITION_OF_DONE.md` | DoD | Development/acceptance |
+| `18_ARCHITECTURE_DECISIONS.md` | Frozen/accepted ADR baseline | Core architecture |
+| `25_LOCAL_WORKSPACE_PROFILE.md` | Portable machine-local workspace rules | **Environment setup** |
+| `28_MASTER_DEVELOPMENT_ROADMAP.md` | Roadmap/checkpoints | Progress monitoring |
+| `29_ADR_011_RUNTIME_BINDING_AND_TRANSPORT.md` | Runtime binding architecture | Runtime work |
+| `30_RUNTIME_CONTRACT_FOUNDATION_GATE.md` | Runtime contract gate | Runtime work |
+| `31_ADR_012_RUNTIME_DOCTOR_REPORTING.md` | Doctor reporting | Runtime Doctor |
+| `33_DEVELOPMENT_PROGRESS_AND_GOAL_EXECUTION_STANDARD.md` | G24–G30 bounded score/routing | Legacy/current G24–G30 |
+| `34_ADR_013_MODULAR_CORE_EXTENSION_ARCHITECTURE.md` | Modular Core architecture | Extension work |
+| `35_ADR_014_DURABLE_EVENT_ORDERING_AND_CANCELLATION_CLEANUP.md` | BASELINE-DEBT-01 architecture (when present on implementation branch) | Debt implementation/review |
+| `36_POLYNEXUS_CROSS_MACHINE_GOVERNANCE.md` | PolyNexus FlowGov-compatible governance profile | **所有跨機/跨工具工作** |
+| `37_CURRENT_ROUTING_INDEX.md` | Active task/routing/checkpoint truth | **每個 session 必讀** |
+| `../governance/POLYNEXUS_PROFILE.yaml` | Machine-readable project governance profile | Tooling / Repo Doctor |
 
-## Token 原則
+## Task documents
 
-新 session 只先讀 `AGENTS.md + PROJECT_STATE + HANDOFF_CURRENT`。再依任務載入 1–3 份必要文件。聊天歷史不是 Source of Truth。
+`docs/tasks/` contains task-specific scope, stop conditions, evidence, and routing. Current task doc outranks stale historical handoff text for that task.
 
-## Development preparation profile additions
-- `25_LOCAL_WORKSPACE_PROFILE.md` — current Windows canonical workspace `D:\AI學習教材\PolyNexus` and portability rule.
-- `26_DEV_PREPARATION_PATCH_v1.0.2.md` — Drive-D development-preparation patch summary.
+## Evidence
+
+Large/raw evidence remains under ignored artifact storage or CI artifacts. Tracked docs should contain deterministic summaries, hashes/references, and actual exit codes rather than raw secrets or massive logs.
+
+## Path rule
+
+No tracked document should require a fixed repository directory. Use repo-relative paths or symbolic `<REPO_ROOT>` / `<TASK_WORKTREE>` / `<LOCAL_EVIDENCE_ROOT>`.

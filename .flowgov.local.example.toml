@@ -1,0 +1,12 @@
+# Optional machine-local profile for PolyNexus / FlowGov-compatible tooling.
+# Copy to `.flowgov.local.toml` if a machine needs overrides.
+# `.flowgov.local.toml` is gitignored and NON_AUTHORITATIVE.
+
+# Examples only; leave empty to let tools discover defaults.
+worktree_root = ""
+evidence_root = ""
+python_command = ""
+node_command = ""
+
+# Repository location itself is intentionally NOT configured here.
+# Discover it with: git rev-parse --show-toplevel

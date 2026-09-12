@@ -1,34 +1,44 @@
-# Local Workspace Profile — v1.0.2
+# Local Workspace Profile — Portable
 
-Date: 2026-08-17
+Status: `MACHINE_LOCAL / NON_AUTHORITATIVE`
 
-## Primary Development Path
+## Repository location
+
+PolyNexus does **not** require a fixed drive or directory. Examples such as `D:\AI學習教材\PolyNexus`, `C:\Projects\PolyNexus`, `E:\Work\PolyNexus`, or a Linux path are all valid machine-local choices.
+
+The repository root must be discovered at runtime:
 
 ```text
-D:\AI學習教材\PolyNexus
+git rev-parse --show-toplevel
 ```
 
-This path is the canonical workspace on the current Windows development machine for the first PolyNexus V1 development cycle.
+Tracked source, governance, task, test, or handoff contracts must use repo-relative paths or symbolic names such as `<REPO_ROOT>`, `<TASK_WORKTREE>`, and `<LOCAL_EVIDENCE_ROOT>`. An absolute local path may appear only in ephemeral operational evidence and must never become cross-machine identity.
+
+## Optional machine-local profile
+
+A machine may copy `.flowgov.local.example.toml` to `.flowgov.local.toml` for local worktree/evidence/tool-command preferences. `.flowgov.local.toml` is gitignored, non-authoritative, and must not contain secret values.
 
 ## Rules
 
-1. Codex, OpenCode and Antigravity open the same physical repository folder above.
-2. Single Active Writer remains mandatory.
-3. Git branches/checkpoints are the protection boundary; do not create separate copies per AI tool.
-4. PolyNexus product code must not hard-code this path. Use repository-relative or configuration-driven paths.
-5. Runtime DB, logs, secrets and generated artifacts remain outside Git according to `.gitignore` and the storage/security ADRs.
-6. If the workspace is intentionally moved later, update this profile and environment checks; this does not require a product ADR.
+1. Repository identity is remote repository + exact Git SHA, not filesystem path.
+2. Cross-machine continuation uses the canonical remote and exact checkpoint.
+3. Single Active Writer remains mandatory per task branch.
+4. Task worktrees may live anywhere on the machine.
+5. Runtime DB, logs, credentials, browser profiles, generated artifacts, and local evidence stay outside tracked Git unless an approved evidence contract explicitly allows a sanitized small file.
+6. Moving or recloning the repository does not require a product ADR.
 
-## Local Path Gate
+## Portability gate
 
-From repository root:
+From any location inside the repository:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\check_workspace_path.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\check_workspace_path.ps1
 ```
 
-Expected result:
+Expected semantic result:
 
 ```text
-Workspace path PASS: D:\AI學習教材\PolyNexus
+Workspace portability PASS
 ```
+
+No drive-letter or absolute-directory equality is required.

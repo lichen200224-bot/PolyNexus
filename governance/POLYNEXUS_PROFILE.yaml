@@ -1,0 +1,47 @@
+schema_version: "0.1-preview"
+governance_model: "FlowGov-compatible"
+project_id: "POLYNEXUS"
+
+canonical_remote:
+  provider: "github"
+  repository: "lichen200224-bot/PolyNexus"
+  expected_remote_name: "origin"
+  remote_truth_command: "git ls-remote"
+
+paths:
+  repository_location_authoritative: false
+  repo_root_discovery: "git rev-parse --show-toplevel"
+  local_profile: ".flowgov.local.toml"
+  local_profile_tracked: false
+
+clone_policy:
+  developer_single_branch_clone: false
+  clean_clone_verification_may_use_single_branch: true
+
+branches:
+  current_default_branch: "feature/g24-g30-development-completion-routing"
+  integration_branch_target: "develop"
+  release_branch_target: "main"
+  default_branch_target: "develop"
+  target_activation_requires_controlled_consolidation: true
+
+checkpoint_model:
+  types:
+    - SYNC_CHECKPOINT
+    - CANDIDATE_CHECKPOINT
+    - ACCEPTED_CHECKPOINT
+  candidate_commit_equals_acceptance: false
+
+roles:
+  role_over_tool: true
+  single_active_writer: true
+  writer_must_differ_from_independent_reviewer: true
+
+safety:
+  force_push: prohibited
+  secret_values_in_git: prohibited
+  actual_exit_code_required: true
+  skipped_is_not_pass: true
+
+current_terminal_checkpoint: "86d5939044c1d7ec2a991820f39287481ee9120f"
+current_product_checkpoint: "96ae53537e5501f1ef374182e7e1966b921a7883"
