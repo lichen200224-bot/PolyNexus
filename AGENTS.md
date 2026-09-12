@@ -1,119 +1,41 @@
-# PolyNexus Agent Instructions
+# PolyNexus — Current Agent Entry
 
-本檔是 Codex / OpenCode / Antigravity / Claude 的短版永久規則。完整規格採 Need-to-know 載入，避免 Token 浪費。
+## Current assignment
 
+Read `docs/delivery/START_HERE.md` and `docs/delivery/SOURCE_LOCK.json` first. This branch is `planning/full-delivery-design-consolidation`, task `PREP-FULL-DELIVERY-01`.
 
-## 0. Workspace Profile
+The Human has explicitly authorized ChatGPT to prepare and publish the documentation and organize Git/GitHub for the full original product plus the accepted expansion. This authorizes documentation-only non-force checkpoints on this branch and a draft review PR. It does not authorize product implementation, acceptance of existing code candidates, live provider actions, production database operations, release, historical branch deletion, default-branch changes, or force/history rewrite. Formal product implementation belongs to Codex after the start gate in `docs/delivery/EXECUTION_CONTRACT.md` is satisfied.
 
-主要 Windows 開發工作目錄為 `D:\AI學習教材\PolyNexus`。這只是本機開發位置；禁止把絕對路徑寫入 Domain、Runtime Contract 或可攜式設定。除非任務明確是安裝／本機環境設定，程式碼應使用 repo-relative path。
+## Authority and loading
 
-## 1. Source of Truth
+1. Current explicit Human decision, within its stated scope.
+2. Exact reviewed/accepted checkpoint and pinned source authority; scope and approval status are separate.
+3. `docs/delivery/START_HERE.md`, `SOURCE_LOCK.json`, `GIT_RECONCILIATION.md`, and `DECISION_AND_GAP_REGISTER.md` for this preparation lane.
+4. Frozen source contracts indexed in `docs/delivery/SOURCE_INDEX.md`; qualified aliases distinguish the two historical ADR-013 documents. An alias is not an amendment or new product version.
+5. Consolidated delivery specifications, followed by the exact task contract.
+6. Original Project State/Handoff/Roadmap sections as historical or source evidence. Their old NEXT_GOAL/NOT_STARTED text is not this lane's active routing.
+7. Actual source and fresh deterministic evidence establish implementation facts; document presence never proves implementation.
 
-優先順序：
-1. `docs/00_SCOPE_BASELINE.md`
-2. `docs/10_DECISION_LOG.md`
-3. `docs/18_ARCHITECTURE_DECISIONS.md`
-4. `docs/01_PRD.md` / `docs/02_SA.md` / `docs/03_SD.md`
-5. `docs/11_PROJECT_STATE.md`
-6. `docs/12_HANDOFF_CURRENT.md`
-7. 實際程式碼與當前測試 Evidence
+Read only relevant contracts, diff, call chain and tests after the entry documents. Imported reference documents retain historical stop/approval text for provenance; they cannot start old goals, confer authority, or override the current pause. Do not substitute chat memory, local paths, branch names or writer reports for verified facts.
 
-若文件互相矛盾，停止擴大修改；先指出衝突並要求 Decision/ADR 更新。
+## Mandatory engineering boundaries
 
-Repository 是完整狀態載體，Handoff 是 current state/delta/routing 導航，不是完整歷史或 source tree 的替代品。Conversation history、AI memory、手動複製的 source tree 皆不是正式 source of truth。
+- One active Writer per task/working branch. The Writer is not the Independent Reviewer of the same patch. A controller or renamed subagent does not by itself prove independence.
+- Discover the workspace using `git rev-parse --show-toplevel`. Use repo-relative paths. Canonical repository is `lichen200224-bot/PolyNexus`.
+- At each write/publication gate verify remote ref, expected parent, working/staged state and exact path allowlist. A local `origin/*` ref is only a cache. GitHub API ref reads are recorded as API evidence, not fabricated `git ls-remote` exit codes.
+- No `git add .`, `git add -A`, force push, history rewrite, destructive reset/clean, broad checkout/discard, branch deletion or remote reconfiguration by inference.
+- A SYNC/CANDIDATE commit is not acceptance. Never amend/rebase away a reviewed candidate. Changes create new immutable checkpoints.
+- Preserve the exact accepted product source; imported planning branches are not product ancestors or accepted implementation merely because their documents are reused.
+- Core owns identity, lifecycle, policy, evidence and accepted-result semantics. Vendor logic stays in Adapter/Driver. UI does not directly operate SQLite, Git, filesystem processes or vendor events.
+- `Task != WorkGeneration != Run != Candidate`; Run remains durable execution identity, not a newly invented Attempt Aggregate. Canonical identity and Golden values come from the frozen REV1 source, not this file.
+- Product Human authorization is distinct from development permission. Agent credentials never become Human credentials. D11-C remains fail-closed; D11-A-LP requires its specified proof. Accept does not imply commit/merge/push/apply/release.
+- Secret values never enter ordinary Domain records, Evidence, logs, Git, exports or handoffs. Managed worktrees and PROJECTED_STAGING are not hostile-code sandboxes.
+- Alembic remains migration authority. No real user database changes during preparation.
+- Real command/tool results and actual exits are required. SKIPPED/NOT_RUN/UNKNOWN/stale evidence are not PASS. Negative child exits and the checking runner's exit are distinct. Fixtures do not establish live conformance.
+- Within a subsequently authorized batch, ordinary defects are fixed and re-reviewed without repeated Human micro-approval. Scope, frozen semantics, security expansion, irreversible effects, budget overruns and unresolved ownership are exception gates.
 
-正式跨電腦接續必須基於 Human-approved remote Git checkpoint。GitHub／其他 remote Git 是 Development Collaboration Infrastructure，不是 PolyNexus Product Core dependency；尚未完成 approved push 與 clean-clone verification 前，不得宣稱 `CROSS_MACHINE_CONTINUATION_READY`。
+## Publication and next owner
 
-## 2. Token-aware Context
+Preparation Writer: ChatGPT. Product implementation: HOLD. Preparation candidate must undergo fresh independent design review and applicable clean-clone/environment verification. This context may report author self-checks and API publication evidence only, not independent acceptance.
 
-每個任務先讀：
-- 本檔
-- `docs/11_PROJECT_STATE.md`
-- `docs/12_HANDOFF_CURRENT.md`
-- 與任務直接相關的 1–3 份規格／程式檔
-
-以上規則適用於 Codex、OpenCode、Antigravity、Claude 與後續接入的 AI 工具。禁止預先讀完整 docs、完整 log、完整 repository；先使用 Git status/diff、task doc、失敗測試名稱與必要 log 片段。
-
-- 同一 task/session 內，未變更的大型文件不重複全文載入；以 file path、section、symbol、commit 或 artifact reference 接續。
-- Writer 只取得實作所需 contract、直接相關檔案與 targeted tests；Reviewer 預設採 diff-first，只擴讀受影響呼叫鏈與 acceptance criteria。
-- 不因切換 AI 工具而依序重做相同 full-repo analysis、完整測試或完整方案；既有 current evidence 可引用，只有 stale、缺漏、衝突或 acceptance 要求時才重跑。
-- 長輸出先由 deterministic tool 篩選；交給 AI 的內容保留 exact command、actual exit code、summary、failure names 與必要錯誤片段。
-- Routine work 優先使用足以完成任務的較低成本模型；只有 architecture、security、high-coupling contract、hard root cause 或 critical acceptance 才升級高推理模型。
-- 到達 acceptance、明確 blocker、Human decision 或既定 stop condition 即停止，不自行延伸下一輪分析。
-- Token 節省不得失真壓縮 Acceptance Criteria、ADR、Policy、Human Decision、Findings、deterministic Evidence、verification command、actual exit code 或 acceptance 所依賴的 deterministic result。需要縮短時使用 `references + current delta`，不得改寫 authoritative material 的語意。
-
-## 3. Single Active Writer
-
-同一個 feature branch 同一時間只允許一個 Agent 寫入。其他工具只做 Review / Verify。Branch 以功能命名，不以 AI 名稱命名。
-
-## 4. Scope Guard
-
-Phase 1：Product-first, Personal-first, Local-first, Evolution-ready。CORE / BASELINE / COMPATIBILITY / FUTURE 分級不得自行改寫。新完整子系統若不在 baseline，先列 Future 或提出 scope trade-off。
-
-## 5. Architecture Guard
-
-ADR-001～010 已 frozen。修改前必須明確提出 ADR impact。
-
-- Vendor-specific logic 只存在 Adapter / Driver。
-- UI 不直接操作 SQLite、OS process、Runtime CLI 或 vendor event。
-- Persist PolyNexus intent/evidence，不以 vendor session format 當 Domain Model。
-- AI Opinion 不得偽裝成 Verified Evidence。
-- ContextPackage ≠ prompt string。
-- Secret value 不得進普通 Domain、Evidence、log、Git、export。
-- `Task != Run`；一個 Task 可以有多個 Run，Run 是目前 durable execution identity。不得把 `Run == Attempt` frozen，也不得未經 Architecture Gate 新增 Attempt entity。
-- Durable execution 必須保留未來識別實際 runtime/model/adapter/execution target/capability/policy provenance 的能力；優先重用現有 contract。新增 persisted runtime binding 必須另走 Architecture Gate。
-- Alembic 是 authoritative schema migration mechanism；`SQLAlchemy create_all()` 不得被宣稱為 production migration authority。其現行 bootstrap/test/local 用途須由獨立 product hardening task 驗證。
-- Automation-ready 不等於已具有 authenticated trusted-human approval。D11 Option C 持續 fail closed；未驗證 Human decision 不得無人化推進。
-
-## 6. Git Safety
-
-修改前執行：
-```bash
-git status --short --branch
-```
-
-禁止未經要求 `git reset --hard`、force push、刪 branch、覆寫他人未提交內容。
-
-每個 Git Gate 必須重新確認 branch、HEAD、working tree 與 staged state。禁止使用 `git add .`、`git add -A`、`git push --all`、`git checkout -- .` 或 `git clean -fd` 取代 explicit allowlist。Commit、push、remote configuration、GitHub repository creation 與 history rewrite 都需要該 Gate 的當輪 Human 明確授權。
-
-## 7. Verification
-
-- PASS 只認真實 command/tool evidence 與 actual exit code。
-- 不可用舊 log 宣稱目前 PASS。
-- Tool FAIL 若為 Workflow hard gate 不能被 AI 投票轉成 PASS。
-- SKIPPED 必須明確標示。
-- 長 log 先機器過濾，再交必要片段給 AI。
-
-## 8. Handoff
-
-重要任務結束前更新 `docs/12_HANDOFF_CURRENT.md`：Goal / Branch / Changed files / Tests+exit codes / Known issues / Next / Do Not Change。
-
-每次工具或人員交接都必須另外提供：`TASK_ID`、`ATTEMPT`、`TASK_DOC`、`HANDOFF_DOC`、`BRANCH`、`WRITER`、`REVIEWER`、`ANTIGRAVITY_STATUS`、`NEXT_OWNER`、完整 changed-files（含 untracked）、protected areas、ADR impact、scope deviation、known limitations、unverified items、current test commands/results/exit codes 與下一步。
-
-- OpenCode：負責實作與測試；完成後更新 handoff，回報 `READY_FOR_CODEX_REVIEW`；不得自行把歷史測試或工具失敗宣告為 PASS。
-- Antigravity：涉及 UI、browser、E2E 或 milestone 時執行獨立 journey/failure-path verification；回報 route、fixture、實際結果、artifact/screenshot ref 與 blocker。若不適用，必須明確寫 `NOT_REQUIRED` 及理由；不得修改 Core contract 或與 Writer 同時寫入。
-- Codex：以只讀方式獨立 review、重跑必要 evidence，輸出 `PASS`、`FAIL` 或 `NEED_ACTION`；FAIL 必須附 severity、檔案/行號、證據與可直接貼給 OpenCode 的 `FIX_PROMPT`（含測試命令）。
-- Human：負責 scope/ADR/產品決策與 Git 授權；只有在 Codex PASS 後，才可明確授權 stage、commit 或 remote push。
-
-PASS 只接受本輪真實 command/tool evidence 與 actual exit code；`SKIPPED`、環境 blocker、未驗證項目與歷史結果必須明確標示，不得轉寫成 PASS。詳細欄位與角色交接規則見 `docs/05_GIT_WORKFLOW.md`、`docs/06_AI_TOOL_COLLABORATION.md`、`docs/08_ACCEPTANCE_STRATEGY.md`。
-
-`NEXT_PROMPT != delegation permission`。每次跨 Runtime／工具 delegation 都必須重新形成明確 Routing Decision，至少包含 `NEXT_ACTION`、`NEXT_OWNER`、`NEXT_PROMPT`、scope 與 stop condition；Agent 不得由 NEXT_PROMPT 推論 recursive delegation 或自動啟動另一 Runtime 的權限。
-
-## 9. Tool Routing
-
-- Codex：Architecture/Core/Hard bug/critical review。
-- OpenCode：Implementation/Tests/Templates/routine work。
-- Antigravity：Browser/E2E/Milestone verification。
-- Claude：依 task 明確指派的 bounded analysis、文件整理或 second opinion；沒有預設 Writer、Reviewer 或 Git 權限。
-- 每個 task 原則上最多 1 Writer + 必要 Reviewer；只有 milestone/RC 才考慮多工具交叉驗證。
-
-## 10. Skills
-
-Repo skills：
-- `polynexus-architecture-gate`
-- `polynexus-implement`
-- `polynexus-review`
-- `polynexus-acceptance`
-- `polynexus-handoff`
-- `polynexus-runtime-conformance`
-- `polynexus-workflow-authoring`
+Preserved predecessor instructions: `docs/delivery/references/AGENTS.product-baseline.md`. Their requirements apply unless this explicitly scoped preparation instruction changes the routing/publication workflow; product safety semantics are not relaxed.

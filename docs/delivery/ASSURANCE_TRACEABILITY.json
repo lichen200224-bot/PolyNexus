@@ -1,0 +1,357 @@
+{
+  "task_id": "PREP-FULL-DELIVERY-01",
+  "status": "WRITER_MAPPING_PENDING_INDEPENDENT_REVIEW",
+  "reviewed_predecessor": "1489cd7f7d54800317cc5558c92041a38c229008",
+  "scope": "EXPLICIT_F001_F002_MAPPING_ONLY_NOT_FULL_SEMANTIC_COVERAGE",
+  "sources": {
+    "scope": {
+      "commit": "43aa27c8b7a1b950645acc0d41234ec7679b653e",
+      "repo_path": "docs/00_SCOPE_BASELINE.md",
+      "local_path": "references/formal/00_SCOPE_BASELINE.md",
+      "blob": "57558a3643ff37538d84fc560d23e0c9e28b6cee"
+    },
+    "prd": {
+      "commit": "43aa27c8b7a1b950645acc0d41234ec7679b653e",
+      "repo_path": "docs/01_PRD.md",
+      "local_path": "references/formal/01_PRD.md",
+      "blob": "fc34c1a734d62e9025eea2f99aaca42bc655b22d"
+    },
+    "human": {
+      "commit": "43aa27c8b7a1b950645acc0d41234ec7679b653e",
+      "repo_path": "docs/35_D11_A_LP_LOCAL_HUMAN_DECISION_PROTOCOL.md",
+      "local_path": "references/formal/35_D11_A_LP_LOCAL_HUMAN_DECISION_PROTOCOL.md",
+      "blob": "e8d143fe1e5e4166ba132a185130b22df54ebbb1"
+    }
+  },
+  "clauses": [
+    {
+      "id": "SCOPE-BASE-04",
+      "source": "scope",
+      "section": "§2 BASELINE / Flexible Governance / Assurance",
+      "pn": [
+        "PN-078"
+      ]
+    },
+    {
+      "id": "ASSURANCE-MODE",
+      "source": "scope",
+      "section": "§5 Assurance Mode",
+      "pn": [
+        "PN-078"
+      ]
+    },
+    {
+      "id": "ASSURANCE-STATUS",
+      "source": "scope",
+      "section": "§5 Assurance Status",
+      "pn": [
+        "PN-078"
+      ]
+    },
+    {
+      "id": "FORMAL-PRD-ASSURANCE",
+      "source": "prd",
+      "section": "§7 Policy / Assurance",
+      "pn": [
+        "PN-078"
+      ]
+    },
+    {
+      "id": "METRIC-08",
+      "source": "prd",
+      "section": "§10 human override",
+      "pn": [
+        "PN-038"
+      ]
+    },
+    {
+      "id": "D11-NO-OVERRIDE",
+      "source": "human",
+      "section": "Decision history / no Override Accept",
+      "pn": [
+        "PN-038",
+        "PN-053",
+        "PN-078"
+      ]
+    }
+  ],
+  "values": [
+    {
+      "kind": "mode",
+      "value": "FLEXIBLE",
+      "source_clause": "ASSURANCE-MODE",
+      "pn": "PN-078",
+      "subitem": 1,
+      "fd": "FD-12",
+      "design": "ASSURANCE_CONTRACT.md#modes",
+      "positive": "AT-078-P01",
+      "negative": "AT-078-N01",
+      "sit": "SIT-15",
+      "uat": "HU-03"
+    },
+    {
+      "kind": "mode",
+      "value": "STANDARD",
+      "source_clause": "ASSURANCE-MODE",
+      "pn": "PN-078",
+      "subitem": 2,
+      "fd": "FD-12",
+      "design": "ASSURANCE_CONTRACT.md#modes",
+      "positive": "AT-078-P02",
+      "negative": "AT-078-N02",
+      "sit": "SIT-15",
+      "uat": "HU-03"
+    },
+    {
+      "kind": "mode",
+      "value": "VERIFIED",
+      "source_clause": "ASSURANCE-MODE",
+      "pn": "PN-078",
+      "subitem": 3,
+      "fd": "FD-12",
+      "design": "ASSURANCE_CONTRACT.md#modes",
+      "positive": "AT-078-P03",
+      "negative": "AT-078-N03",
+      "sit": "SIT-15",
+      "uat": "HU-03"
+    },
+    {
+      "kind": "status",
+      "value": "UNREVIEWED",
+      "source_clause": "ASSURANCE-STATUS",
+      "pn": "PN-078",
+      "subitem": 4,
+      "fd": "FD-12",
+      "design": "ASSURANCE_CONTRACT.md#statuses",
+      "positive": "AT-078-P04",
+      "negative": "AT-078-N04",
+      "sit": "SIT-15",
+      "uat": "HU-03"
+    },
+    {
+      "kind": "status",
+      "value": "SELF_REVIEWED",
+      "source_clause": "ASSURANCE-STATUS",
+      "pn": "PN-078",
+      "subitem": 5,
+      "fd": "FD-12",
+      "design": "ASSURANCE_CONTRACT.md#statuses",
+      "positive": "AT-078-P05",
+      "negative": "AT-078-N05",
+      "sit": "SIT-15",
+      "uat": "HU-03"
+    },
+    {
+      "kind": "status",
+      "value": "CROSS_REVIEWED",
+      "source_clause": "ASSURANCE-STATUS",
+      "pn": "PN-078",
+      "subitem": 6,
+      "fd": "FD-12",
+      "design": "ASSURANCE_CONTRACT.md#statuses",
+      "positive": "AT-078-P06",
+      "negative": "AT-078-N06",
+      "sit": "SIT-15",
+      "uat": "HU-03"
+    },
+    {
+      "kind": "status",
+      "value": "VERIFIED",
+      "source_clause": "ASSURANCE-STATUS",
+      "pn": "PN-078",
+      "subitem": 7,
+      "fd": "FD-12",
+      "design": "ASSURANCE_CONTRACT.md#statuses",
+      "positive": "AT-078-P07",
+      "negative": "AT-078-N07",
+      "sit": "SIT-15",
+      "uat": "HU-03"
+    }
+  ],
+  "metric": {
+    "pn": "PN-038",
+    "fd": "FD-19",
+    "legacy_name": "human override",
+    "canonical_key": "human_ai_recommendation_disagreement_count",
+    "can_authorize_acceptance": false,
+    "can_create_acceptance_event": false,
+    "cases": [
+      "AT-038-MP01",
+      "AT-038-MP02",
+      "AT-038-MN01",
+      "AT-038-MN02"
+    ]
+  },
+  "tests": [
+    {
+      "id": "AT-078-P01",
+      "input": "固定FLEXIBLE/profile並完成自評",
+      "expected": "SELF_REVIEWED且optional未跑明示",
+      "forbidden_effect": "不得產生未授權launch/egress/Git/Human acceptance或改寫舊Candidate/決策"
+    },
+    {
+      "id": "AT-078-N01",
+      "input": "舊target有required hard-gate FAIL，改FLEXIBLE",
+      "expected": "FAIL/舊contract不變，不能Accept",
+      "forbidden_effect": "不得產生未授權launch/egress/Git/Human acceptance或改寫舊Candidate/決策"
+    },
+    {
+      "id": "AT-078-P02",
+      "input": "STANDARD及可歸因獨立cross-review",
+      "expected": "CROSS_REVIEWED，outcome按finding",
+      "forbidden_effect": "不得產生未授權launch/egress/Git/Human acceptance或改寫舊Candidate/決策"
+    },
+    {
+      "id": "AT-078-N02",
+      "input": "同lineage改名/重貼兩份自評",
+      "expected": "不成立獨立cross-review",
+      "forbidden_effect": "不得產生未授權launch/egress/Git/Human acceptance或改寫舊Candidate/決策"
+    },
+    {
+      "id": "AT-078-P03",
+      "input": "VERIFIED及有效非空verification contract",
+      "expected": "執行前UNREVIEWED，之後按證據衍生",
+      "forbidden_effect": "不得產生未授權launch/egress/Git/Human acceptance或改寫舊Candidate/決策"
+    },
+    {
+      "id": "AT-078-N03",
+      "input": "空hard-gate或未知profile只送Mode=VERIFIED",
+      "expected": "不verified-ready、不升Status",
+      "forbidden_effect": "不得產生未授權launch/egress/Git/Human acceptance或改寫舊Candidate/決策"
+    },
+    {
+      "id": "AT-078-P04",
+      "input": "新target無有效observations",
+      "expected": "read/reload均UNREVIEWED",
+      "forbidden_effect": "不得產生未授權launch/egress/Git/Human acceptance或改寫舊Candidate/決策"
+    },
+    {
+      "id": "AT-078-N04",
+      "input": "提供其他Candidate/舊Run review",
+      "expected": "新target不能借證升級",
+      "forbidden_effect": "不得產生未授權launch/egress/Git/Human acceptance或改寫舊Candidate/決策"
+    },
+    {
+      "id": "AT-078-P05",
+      "input": "正確綁定的writer self-review",
+      "expected": "SELF_REVIEWED且AI_OPINION保留",
+      "forbidden_effect": "不得產生未授權launch/egress/Git/Human acceptance或改寫舊Candidate/決策"
+    },
+    {
+      "id": "AT-078-N05",
+      "input": "自評payload宣稱verified/independent",
+      "expected": "不升級、不變成TOOL_EVIDENCE",
+      "forbidden_effect": "不得產生未授權launch/egress/Git/Human acceptance或改寫舊Candidate/決策"
+    },
+    {
+      "id": "AT-078-P06",
+      "input": "合法independent observations與正確target/profile",
+      "expected": "CROSS_REVIEWED",
+      "forbidden_effect": "不得產生未授權launch/egress/Git/Human acceptance或改寫舊Candidate/決策"
+    },
+    {
+      "id": "AT-078-N06",
+      "input": "foreign/stale/mismatched review",
+      "expected": "只呈現有根據層級",
+      "forbidden_effect": "不得產生未授權launch/egress/Git/Human acceptance或改寫舊Candidate/決策"
+    },
+    {
+      "id": "AT-078-P07",
+      "input": "完整有效deterministic產品FAIL證據，另測PASS",
+      "expected": "VERIFIED深度與FAIL/PASS outcome分欄，FAIL不能Accept",
+      "forbidden_effect": "不得產生未授權launch/egress/Git/Human acceptance或改寫舊Candidate/決策"
+    },
+    {
+      "id": "AT-078-N07",
+      "input": "required missing/skip或infra timeout/mismatch",
+      "expected": "不能顯VERIFIED或滿足mandatory",
+      "forbidden_effect": "不得產生未授權launch/egress/Git/Human acceptance或改寫舊Candidate/決策"
+    },
+    {
+      "id": "AT-078-P08",
+      "input": "Begin前CAS選mode/profile，Begin後reload",
+      "expected": "保存不可變effective mode/profile",
+      "forbidden_effect": "不得產生未授權launch/egress/Git/Human acceptance或改寫舊Candidate/決策"
+    },
+    {
+      "id": "AT-078-N08",
+      "input": "已發布target原地改mode/validation contract",
+      "expected": "拒絕；新input/generation及必要新Candidate",
+      "forbidden_effect": "不得產生未授權launch/egress/Git/Human acceptance或改寫舊Candidate/決策"
+    },
+    {
+      "id": "AT-078-P09",
+      "input": "新增有效observations含直接UNREVIEWED→VERIFIED",
+      "expected": "正確重算且保留assessment歷史",
+      "forbidden_effect": "不得產生未授權launch/egress/Git/Human acceptance或改寫舊Candidate/決策"
+    },
+    {
+      "id": "AT-078-N09",
+      "input": "使evidence stale/invalid",
+      "expected": "降至有根據層級、Human歷史不變、不自動revoke",
+      "forbidden_effect": "不得產生未授權launch/egress/Git/Human acceptance或改寫舊Candidate/決策"
+    },
+    {
+      "id": "AT-078-P10",
+      "input": "REST assessment及Candidate UI",
+      "expected": "mode/status/outcome/maturity/disposition分欄一致",
+      "forbidden_effect": "不得產生未授權launch/egress/Git/Human acceptance或改寫舊Candidate/決策"
+    },
+    {
+      "id": "AT-078-N10",
+      "input": "caller傳assurance_status或accepted=true",
+      "expected": "拒絕寫入，zero launch/egress/Git/HumanDecision",
+      "forbidden_effect": "不得產生未授權launch/egress/Git/Human acceptance或改寫舊Candidate/決策"
+    },
+    {
+      "id": "AT-078-P11",
+      "input": "legacy缺可信mode/profile/observations",
+      "expected": "UNREVIEWED＋legacy reason，不猜值",
+      "forbidden_effect": "不得產生未授權launch/egress/Git/Human acceptance或改寫舊Candidate/決策"
+    },
+    {
+      "id": "AT-078-N11",
+      "input": "unknown enum/無授權/stale或cross-scope target",
+      "expected": "拒絕且protected facts前後不變",
+      "forbidden_effect": "不得產生未授權launch/egress/Git/Human acceptance或改寫舊Candidate/決策"
+    },
+    {
+      "id": "AT-038-MP01",
+      "input": "可歸因Human合法audit分歧事件及被引用AI建議",
+      "expected": "計數1，只讀既有decision",
+      "forbidden_effect": "不得建立/推論/授權/繞過Human Accept，不新增Override Accept"
+    },
+    {
+      "id": "AT-038-MP02",
+      "input": "同event重送；完整空觀察window",
+      "expected": "相同event仍1；完整空window=0",
+      "forbidden_effect": "不得建立/推論/授權/繞過Human Accept，不新增Override Accept"
+    },
+    {
+      "id": "AT-038-MN01",
+      "input": "Agent自述、無法歸因或缺AI建議；不足觀察coverage",
+      "expected": "不算已確認分歧，coverage不足UNKNOWN/null",
+      "forbidden_effect": "不得建立/推論/授權/繞過Human Accept，不新增Override Accept"
+    },
+    {
+      "id": "AT-038-MN02",
+      "input": "新增/增加/偽造metric或夾帶accept/override字段",
+      "expected": "metric不能改AcceptanceRecorded/decision history/eligibility/outcome；accept/override字段拒絕",
+      "forbidden_effect": "不得建立/推論/授權/繞過Human Accept，不新增Override Accept"
+    }
+  ],
+  "required_design_links": [
+    "REQUIREMENTS.md",
+    "FEATURE_WORK_PACKAGES.md",
+    "PRD.md",
+    "SA.md",
+    "SD.md",
+    "DATA_AND_API.md",
+    "UX_SPEC.md",
+    "TEST_PLAN.md",
+    "OPERATIONS.md",
+    "UAT_AND_RELEASE.md"
+  ],
+  "product_tests": "NOT_RUN",
+  "independent_review": "NOT_RUN"
+}

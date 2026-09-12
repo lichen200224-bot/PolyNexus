@@ -1,0 +1,41 @@
+{
+  "task_id": "PREP-FULL-DELIVERY-01",
+  "role": "DOCUMENTATION_WRITER_SELF_CHECK",
+  "result": "PASS_FOR_LISTED_STRUCTURAL_CHECKS_ONLY",
+  "matrix_git_blob": "a71dd39cad51bea8e21504ea8bd24d1a3ab3ac4f",
+  "matrix_sha256": "3572014dbd5a25346f65ab36d7d2cb87bb5b5efeb0c9795da50ac7aad5a83af6",
+  "matrix_bytes": 30080,
+  "validator_git_blob": "f3dc328ae9cec67cdc244ca87cde3115d2b7ee3c",
+  "selftest_git_blob": "10e03b6ee79b87bbb504681d9b7ae9724200a0eb",
+  "uploaded_blobs_match_locally_validated_bytes": true,
+  "feature_packages": 22,
+  "requirement_rows": 77,
+  "functional_subitems": 245,
+  "planned_positive_negative_ut_case_groups": 154,
+  "counts_are_planning_not_product_test_results": true,
+  "checks": [
+    {"command": "python /mnt/data/polynexus_prep/delivery/checks/validate_feature_scope.py", "actual_exit_code": 0, "scope": "LOCAL_AUTHORED_MATRIX; unique PN primary ownership, fields, UAT refs, package DAG", "requirements_file_id_check": "NOT_RUN"},
+    {"command": "python /mnt/data/polynexus_prep/delivery/checks/selftest_feature_scope.py", "actual_exit_code": 0, "scope": "VALIDATOR_SELFTEST_ONLY", "cases": [
+      {"case": "valid-matrix", "expected_child_exit": 0, "actual_child_exit": 0},
+      {"case": "duplicate-and-missing-PN", "expected_child_exit": 1, "actual_child_exit": 1},
+      {"case": "dependency-cycle", "expected_child_exit": 1, "actual_child_exit": 1},
+      {"case": "missing-limits", "expected_child_exit": 1, "actual_child_exit": 1},
+      {"case": "silent-start-authorization", "expected_child_exit": 1, "actual_child_exit": 1}
+    ]},
+    {"command": "git ls-remote --heads https://github.com/lichen200224-bot/PolyNexus.git", "actual_exit_code": 128, "result": "ENVIRONMENT_BLOCKED", "stderr": "Could not resolve host: github.com"}
+  ],
+  "path_note": "Recorded /mnt/data paths describe the author validation environment only, not product identity or required user workspace paths.",
+  "portable_reproduction": [
+    "python docs/delivery/checks/validate_feature_scope.py --requirements docs/delivery/REQUIREMENTS.md",
+    "python docs/delivery/checks/selftest_feature_scope.py"
+  ],
+  "remote_publication_method": "GITHUB_CONNECTOR_GIT_DATA_API; not git CLI push",
+  "publication_receipt": "EXTERNAL_PR_RECEIPT_FOR_EXACT_FINAL_COMMIT",
+  "whole_repo_clean_clone": "NOT_RUN_ENVIRONMENT_BLOCKED",
+  "whole_document_link_and_normative_closure": "PENDING_INDEPENDENT_REVIEW",
+  "original_source_to_every_atomic_clause_review": "NOT_RUN",
+  "product_tests": "NOT_RUN",
+  "windows_or_live_runtime_verification": "NOT_RUN",
+  "independent_design_review": "NOT_RUN",
+  "human_uat": "NOT_RUN"
+}

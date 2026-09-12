@@ -1,0 +1,31 @@
+# TA-F4 Human Decision
+
+```yaml
+GOAL_ID: TA-F4
+DECISION_DATE: 2026-09-11
+DECISION_SOURCE: Current explicit Human instructions in the controlling Codex task
+HUMAN_DECISION: ACCEPTED
+INDEPENDENT_L2_VERDICT: PASS
+PUSH_RECOMMENDATION: APPROVE_TO_PUSH
+BLOCKER: 0
+MAJOR: 0
+MINOR: 0
+EXACT_ACCEPTED_CANDIDATE: f62d3ec1d0afa72191d1a63ae43f3bfb4089d296
+EXACT_PREDECESSOR: 284929a8f5a39df5524ccba7d733aa9161fc91e9
+INDEPENDENT_REVIEW_PACKAGE_SHA256: 59018bb0a6fb301e357c0a12d4542ca3905f789787bca2ecd1c9e1faffd44dd7
+HUMAN_ACCEPTANCE: APPROVED
+PUSH_AUTHORIZATION: EXACT_REVIEWED_SHA_ONLY
+APPROVED_REMOTE: https://github.com/lichen200224-bot/PolyNexus.git
+APPROVED_BRANCH: codex/track-a-formalization
+ONE_BOUNDED_ACCEPTANCE_RECEIPT_CLOSURE: AUTHORIZED
+RECEIPT_SCOPE: METADATA_ONLY
+RECEIPT_PARENT_RULE: DIRECT_SINGLE_PARENT_C
+F5: NOT_AUTHORIZED
+S0: NOT_AUTHORIZED
+S0_PREDECESSOR: UNASSIGNED
+PRODUCT_IMPLEMENTATION: HOLD
+```
+
+This decision authorizes only the non-force push of the exact reviewed Candidate and one
+metadata-only acceptance receipt closure. It does not authorize F5, S0, W1, Product
+Implementation, migration, formal-contract changes, or product-code changes.
