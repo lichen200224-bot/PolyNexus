@@ -6,6 +6,8 @@
 - `STATUS=ARCHITECTURE_PROPOSAL`
 - `IMPLEMENTATION_NOT_AUTHORIZED`
 - `CANONICAL_START_SHA=f0c0b986380dc21d103d4e856057cb8ac435a8f9`
+- `PREVIOUS_REVIEW_CANDIDATE_SHA=6bfa2f8653d0f667979d48a3628a77b15584e11d`
+- `PREVIOUS_REVIEW_RESULT=MCF02_ARCHITECTURE_REVIEW_NEED_FIX`
 - `CANONICAL_CONTINUATION_BRANCH=feature/mcf-01-static-module-contract`
 - `ARCHITECTURE_BRANCH=architecture/mcf-02-external-runtime-routing`
 - `MCF02=NOT_STARTED`
@@ -131,12 +133,53 @@ target adapter 內部，不進入 Core contract。
 | `egress` | destination class + side-effect flag | 在 input dispatch 前執行 data/egress gate | 缺失、擴張或 approval 未完成即不送 |
 | `auth_ownership` | existing `AuthOwnership` | 保留 runtime-managed/SecretRef/no-auth 邊界 | raw secret、ownership mismatch 拒絕 |
 | `conformance` | scope + evidence ref, never self-certified | Doctor 區分 declaration 與 accepted evidence | declaration 不產生 PASS |
+| `execution_envelope_ref` | Core-owned immutable digest/reference | 綁定有效設定、workspace 與 executable identity | 缺失、未知或 drift 即 readiness false |
 
 不加入 vendor model picker、theme、TUI layout、billing plan、marketplace metadata、
 browser DOM selector 或 vendor-only experimental flag；它們沒有跨 runtime 的
 PolyNexus lifecycle use case。
 
-### 5.2 Session handle
+### 5.2 Effective runtime configuration boundary
+
+`EFFECTIVE_RUNTIME_CONFIGURATION_BOUNDARY` 是每次 external Run 的 Core-owned
+execution envelope。OpenCode 會依 working directory 合併 configuration、plugins、
+models、agents、commands、skills、instructions 與 MCP configuration，因此只綁定
+provider/runtime/adapter/profile/contract version 不足以證明同一執行環境。
+
+第一個 implementation 必須使用：
+
+- `POLYNEXUS_CONTROLLED_EXECUTION_ENVELOPE=REQUIRED`
+- `WORKSPACE_SCOPE_MODE=PROJECTED_STAGING`
+- `DIRECT_PROJECT_WORKSPACE=NOT_AUTHORIZED`
+
+Core 必須在建立 immutable binding 與啟動 external work 前，先以無副作用 preflight
+解析並驗證下列 canonical envelope；可把 digest/reference 放入既有 binding metadata
+或 conformance evidence，不要求新增 Core Domain：
+
+| Envelope field | Required value/shape | Purpose | Fail-closed rule |
+|---|---|---|---|
+| `workspace_scope_mode` | V1 exactly `PROJECTED_STAGING` | 只暴露 projected ContextPackage/approved files | unknown、DIRECT 或 path escape 拒絕 |
+| `effective_runtime_configuration_fingerprint` | strong digest of normalized effective non-secret config + precedence | 偵測 global/project/default 合併後的真實設定 | 無法解析、來源不明或 drift 即 readiness false |
+| `permission_policy_fingerprint` | digest/reference to Core-approved normalized permission policy | OpenCode default `allow` 不等於 Human authorization | 缺失、permissive expansion 或 mismatch 即不 dispatch |
+| `enabled_plugin_set` | sorted identity/version/digest set or explicit `NONE` | 防止 project/global plugin side-loading | 未核准項目、npm/package declaration 或 load drift 拒絕 |
+| `enabled_mcp_set` | sorted server identity/transport/destination digest or explicit `NONE` | 將 MCP tool/egress 納入 Core policy | local/remote unknown server 均拒絕 |
+| `remote_skill_catalog_state` | approved catalog snapshot digest/reference or explicit `NONE` | 防止 instructions/skills 形成 remote code/data path | remote/unknown catalog 拒絕 |
+| `executable_identity` | canonical resolved path + content SHA-256/equivalent strong identity | 區分 same path + changed executable | path/digest missing或 mismatch 即 readiness false |
+| `observed_runtime_version` | bounded output from the bound executable's version probe | 將版本觀察連回已 hash 的 binary，而非信任 descriptor | missing、unparseable或 policy mismatch 即 readiness false |
+
+fingerprint input 可以包含 normalized non-secret configuration identity、source precedence、
+approved item identities 與 content digests；不得把 raw configuration、credential、token、
+cookie、auth header、SecretRef value 或完整 private instruction body 存入 binding。若原始
+設定含 secret，binding 只記錄 bounded source reference與不可逆 digest，實值留在既有
+secret/runtime-managed boundary。
+
+`PROJECTED_STAGING` 由 Core 建立新的受控 staging workspace，只 materialize allowlisted
+ContextPackage/approved files，並以 canonical path containment 驗證 input/output。不得將
+真實 project root、parent directory、global config home 或任意 symlink target 默認暴露給
+OpenCode。未來 `DIRECT_PROJECT_WORKSPACE` 必須另過 architecture/security/Human gate，
+不是 MCF-02 第一版 capability。
+
+### 5.3 Session handle
 
 外部 handle 只應含：
 
@@ -144,19 +187,21 @@ PolyNexus lifecycle use case。
 - `project_scope_digest`：由 Core 對 project/workspace scope 計算的不可逆關聯值。
 - `binding_fingerprint`：provider/runtime/adapter/profile revision/contract version 的
   canonical digest。
+- `execution_envelope_fingerprint`：上述 effective configuration、permission、plugin、
+  MCP、skill/catalog、workspace mode 與 executable identity 的 Core-owned digest。
 - `created_by_run_id`：Core Run correlation。
 - `attach_generation`：每次合法 attach 遞增，防 stale attachment。
 
 它不是 Core Run identity，也不能單獨證明 resume、ownership 或 cleanup。
 
-### 5.3 Required operations and mapping
+### 5.4 Required operations and mapping
 
 | Generic operation/capability | Existing Core mapping | Required semantics |
 |---|---|---|
 | `health` | `RuntimeAdapter.health()` | 當下 probe；不是 conformance verdict |
-| `readiness` | `RuntimeAdapter.readiness()` | binary ready for declared profile/version |
+| `readiness` | `RuntimeAdapter.readiness()` | effective config與 executable identity 完整匹配才可 ready |
 | `create_session` | `create_run(context)` | 只在 binding 已 commit 後建立；回傳 scoped handle |
-| `attach_session` | internal to `create_run`/`resume` | 驗證 project digest、binding fingerprint、generation |
+| `attach_session` | internal to `create_run`/`resume` | 驗證 project digest、binding/envelope fingerprint、generation |
 | `dispatch_input` | `submit(runtime_ref, task)` | 只送投影後 ContextPackage/Task；先過 Human/egress gate |
 | `observe_events` | adapter internal stream projected by `status()` | bounded ordered observations；未知 event 不改 RunState |
 | `capture_result` | `result(runtime_ref)` | 回傳 candidate output；不得自帶 trusted PASS |
@@ -166,10 +211,10 @@ PolyNexus lifecycle use case。
 | `timeout` | `RunSupervisor` deadline | module 不得延長或關閉 Core deadline |
 | `cleanup` | `cleanup(runtime_ref)` | 終止 owned process/stream/handles；bool 不足以單獨證明 |
 | `resume` | `resume(runtime_ref, checkpoint)` | 只依 `NATIVE`/`MANAGED`/`NONE` 真實宣告執行 |
-| `version_info` | `version_info()` + binding/Doctor evidence | bounded public version；drift fail closed |
+| `version_info` | `version_info()` + binding/Doctor evidence | observed version必須與 executable path/content digest 一起驗證 |
 | `normalize_failure` | adapter → fixed error category | raw stderr/payload/secret 不進 persistence 或 API |
 
-### 5.4 Capability vocabulary
+### 5.5 Capability vocabulary
 
 未來 capability closed set 最少需要：
 
@@ -196,12 +241,29 @@ PolyNexus lifecycle use case。
 Module 宣告是 upper bound；每次 runtime request 仍須交由 Core/Human policy 決定。
 未知 class、runtime 臨時擴張或「允許全部」均拒絕。
 
+OpenCode 的 global/project default 即使是 `allow`，也不是 PolyNexus Human
+authorization。第一版 controlled envelope 必須將未核准 external side effect、任意
+network/tool egress、任意 local/remote MCP server、未核准 plugin、npm/package plugin
+安裝、remote skill/catalog 與跨 workspace access 全部設為 deny。無法證明 effective
+permission/config 與 Core-approved fingerprint 一致時：
+
+- `READINESS=FALSE`
+- `DISPATCH=DENIED`
+- 不得以 OpenCode 可以正常執行作為 PASS。
+
 ### Egress declaration
 
 最少記錄 destination trust、是否 remote model/service、是否含 side effect，以及
 實際 observe 到的 route category。`LOCAL_CHILD` 只代表控制通道在本機，不代表
 模型推理或工具流量沒有 external egress。外部 runtime 不得利用 subprocess
 身分繞過 `evaluate_egress_policy`。
+
+必須分開建模兩個 channel，不能用一個 `NETWORK_EGRESS` boolean 合併：
+
+1. `PROVIDER_MODEL_EGRESS`：external runtime 自身為 model/provider 發出的必要流量，
+   仍受 data classification、destination 與 Human gate 約束。
+2. `AGENT_EXTENSION_EGRESS`：agent tool、MCP、plugin、command、skill/catalog 或其他
+   side-effect 流量；預設拒絕，逐項 allowlist 後仍須接受 per-operation policy。
 
 ### Auth / SecretRef
 
@@ -224,6 +286,12 @@ Session record 存在、process 尚在、CLI 有 `--resume` flag 或 workspace �
 足以單獨證明 `NATIVE`。OpenCode ACP 的 load/resume 仍須在 target conformance test
 證明 project scope、message replay、active work state 與 version behavior，才能從
 proposal 升級為 `NATIVE`。
+
+每次 attach/resume 都必須重新計算並比較 `execution_envelope_fingerprint`，包含
+workspace scope mode、effective config、permission policy、plugin set、MCP set、remote
+skill/catalog state 與 executable identity。任一 drift 即 fail closed：原 external
+session 不得作 `NATIVE` resume；不得藉由建立新 fingerprint 重綁同一 Run。若 future
+policy 允許，只能建立新 Run 或以明示的 `MANAGED` 新 session 流程重新經 Human gate。
 
 ## 8. Artifact and Evidence boundary
 
@@ -277,8 +345,13 @@ egress decision ref、Human decision ref（若適用）。
 
 | THREAT | CORE_OWNER | MODULE_RESPONSIBILITY | FAIL_CLOSED_RULE | EVIDENCE_REQUIRED |
 |---|---|---|---|---|
-| runtime impersonation | Registry/binding validation | 回報 stable identity/version | handshake identity 與 static descriptor 不同即不 dispatch | binding fingerprint、handshake transcript digest |
+| executable replacement / runtime impersonation | Registry/binding/readiness validation | 提供 resolved launch target並允許 Core獨立hash/probe | canonical path、content SHA-256/equivalent strong identity、observed version任一缺失或 drift 即 `READINESS=FALSE` / `NO_DISPATCH`；不信任自報名稱/版本 | resolved path、Core-computed content digest、version probe、binding/envelope fingerprint |
 | capability overclaim | Module bridge + conformance gate | 只宣告實際支援能力 | declaration/observation 不一致即拒絕 factory 或 operation | negative capability probes |
+| external configuration injection | Core envelope/config normalizer | 只使用 approved effective config | malicious/unknown global、project或 working-directory config 即 readiness false | config source inventory、normalized digest、malicious `opencode.json` test |
+| plugin side-loading | Core plugin allowlist | 回報實際 loaded plugin set且不自行安裝 | `.opencode/plugins/**`、npm/package declaration或未核准 plugin 一律拒絕 launch/dispatch | approved set、filesystem/package scan digest、negative tests |
+| MCP side-channel | Core MCP/egress policy | 完整回報 local/remote MCP endpoint與tool request | 未核准 server、transport、destination或啟動 side effect 即拒絕 | MCP set fingerprint、process/network observation、local/remote fixtures |
+| permission-policy drift | Core Human/policy authority | 將 permission request交回 Core | OpenCode default allow、fingerprint drift或auto-approve一律不構成授權並拒絕 operation | approved policy digest、Human decision id、effective permission probe |
+| workspace/config drift on session resume | RunSupervisor + envelope validator | attach時回報 session working directory/config identity | project scope、staging path或 envelope fingerprint不符即拒絕 attach/NATIVE resume | original/current envelope comparison、path containment、resume denial event |
 | stale session attachment | RunSupervisor + session-scope validator | 回報 session generation | scope digest、binding fingerprint 或 generation 不符即拒絕 attach | attach decision、session digest |
 | cross-project session leakage | Core project/context boundary | 不得跨 workspace 回傳資料 | project digest 不符、unknown artifact source 即拒絕 | project-scoped fixture與negative test |
 | secret leakage | SecretRef/redaction/persistence boundaries | 不輸出 credential/raw headers | secret-shaped output redacted；raw auth material拒絕持久化 | canary secret scan、sanitized result |
@@ -302,16 +375,18 @@ egress decision ref、Human decision ref（若適用）。
     external descriptor；不得破壞既有三個 adapter construction。
 - `services/core/src/polynexus_core/runtime/external_contracts.py`（new）
   - 放置 vendor-neutral descriptor、session handle、event/result/failure category
-    contract；不得含 process implementation 或 credential value。
+    contract，以及 execution-envelope digest/reference shape；不得含 raw config、
+    process implementation 或 credential value。
 - `services/core/src/polynexus_core/runtime/opencode_acp.py`（new）
   - 唯一第一 target adapter；管理 `opencode acp` local child/stdin/stdout/stderr、
-    ACP v1、session scope、cancel/cleanup 與 failure normalization。
+    ACP v1、PROJECTED_STAGING、effective-config/executable verification、session scope、
+    cancel/cleanup 與 failure normalization。
 - `services/core/src/polynexus_core/extensions/runtime_bridge.py`
   - 驗證 external closed capabilities、manifest/profile/descriptor identity 與 factory；
     仍註冊到同一 `RuntimeRegistry`。
 - `services/core/src/polynexus_core/runtime/registry.py`
-  - 新增 explicit static external-profile policy gate與 adapter-version binding metadata；
-    unknown profile仍無 fallback，不可全面放寬 LOCAL profile。
+  - 新增 explicit static external-profile policy gate與 adapter-version/envelope binding
+    metadata；unknown profile仍無 fallback，不可全面放寬 LOCAL profile。
 - `services/core/src/polynexus_core/runtime/routing_policy.py`
   - 將 external runtime 自身 egress 與 side-effect declaration 納入 dispatch 前政策；
     local child process 不得被誤視為 loopback-only inference。
@@ -366,7 +441,7 @@ egress decision ref、Human decision ref（若適用）。
 ### Session and dispatch
 
 - create session 只在 binding commit 後發生，且 Core Run id 不外借為 vendor authority。
-- attach 驗證 project scope digest、binding fingerprint、generation與 stored directory。
+- attach 驗證 project scope digest、binding/envelope fingerprint、generation與 stored directory。
 - dispatch 只含 projected ContextPackage/Task；unknown field與整個 workspace隱式匯出拒絕。
 - streaming chunk、snapshot、tool/permission、unknown event、out-of-order/duplicate event
   均有 deterministic projection；unknown event 不可完成 Run。
@@ -390,6 +465,8 @@ egress decision ref、Human decision ref（若適用）。
 - `MANAGED` 建立新 external session，從 Core-owned checkpoint重建，不冒充 native。
 - version/profile drift、deleted session、partial transcript、active old session、跨機器缺少
   state 全部 fail closed。
+- effective config、permission、plugin、MCP、skill/catalog、executable identity 或
+  workspace path 任一 drift 後的 attach/NATIVE resume 必須拒絕，且不得 rebind 原 Run。
 
 ### Policy, secret and provenance
 
@@ -402,6 +479,28 @@ egress decision ref、Human decision ref（若適用）。
   cross-project locator、TOCTOU mutation。
 - vendor output含 PASS/VERIFIED/CERTIFIED只成為 candidate Artifact/AI_OPINION。
 - fabricated Evidence/Finding/Artifact id、spoofed actor/source、duplicate artifact id拒絕。
+
+### Controlled execution envelope negative tests
+
+下列 deterministic fixtures 即使 OpenCode process 可以正常啟動或回傳成功，也必須
+`READINESS=FALSE`、`DISPATCH=DENIED` 或在 drift 時拒絕 attach/resume：
+
+- malicious project `opencode.json` 注入 model、agent、command、instruction 或 egress。
+- permissive permission configuration（含 default `allow` / auto-approve）。
+- `.opencode/plugins/**` side-loading。
+- npm/package plugin declaration或 install/download request。
+- MCP local server declaration與未核准 child process。
+- MCP remote server declaration與未核准 destination/network egress。
+- remote skill/catalog declaration或狀態無法固定。
+- global/project config disagreement及 precedence 無法 canonicalize。
+- binding 後 effective config drift。
+- config drift 後 resume 原 external session。
+- same canonical executable path但 executable content SHA-256 改變。
+- workspace path substitution、symlink/junction escape或 staging root replacement。
+- uncontrolled direct-project workspace access。
+
+另需正向證明 explicit `NONE` plugin/MCP/remote-skill sets、approved projected files與
+provider/model egress allowlist；沒有這些正向證據不得只靠 negative scan 宣告 ready。
 
 ### Ownership and compatibility
 
@@ -422,7 +521,11 @@ Human gate 只有在下列項目明確成立時才可授權 future implementatio
 4. 同意 cancel/cleanup exact-state proof 與 `ORPHANED` fail-closed rule。
 5. 同意 output 只為 candidate Artifact/AI_OPINION，不是 Evidence。
 6. 同意 explicit static executable provisioning；不建立 Plugin Platform。
-7. 核准精確 implementation allowlist、test fixtures 與任何需要的新 ADR。
+7. 同意 `POLYNEXUS_CONTROLLED_EXECUTION_ENVELOPE` 與第一版唯一
+   `WORKSPACE_SCOPE_MODE=PROJECTED_STAGING`。
+8. 同意 effective config/permission/plugin/MCP/skill/executable drift 對 readiness、
+   dispatch及 NATIVE resume 全部 fail closed。
+9. 核准精確 implementation allowlist、test fixtures 與任何需要的新 ADR。
 
 在此之前：
 
@@ -431,4 +534,11 @@ Human gate 只有在下列項目明確成立時才可授權 future implementatio
 - `RESUME_MODEL=DEFINED`
 - `ARTIFACT_EVIDENCE_BOUNDARY=DEFINED`
 - `MINIMUM_IMPLEMENTATION_SCOPE=PROPOSED`
+- `EFFECTIVE_RUNTIME_CONFIG_BOUNDARY=DEFINED`
+- `POLYNEXUS_CONTROLLED_EXECUTION_ENVELOPE=DEFINED`
+- `WORKSPACE_SCOPE_MODE=PROJECTED_STAGING`
+- `PLUGIN_MCP_BYPASS=FAIL_CLOSED`
+- `PERMISSION_EGRESS_BYPASS=FAIL_CLOSED`
+- `EXECUTABLE_IDENTITY_BINDING=DEFINED`
+- `CONFIG_DRIFT_RESUME_RULE=FAIL_CLOSED`
 - `IMPLEMENTATION_AUTHORIZED=NO`

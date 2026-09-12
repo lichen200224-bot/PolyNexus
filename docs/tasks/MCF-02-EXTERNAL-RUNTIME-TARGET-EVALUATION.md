@@ -6,6 +6,8 @@
 - `LANGUAGE=TRADITIONAL_CHINESE`
 - `RESEARCH_AS_OF=2026-09-12`
 - `CANONICAL_START_SHA=f0c0b986380dc21d103d4e856057cb8ac435a8f9`
+- `PREVIOUS_REVIEW_CANDIDATE_SHA=6bfa2f8653d0f667979d48a3628a77b15584e11d`
+- `PREVIOUS_REVIEW_RESULT=MCF02_ARCHITECTURE_REVIEW_NEED_FIX`
 - `IMPLEMENTATION_AUTHORIZED=NO`
 - `LIVE_VENDOR_LOGIN_OR_SEND=NONE`
 
@@ -23,6 +25,7 @@ architecture/governance deliverable 全部集中於 `docs/tasks/` 的慣例，�
 - `BACKUP_TARGET=Gemini CLI via ACP v1 (local stdio child process)`
 - `GENERIC_PROTOCOL_BASELINE=ACP v1`
 - `FIRST_IMPLEMENTATION_TARGET_COUNT=1`
+- `FIRST_REAL_EXTERNAL_EXECUTABLE_TARGET=OpenCode via ACP v1`
 
 OpenCode 的官方 ACP surface 已公開定義 local child-process/stdin/stdout、protocol
 v1、multi-session、load/resume、cancel、streaming、permission 與 auth ownership；
@@ -35,6 +38,11 @@ target；但服務存取政策正在轉換，且 cleanup/process-tree 真實性�
 所以列為 backup，不與 primary 同時實作。
 [Gemini CLI ACP mode](https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/acp-mode.md)
 [Gemini CLI terms and privacy](https://github.com/google-gemini/gemini-cli/blob/main/docs/resources/tos-privacy.md)
+
+此選擇不沿用 repository 既有 deterministic `OpenCodeRuntimeAdapter` 的 acceptance。
+MCF-02 的 OpenCode target 是首次受控啟動 real external `opencode acp` executable、解析
+其 working-directory effective configuration，並驗證 session/lifecycle/egress 的新路徑。
+既有 conformance PASS 不得作為本 target 的 live、readiness 或 conformance PASS。
 
 ## 2. 評分方法
 
@@ -97,6 +105,9 @@ identity熟悉度當成 target 選擇理由，本輪仍選 OpenCode/ACP。
 - `ARTIFACT_ACCESS=YES — session diff/files plus sanitized CLI export; bytes/hash仍由 Core驗證`
 - `AUTH_MODEL=Provider credentials remain owned by OpenCode; HTTP server can use Basic auth`
 - `SECRET_RISK=MEDIUM — provider credential store and optional server password must remain outside Core output`
+- `EFFECTIVE_CONFIG_RISK=HIGH — working directory may activate configuration, plugins, models, agents, commands, skills, instructions and MCP`
+- `CONTROLLED_ENVELOPE_REQUIRED=YES — PROJECTED_STAGING; explicit plugin/MCP/remote-skill sets; Core permission/egress policy`
+- `EXECUTABLE_IDENTITY_REQUIRED=canonical resolved path + Core-computed content SHA-256/equivalent + observed version`
 - `LICENSE_OR_INTEGRATION_CONCERN=MIT; executable must be preinstalled, not downloaded by MCF-02`
 - `PRIVATE_API_REQUIRED=NO`
 - `COOKIE_OR_TOKEN_REPLAY_REQUIRED=NO`
@@ -376,6 +387,11 @@ Sources:
    orphan test；但 cleanup仍必須由 PolyNexus獨立驗證。
 5. provider credential 可保持 `RUNTIME_MANAGED`，不需要 SecretRef 值、cookie 或
    browser session replay。
+6. Primary 身分只表示最小、公開、可驗證的 real executable/ACP target；不表示可以
+   信任 OpenCode global/project defaults。第一版必須由 Core 建立
+   `POLYNEXUS_CONTROLLED_EXECUTION_ENVELOPE` 與 `PROJECTED_STAGING` workspace。
+7. effective config、permission、plugin、MCP、remote skill/catalog或 executable content
+   無法固定／發生 drift 時，readiness/dispatch/attach/NATIVE resume 均 fail closed。
 
 ### Why Gemini/ACP is backup
 
