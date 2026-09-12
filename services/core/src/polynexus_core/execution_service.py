@@ -99,6 +99,18 @@ class ExecutionService:
         )
         # Composition-root injectable; default registers only reference.local.
         self._registry: RuntimeRegistry = registry or build_default_registry()
+        self._external_prepared: dict[str, object] = {}
+
+    def _bind_runtime(self, profile, task, context, *, run_id, resolved_at):
+        prepared = self._registry.prepare_external(profile, run_id, task, context)
+        if prepared is None:
+            return self._registry.bind(profile.runtime_profile_ref, run_id, resolved_at)
+        snapshot = profile.bind(
+            run_id, resolved_at, adapter_version=prepared.descriptor.binding_version_token
+        )
+        prepared.validate(snapshot)
+        self._external_prepared[run_id] = prepared
+        return snapshot
 
     def prepare_claimed_run(
         self,
@@ -157,8 +169,8 @@ class ExecutionService:
             )
             self._run_repo.append_event(claim_event)
             self._binding_repo.insert_once(
-                self._registry.bind(
-                    profile.runtime_profile_ref,
+                self._bind_runtime(
+                    profile, task, context,
                     run_id=run.id,
                     resolved_at=claim_event.occurred_at,
                 )
@@ -319,8 +331,8 @@ class ExecutionService:
         try:
             self._run_repo.append_event(claim_event)
             self._binding_repo.insert_once(
-                self._registry.bind(
-                    profile.runtime_profile_ref,
+                self._bind_runtime(
+                    profile, task, context,
                     run_id=run.id,
                     resolved_at=claim_event.occurred_at,
                 )
@@ -472,8 +484,8 @@ class ExecutionService:
             # CREATED→STARTING claim event timestamp; rebinding a Run is
             # rejected by insert_once.
             self._binding_repo.insert_once(
-                self._registry.bind(
-                    profile.runtime_profile_ref,
+                self._bind_runtime(
+                    profile, task, context,
                     run_id=run_id,
                     resolved_at=claim_event.occurred_at,
                 )
@@ -616,11 +628,13 @@ class ExecutionService:
         from polynexus_core.domain.enums import RunState
 
         try:
-            adapter = self._registry.create_adapter(profile)
+            prepared = self._external_prepared.pop(run_id, None)
+            if prepared is None:
+                return self._registry.create_adapter(profile)
             snapshot = self._binding_repo.get_by_run(run_id)
             if snapshot is None:
                 raise RuntimeBindingError("Claimed Run has no immutable runtime binding")
-            return self._registry.bind_adapter_to_snapshot(profile, adapter, snapshot)
+            return self._registry.create_external_adapter(profile, prepared, snapshot)
         except Exception:
             stored = self._run_repo.get(run_id)
             assert stored is not None

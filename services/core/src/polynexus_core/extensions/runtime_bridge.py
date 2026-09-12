@@ -11,7 +11,7 @@ from polynexus_core.extensions.manifest import HealthBoundary, ModuleError, Modu
 from polynexus_core.extensions.registry import ModuleRegistry
 from polynexus_core.runtime.contracts import RuntimeAdapter, RuntimeCapabilities
 from polynexus_core.runtime.external_contracts import (
-    ControlledExecutionEnvelope,
+    ExternalRuntimeDefinition,
     ExternalRuntimeDescriptor,
 )
 from polynexus_core.runtime.registry import AdapterFactory, RuntimeRegistry
@@ -154,21 +154,21 @@ class RuntimeModuleBridge:
         manifest: ModuleManifest,
         profile: RuntimeProfile,
         factory: AdapterFactory,
-        descriptor: ExternalRuntimeDescriptor,
-        envelope: ControlledExecutionEnvelope,
+        definition: ExternalRuntimeDefinition,
     ) -> None:
         """Register one statically composed external runtime module.
 
         MCF-02 intentionally permits one profile per external module and keeps
         executable discovery/install outside this bridge.
         """
+        if type(definition) is not ExternalRuntimeDefinition:
+            raise ModuleError("Invalid external runtime definition")
+        descriptor = definition.descriptor
         if (
             type(manifest) is not ModuleManifest
             or manifest.module_type is not ModuleType.RUNTIME
             or type(profile) is not RuntimeProfile
             or not callable(factory)
-            or not isinstance(descriptor, ExternalRuntimeDescriptor)
-            or not isinstance(envelope, ControlledExecutionEnvelope)
             or self.modules.contains(manifest.module_id)
             or descriptor.module_id != manifest.module_id
             or descriptor.module_version != manifest.module_version
@@ -178,9 +178,13 @@ class RuntimeModuleBridge:
             raise ModuleError("Invalid external runtime module registration")
         manifest.__post_init__()
         copied = replace(profile)
-        wrapper = self._guarded_factory(manifest, factory, ((copied, factory),))
+        def wrapper(prepared):
+            self.modules.resolve(manifest.module_id)
+            adapter = factory(prepared)
+            _check_capabilities(adapter, manifest.capabilities)
+            return adapter
         try:
-            self.runtimes.register_external(copied, wrapper, descriptor, envelope)
+            self.runtimes.register_external(copied, wrapper, definition)
             self.modules.register(manifest)
         except Exception:
             raise ModuleError("Invalid external runtime module registration") from None

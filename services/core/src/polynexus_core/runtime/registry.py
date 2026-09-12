@@ -34,7 +34,8 @@ from polynexus_core.domain.enums import (
 )
 from polynexus_core.runtime.contracts import RuntimeAdapter
 from polynexus_core.runtime.external_contracts import (
-    ControlledExecutionEnvelope,
+    ExternalRuntimeDefinition,
+    PreparedExternalRun,
     ExternalRuntimeDescriptor,
     LaunchMode,
     ProtocolKind,
@@ -224,8 +225,8 @@ class RuntimeRegistry:
     def __init__(self) -> None:
         self._profiles: dict[str, RuntimeProfile] = {}
         self._factories: dict[str, AdapterFactory] = {}
-        self._external_descriptors: dict[str, ExternalRuntimeDescriptor] = {}
-        self._external_envelopes: dict[str, ControlledExecutionEnvelope] = {}
+        self._external_definitions: dict[str, ExternalRuntimeDefinition] = {}
+        self._external_factories: dict[str, Callable] = {}
 
     def register(self, profile: RuntimeProfile, factory: AdapterFactory) -> None:
         """Register a profile and its adapter factory (composition-root wiring)."""
@@ -261,63 +262,52 @@ class RuntimeRegistry:
         self._factories = factories
 
     def register_external(
-        self,
-        profile: RuntimeProfile,
-        factory: AdapterFactory,
-        descriptor: ExternalRuntimeDescriptor,
-        envelope: ControlledExecutionEnvelope,
+        self, profile: RuntimeProfile, factory: Callable,
+        definition: ExternalRuntimeDefinition,
     ) -> None:
-        """Register one explicitly configured external runtime profile.
+        """Register static policy and a factory taking one PreparedExternalRun."""
+        if type(definition) is not ExternalRuntimeDefinition or not callable(factory):
+            raise RuntimeBindingError("Invalid external definition")
+        descriptor = definition.descriptor
+        identity = (profile.provider_id, profile.runtime_id, profile.adapter_id, profile.runtime_profile_ref)
+        declared = (descriptor.provider_id, descriptor.runtime_id, descriptor.adapter_id, descriptor.runtime_profile_ref)
+        if identity != declared or profile.auth_ownership is not descriptor.auth_ownership:
+            raise RuntimeBindingError("External runtime identity mismatch")
+        if profile.transport_kind is not TransportKind.LOCAL or profile.execution_target is not ExecutionTarget.LOCAL:
+            raise RuntimeBindingError("External runtime transport mismatch")
+        if profile.runtime_profile_ref in self._profiles or profile.adapter_id in self._factories:
+            raise RuntimeBindingError("Conflicting external runtime registration")
+        if profile.adapter_id in {p.adapter_id for p in self._profiles.values()}:
+            raise RuntimeBindingError("Conflicting external adapter registration")
+        from dataclasses import replace
+        self._profiles[profile.runtime_profile_ref] = replace(profile)
+        self._external_definitions[profile.runtime_profile_ref] = definition
+        self._external_factories[profile.runtime_profile_ref] = factory
 
-        This is static composition only: it neither discovers nor downloads an
-        executable, and the factory remains lazy.  Unknown identity, auth,
-        protocol, or execution-envelope values fail before registry publish.
-        """
-        try:
-            matches = (
-                type(profile) is RuntimeProfile
-                and callable(factory)
-                and isinstance(descriptor, ExternalRuntimeDescriptor)
-                and isinstance(envelope, ControlledExecutionEnvelope)
-                and descriptor.execution_envelope_ref == envelope.execution_envelope_ref
-                and (
-                    descriptor.provider_id,
-                    descriptor.runtime_id,
-                    descriptor.adapter_id,
-                    descriptor.runtime_profile_ref,
-                )
-                == (
-                    profile.provider_id,
-                    profile.runtime_id,
-                    profile.adapter_id,
-                    profile.runtime_profile_ref,
-                )
-                and descriptor.auth_ownership is profile.auth_ownership
-                and descriptor.protocol_kind is ProtocolKind.ACP
-                and descriptor.launch_mode is LaunchMode.LOCAL_CHILD
-                and profile.transport_kind is TransportKind.LOCAL
-                and profile.execution_target is ExecutionTarget.LOCAL
-                and profile.auth_ownership in {
-                    AuthOwnership.RUNTIME_MANAGED,
-                    AuthOwnership.SECRET_REF,
-                    AuthOwnership.NONE,
-                }
-            )
-            existing_descriptor = self._external_descriptors.get(profile.runtime_profile_ref)
-            existing_envelope = self._external_envelopes.get(profile.runtime_profile_ref)
-        except Exception:
-            matches = False
-            existing_descriptor = None
-            existing_envelope = None
-        if not matches:
-            raise RuntimeBindingError("External runtime registration is invalid")
-        if existing_descriptor is not None and existing_descriptor != descriptor:
-            raise RuntimeBindingError("Conflicting external runtime registration")
-        if existing_envelope is not None and existing_envelope != envelope:
-            raise RuntimeBindingError("Conflicting external runtime registration")
-        self.register(profile, factory)
-        self._external_descriptors[profile.runtime_profile_ref] = descriptor
-        self._external_envelopes[profile.runtime_profile_ref] = envelope
+    def prepare_external(self, profile: RuntimeProfile, run_id: str, task, context):
+        definition = self._external_definitions.get(profile.runtime_profile_ref)
+        if definition is None:
+            return None
+        self._validate_external_profile(profile)
+        return definition.prepare(run_id, task, context)
+
+    def create_external_adapter(self, profile: RuntimeProfile, prepared: PreparedExternalRun, snapshot):
+        self._validate_external_profile(profile)
+        definition = self._external_definitions[profile.runtime_profile_ref]
+        from dataclasses import replace
+        if replace(prepared.descriptor, execution_envelope_ref="0" * 64) != definition.descriptor:
+            raise RuntimeBindingError("External descriptor identity mismatch")
+        if prepared.envelope.executable_identity != definition.executable:
+            raise RuntimeBindingError("External executable identity mismatch")
+        if prepared.envelope.effective_runtime_configuration_fingerprint != definition.effective_config_digest:
+            raise RuntimeBindingError("External config policy mismatch")
+        prepared.validate(snapshot)
+        adapter = self._external_factories[profile.runtime_profile_ref](prepared)
+        _validate_adapter_compatibility(profile, adapter, ())
+        if adapter.envelope != prepared.envelope or adapter.descriptor != prepared.descriptor:
+            raise RuntimeBindingError("External factory scope mismatch")
+        adapter.bind_core_run(snapshot)
+        return adapter
 
     def resolve(self, profile_ref: str) -> RuntimeProfile:
         """Resolve a profile reference; unknown references fail closed.
@@ -344,25 +334,24 @@ class RuntimeRegistry:
             environment=environment,
         )
         profile = self.resolve(profile_ref)
-        if profile.runtime_profile_ref in self._external_descriptors:
+        if profile.runtime_profile_ref in self._external_definitions:
             self._validate_external_profile(profile)
         else:
             _validate_v1_profile(profile)
         return profile
 
     def _validate_external_profile(self, profile: RuntimeProfile) -> None:
-        descriptor = self._external_descriptors.get(profile.runtime_profile_ref)
-        envelope = self._external_envelopes.get(profile.runtime_profile_ref)
-        if descriptor is None or envelope is None:
-            raise RuntimeBindingError(_V1_PROFILE_POLICY_REASON)
+        definition = self._external_definitions.get(profile.runtime_profile_ref)
+        if definition is None:
+            raise RuntimeBindingError("Missing external definition")
+        descriptor = definition.descriptor
         if (
             descriptor.provider_id != profile.provider_id
             or descriptor.runtime_id != profile.runtime_id
             or descriptor.adapter_id != profile.adapter_id
             or descriptor.auth_ownership is not profile.auth_ownership
-            or descriptor.execution_envelope_ref != envelope.execution_envelope_ref
         ):
-            raise RuntimeBindingError(_V1_PROFILE_POLICY_REASON)
+            raise RuntimeBindingError("External profile identity mismatch")
 
     def create_adapter(
         self,
@@ -378,14 +367,6 @@ class RuntimeRegistry:
             )
         adapter = factory()
         _validate_adapter_compatibility(profile, adapter, required_capabilities)
-        descriptor = self._external_descriptors.get(profile.runtime_profile_ref)
-        if descriptor is not None:
-            envelope = self._external_envelopes.get(profile.runtime_profile_ref)
-            try:
-                if adapter.descriptor != descriptor or adapter.envelope != envelope:  # type: ignore[attr-defined]
-                    raise ValueError
-            except Exception:
-                raise RuntimeBindingError("External runtime factory identity mismatch") from None
         return adapter
 
     def _create_adapter_for_observation(self, profile: RuntimeProfile) -> RuntimeAdapter:
@@ -406,31 +387,6 @@ class RuntimeRegistry:
                 "No adapter factory registered for the resolved profile"
             ) from None
         return factory()
-
-    def bind_adapter_to_snapshot(
-        self,
-        profile: RuntimeProfile,
-        adapter: RuntimeAdapter,
-        snapshot: RuntimeBindingSnapshot,
-    ) -> RuntimeAdapter:
-        """Attach an external adapter to an already-persisted immutable binding."""
-        descriptor = self._external_descriptors.get(profile.runtime_profile_ref)
-        if descriptor is None:
-            return adapter
-        if (
-            snapshot.runtime_profile_ref != profile.runtime_profile_ref
-            or snapshot.provider_id != profile.provider_id
-            or snapshot.runtime_id != profile.runtime_id
-            or snapshot.adapter_id != profile.adapter_id
-            or snapshot.adapter_version != descriptor.binding_version_token
-        ):
-            raise RuntimeBindingError("External adapter binding identity mismatch")
-        try:
-            binder = adapter.bind_core_run  # type: ignore[attr-defined]
-            binder(snapshot)
-        except Exception:
-            raise RuntimeBindingError("External adapter binding failed") from None
-        return adapter
 
     def inspect_selected_profile(
         self,
@@ -463,12 +419,10 @@ class RuntimeRegistry:
     ) -> RuntimeBindingSnapshot:
         """Resolve a profile reference into an immutable Run-owned snapshot."""
         profile = self.resolve(profile_ref)
-        descriptor = self._external_descriptors.get(profile_ref)
-        return profile.bind(
-            run_id=run_id,
-            resolved_at=resolved_at,
-            adapter_version=(descriptor.binding_version_token if descriptor is not None else None),
-        )
+        if profile_ref in self._external_definitions:
+            raise RuntimeBindingError("External binding requires Run-scoped preparation")
+        return profile.bind(run_id=run_id, resolved_at=resolved_at)
+
 
 
 def build_default_registry() -> RuntimeRegistry:

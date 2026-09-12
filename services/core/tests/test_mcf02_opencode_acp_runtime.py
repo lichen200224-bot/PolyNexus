@@ -4,7 +4,8 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -24,18 +25,26 @@ from polynexus_core.persistence.repository import (
 )
 from polynexus_core.runtime.external_contracts import (
     MAX_FRAME_BYTES,
+    PreparedExternalRun,
+    ExternalRuntimeDefinition,
     ExternalContractError,
     build_controlled_execution_envelope,
     create_projected_staging,
 )
 from polynexus_core.runtime.opencode_acp import (
     AcpBoundaryError,
+    controlled_config,
+    normalized_config_digest,
+    configuration_sources_clear,
     OpenCodeAcpRuntimeAdapter,
     build_opencode_acp_descriptor,
     build_opencode_acp_profile,
 )
 from polynexus_core.runtime.contracts import RuntimeStatus
 from polynexus_core.runtime.registry import RUNTIME_PROFILE_ENV, RuntimeRegistry
+from polynexus_core.runtime.routing_policy import (
+    RunScopedPolicyAuthorization, DataClassification, ExecutionMode, DestinationTrust,
+)
 from polynexus_core.runtime.supervisor import RunSupervisor
 from polynexus_core.workflows.loader import load_workflow_definition
 
@@ -192,7 +201,20 @@ def inputs() -> tuple[Task, ContextPackage]:
     return task, context
 
 
-async def version_probe(_path: Path, _environment) -> str:
+async def config_probe(_path, _cwd, _environment):
+    return json.dumps(controlled_config()).encode()
+
+
+def policy_for(prepared):
+    return RunScopedPolicyAuthorization.issue(
+        run_id=prepared.run_id, task_id=prepared.task_id, project_id=prepared.project_id,
+        destination_ref="opencode.provider", envelope_ref=prepared.envelope.execution_envelope_ref,
+        classifications=(DataClassification.PUBLIC,), execution_mode=ExecutionMode.STANDARD,
+        destination_trust=DestinationTrust.TRUSTED_EXTERNAL,
+    )
+
+
+async def version_probe(_path: Path, _cwd: Path, _environment) -> str:
     return "1.0.0"
 
 
@@ -208,12 +230,14 @@ def build_adapter(
 ):
     task, context = inputs()
     staging = create_projected_staging(tmp_path, context)
+    (staging / ".polynexus-run").write_text("run-mcf02-acp", encoding="utf-8")
     executable = tmp_path / "opencode-bin"
     executable.write_bytes(b"opencode executable v1")
     envelope = build_controlled_execution_envelope(
         staging_root=staging,
         executable_path=executable,
         observed_runtime_version="1.0.0",
+        effective_config_digest=normalized_config_digest(json.dumps(controlled_config()).encode()),
     )
     descriptor = build_opencode_acp_descriptor(envelope)
     process = FakeProcess(mode=mode, stderr=stderr, prompt_result=prompt_result)
@@ -242,11 +266,16 @@ def build_adapter(
             return False
         return False
 
+    prepared = PreparedExternalRun(
+        "run-mcf02-acp", task.id, task.project_id, context.id, staging, envelope, descriptor
+    )
     adapter = OpenCodeAcpRuntimeAdapter(
         staging_root=staging,
         envelope=envelope,
         descriptor=descriptor,
-        provider_model_approved=approved,
+        prepared=prepared,
+        authorization=policy_for(prepared) if approved else None,
+        config_probe=config_probe,
         operation_timeout=timeout,
         process_launcher=launcher,
         version_probe=version_probe,
@@ -285,7 +314,8 @@ def test_fake_acp_create_dispatch_stream_result_and_candidate_evidence(tmp_path:
     assert launch["args"] == (str(adapter.envelope.executable_identity.resolved_path), "acp")
     assert launch["cwd"] == staging
     environment = launch["environment"]
-    assert "HOME" not in environment and "USERPROFILE" not in environment
+    assert environment["HOME"] == str(staging / ".runtime-home")
+    assert environment["USERPROFILE"] == environment["HOME"]
     assert process.returncode == 0
 
 
@@ -421,8 +451,10 @@ def test_cleanup_uncertainty_is_orphaned_by_run_supervisor(
     )
     workflow = load_workflow_definition(ROOT / "workflows" / "builtin" / "review-minimal.yaml")
     supervisor = RunSupervisor(adapter)
-    session = asyncio.run(supervisor.start(task, context, workflow))
-    execution = asyncio.run(supervisor.cancel(session))
+    run = Run(id="run-mcf02-acp", task_id=task.id, workflow_id=task.workflow_id,
+              workflow_version=1, context_package_id=context.id)
+    run.transition(RunState.STARTING)
+    execution = asyncio.run(supervisor.execute_claimed_run(run, task, context, workflow))
     assert execution.run.state is RunState.ORPHANED
     assert execution.run.events[-1].to_state is RunState.ORPHANED
     if failure_kind == "child-remains":
@@ -550,91 +582,298 @@ def test_artifact_hash_cross_project_metadata_and_path_escape_fail_closed(
 def test_fake_acp_is_not_live_compatibility_or_certification(tmp_path: Path) -> None:
     adapter, _, _, _, _, _, _ = build_adapter(tmp_path)
     assert adapter.version_info().startswith("opencode-acp-adapter/")
+    assert adapter.capabilities().permission_requests is False
     assert "live" not in adapter.version_info().lower()
     assert "certified" not in adapter.version_info().lower()
     assert "production" not in adapter.version_info().lower()
 
 
-def test_execution_service_commits_external_binding_before_factory_and_keeps_supervisor_owner(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+@pytest.mark.parametrize("same_project", [False, True])
+def test_same_profile_two_runs_two_projects_have_durable_isolated_envelopes(tmp_path, monkeypatch, same_project):
     database = create_engine(f"sqlite:///{tmp_path / 'mcf02.db'}")
     Base.metadata.create_all(database)
+    prepared_runs = []
+    factories = []
+    executable = tmp_path / "opencode-core-path-bin"
+    executable.write_bytes(b"explicit executable")
+    from polynexus_core.runtime.external_contracts import build_executable_identity
+    # Template sentinel cannot be executed or mistaken for a Run envelope.
+    template_root = create_projected_staging(tmp_path, inputs()[1])
+    template_envelope = build_controlled_execution_envelope(
+        staging_root=template_root, executable_path=executable, observed_runtime_version="1.0.0"
+    )
+    template = replace(build_opencode_acp_descriptor(template_envelope), execution_envelope_ref="0" * 64)
+    definition = ExternalRuntimeDefinition(
+        template, build_executable_identity(executable, "1.0.0"), tmp_path,
+        normalized_config_digest(json.dumps(controlled_config()).encode()),
+    )
+
+    def factory(prepared):
+        with Session(database) as observer:
+            binding = SqlRuntimeBindingSnapshotRepository(observer).get_by_run(prepared.run_id)
+            assert binding is not None
+            prepared.validate(binding)
+            factories.append(binding)
+        process = FakeProcess()
+        async def launch(args, cwd, environment):
+            assert cwd == prepared.staging_root
+            return process
+        async def cleanup(proc, timeout):
+            process.returncode = 0
+            return True
+        prepared_runs.append(prepared)
+        return OpenCodeAcpRuntimeAdapter(
+            staging_root=prepared.staging_root, envelope=prepared.envelope,
+            descriptor=prepared.descriptor, prepared=prepared, authorization=policy_for(prepared),
+            process_launcher=launch, version_probe=version_probe, config_probe=config_probe,
+            tree_cleanup=cleanup,
+        )
+
+    registry = RuntimeRegistry()
+    profile = build_opencode_acp_profile()
+    registry.register_external(profile, factory, definition)
     try:
-        task, context = inputs()
-        project = Project(id=context.project_id, name="MCF02 Core path")
-        run = Run(
-            task_id=task.id,
-            workflow_id=task.workflow_id,
-            workflow_version=task.workflow_version,
-            context_package_id=context.id,
-        )
-        staging = create_projected_staging(tmp_path, context)
-        executable = tmp_path / "opencode-core-path-bin"
-        executable.write_bytes(b"opencode executable v1")
-        envelope = build_controlled_execution_envelope(
-            staging_root=staging,
-            executable_path=executable,
-            observed_runtime_version="1.0.0",
-        )
-        descriptor = build_opencode_acp_descriptor(envelope)
-        profile = build_opencode_acp_profile()
-        current_run_id = run.id
-        factory_observations: list[str] = []
-
-        def factory() -> OpenCodeAcpRuntimeAdapter:
-            # A separate connection proves the immutable binding was committed
-            # before the external process adapter could be constructed.
-            with Session(database) as observer:
-                snapshot = SqlRuntimeBindingSnapshotRepository(observer).get_by_run(
-                    current_run_id
-                )
-                assert snapshot is not None
-                assert snapshot.adapter_version == descriptor.binding_version_token
-                factory_observations.append(snapshot.run_id)
-            process = FakeProcess()
-
-            async def launcher(args, cwd, environment):
-                del args, cwd, environment
-                return process
-
-            async def cleanup(proc, _timeout):
-                assert proc is process
-                process.returncode = 0
-                process.stdout.queue.put_nowait(b"")
-                return True
-
-            return OpenCodeAcpRuntimeAdapter(
-                staging_root=staging,
-                envelope=envelope,
-                descriptor=descriptor,
-                provider_model_approved=True,
-                process_launcher=launcher,
-                version_probe=version_probe,
-                tree_cleanup=cleanup,
-            )
-
-        registry = RuntimeRegistry()
-        registry.register_external(profile, factory, descriptor, envelope)
         with Session(database) as session:
-            for repository, entity in (
-                (SqlProjectRepository, project),
-                (SqlContextPackageRepository, context),
-                (SqlTaskRepository, task),
-                (SqlRunRepository, run),
-            ):
-                repository(session).add(entity)
-            session.commit()
-            monkeypatch.setenv(RUNTIME_PROFILE_ENV, profile.runtime_profile_ref)
-            execution = asyncio.run(
-                ExecutionService(session, registry).execute_existing_run(run.id)
-            )
-            assert execution.run.state is RunState.COMPLETED
-            assert execution.run.runtime_ref.startswith("opencode-acp:")
-            assert factory_observations == [run.id]
-            snapshot = SqlRuntimeBindingSnapshotRepository(session).get_by_run(run.id)
-            assert snapshot is not None
-            assert snapshot.adapter_version == descriptor.binding_version_token
-            assert [event.to_state for event in execution.run.events][-1] is RunState.COMPLETED
+            for _ in range(2):
+                task, context = inputs()
+                if same_project and prepared_runs:
+                    context = replace(context, project_id=prepared_runs[0].project_id)
+                    task = replace(task, project_id=context.project_id)
+                project = Project(id=context.project_id, name="isolated")
+                run = Run(task_id=task.id, workflow_id=task.workflow_id,
+                          workflow_version=1, context_package_id=context.id)
+                for repo, entity in ((SqlProjectRepository, project),
+                                     (SqlContextPackageRepository, context),
+                                     (SqlTaskRepository, task), (SqlRunRepository, run)):
+                    if repo is SqlProjectRepository and same_project and prepared_runs:
+                        continue
+                    repo(session).add(entity)
+                session.commit()
+                monkeypatch.setenv(RUNTIME_PROFILE_ENV, profile.runtime_profile_ref)
+                result = asyncio.run(ExecutionService(session, registry).execute_existing_run(run.id))
+                assert result.run.state is RunState.COMPLETED
+        a, b = prepared_runs
+        assert a.staging_root != b.staging_root
+        assert a.envelope.execution_envelope_ref != b.envelope.execution_envelope_ref
+        assert (a.project_id == b.project_id) is same_project
+        assert a.context_id not in (b.staging_root / "context.json").read_text()
+        (a.staging_root / "private-artifact").write_text("run a only")
+        assert not (b.staging_root / "private-artifact").exists()
+        with pytest.raises(ExternalContractError):
+            replace(b, staging_root=a.staging_root, envelope=a.envelope).validate(factories[1])
+        assert not hasattr(registry, "_external_envelopes")
     finally:
         database.dispose()
+
+
+@pytest.mark.parametrize("field,value", [
+    ("plugin", ["npm:unapproved"]),
+    ("plugin", ["file:///global/plugins/evil.js"]),
+    ("mcp", {"global": {"type": "local", "command": ["evil"]}}),
+    ("mcp", {"remote": {"type": "remote", "url": "https://invalid.example"}}),
+    ("permission", {"*": "allow"}),
+    ("permission", {"*": "deny", "external_directory": "allow"}),
+    ("agent", {"build": {"permission": {"*": "allow"}}}),
+    ("skills", {"urls": ["https://invalid.example/catalog"]}),
+    ("autoApprove", True),
+    ("managed", {"permission": "allow"}),
+    ("remote", {"url": "https://invalid.example/config"}),
+])
+def test_final_resolver_expansion_denies_readiness_and_launch(tmp_path, field, value):
+    adapter, task, context, _, _, _, launch = build_adapter(tmp_path)
+    runtime_ref = create(adapter, context)
+    effective = controlled_config()
+    effective[field] = value
+    async def injected(path, cwd, env):
+        return json.dumps(effective).encode()
+    adapter._config_probe = injected
+    assert asyncio.run(adapter.readiness()) is False
+    with pytest.raises(AcpBoundaryError):
+        asyncio.run(adapter.submit(runtime_ref, task))
+    assert launch == {}
+
+
+@pytest.mark.parametrize("raw", [b"{}", b"not-json", b'{"permission":{},"permission":{}}', b"x" * (MAX_FRAME_BYTES + 1)], ids=["missing", "malformed", "duplicate", "oversize"])
+def test_unparseable_or_incomplete_effective_config_is_not_safe(tmp_path, raw):
+    adapter, _, _, _, _, _, _ = build_adapter(tmp_path)
+    async def invalid(*args):
+        return raw
+    adapter._config_probe = invalid
+    assert asyncio.run(adapter.readiness()) is False
+
+
+@pytest.mark.parametrize("source", ["global", "global-plugin", "global-mcp", "managed", "project", "remote-auth"])
+def test_source_inventory_rejects_expansion_before_resolver(tmp_path, monkeypatch, source):
+    import polynexus_core.runtime.opencode_acp as module
+    adapter, _, _, staging, _, _, _ = build_adapter(tmp_path)
+    monkeypatch.setattr(module.sys, "platform", "win32")
+    managed_parent = tmp_path / "program-data"
+    managed_parent.mkdir()
+    monkeypatch.setenv("ProgramData", str(managed_parent))
+    env = adapter._controlled_environment()
+    assert configuration_sources_clear(staging, env)
+    targets = {
+        "global": staging / ".runtime-home/config/opencode/opencode.json",
+        "global-plugin": staging / ".runtime-home/config/opencode/plugins/evil.js",
+        "global-mcp": staging / ".runtime-home/config/opencode/mcp.json",
+        "managed": managed_parent / "opencode/opencode.json",
+        "project": tmp_path / "opencode.json",
+        "remote-auth": staging / ".runtime-home/data/opencode/auth.json",
+    }
+    target = targets[source]
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text("{}")
+    assert configuration_sources_clear(staging, env) is False
+
+
+@pytest.mark.parametrize("mismatch", ["run_id", "task_id", "project_id", "destination_ref", "envelope_ref", "missing-ref", "expired", "boolean", "human-required"])
+def test_policy_authorization_is_run_scoped_and_never_infers_human_approval(tmp_path, mismatch):
+    adapter, task, context, _, _, _, launch = build_adapter(tmp_path)
+    ref = create(adapter, context)
+    authorization = adapter._authorization
+    if mismatch == "boolean":
+        authorization = True
+    elif mismatch == "missing-ref":
+        authorization = replace(authorization, policy_decision_ref="")
+    elif mismatch == "expired":
+        authorization = replace(authorization, expires_at=datetime.now(timezone.utc) - timedelta(seconds=1))
+        authorization = replace(authorization, policy_decision_ref=authorization.reference())
+    elif mismatch == "human-required":
+        authorization = replace(authorization, classifications=(DataClassification.CONFIDENTIAL,))
+        authorization = replace(authorization, policy_decision_ref=authorization.reference())
+    else:
+        authorization = replace(authorization, **{mismatch: "other"})
+        authorization = replace(authorization, policy_decision_ref=authorization.reference())
+    adapter._authorization = authorization
+    with pytest.raises(AcpBoundaryError):
+        asyncio.run(adapter.submit(ref, task))
+    assert launch == {}
+
+
+@pytest.mark.parametrize("params", [
+    {"sessionId": "current", "options": [{"kind": "allow_once"}]},
+    {"sessionId": "current", "options": [{"kind": "reject_once"}]},
+    {"sessionId": "stale", "options": []},
+    None,
+])
+def test_option_b_incoming_permission_request_never_becomes_response(tmp_path, params):
+    adapter, task, context, _, _, process, _ = build_adapter(tmp_path)
+    ref = create(adapter, context)
+    original = process.stdin.write
+    def incoming(data):
+        message = json.loads(data)
+        if message.get("method") == "session/prompt":
+            process.stdout.queue.put_nowait(json.dumps({
+                "jsonrpc": "2.0", "id": message["id"],
+                "method": "session/request_permission", "params": params,
+                "result": {"output": "PASS"},
+            }).encode() + b"\n")
+        else:
+            original(data)
+    process.stdin.write = incoming
+    assert adapter.capabilities().permission_requests is False
+    with pytest.raises(AcpBoundaryError):
+        asyncio.run(adapter.submit(ref, task))
+    assert asyncio.run(adapter.cleanup(ref)) is True
+
+
+def test_artifact_changed_during_process_cleanup_rejects_original_claim(tmp_path):
+    payload = b"before"
+    claim = {"path": "out.bin", "size": len(payload), "sha256": hashlib.sha256(payload).hexdigest()}
+    adapter, task, context, staging, _, process, _ = build_adapter(
+        tmp_path, prompt_result={"output": "ok", "artifacts": [claim]}
+    )
+    ref = create(adapter, context)
+    async def modifying_cleanup(proc, timeout):
+        (staging / "out.bin").write_bytes(b"after!")
+        process.returncode = 0
+        return True
+    adapter._tree_cleanup = modifying_cleanup
+    asyncio.run(adapter.submit(ref, task))
+    with pytest.raises(AcpBoundaryError):
+        asyncio.run(adapter.result(ref))
+
+
+def test_imported_artifact_storage_is_core_snapshot_not_staging(tmp_path):
+    payload = b"candidate"
+    claim = {"path": "out.bin", "size": len(payload), "sha256": hashlib.sha256(payload).hexdigest()}
+    adapter, task, context, staging, _, process, _ = build_adapter(
+        tmp_path, prompt_result={"output": "ok", "artifacts": [claim]}
+    )
+    ref = create(adapter, context)
+    asyncio.run(adapter.submit(ref, task))
+    assert process.returncode == 0
+    (staging / "out.bin").write_bytes(payload)
+    result = asyncio.run(adapter.result(ref))
+    stored = Path(result.artifacts[0].storage_ref)
+    assert staging not in stored.parents
+    (staging / "out.bin").write_bytes(b"later overwrite")
+    assert stored.read_bytes() == payload
+    assert hashlib.sha256(stored.read_bytes()).hexdigest() == result.artifacts[0].sha256
+    assert result.evidence[0].metadata["provider_model_egress"] == "CORE_POLICY_ALLOWED"
+    assert result.evidence[0].metadata["policy_decision_ref"].startswith("policy-")
+    assert "HUMAN_APPROVED" not in repr(result)
+
+
+def test_default_resolver_uses_bound_binary_and_identical_cwd_environment(tmp_path, monkeypatch):
+    import polynexus_core.runtime.opencode_acp as module
+    adapter, _, _, staging, executable, _, _ = build_adapter(tmp_path)
+    observed = []
+    class ProbeStream:
+        def __init__(self, value):
+            self.value = value
+        async def read(self, size):
+            value, self.value = self.value[:min(size, 7)], self.value[min(size, 7):]
+            return value
+    class ProbeProcess:
+        returncode = 0
+        stdout = ProbeStream(json.dumps(controlled_config()).encode())
+        stderr = ProbeStream(b"synthetic secret discarded")
+        async def wait(self):
+            return 0
+    async def launcher(args, cwd, environment):
+        observed.append((args, cwd, environment))
+        return ProbeProcess()
+    monkeypatch.setattr(module, "_default_launcher", launcher)
+    monkeypatch.setattr(module, "configuration_sources_clear", lambda cwd, env: True)
+    environment = adapter._controlled_environment()
+    raw = asyncio.run(module._default_config_probe(executable, staging, environment))
+    assert observed == [((str(executable), "debug", "config"), staging, environment)]
+    assert normalized_config_digest(raw) == adapter.envelope.effective_runtime_configuration_fingerprint
+
+
+def test_unknown_source_inventory_does_not_launch_resolver(tmp_path, monkeypatch):
+    import polynexus_core.runtime.opencode_acp as module
+    adapter, _, _, staging, executable, _, _ = build_adapter(tmp_path)
+    calls = []
+    async def launcher(*args):
+        calls.append(args)
+        raise AssertionError("must not launch")
+    monkeypatch.setattr(module, "_default_launcher", launcher)
+    monkeypatch.setattr(module, "configuration_sources_clear", lambda cwd, env: False)
+    with pytest.raises(AcpBoundaryError):
+        asyncio.run(module._default_config_probe(executable, staging, adapter._controlled_environment()))
+    assert calls == []
+
+
+def test_artifact_mutation_after_first_read_is_rejected(tmp_path, monkeypatch):
+    payload = b"original"
+    claim = {"path": "out.bin", "size": len(payload), "sha256": hashlib.sha256(payload).hexdigest()}
+    adapter, task, context, staging, _, _, _ = build_adapter(
+        tmp_path, prompt_result={"output": "ok", "artifacts": [claim]}
+    )
+    ref = create(adapter, context)
+    asyncio.run(adapter.submit(ref, task))
+    path = staging / "out.bin"
+    path.write_bytes(payload)
+    original = Path.read_bytes
+    changed = []
+    def racing_read(self):
+        data = original(self)
+        if self == path and not changed:
+            changed.append(True)
+            self.write_bytes(b"modified")
+        return data
+    monkeypatch.setattr(Path, "read_bytes", racing_read)
+    with pytest.raises(AcpBoundaryError):
+        asyncio.run(adapter.result(ref))

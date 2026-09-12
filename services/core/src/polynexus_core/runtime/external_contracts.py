@@ -14,13 +14,13 @@ import re
 import shutil
 import tempfile
 from collections.abc import Iterable, Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import StrEnum
 from pathlib import Path
 from typing import Protocol
 
 from polynexus_core.domain.enums import AuthOwnership
-from polynexus_core.domain.models import ContextPackage
+from polynexus_core.domain.models import ContextPackage, Task
 from polynexus_core.domain.runtime_binding import (
     RuntimeBindingError,
     RuntimeBindingSnapshot,
@@ -302,6 +302,66 @@ class ExternalRuntimeAdapter(RuntimeAdapter, Protocol):
     def bind_core_run(self, snapshot: RuntimeBindingSnapshot) -> None: ...
 
 
+@dataclass(frozen=True)
+class ExternalRuntimeDefinition:
+    """Static operator policy only; never contains a materialized workspace.
+
+    The descriptor's envelope reference is a template sentinel, not a binding.
+    ExecutionService materializes a fresh run before committing its snapshot.
+    """
+
+    descriptor: ExternalRuntimeDescriptor
+    executable: ExecutableIdentity
+    staging_parent: Path
+    effective_config_digest: str
+
+    def __post_init__(self) -> None:
+        if self.descriptor.execution_envelope_ref != "0" * 64:
+            raise ExternalContractError("Static definition must not contain a Run envelope")
+        _safe_digest(self.effective_config_digest, "expected effective config digest")
+
+    def prepare(self, run_id: str, task: Task, context: ContextPackage) -> PreparedExternalRun:
+        if task.project_id != context.project_id or task.context_package_id != context.id:
+            raise ExternalContractError("External Run scope mismatch")
+        root = create_projected_staging(self.staging_parent, context)
+        (root / ".polynexus-run").write_text(run_id, encoding="utf-8")
+        envelope = build_controlled_execution_envelope(
+            staging_root=root,
+            executable_path=Path(self.executable.resolved_path),
+            observed_runtime_version=self.executable.observed_runtime_version,
+            effective_config_digest=self.effective_config_digest,
+        )
+        if envelope.executable_identity != self.executable:
+            raise ExternalContractError("Executable identity drift")
+        return PreparedExternalRun(
+            run_id, task.id, context.project_id, context.id, root, envelope,
+            replace(self.descriptor, execution_envelope_ref=envelope.execution_envelope_ref),
+        )
+
+
+@dataclass(frozen=True)
+class PreparedExternalRun:
+    """Transient Core preparation, held by ExecutionService, not static registry."""
+
+    run_id: str
+    task_id: str
+    project_id: str
+    context_id: str
+    staging_root: Path
+    envelope: ControlledExecutionEnvelope
+    descriptor: ExternalRuntimeDescriptor
+
+    def validate(self, snapshot: RuntimeBindingSnapshot) -> None:
+        if snapshot.run_id != self.run_id or snapshot.adapter_version != self.descriptor.binding_version_token:
+            raise ExternalContractError("External Run binding mismatch")
+        if (self.staging_root / ".polynexus-run").read_text(encoding="utf-8") != self.run_id:
+            raise ExternalContractError("External Run staging mismatch")
+        value = json.loads((self.staging_root / "context.json").read_text(encoding="utf-8"))
+        if (value.get("project_id"), value.get("context_id")) != (self.project_id, self.context_id):
+            raise ExternalContractError("External context scope mismatch")
+        validate_current_envelope(self.envelope, self.staging_root)
+
+
 def is_link_or_junction(path: Path) -> bool:
     """Reject both ordinary links and Windows junction/reparse escapes."""
     try:
@@ -446,6 +506,7 @@ def build_controlled_execution_envelope(
     staging_root: Path,
     executable_path: Path,
     observed_runtime_version: str,
+    effective_config_digest: str = "0" * 64,
 ) -> ControlledExecutionEnvelope:
     workspace_identity, content_fingerprint = inspect_projected_staging(staging_root)
     executable = build_executable_identity(executable_path, observed_runtime_version)
@@ -464,7 +525,9 @@ def build_controlled_execution_envelope(
         "permission_policy": permission_policy,
         "config_precedence": ["CORE_CONTROLLED_ONLY"],
     }
-    effective_fingerprint = _canonical_digest(effective_config)
+    # This is a pinned expected resolved-config digest. Readiness must obtain
+    # and compare actual resolver output; a template alone is never evidence.
+    effective_fingerprint = _safe_digest(effective_config_digest, "effective config digest")
     permission_fingerprint = _canonical_digest(permission_policy)
     reference = _canonical_digest(
         {
@@ -498,16 +561,13 @@ def build_controlled_execution_envelope(
 
 
 def validate_current_envelope(envelope: ControlledExecutionEnvelope, staging_root: Path) -> None:
-    identity, content = inspect_projected_staging(staging_root)
-    current_executable = build_executable_identity(
-        Path(envelope.executable_identity.resolved_path),
-        envelope.executable_identity.observed_runtime_version,
+    rebuilt = build_controlled_execution_envelope(
+        staging_root=staging_root,
+        executable_path=Path(envelope.executable_identity.resolved_path),
+        observed_runtime_version=envelope.executable_identity.observed_runtime_version,
+        effective_config_digest=envelope.effective_runtime_configuration_fingerprint,
     )
-    if (
-        identity != envelope.workspace_identity
-        or content != envelope.workspace_content_fingerprint
-        or current_executable != envelope.executable_identity
-    ):
+    if rebuilt != envelope:
         raise ExternalContractError("External execution envelope drift detected")
 
 

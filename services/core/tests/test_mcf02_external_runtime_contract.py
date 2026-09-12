@@ -21,6 +21,7 @@ from polynexus_core.extensions import (
 )
 from polynexus_core.runtime.external_contracts import (
     ControlledExecutionEnvelope,
+    ExternalRuntimeDefinition,
     EgressChannel,
     EgressDeclaration,
     EgressDisposition,
@@ -248,14 +249,17 @@ def test_link_and_direct_project_workspace_are_rejected(
 def test_provider_and_agent_egress_are_separate_and_human_gated(tmp_path: Path) -> None:
     _, _, envelope = controlled(tmp_path)
     descriptor = build_opencode_acp_descriptor(envelope)
-    pending = evaluate_external_egress(descriptor, provider_model_approved=False)
+    pending = evaluate_external_egress(descriptor)
     assert pending.provider_model_egress is PolicyDecision.APPROVAL_REQUIRED
     assert pending.agent_extension_egress is PolicyDecision.DENY
     assert pending.dispatch_allowed is False
-    approved = evaluate_external_egress(descriptor, provider_model_approved=True)
-    assert approved.provider_model_egress is PolicyDecision.ALLOW
-    assert approved.agent_extension_egress is PolicyDecision.DENY
-    assert approved.dispatch_allowed is True
+    boolean = evaluate_external_egress(descriptor, authorization=True)
+    assert boolean.dispatch_allowed is False
+    declared = replace(descriptor, egress=(
+        EgressDeclaration(EgressChannel.PROVIDER_MODEL_EGRESS, EgressDisposition.APPROVED),
+        EgressDeclaration(EgressChannel.AGENT_EXTENSION_EGRESS, EgressDisposition.DENY),
+    ))
+    assert evaluate_external_egress(declared).dispatch_allowed is False
 
 
 def test_agent_extension_egress_cannot_be_enabled(tmp_path: Path) -> None:
@@ -268,89 +272,46 @@ def test_agent_extension_egress_cannot_be_enabled(tmp_path: Path) -> None:
         )
 
 
-async def _version(_path: Path, _environment) -> str:
-    return "1.0.0"
-
-
-def test_external_registry_binds_envelope_without_schema_change(tmp_path: Path) -> None:
-    root, _, envelope = controlled(tmp_path)
+def test_static_registration_rejects_materialized_envelope(tmp_path):
+    root, executable, envelope = controlled(tmp_path)
     descriptor = build_opencode_acp_descriptor(envelope)
-    profile = build_opencode_acp_profile()
-    factory = lambda: OpenCodeAcpRuntimeAdapter(
-        staging_root=root,
-        envelope=envelope,
-        descriptor=descriptor,
-        version_probe=_version,
-    )
-    registry = RuntimeRegistry()
-    registry.register_external(profile, factory, descriptor, envelope)
-    selected = registry._resolve_selected_profile(explicit_request=profile.runtime_profile_ref)
-    snapshot = registry.bind(
-        profile.runtime_profile_ref,
-        "run-mcf02",
-        datetime.now(timezone.utc),
-    )
-    assert selected == profile
-    assert snapshot.adapter_version == descriptor.binding_version_token
-    assert envelope.execution_envelope_ref in snapshot.adapter_version
-    adapter = registry.create_adapter(profile)
-    registry.bind_adapter_to_snapshot(profile, adapter, snapshot)
-    with pytest.raises(ExternalContractError, match="already bound"):
-        adapter.bind_core_run(snapshot)  # type: ignore[attr-defined]
+    with pytest.raises(ExternalContractError):
+        ExternalRuntimeDefinition(descriptor, envelope.executable_identity, tmp_path, "0" * 64)
 
 
-def test_external_registration_identity_mismatch_conflict_and_no_fallback(tmp_path: Path) -> None:
-    root, _, envelope = controlled(tmp_path)
-    descriptor = build_opencode_acp_descriptor(envelope)
-    profile = build_opencode_acp_profile()
+def test_external_definition_registry_conflict_and_no_unscoped_execution(tmp_path):
+    root, executable, envelope = controlled(tmp_path)
+    descriptor = replace(build_opencode_acp_descriptor(envelope), execution_envelope_ref="0" * 64)
+    definition = ExternalRuntimeDefinition(descriptor, envelope.executable_identity, tmp_path, "0" * 64)
     registry = RuntimeRegistry()
-    factory = lambda: OpenCodeAcpRuntimeAdapter(
-        staging_root=root, envelope=envelope, descriptor=descriptor, version_probe=_version
-    )
-    with pytest.raises(RuntimeBindingError, match="invalid"):
-        registry.register_external(
-            replace(profile, provider_id="other"), factory, descriptor, envelope
-        )
-    registry.register_external(profile, factory, descriptor, envelope)
-    with pytest.raises(RuntimeBindingError, match="Conflicting"):
-        registry.register_external(
-            profile,
-            factory,
-            replace(descriptor, module_version="1.0.1"),
-            envelope,
-        )
-    with pytest.raises(RuntimeBindingError, match="Unknown"):
+    profile = build_opencode_acp_profile()
+    factory = lambda prepared: None
+    with pytest.raises(RuntimeBindingError):
+        registry.register_external(replace(profile, provider_id="wrong"), factory, definition)
+    registry.register_external(profile, factory, definition)
+    with pytest.raises(RuntimeBindingError):
+        registry.register_external(profile, factory, definition)
+    with pytest.raises(RuntimeBindingError):
+        registry.create_adapter(profile)
+    with pytest.raises(RuntimeBindingError):
+        registry.bind(profile.runtime_profile_ref, "run-a", datetime.now(timezone.utc))
+    with pytest.raises(RuntimeBindingError):
         registry.resolve("missing.external")
 
 
-def test_runtime_module_bridge_registers_one_explicit_external_profile(tmp_path: Path) -> None:
-    root, _, envelope = controlled(tmp_path)
-    descriptor = build_opencode_acp_descriptor(envelope)
+def test_bridge_static_external_definition_stays_disabled_at_factory(tmp_path):
+    root, executable, envelope = controlled(tmp_path)
+    descriptor = replace(build_opencode_acp_descriptor(envelope), execution_envelope_ref="0" * 64)
+    definition = ExternalRuntimeDefinition(descriptor, envelope.executable_identity, tmp_path, "0" * 64)
     profile = build_opencode_acp_profile()
-    factory = lambda: OpenCodeAcpRuntimeAdapter(
-        staging_root=root, envelope=envelope, descriptor=descriptor, version_probe=_version
-    )
-    manifest = ModuleManifest(
-        module_id=descriptor.module_id,
-        module_type=ModuleType.RUNTIME,
-        module_version=descriptor.module_version,
-        provider_id=descriptor.provider_id,
-        capabilities=(
-            "cancel",
-            "external_sessions",
-            "event_stream",
-            "permission_requests",
-            "egress_declaration",
-        ),
-        health=HealthBoundary.RUNTIME_PROBE,
-        conformance_scope=ConformanceScope.UNVERIFIED,
-    )
     bridge = RuntimeModuleBridge(ModuleRegistry(), RuntimeRegistry())
-    bridge.register_external(manifest, profile, factory, descriptor, envelope)
-    adapter = bridge.runtimes.create_adapter(profile)
-    assert isinstance(adapter, OpenCodeAcpRuntimeAdapter)
-    with pytest.raises(Exception):
-        bridge.register_external(manifest, profile, factory, descriptor, envelope)
+    manifest = ModuleManifest(module_id=descriptor.module_id, module_type=ModuleType.RUNTIME,
+                              module_version=descriptor.module_version,
+                              provider_id=descriptor.provider_id)
+    bridge.register_external(manifest, profile, lambda prepared: None, definition)
+    bridge.modules.set_enabled(manifest.module_id, False)
+    with pytest.raises(RuntimeBindingError):
+        bridge.runtimes.create_adapter(profile)
 
 
 def test_binding_token_does_not_contain_raw_config_or_credential(tmp_path: Path) -> None:

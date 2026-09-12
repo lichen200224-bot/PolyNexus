@@ -1,6 +1,31 @@
 # Current Handoff
 
-## Current governance routing — POST-G30-ARCHITECTURE-ROUTING-01 (2026-09-12)
+## Current task — MCF-02-I01 F001–F005 repair (2026-09-12)
+
+- `TASK_ID`: `MCF-02-I01-OPENCODE-ACP-EXTERNAL-RUNTIME-FOUNDATION`.
+- `ATTEMPT`: repair of historical NEED_FIX `18fab2b092911d9dd1f95eccda29b52dfaedff7d`.
+- `BRANCH`: `feature/mcf-02-opencode-acp-runtime`.
+- `WRITER`: Codex; `REVIEWER` / `NEXT_OWNER`: `FRESH_INDEPENDENT_IMPLEMENTATION_REVIEWER`.
+- `STATUS`: `READY_FOR_FRESH_INDEPENDENT_REVIEW`; `IMPLEMENTATION_ACCEPTED=NO`.
+- `TASK_DOC`: `docs/tasks/MCF-02-EXTERNAL-RUNTIME-MODULE-CONTRACT.md`.
+- `REPAIR_REVIEW_NOTES`: `docs/tasks/MCF-02-I01-REPAIR-REVIEW-NOTES.md`.
+- `HANDOFF_DOC`: `docs/12_HANDOFF_CURRENT.md`.
+- `ANTIGRAVITY_STATUS`: `NOT_REQUIRED`; deterministic Core-only repair, no UI/browser/live milestone.
+- Goal: isolate each Run's staging/envelope, observe resolved config, replace boolean approval with scoped Core policy, accurately disable ACP permission callbacks, import artifacts after cleanup into Core-owned copies.
+- F003 bounded disposition explicitly authorized in the follow-up conversation: existing D05 policy can authorize its own allowed routes; D11 Human-required routes remain denied. A policy reference is not Human authentication. This is a disclosed limitation, not verified Human approval.
+- Fresh focused command: `python -m pytest services/core/tests/test_mcf02_external_runtime_contract.py services/core/tests/test_mcf02_opencode_acp_runtime.py` → **103 passed / 0 failed / 0 skipped / actual exit 0**.
+- Fresh runtime/module command: `python -m pytest services/core/tests/test_runtime_skeleton.py services/core/tests/test_mcf01_static_modules.py services/core/tests/test_wp14b_runtime_binding.py services/core/tests/test_wp14_codex_runtime.py services/core/tests/test_wp15_opencode_runtime.py services/core/tests/test_wp16_runtime_doctor.py` → **276 passed / 0 failed / 0 skipped / actual exit 0**.
+- Fresh Full Core: from `services/core`, `python -m pytest --tb=short -rs` → **921 passed / 0 failed / 1 skipped / actual exit 0**, 192 existing deprecation warnings. Includes temporary SQLite migration regression; no migration was added or changed.
+- Skip: `tests/test_wp07_integration.py:799`, real symlink creation denied by existing Windows policy. `SKIPPED != PASS`.
+- Tests used the existing development venv; explicit fresh writable basetemp directories were under the process TEMP root. Earlier repair attempts exposed a test fixture assigning to a frozen ContextPackage, oversized pytest parameter ids and a Registry source guard; all were corrected and fresh suites above supersede those failed runs.
+- Fresh validators: `python -B scripts/validate_baseline.py` → actual exit **0**; `powershell -NoProfile -ExecutionPolicy Bypass -File tools/validate-polynexus-governance.ps1 .` → actual exit **0**; `git diff --check` → actual exit **0**. No previous candidate's logs count as repair evidence.
+- Complete change scope: `services/core/src/polynexus_core/execution_service.py`; `services/core/src/polynexus_core/extensions/runtime_bridge.py`; `services/core/src/polynexus_core/runtime/external_contracts.py`; `services/core/src/polynexus_core/runtime/opencode_acp.py`; `services/core/src/polynexus_core/runtime/registry.py`; `services/core/src/polynexus_core/runtime/routing_policy.py`; `services/core/tests/test_mcf02_external_runtime_contract.py`; `services/core/tests/test_mcf02_opencode_acp_runtime.py`; this handoff; new `docs/tasks/MCF-02-I01-REPAIR-REVIEW-NOTES.md`.
+- Protected areas unchanged: migrations, Domain models, ADR text, native/default reference profile, existing conformance adapters, UI/browser, dependencies, plugin platform. `ADR_IMPACT=NO_TEXT_OR_OWNERSHIP_CHANGE`; snapshot remains insert-once and never rebound. `SCOPE_DEVIATION=NONE` relative to the approved bounded repair direction.
+- Known limits: no live OpenCode compatibility claim; no reused operator credentials; unsupported resolved config/source inventory/platform stays not ready; permission callbacks and NATIVE resume remain unavailable. Prepared state is transient and restart cannot silently recreate or rebind an existing Run. Full review details and development seams are in the repair notes.
+- Next: independently inspect exact remote repair SHA, compare against historical NEED_FIX SHA, reproduce tests and assess F001–F005 against the stated bounded disposition. Writer does not self-accept.
+- Do not change: historical Candidate ancestry, canonical branch, bounded project score, D11 Human attribution rule, or target count. No live gate, Gemini, merge, rebase, squash, tag or force-push.
+
+## Historical governance routing — POST-G30-ARCHITECTURE-ROUTING-01 (2026-09-12; superseded for MCF-02)
 
 - `TASK_ID`: `G30-FINAL-EXTERNAL-VERIFICATION-AND-100-POINT-RECONCILIATION`
 - `STATUS`: `FINAL_ACCEPTED / CLOSED`

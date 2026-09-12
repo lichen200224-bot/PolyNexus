@@ -8,6 +8,9 @@ from __future__ import annotations
 
 import ipaddress
 import re
+import hashlib
+import json
+from datetime import datetime, timezone, timedelta
 from dataclasses import dataclass
 from enum import StrEnum
 from typing import Iterable
@@ -72,10 +75,14 @@ class ExternalEgressDecision:
 def evaluate_external_egress(
     descriptor: ExternalRuntimeDescriptor,
     *,
-    provider_model_approved: bool,
+    authorization=None,
+    run_id: str = "",
+    task_id: str = "",
+    project_id: str = "",
+    envelope_ref: str = "",
 ) -> ExternalEgressDecision:
-    """Apply the MCF-02 V1 envelope: provider approval, extensions denied."""
-    if not isinstance(descriptor, ExternalRuntimeDescriptor) or type(provider_model_approved) is not bool:
+    """Re-evaluate existing D05 policy; D11 Human-required decisions stay pending."""
+    if not isinstance(descriptor, ExternalRuntimeDescriptor):
         raise RuntimeBindingError("External egress declaration is invalid")
     declarations = {item.channel: item for item in descriptor.egress}
     try:
@@ -87,13 +94,69 @@ def evaluate_external_egress(
         return ExternalEgressDecision(PolicyDecision.DENY, PolicyDecision.DENY)
     if provider.disposition is EgressDisposition.DENY:
         provider_decision = PolicyDecision.DENY
-    elif provider.disposition is EgressDisposition.APPROVED:
-        provider_decision = PolicyDecision.ALLOW
-    elif provider_model_approved:
+    elif type(authorization) is RunScopedPolicyAuthorization and authorization.matches(
+        run_id, task_id, project_id, provider.destination_ref, envelope_ref
+    ):
         provider_decision = PolicyDecision.ALLOW
     else:
         provider_decision = PolicyDecision.APPROVAL_REQUIRED
     return ExternalEgressDecision(provider_decision, PolicyDecision.DENY)
+
+
+@dataclass(frozen=True)
+class RunScopedPolicyAuthorization:
+    """Core composition policy record, NOT a verified Human decision.
+
+    References provide audit correlation, not authentication. Re-evaluation
+    never upgrades D05 APPROVAL_REQUIRED, irrespective of evidence strings.
+    This internal value is not accepted from a vendor frame or public API.
+    """
+
+    run_id: str
+    task_id: str
+    project_id: str
+    destination_ref: str
+    envelope_ref: str
+    classifications: tuple[DataClassification, ...]
+    execution_mode: ExecutionMode
+    destination_trust: DestinationTrust
+    side_effect: bool
+    expires_at: datetime
+    policy_decision_ref: str
+
+    def matches(self, run_id, task_id, project_id, destination_ref, envelope_ref) -> bool:
+        try:
+            if (self.run_id, self.task_id, self.project_id, self.destination_ref, self.envelope_ref) != (
+                run_id, task_id, project_id, destination_ref, envelope_ref
+            ):
+                return False
+            if not self.policy_decision_ref or self.policy_decision_ref != self.reference():
+                return False
+            if self.expires_at <= datetime.now(timezone.utc):
+                return False
+            result = evaluate_egress_policy(
+                classifications=self.classifications, execution_mode=self.execution_mode,
+                destination_trust=self.destination_trust, local_available=False,
+                side_effect=self.side_effect,
+            )
+            return result.decision is PolicyDecision.ALLOW and result.route == EXTERNAL_ROUTE
+        except Exception:
+            return False
+
+    def reference(self) -> str:
+        payload = [self.run_id, self.task_id, self.project_id, self.destination_ref,
+                   self.envelope_ref, list(self.classifications), self.execution_mode,
+                   self.destination_trust, self.side_effect, self.expires_at.isoformat()]
+        return "policy-" + hashlib.sha256(json.dumps(payload, separators=(",", ":")).encode()).hexdigest()
+
+    @classmethod
+    def issue(cls, *, run_id, task_id, project_id, destination_ref, envelope_ref,
+              classifications, execution_mode, destination_trust, side_effect=False):
+        from dataclasses import replace
+        record = cls(run_id, task_id, project_id, destination_ref, envelope_ref,
+                     tuple(classifications), execution_mode, destination_trust, side_effect,
+                     datetime.now(timezone.utc) + timedelta(minutes=5), "")
+        return replace(record, policy_decision_ref=record.reference())
 
 
 LOCAL_ROUTE = "LOCAL"
