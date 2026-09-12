@@ -21,6 +21,10 @@ class RuntimeCapabilities:
     timeout_cleanup_verified: bool = False
     usage_visibility: UsageVisibility = UsageVisibility.UNAVAILABLE
     auth_ownership: AuthOwnership = AuthOwnership.NONE
+    external_sessions: bool = False
+    event_stream: bool = False
+    permission_requests: bool = False
+    egress_declaration: bool = False
 
 
 @dataclass(frozen=True)

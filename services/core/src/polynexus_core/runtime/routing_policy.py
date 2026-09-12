@@ -16,6 +16,11 @@ from urllib.parse import SplitResult, urlsplit
 from polynexus_core.domain.enums import AuthOwnership, ResumeMode, UsageVisibility
 from polynexus_core.domain.models import Evidence
 from polynexus_core.domain.runtime_binding import RuntimeBindingError
+from polynexus_core.runtime.external_contracts import (
+    EgressChannel,
+    EgressDisposition,
+    ExternalRuntimeDescriptor,
+)
 
 
 class DataClassification(StrEnum):
@@ -47,6 +52,48 @@ class PolicyDecision(StrEnum):
     ALLOW = "ALLOW"
     APPROVAL_REQUIRED = "APPROVAL_REQUIRED"
     DENY = "DENY"
+
+
+@dataclass(frozen=True, slots=True)
+class ExternalEgressDecision:
+    """Separate provider/model transport from agent extension egress."""
+
+    provider_model_egress: PolicyDecision
+    agent_extension_egress: PolicyDecision
+
+    @property
+    def dispatch_allowed(self) -> bool:
+        return (
+            self.provider_model_egress is PolicyDecision.ALLOW
+            and self.agent_extension_egress is PolicyDecision.DENY
+        )
+
+
+def evaluate_external_egress(
+    descriptor: ExternalRuntimeDescriptor,
+    *,
+    provider_model_approved: bool,
+) -> ExternalEgressDecision:
+    """Apply the MCF-02 V1 envelope: provider approval, extensions denied."""
+    if not isinstance(descriptor, ExternalRuntimeDescriptor) or type(provider_model_approved) is not bool:
+        raise RuntimeBindingError("External egress declaration is invalid")
+    declarations = {item.channel: item for item in descriptor.egress}
+    try:
+        provider = declarations[EgressChannel.PROVIDER_MODEL_EGRESS]
+        extension = declarations[EgressChannel.AGENT_EXTENSION_EGRESS]
+    except Exception:
+        raise RuntimeBindingError("External egress declaration is invalid") from None
+    if extension.disposition is not EgressDisposition.DENY:
+        return ExternalEgressDecision(PolicyDecision.DENY, PolicyDecision.DENY)
+    if provider.disposition is EgressDisposition.DENY:
+        provider_decision = PolicyDecision.DENY
+    elif provider.disposition is EgressDisposition.APPROVED:
+        provider_decision = PolicyDecision.ALLOW
+    elif provider_model_approved:
+        provider_decision = PolicyDecision.ALLOW
+    else:
+        provider_decision = PolicyDecision.APPROVAL_REQUIRED
+    return ExternalEgressDecision(provider_decision, PolicyDecision.DENY)
 
 
 LOCAL_ROUTE = "LOCAL"

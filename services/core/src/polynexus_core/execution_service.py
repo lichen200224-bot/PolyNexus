@@ -616,7 +616,11 @@ class ExecutionService:
         from polynexus_core.domain.enums import RunState
 
         try:
-            return self._registry.create_adapter(profile)
+            adapter = self._registry.create_adapter(profile)
+            snapshot = self._binding_repo.get_by_run(run_id)
+            if snapshot is None:
+                raise RuntimeBindingError("Claimed Run has no immutable runtime binding")
+            return self._registry.bind_adapter_to_snapshot(profile, adapter, snapshot)
         except Exception:
             stored = self._run_repo.get(run_id)
             assert stored is not None

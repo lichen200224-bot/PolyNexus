@@ -456,6 +456,10 @@ def _sanitize_capabilities(value: object) -> RuntimeCapabilities | None:
                 value.cancel,
                 value.artifacts,
                 value.timeout_cleanup_verified,
+                value.external_sessions,
+                value.event_stream,
+                value.permission_requests,
+                value.egress_declaration,
             )
         ):
             return None
@@ -472,6 +476,10 @@ def _sanitize_capabilities(value: object) -> RuntimeCapabilities | None:
             timeout_cleanup_verified=value.timeout_cleanup_verified,
             usage_visibility=value.usage_visibility,
             auth_ownership=value.auth_ownership,
+            external_sessions=value.external_sessions,
+            event_stream=value.event_stream,
+            permission_requests=value.permission_requests,
+            egress_declaration=value.egress_declaration,
         )
     except Exception:
         return None

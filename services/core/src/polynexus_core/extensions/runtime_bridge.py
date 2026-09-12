@@ -10,10 +10,15 @@ from polynexus_core.domain.runtime_binding import RuntimeProfile
 from polynexus_core.extensions.manifest import HealthBoundary, ModuleError, ModuleManifest, ModuleType
 from polynexus_core.extensions.registry import ModuleRegistry
 from polynexus_core.runtime.contracts import RuntimeAdapter, RuntimeCapabilities
+from polynexus_core.runtime.external_contracts import (
+    ControlledExecutionEnvelope,
+    ExternalRuntimeDescriptor,
+)
 from polynexus_core.runtime.registry import AdapterFactory, RuntimeRegistry
 
 _RUNTIME_CAPABILITIES = frozenset({
     "cancel", "resume", "artifacts", "timeout_cleanup_verified", "usage_visibility", "auth_ownership",
+    "external_sessions", "event_stream", "permission_requests", "egress_declaration",
 })
 
 
@@ -21,7 +26,10 @@ def _check_capabilities(adapter: RuntimeAdapter, declared: tuple[str, ...]) -> N
     caps = adapter.capabilities()
     if (
         type(caps) is not RuntimeCapabilities
-        or any(type(getattr(caps, key)) is not bool for key in ("cancel", "artifacts", "timeout_cleanup_verified"))
+        or any(type(getattr(caps, key)) is not bool for key in (
+            "cancel", "artifacts", "timeout_cleanup_verified", "external_sessions",
+            "event_stream", "permission_requests", "egress_declaration",
+        ))
         or not isinstance(caps.resume, ResumeMode)
         or not isinstance(caps.usage_visibility, UsageVisibility)
         or not isinstance(caps.auth_ownership, AuthOwnership)
@@ -34,6 +42,10 @@ def _check_capabilities(adapter: RuntimeAdapter, declared: tuple[str, ...]) -> N
         "resume": caps.resume is not ResumeMode.NONE,
         "usage_visibility": caps.usage_visibility is not UsageVisibility.UNAVAILABLE,
         "auth_ownership": True,
+        "external_sessions": caps.external_sessions,
+        "event_stream": caps.event_stream,
+        "permission_requests": caps.permission_requests,
+        "egress_declaration": caps.egress_declaration,
     }
     if not all(available[name] for name in declared):
         raise ModuleError("Runtime does not satisfy module capabilities")
@@ -136,6 +148,43 @@ class RuntimeModuleBridge:
             except Exception:
                 raise ModuleError("Runtime module factory or capability check failed") from None
         return create
+
+    def register_external(
+        self,
+        manifest: ModuleManifest,
+        profile: RuntimeProfile,
+        factory: AdapterFactory,
+        descriptor: ExternalRuntimeDescriptor,
+        envelope: ControlledExecutionEnvelope,
+    ) -> None:
+        """Register one statically composed external runtime module.
+
+        MCF-02 intentionally permits one profile per external module and keeps
+        executable discovery/install outside this bridge.
+        """
+        if (
+            type(manifest) is not ModuleManifest
+            or manifest.module_type is not ModuleType.RUNTIME
+            or type(profile) is not RuntimeProfile
+            or not callable(factory)
+            or not isinstance(descriptor, ExternalRuntimeDescriptor)
+            or not isinstance(envelope, ControlledExecutionEnvelope)
+            or self.modules.contains(manifest.module_id)
+            or descriptor.module_id != manifest.module_id
+            or descriptor.module_version != manifest.module_version
+            or descriptor.provider_id != profile.provider_id
+            or not set(manifest.capabilities).issubset(_RUNTIME_CAPABILITIES)
+        ):
+            raise ModuleError("Invalid external runtime module registration")
+        manifest.__post_init__()
+        copied = replace(profile)
+        wrapper = self._guarded_factory(manifest, factory, ((copied, factory),))
+        try:
+            self.runtimes.register_external(copied, wrapper, descriptor, envelope)
+            self.modules.register(manifest)
+        except Exception:
+            raise ModuleError("Invalid external runtime module registration") from None
+        self._profile_refs[manifest.module_id] = (copied.runtime_profile_ref,)
 
     async def probe(self, module_id: str, profile_ref: str, *, timeout: float = 1.0) -> ModuleHealth:
         """Observe readiness without allocating a Run; never an execution route."""
