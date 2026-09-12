@@ -1,3 +1,38 @@
+# PUBLICATION-INTEGRITY-REPAIR-01 — current publication correction
+
+REJECTED_CANDIDATE_SHA=180432d03f6d423bb3152c233fb4f0a5072868f5
+REJECTION_GATE=PUBLICATION_INTEGRITY
+REJECTION_CAUSE=working-tree CRLF hashes were used instead of canonical committed blob hashes
+
+Repair lineage: one new commit directly after the rejected Candidate; no rewrite.
+Functional content and prior functional PASS history are unchanged. No acceptance,
+merge or freeze is claimed. Return the new exact SHA to Fresh Independent Review.
+
+All 20 freeze_hashes are SHA-256 of binary Git blob content extracted from
+180432d03f6d423bb3152c233fb4f0a5072868f5:<candidate path>, never checkout bytes.
+The repair's own committed blobs must independently match those same 20 values.
+
+Evidence representation is explicit in manifest.json: evidence_sha256 verifies
+raw members in writer-evidence.zip; unchanged members retain original bytes/hashes.
+Corrected collection and this handoff use UTF-8 LF both as committed blobs and ZIP
+members. committed_evidence_sha256 separately verifies direct Git blob copies,
+including unchanged files whose original archived CRLF bytes differ from Git LF.
+No unrelated evidence content or evidence_sha256 entry is regenerated.
+The ZIP is rebuilt deterministically because it contains both corrected files;
+all other member contents, including historical failure records, are preserved.
+
+CANONICAL_PREDECESSOR_COLLECTION=771
+CANDIDATE_COLLECTION=819
+DELTA=+48
+REMOVED=0
+COLLECTION_ACCOUNTING=EXPLAINED
+Prior 816 → 819 accounting is SUPERSEDED_WRITER_INTERMEDIATE_MEASUREMENT.
+
+The Writer functional handoff below is historical to rejected Candidate 180432d.
+Its test results are preserved, not rerun or reinterpreted by this publication repair.
+
+---
+
 ==================================================
 BASELINE-DEBT-01 WRITER HANDOFF — IMPLEMENTATION
 ==================================================
@@ -73,15 +108,21 @@ are unchanged. No optional keys, skip/xfail, assertion removal or production fix
 
 ## Collection and verification
 
-PREVIOUS_TOTAL_COLLECTED=816; CURRENT_TOTAL_COLLECTED=819; EXPECTED=YES.
-KNOWN_ADDED_TESTS:
-- test_cp06_wp30_clean_install::test_clean_head_ordering_defaults_and_required_sequence
-OTHER_COLLECTION_DELTA:
-- test_baseline_debt_01::test_cancellation_persistence_failure_rolls_back[commit]
-- test_baseline_debt_01::test_cancellation_persistence_failure_rolls_back[update]
-The rollback cases were added after original full-1; fresh-schema case was added
-in LIMITED_2. No removed tests. Current full set exactly matches limited2-full.
-Evidence: g14-collection-delta.json and both Full Core JUnit collections.
+CANONICAL_PREDECESSOR_COLLECTION=771
+CANDIDATE_COLLECTION=819
+DELTA=+48
+REMOVED=0
+COLLECTION_ACCOUNTING=EXPLAINED
+Canonical predecessor: 86d5939044c1d7ec2a991820f39287481ee9120f.
+Rejected functional Candidate: 180432d03f6d423bb3152c233fb4f0a5072868f5.
+Independent exact-commit git archive snapshots both collected with exit 0.
+All 48 added node IDs are recorded losslessly in g14-collection-delta.json:
+40 BASELINE-DEBT-01 cases, 7 migration cases, 1 fresh-schema case. No removals.
+
+SUPERSEDED_WRITER_INTERMEDIATE_MEASUREMENT: the former 816 → 819 (+3)
+comparison used intermediate working-state Full Core JUnit collections, not the
+canonical predecessor. Fresh Independent Review rejected that accounting. Its
+historical observations below remain preserved but are not canonical baseline truth.
 
 G14_SINGLE: 1 passed / 0 failed / 0 skipped, ACTUAL_EXIT_CODE=0.
 G14_MODULE: 13 passed / 0 failed / 0 skipped, ACTUAL_EXIT_CODE=0.

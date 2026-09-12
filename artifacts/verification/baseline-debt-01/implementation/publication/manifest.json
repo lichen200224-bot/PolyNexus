@@ -137,26 +137,26 @@
   ],
   "excluded": "Ignored runtime databases, tmp directories, Python diagnostic/execution harnesses and caches are not staged. No source debug residue found in frozen delta.",
   "freeze_hashes": {
-    "docs/10_DECISION_LOG.md": "d2073b116003f748e2fb423cb2cd534447264f03113fce5a4323b082a11c19a9",
-    "docs/12_HANDOFF_CURRENT.md": "aa2b272c7a381a1f1637f98fa65b7cdea8e4ae92c03814dbfc43fa23cede40a4",
-    "docs/15_DOCUMENT_INDEX.md": "cbd609a93336dafa0f29e1d7c7ecfdb5feef3727c7c61759d808fba2e999506d",
-    "docs/tasks/BASELINE-DEBT-01.md": "2452163a92c4419b99e46138d48e1a3fe1bcaf18b2d8fa62728e14066408eaa9",
-    "services/core/src/polynexus_core/execution_service.py": "e6d5218c42b9942d866f84ddc9b957f4dfaae3a92cbe8820d4a6d2c3b390452d",
+    "docs/10_DECISION_LOG.md": "62b5b8e75983022b3e27fcc2446f657383f09905480c5d3c449f5f1e652699bd",
+    "docs/12_HANDOFF_CURRENT.md": "c6eea4807b08fe12b2e14f140da5bc7f1b538d749daf159fbbbd1d1481e18f80",
+    "docs/15_DOCUMENT_INDEX.md": "28fae7f0d8dd125dcf224daab508c3cdbaf9721160cf249c4b5e539488ddf37d",
+    "docs/tasks/BASELINE-DEBT-01.md": "98957ee10fb2838765194f2a652001d4237b7e43575c33893c46feeb215a6cb1",
+    "services/core/src/polynexus_core/execution_service.py": "e4c1d4e71e5cb017bb8c653be155676cbab4cd0e2b65fe828498e161ec9fcb14",
     "services/core/src/polynexus_core/persistence/models.py": "f22ee96e056309c7ee3b806721d54f8c39f9037a8e7c03cb67d64c5e85a890bf",
     "services/core/src/polynexus_core/persistence/repository.py": "e2957bfa8d86c8cd533c3cae2a7fd2c360d8bc6b643022289b5e8f44f85dd765",
-    "services/core/src/polynexus_core/runtime/supervisor.py": "9addb955c157e16c51665ab5efa79b1784cfb07e6150ad2bc9be345f51bdcca9",
-    "services/core/tests/test_cp06_wp30_clean_install.py": "6e26bcfc025ca14a231621155aca8238b988136eb876b4f57e675912cbe14f3d",
-    "services/core/tests/test_g14_runtime_reconciliation.py": "ea339cb77602791b80a8548c9002839d6e111755afb064c82f5f57004f545e8f",
-    "services/core/tests/test_g17_migration_restore_authority.py": "a438b18472a18e35ef03741d47c61a52452d1acecbca5e831c63767bc247c945",
+    "services/core/src/polynexus_core/runtime/supervisor.py": "60a65b85c94e76b6a4dcfd4ef7df3ecbf2ea9712357723cc5ee6cae6e89dff60",
+    "services/core/tests/test_cp06_wp30_clean_install.py": "2148881d517cf5811a503e3de81013e5f9a6eac3297a105d7275d6af4a6ca1c8",
+    "services/core/tests/test_g14_runtime_reconciliation.py": "318218388181d3734fc8909066a7285cafa8f89f4dfa80b5e2b245af0811953e",
+    "services/core/tests/test_g17_migration_restore_authority.py": "feb126d8dcebded30b3d014dcc2cd22eab3ff910f96b19144182662f290a22cb",
     "services/core/tests/test_wp09_query_api.py": "2dca32484d8648174425c7e7dc5e88242068f4631c1fb73a66a5322cbe4dabc4",
-    "services/core/tests/test_wp12_council.py": "cdf7936059e342c529938a39350d9102674aa116b72edf4bf6a58e78b5724830",
-    "services/core/tests/test_wp14b_runtime_binding.py": "8c6225a080842fac931515d5f17b76b629670be4ef1413e3e4a4b41e16b1bde2",
-    "services/core/tests/test_wp23_backup_restore_migration.py": "9b8b77f85d599495b2599625dd80018f4e1b5be5852675bc80511c2ef6ae193b",
+    "services/core/tests/test_wp12_council.py": "0f2b5364ef9deb55f993c6a82058f77c8611fa7c755c7267f0d5c4b5a2c394d0",
+    "services/core/tests/test_wp14b_runtime_binding.py": "754795c7ddecbf1f918854da97a044d38973d3388e673b71e7f080f8a84db172",
+    "services/core/tests/test_wp23_backup_restore_migration.py": "b677d3d2f0c693f3a062548a4724cc817f02c0476d81e4dc1c98d87f8bf2744a",
     "services/core/tests/test_wp24_resource_guards.py": "7e1cdf5dc048112e13c8173fd2b08998d4e8189b138f5055c30690e93023c5a8",
-    "docs/35_ADR_014_DURABLE_EVENT_ORDERING_AND_CANCELLATION_CLEANUP.md": "0af079acdd0866a7f32310fcbf86ee48717756ce69951521fa06ef86fd61fa25",
+    "docs/35_ADR_014_DURABLE_EVENT_ORDERING_AND_CANCELLATION_CLEANUP.md": "09737b886a2343287ddd069ec52ae7f1810afc784323580a06ee57ec0ae97d04",
     "services/core/alembic/versions/0003_run_event_sequence.py": "6c57b680403d8fa2c834971dc22812ad448552420eb042127c7c597cb67bb9d9",
-    "services/core/tests/test_baseline_debt_01.py": "99cd084c3251de8fcd5590d673eb918572939c61fa8c6ef8533cd92da302800f",
-    "services/core/tests/test_baseline_debt_01_migration.py": "94dbf3b2023ed7e036b70bbd31d5cb2b94734d7d0cf503f97a362f400e3c36d6"
+    "services/core/tests/test_baseline_debt_01.py": "7996399419d513398f58aa0cd9f553bc02c101b6ed38c6e7b23d5287f7271158",
+    "services/core/tests/test_baseline_debt_01_migration.py": "de9d3afdbaa43fb9853a79b5736ac9bbf510d5117a17827ed6b5d52e1b84b93c"
   },
   "evidence_sha256": {
     "artifacts/verification/baseline-debt-01/baseline-validator.log": "20de4b0ba8232df17d8bbbb3e7901562ac4b277dc839f62584680d2ad672cd63",
@@ -178,7 +178,7 @@
     "artifacts/verification/baseline-debt-01/implementation/full-1.xml": "ccde230cc4643d71b7859e771b738bb2030f15e5fd6b3bdffd86363f9b894fc1",
     "artifacts/verification/baseline-debt-01/implementation/g14-baseline.log": "20de4b0ba8232df17d8bbbb3e7901562ac4b277dc839f62584680d2ad672cd63",
     "artifacts/verification/baseline-debt-01/implementation/g14-before-hashes.json": "fe9e8b599c555ee4df34b107758d2d432dbc33f739be557f1b76f75c63901a19",
-    "artifacts/verification/baseline-debt-01/implementation/g14-collection-delta.json": "7117cbc929acfa552a6c11689b5ada2ccf80de9dcd798d3dab6db7770f1a305c",
+    "artifacts/verification/baseline-debt-01/implementation/g14-collection-delta.json": "0fa86efc6ce87c0caf3ecc790c47d9cf4d94cf5291acdfc0671bb6f2a0d9ecfa",
     "artifacts/verification/baseline-debt-01/implementation/g14-diagnostic-snapshots.json": "dbecd7e606e2dbef15ec9e54e14e506ec764e826981ccd1a547fa98661fb3d24",
     "artifacts/verification/baseline-debt-01/implementation/g14-diagnostic.log": "2740c4d98fd4de2f5f7427ce71e002cbf782aff85a2b4748ec3f2395f95af331",
     "artifacts/verification/baseline-debt-01/implementation/g14-diagnostic.xml": "9e631699e632f62b9c06bafbe2177aa35579a55ad89e122487b448ea5fcd8c2d",
@@ -245,7 +245,7 @@
     "artifacts/verification/baseline-debt-01/implementation/writer-handoff-before-g14-closure.md": "7160e7f43a1d4646fb46af2a1c04573e9c9c848f942035ff8c720e5535ee4f92",
     "artifacts/verification/baseline-debt-01/implementation/writer-handoff-before-limited-expansion.md": "0fd026d11ea7587b91d50c6c7f25589b78839d505f98f34c2b0d580fbd32e6fa",
     "artifacts/verification/baseline-debt-01/implementation/writer-handoff-before-limited2.md": "2bcaed3b1a8cdbddfda0fe1051c66591860b16dec89e7f8acc6494208ad91539",
-    "artifacts/verification/baseline-debt-01/implementation/writer-handoff.md": "c4f796bb9b709fac4020c23d3891db7aaee4cf280e4d05741389735ac297afd4",
+    "artifacts/verification/baseline-debt-01/implementation/writer-handoff.md": "2608ce49a38325b7af3f61fdc43b06bb66ccd83d0ef78fa6bc5272eb76df754a",
     "artifacts/verification/baseline-debt-01/inventory.json": "4aa76633f4373ee28cb0b712c03d04b30412697ab5c60cdfa7327eee102804ea",
     "artifacts/verification/baseline-debt-01/matrix.log": "9f1d6148515176f3c5fb887f61377d9acc52e7a3c38ed0d2b44097d20bd8962c",
     "artifacts/verification/baseline-debt-01/matrix.xml": "02a4c42729c31846fce0c5d6af7765bc3761d24e3a3377fe11880fb138d89141",
@@ -269,7 +269,7 @@
     "artifacts/verification/baseline-debt-01/timeout.xml": "883f3c7a96f481068df4c341b56d1ff610621165073096ee91396003a2b43ef0",
     "artifacts/verification/baseline-debt-01/writer-handoff.md": "e623816a88762129f7190586948d966d45339e603f1609840c26c5ca2a19ad97"
   },
-  "archive_sha256": "51477b80b3f725e2d244a025f918d8dd375c9088c614ef045c1ce32ea956f096",
+  "archive_sha256": "5ddd1bdaa1ce90f5995568c82210aebbc9ffea936669c1cd575272e89dd0a08c",
   "stage_files": [
     "docs/10_DECISION_LOG.md",
     "docs/12_HANDOFF_CURRENT.md",
@@ -307,5 +307,50 @@
     "artifacts/verification/baseline-debt-01/implementation/publication/writer-evidence.zip",
     "artifacts/verification/baseline-debt-01/implementation/publication/pre-commit-checks.json",
     "artifacts/verification/baseline-debt-01/implementation/publication/manifest.json"
-  ]
+  ],
+  "freeze_hashes_semantics": {
+    "algorithm": "SHA-256",
+    "byte_source": "canonical committed Git blob bytes, binary-safe git cat-file blob; never working-tree bytes",
+    "source_commit": "180432d03f6d423bb3152c233fb4f0a5072868f5",
+    "repair_expectation": "all candidate_files unchanged in repair commit; verify from new commit independently"
+  },
+  "evidence_sha256_semantics": {
+    "byte_source": "exact decompressed ZIP member bytes at each formal_evidence_files path",
+    "archive": "artifacts/verification/baseline-debt-01/implementation/publication/writer-evidence.zip",
+    "unchanged_evidence": "original archived bytes and hashes retained, including original CRLF; direct canonical Git copies separately hashed below",
+    "corrected_canonical_git_and_archive_paths": [
+      "artifacts/verification/baseline-debt-01/implementation/g14-collection-delta.json",
+      "artifacts/verification/baseline-debt-01/implementation/writer-handoff.md"
+    ]
+  },
+  "committed_evidence_sha256": {
+    "artifacts/verification/baseline-debt-01/implementation/g14-collection-delta.json": "0fa86efc6ce87c0caf3ecc790c47d9cf4d94cf5291acdfc0671bb6f2a0d9ecfa",
+    "artifacts/verification/baseline-debt-01/implementation/g14-final-file-inventory.json": "f4e928beeff9dc58335cda63125f7c3ea675bc1a0ffcd9d40a4db71bcf92fc43",
+    "artifacts/verification/baseline-debt-01/implementation/g14-final-five-closure.json": "31190c6bfd34fb82b51def3fa3cd6046a95dfd077f25047cd10d049284aebe52",
+    "artifacts/verification/baseline-debt-01/implementation/g14-final-git-state.json": "30feaf3d4c0f5bdd66066e9d2c7c178c4ef68db4e270e570074a1b70b643d5f7",
+    "artifacts/verification/baseline-debt-01/implementation/g14-focused-result.json": "545a9b7ec0dc41efca42a59f39a6fa9fec38cae8b6069d475b7f0dc5c2cb2f70",
+    "artifacts/verification/baseline-debt-01/implementation/g14-full-result.json": "681c671b7ee36975612a67aad2471cb597790b8923db223720a5470baec8383b",
+    "artifacts/verification/baseline-debt-01/implementation/g14-module-result.json": "df7491a383d741fad5bb7c55f66ded526a2ce1a3493d805743fdf6a07e11211a",
+    "artifacts/verification/baseline-debt-01/implementation/g14-root-cause.json": "661a8bf07cdf7ef6f27f46375c3fddd676e5fe24089479283481cdc9eb3e086c",
+    "artifacts/verification/baseline-debt-01/implementation/g14-scope-result.json": "c9b56e615126467437b4b7d4d3429310438e597ef1a88473d113ad0322e5f9ff",
+    "artifacts/verification/baseline-debt-01/implementation/g14-single-result.json": "2b3bc188d592091f9b152459d22e3d5b7d321173693c66ecabba3833e2d3c820",
+    "artifacts/verification/baseline-debt-01/implementation/g14-stability-results.json": "e1fd14b6c96de12611267d9b850cdd7f4e76656ac024c8306131e6899f54b3c9",
+    "artifacts/verification/baseline-debt-01/implementation/g14-validator-results.json": "7128092c96cad60e56fb9d5290520420c293fec6b0d56c3d64d8e19a19f6710b",
+    "artifacts/verification/baseline-debt-01/implementation/writer-handoff.md": "2608ce49a38325b7af3f61fdc43b06bb66ccd83d0ef78fa6bc5272eb76df754a"
+  },
+  "publication_integrity_repair": {
+    "id": "PUBLICATION-INTEGRITY-REPAIR-01",
+    "direct_parent_required": "180432d03f6d423bb3152c233fb4f0a5072868f5",
+    "functional_baseline": "86d5939044c1d7ec2a991820f39287481ee9120f",
+    "functional_content_changed": false,
+    "archive_rebuilt": true,
+    "archive_sha256_before": "51477b80b3f725e2d244a025f918d8dd375c9088c614ef045c1ce32ea956f096",
+    "archive_member_content_changes": [
+      "artifacts/verification/baseline-debt-01/implementation/g14-collection-delta.json",
+      "artifacts/verification/baseline-debt-01/implementation/writer-handoff.md"
+    ],
+    "deterministic_archive": "sorted paths; timestamp 1980-01-01; Unix regular 0644; DEFLATE level 9; two builds byte-identical",
+    "collection_source": "g14-collection-delta.json",
+    "scope_note": "candidate_files and stage_files record original functional publication inventory; this repair changes only manifest, collection, handoff and ZIP"
+  }
 }
