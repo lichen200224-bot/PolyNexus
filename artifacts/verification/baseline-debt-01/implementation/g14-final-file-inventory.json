@@ -1,0 +1,33 @@
+{
+  "MODIFIED_FILES": [
+    "docs/10_DECISION_LOG.md",
+    "docs/12_HANDOFF_CURRENT.md",
+    "docs/15_DOCUMENT_INDEX.md",
+    "docs/tasks/BASELINE-DEBT-01.md",
+    "services/core/src/polynexus_core/execution_service.py",
+    "services/core/src/polynexus_core/persistence/models.py",
+    "services/core/src/polynexus_core/persistence/repository.py",
+    "services/core/src/polynexus_core/runtime/supervisor.py",
+    "services/core/tests/test_cp06_wp30_clean_install.py",
+    "services/core/tests/test_g14_runtime_reconciliation.py",
+    "services/core/tests/test_g17_migration_restore_authority.py",
+    "services/core/tests/test_wp09_query_api.py",
+    "services/core/tests/test_wp12_council.py",
+    "services/core/tests/test_wp14b_runtime_binding.py",
+    "services/core/tests/test_wp23_backup_restore_migration.py",
+    "services/core/tests/test_wp24_resource_guards.py"
+  ],
+  "NEW_FILES": [
+    "docs/35_ADR_014_DURABLE_EVENT_ORDERING_AND_CANCELLATION_CLEANUP.md",
+    "services/core/alembic/versions/0003_run_event_sequence.py",
+    "services/core/tests/test_baseline_debt_01.py",
+    "services/core/tests/test_baseline_debt_01_migration.py"
+  ],
+  "DELETED_FILES": [],
+  "UNTRACKED_FILES": [
+    "docs/35_ADR_014_DURABLE_EVENT_ORDERING_AND_CANCELLATION_CLEANUP.md",
+    "services/core/alembic/versions/0003_run_event_sequence.py",
+    "services/core/tests/test_baseline_debt_01.py",
+    "services/core/tests/test_baseline_debt_01_migration.py"
+  ]
+}

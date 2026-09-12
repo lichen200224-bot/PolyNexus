@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime, timezone
 from typing import Sequence
 
+from sqlalchemy import update as sa_update
 from sqlalchemy.orm import Session
 
 from polynexus_core.domain.enums import (
@@ -212,6 +213,27 @@ def _row_to_event(r: RunEventRow) -> RunEvent:
         occurred_at=r.occurred_at,
         reason=r.reason,
     )
+
+
+def _append_events(session: Session, events: Sequence[RunEvent]) -> None:
+    """Allocate per-Run ordinals atomically in the caller's transaction."""
+    grouped: dict[str, list[RunEvent]] = {}
+    for event in events:
+        grouped.setdefault(event.run_id, []).append(event)
+    for run_id, batch in grouped.items():
+        high = session.execute(
+            sa_update(RunRow)
+            .where(RunRow.id == run_id)
+            .values(next_event_sequence=RunRow.next_event_sequence + len(batch))
+            .returning(RunRow.next_event_sequence)
+        ).scalar_one_or_none()
+        if high is None:
+            raise ValueError(f"Run {run_id} not found for event append")
+        for sequence, event in enumerate(batch, high - len(batch) + 1):
+            row = _event_to_row(event)
+            row.event_sequence = sequence
+            row.sequence_legacy_backfill = False
+            session.add(row)
 
 
 def _artifact_to_row(a: Artifact) -> ArtifactRow:
@@ -560,8 +582,8 @@ class SqlRunRepository(RunRepository):
 
     def add(self, run: Run) -> None:
         self._s.add(_run_to_row(run))
-        for event in run.events:
-            self._s.add(_event_to_row(event))
+        self._s.flush()
+        _append_events(self._s, run.events)
 
     def get(self, run_id: str) -> Run | None:
         r = self._s.get(RunRow, run_id)
@@ -571,7 +593,7 @@ class SqlRunRepository(RunRepository):
         event_rows = (
             self._s.query(RunEventRow)
             .filter_by(run_id=run_id)
-            .order_by(RunEventRow.occurred_at, RunEventRow.id)
+            .order_by(RunEventRow.run_id, RunEventRow.event_sequence)
             .all()
         )
         run.events = [_row_to_event(er) for er in event_rows]
@@ -590,7 +612,7 @@ class SqlRunRepository(RunRepository):
             event_rows = (
                 self._s.query(RunEventRow)
                 .filter_by(run_id=r.id)
-                .order_by(RunEventRow.occurred_at, RunEventRow.id)
+                .order_by(RunEventRow.run_id, RunEventRow.event_sequence)
                 .all()
             )
             run.events = [_row_to_event(er) for er in event_rows]
@@ -612,7 +634,7 @@ class SqlRunRepository(RunRepository):
             event_rows = (
                 self._s.query(RunEventRow)
                 .filter_by(run_id=r.id)
-                .order_by(RunEventRow.occurred_at, RunEventRow.id)
+                .order_by(RunEventRow.run_id, RunEventRow.event_sequence)
                 .all()
             )
             run.events = [_row_to_event(er) for er in event_rows]
@@ -625,14 +647,14 @@ class SqlRunRepository(RunRepository):
             raise ValueError(f"Run {run.id} not found")
         updated = _run_to_row(run)
         for col in RunRow.__table__.columns:
+            if col.name == "next_event_sequence":
+                continue
             setattr(existing, col.name, getattr(updated, col.name))
         existing_events = (
             self._s.query(RunEventRow).filter_by(run_id=run.id).all()
         )
         existing_event_ids = {e.id for e in existing_events}
-        for event in run.events:
-            if event.id not in existing_event_ids:
-                self._s.add(_event_to_row(event))
+        _append_events(self._s, [event for event in run.events if event.id not in existing_event_ids])
 
     def claim_for_execution(self, run_id: str) -> bool:
         """Atomically claim a Run for execution using CAS.
@@ -657,7 +679,7 @@ class SqlRunRepository(RunRepository):
 
     def append_event(self, event: RunEvent) -> None:
         """Append a single RunEvent to the database."""
-        self._s.add(_event_to_row(event))
+        _append_events(self._s, [event])
         self._s.flush()
 
 
@@ -666,13 +688,13 @@ class SqlRunEventRepository(RunEventRepository):
         self._s = session
 
     def add(self, event: RunEvent) -> None:
-        self._s.add(_event_to_row(event))
+        _append_events(self._s, [event])
 
     def list_by_run(self, run_id: str) -> Sequence[RunEvent]:
         rows = (
             self._s.query(RunEventRow)
             .filter_by(run_id=run_id)
-            .order_by(RunEventRow.occurred_at, RunEventRow.id)
+            .order_by(RunEventRow.run_id, RunEventRow.event_sequence)
             .all()
         )
         return [_row_to_event(r) for r in rows]

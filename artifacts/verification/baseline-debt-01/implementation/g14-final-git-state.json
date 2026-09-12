@@ -1,0 +1,75 @@
+[
+  {
+    "COMMAND": [
+      "git",
+      "-c",
+      "safe.directory=C:/Users/shawn/OneDrive/文件/PONYNEXUS/baseline-debt-01",
+      "status",
+      "--short"
+    ],
+    "ACTUAL_EXIT_CODE": 0,
+    "OUTPUT": " M docs/10_DECISION_LOG.md\n M docs/12_HANDOFF_CURRENT.md\n M docs/15_DOCUMENT_INDEX.md\n M docs/tasks/BASELINE-DEBT-01.md\n M services/core/src/polynexus_core/execution_service.py\n M services/core/src/polynexus_core/persistence/models.py\n M services/core/src/polynexus_core/persistence/repository.py\n M services/core/src/polynexus_core/runtime/supervisor.py\n M services/core/tests/test_cp06_wp30_clean_install.py\n M services/core/tests/test_g14_runtime_reconciliation.py\n M services/core/tests/test_g17_migration_restore_authority.py\n M services/core/tests/test_wp09_query_api.py\n M services/core/tests/test_wp12_council.py\n M services/core/tests/test_wp14b_runtime_binding.py\n M services/core/tests/test_wp23_backup_restore_migration.py\n M services/core/tests/test_wp24_resource_guards.py\n?? docs/35_ADR_014_DURABLE_EVENT_ORDERING_AND_CANCELLATION_CLEANUP.md\n?? services/core/alembic/versions/0003_run_event_sequence.py\n?? services/core/tests/test_baseline_debt_01.py\n?? services/core/tests/test_baseline_debt_01_migration.py\n",
+    "STDERR": ""
+  },
+  {
+    "COMMAND": [
+      "git",
+      "-c",
+      "safe.directory=C:/Users/shawn/OneDrive/文件/PONYNEXUS/baseline-debt-01",
+      "diff",
+      "--name-only"
+    ],
+    "ACTUAL_EXIT_CODE": 0,
+    "OUTPUT": "docs/10_DECISION_LOG.md\ndocs/12_HANDOFF_CURRENT.md\ndocs/15_DOCUMENT_INDEX.md\ndocs/tasks/BASELINE-DEBT-01.md\nservices/core/src/polynexus_core/execution_service.py\nservices/core/src/polynexus_core/persistence/models.py\nservices/core/src/polynexus_core/persistence/repository.py\nservices/core/src/polynexus_core/runtime/supervisor.py\nservices/core/tests/test_cp06_wp30_clean_install.py\nservices/core/tests/test_g14_runtime_reconciliation.py\nservices/core/tests/test_g17_migration_restore_authority.py\nservices/core/tests/test_wp09_query_api.py\nservices/core/tests/test_wp12_council.py\nservices/core/tests/test_wp14b_runtime_binding.py\nservices/core/tests/test_wp23_backup_restore_migration.py\nservices/core/tests/test_wp24_resource_guards.py\n",
+    "STDERR": "warning: in the working copy of 'docs/10_DECISION_LOG.md', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'docs/12_HANDOFF_CURRENT.md', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'docs/15_DOCUMENT_INDEX.md', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'docs/tasks/BASELINE-DEBT-01.md', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'services/core/src/polynexus_core/execution_service.py', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'services/core/src/polynexus_core/runtime/supervisor.py', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'services/core/tests/test_cp06_wp30_clean_install.py', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'services/core/tests/test_g14_runtime_reconciliation.py', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'services/core/tests/test_g17_migration_restore_authority.py', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'services/core/tests/test_wp12_council.py', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'services/core/tests/test_wp14b_runtime_binding.py', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'services/core/tests/test_wp23_backup_restore_migration.py', CRLF will be replaced by LF the next time Git touches it\n"
+  },
+  {
+    "COMMAND": [
+      "git",
+      "-c",
+      "safe.directory=C:/Users/shawn/OneDrive/文件/PONYNEXUS/baseline-debt-01",
+      "diff",
+      "--stat"
+    ],
+    "ACTUAL_EXIT_CODE": 0,
+    "OUTPUT": " docs/10_DECISION_LOG.md                            |  11 +\n docs/12_HANDOFF_CURRENT.md                         |  58 ++\n docs/15_DOCUMENT_INDEX.md                          |   1 +\n docs/tasks/BASELINE-DEBT-01.md                     | 185 +++++\n .../core/src/polynexus_core/execution_service.py   |  24 +-\n .../core/src/polynexus_core/persistence/models.py  |  22 +\n .../src/polynexus_core/persistence/repository.py   |  44 +-\n .../core/src/polynexus_core/runtime/supervisor.py  | 818 +++++++++++----------\n .../core/tests/test_cp06_wp30_clean_install.py     | 102 ++-\n .../core/tests/test_g14_runtime_reconciliation.py  |  17 +-\n .../tests/test_g17_migration_restore_authority.py  |  51 +-\n services/core/tests/test_wp09_query_api.py         |  12 +-\n services/core/tests/test_wp12_council.py           |  37 +-\n services/core/tests/test_wp14b_runtime_binding.py  |  13 +-\n .../tests/test_wp23_backup_restore_migration.py    |   4 +-\n services/core/tests/test_wp24_resource_guards.py   |  47 +-\n 16 files changed, 1007 insertions(+), 439 deletions(-)\n",
+    "STDERR": "warning: in the working copy of 'docs/10_DECISION_LOG.md', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'docs/12_HANDOFF_CURRENT.md', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'docs/15_DOCUMENT_INDEX.md', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'docs/tasks/BASELINE-DEBT-01.md', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'services/core/src/polynexus_core/execution_service.py', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'services/core/src/polynexus_core/runtime/supervisor.py', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'services/core/tests/test_cp06_wp30_clean_install.py', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'services/core/tests/test_g14_runtime_reconciliation.py', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'services/core/tests/test_g17_migration_restore_authority.py', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'services/core/tests/test_wp12_council.py', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'services/core/tests/test_wp14b_runtime_binding.py', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'services/core/tests/test_wp23_backup_restore_migration.py', CRLF will be replaced by LF the next time Git touches it\n"
+  },
+  {
+    "COMMAND": [
+      "git",
+      "-c",
+      "safe.directory=C:/Users/shawn/OneDrive/文件/PONYNEXUS/baseline-debt-01",
+      "rev-parse",
+      "HEAD"
+    ],
+    "ACTUAL_EXIT_CODE": 0,
+    "OUTPUT": "86d5939044c1d7ec2a991820f39287481ee9120f\n",
+    "STDERR": ""
+  },
+  {
+    "COMMAND": [
+      "git",
+      "-c",
+      "safe.directory=C:/Users/shawn/OneDrive/文件/PONYNEXUS/baseline-debt-01",
+      "branch",
+      "--show-current"
+    ],
+    "ACTUAL_EXIT_CODE": 0,
+    "OUTPUT": "feature/baseline-debt-01-deterministic-lifecycle-cleanup\n",
+    "STDERR": ""
+  },
+  {
+    "COMMAND": [
+      "git",
+      "-c",
+      "safe.directory=C:/Users/shawn/OneDrive/文件/PONYNEXUS/baseline-debt-01",
+      "diff",
+      "--cached",
+      "--name-only"
+    ],
+    "ACTUAL_EXIT_CODE": 0,
+    "OUTPUT": "",
+    "STDERR": ""
+  }
+]

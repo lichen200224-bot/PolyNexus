@@ -1,0 +1,95 @@
+{
+  "G14_ROOT_CAUSE": "Equal observed_at timestamps; existing ORDER BY observed_at,id puts provenance before original safe evidence. Positional lookup, not metadata loss. ADR-014 did not change Evidence ordering or retention.",
+  "SAFE_EVIDENCE_BEFORE_RECONCILIATION": {
+    "id": "evidence_84ed6547a401470394c54d3e0e18086b",
+    "actor_id": "adapter:normalized",
+    "source": "normalized-runtime",
+    "type": "RUNTIME_EVIDENCE",
+    "status": "OBSERVED",
+    "observed_at": "2026-09-12 04:44:55.952930+00:00",
+    "metadata": {
+      "safe_key": "safe_value"
+    }
+  },
+  "EVIDENCE_AFTER_RELOAD": {
+    "count": 2,
+    "records": [
+      {
+        "id": "evidence_84ed6547a401470394c54d3e0e18086b",
+        "actor_id": "adapter:normalized",
+        "source": "normalized-runtime",
+        "type": "RUNTIME_EVIDENCE",
+        "status": "OBSERVED",
+        "observed_at": "2026-09-12 04:44:55.952930",
+        "metadata": {
+          "safe_key": "safe_value"
+        }
+      },
+      {
+        "id": "evidence_72d1c28caa144b129afe8ce17f5a70d7",
+        "actor_id": "system:restart-reconciliation",
+        "source": "runtime-adapter",
+        "type": "RUNTIME_EVIDENCE",
+        "status": "PASS",
+        "observed_at": "2026-09-12 04:44:55.966928",
+        "metadata": {
+          "reconciled_after_restart": true,
+          "provider_id": "polynexus",
+          "runtime_id": "reference",
+          "adapter_id": "builtin.reference",
+          "runtime_profile_ref": "reference.local",
+          "profile_revision": 1,
+          "adapter_version": "test-restart-adapter/1"
+        }
+      }
+    ]
+  },
+  "ORIGINAL_FAILED_RUN_RELOADED_RECORDS": {
+    "database": "C:\\Users\\shawn\\AppData\\Local\\Temp\\polynexus-baseline-debt-01-limited2-full\\test_completed_runtime_retains0\\g14-reconciliation.db",
+    "ordered_evidence": [
+      {
+        "rowid": 2,
+        "id": "evidence_cc461dfac1a545488c9a3a17c48bb11f",
+        "actor_id": "system:restart-reconciliation",
+        "source": "runtime-adapter",
+        "type": "RUNTIME_EVIDENCE",
+        "status": "PASS",
+        "observed_at": "2026-09-12 00:46:51.820511",
+        "metadata": {
+          "reconciled_after_restart": true,
+          "provider_id": "polynexus",
+          "runtime_id": "reference",
+          "adapter_id": "builtin.reference",
+          "runtime_profile_ref": "reference.local",
+          "profile_revision": 1,
+          "adapter_version": "test-restart-adapter/1"
+        }
+      },
+      {
+        "rowid": 1,
+        "id": "evidence_eebcd7fcda18434c9206c8ec10cb8b93",
+        "actor_id": "adapter:normalized",
+        "source": "normalized-runtime",
+        "type": "RUNTIME_EVIDENCE",
+        "status": "OBSERVED",
+        "observed_at": "2026-09-12 00:46:51.820511",
+        "metadata": {
+          "safe_key": "safe_value"
+        }
+      }
+    ]
+  },
+  "SAFE_KEY_PRESENT_ANYWHERE": "YES",
+  "ORDER_CHANGED": "YES: original failed run rowid insertion order safe then provenance becomes provenance then safe under observed_at,id; diagnostic rerun has distinct timestamps and passes unchanged test",
+  "METADATA_LOST": "NO",
+  "METADATA_OVERWRITTEN": "NO",
+  "CONTRACT_CHANGED_BY_ADR014": "NO",
+  "evidence": [
+    "ADR-014 Decision and boundaries limits sequence metadata to Run/RunEvent persistence; no Evidence retention change",
+    "reconciliation._normalize_runtime_result copies approved metadata with dict(evidence.metadata)",
+    "_build_completed_outputs appends provenance after safe_result.evidence",
+    "repository._evidence_to_row serializes metadata, _row_to_evidence deserializes it; SqlEvidenceRepository.list_by_run orders observed_at,id",
+    "original failed SQLite database contains exact safe_key/safe_value on safe record"
+  ],
+  "BEFORE_SNAPSHOT_NOTE": "Before/after snapshots captured by non-mutating trace in one diagnostic execution of the unmodified test; original failed-run before Python object was not retained. Its original persistence insertion rowid and source plus matching safe metadata are recorded separately."
+}

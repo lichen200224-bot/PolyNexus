@@ -1,0 +1,20 @@
+{
+  "COMMAND": [
+    "D:\\AI\u5b78\u7fd2\u6559\u6750\\PolyNexus\\.venv\\Scripts\\python.exe",
+    "-B",
+    "-m",
+    "pytest",
+    "services/core/tests/test_g14_runtime_reconciliation.py::test_completed_runtime_retains_owned_safe_normalized_outputs",
+    "-o",
+    "addopts=",
+    "-q",
+    "--tb=short",
+    "--basetemp=artifacts\\verification\\baseline-debt-01\\implementation\\tmp-g14-single",
+    "--junitxml=artifacts\\verification\\baseline-debt-01\\implementation\\g14-single.xml"
+  ],
+  "ACTUAL_EXIT_CODE": 0,
+  "EVIDENCE_PATH": "artifacts\\verification\\baseline-debt-01\\implementation\\g14-single.log",
+  "passed": 1,
+  "failed": 0,
+  "skipped": 0
+}

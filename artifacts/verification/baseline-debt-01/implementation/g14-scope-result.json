@@ -1,0 +1,9 @@
+{
+  "THIS_ROUND_CHANGED": [
+    "services/core/tests/test_g14_runtime_reconciliation.py"
+  ],
+  "UNAUTHORIZED_FILES": [],
+  "STAGED_FILES": [],
+  "IGNORED_EVIDENCE": "task evidence directory intentionally excluded from git file inventory",
+  "ACTUAL_EXIT_CODE": 0
+}

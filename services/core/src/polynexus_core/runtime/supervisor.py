@@ -55,6 +55,7 @@ _CANCELLED_REASON = "Run cancelled"
 # runtime that cannot finish inside these bounds fails closed through the
 # existing timeout/cancel cleanup path.
 _DEFAULT_OPERATION_TIMEOUT_SECONDS = 30.0
+_DEFAULT_CLEANUP_TIMEOUT_SECONDS = 30.0
 _MAX_RUN_OPERATIONS = 8
 _MAX_CONCURRENT_RUNTIME_OPERATIONS = 4
 
@@ -108,17 +109,19 @@ class _RuntimeOperationGate:
 class _GuardedRuntimeAdapter:
     """Adapter view used by workflow executors to retain the runtime ref."""
 
-    def __init__(self, supervisor: "RunSupervisor", budget: _RunResourceBudget) -> None:
+    def __init__(self, supervisor: "RunSupervisor", budget: _RunResourceBudget, run: Run) -> None:
         self._supervisor = supervisor
         self._adapter = supervisor._adapter
         self._budget = budget
         self.runtime_ref: str | None = None
+        self._run = run
 
     async def create_run(self, context: ContextPackage) -> str:
         runtime_ref = await self._supervisor._invoke(
             lambda: self._adapter.create_run(context), self._budget
         )
         self.runtime_ref = runtime_ref
+        self._run.runtime_ref = runtime_ref
         return runtime_ref
 
     async def submit(self, runtime_ref: str, task: Task) -> None:
@@ -208,17 +211,61 @@ class RunSupervisor:
         budget: _RunResourceBudget,
         *,
         count_budget: bool = True,
+        cleanup: bool = False,
     ) -> _T:
         """Run one adapter boundary call under a slot, timeout, and budget."""
         if count_budget:
             budget.consume()
         async with self._runtime_slot():
             try:
-                return await asyncio.wait_for(
-                    operation(), timeout=_DEFAULT_OPERATION_TIMEOUT_SECONDS
+                return await self._wait_for_operation(
+                    operation(), timeout=(
+                        _DEFAULT_CLEANUP_TIMEOUT_SECONDS if cleanup
+                        else _DEFAULT_OPERATION_TIMEOUT_SECONDS
+                    ),
                 )
             except asyncio.TimeoutError:
                 raise _ResourceTimeout from None
+
+    async def _wait_for_operation(self, operation: Awaitable[_T], *, timeout: float) -> _T:
+        """Internal deadline seam; no public runtime policy or API exposure."""
+        return await asyncio.wait_for(operation, timeout=timeout)
+
+    @asynccontextmanager
+    async def _cancellation_guard(self, run: Run):
+        try:
+            yield
+        except asyncio.CancelledError:
+            run.result = None
+            if run.state in {RunState.STARTING, RunState.RUNNING}:
+                run.transition(RunState.CANCEL_REQUESTED)
+            if run.state is RunState.CANCEL_REQUESTED:
+                verified = False
+                if run.runtime_ref is not None:
+                    async def bounded_cleanup():
+                        try:
+                            return await asyncio.wait_for(
+                                self._cleanup_and_verify(run.runtime_ref, RunState.CANCELLED),
+                                timeout=3 * _DEFAULT_CLEANUP_TIMEOUT_SECONDS,
+                            )
+                        except (Exception, asyncio.CancelledError):
+                            return False
+
+                    cleanup_task = asyncio.create_task(bounded_cleanup())
+                    interrupted = False
+                    while not cleanup_task.done():
+                        try:
+                            await asyncio.shield(cleanup_task)
+                        except asyncio.CancelledError:
+                            # A repeated caller cancellation cannot cancel verification.
+                            # Conservatively retain uncertainty in the terminal state.
+                            interrupted = True
+                    verified = cleanup_task.result() and not interrupted
+                run.transition(
+                    RunState.CANCELLED if verified else RunState.ORPHANED,
+                    reason=_CANCELLED_REASON if verified else _CLEANUP_FAILED_REASON,
+                )
+            raise
 
     async def _execute_workflow(
         self,
@@ -226,9 +273,10 @@ class RunSupervisor:
         context: ContextPackage,
         workflow: WorkflowDefinition,
         budget: _RunResourceBudget,
+        run: Run,
     ):
         """Execute workflow setup through the same bounded adapter boundary."""
-        guarded_adapter = _GuardedRuntimeAdapter(self, budget)
+        guarded_adapter = _GuardedRuntimeAdapter(self, budget, run)
         request = WorkflowExecutionRequest(task=task, context=context, workflow=workflow)
         try:
             # The workflow coroutine itself is bounded, while its adapter
@@ -318,35 +366,36 @@ class RunSupervisor:
             context_package_id=context.id,
         )
         run.transition(RunState.STARTING)
-        budget = self._new_budget()
-        try:
-            execution, runtime_ref, guard_tripped = await self._execute_workflow(
-                task, context, workflow, budget
+        async with self._cancellation_guard(run):
+            budget = self._new_budget()
+            try:
+                execution, runtime_ref, guard_tripped = await self._execute_workflow(
+                    task, context, workflow, budget, run
+                )
+            except _WorkflowExecutionFailure as exc:
+                cleanup_ok = await self._failure_cleanup(run, exc.runtime_ref, budget)
+                reason = _RUNTIME_FAILURE_REASON if cleanup_ok else _CLEANUP_FAILED_REASON
+                raise RuntimeError(reason) from None
+            except Exception as exc:
+                reason = redact_exception(exc, fallback=_RUNTIME_FAILURE_REASON)
+                run.transition(RunState.FAILED, reason=reason)
+                raise RuntimeError(reason) from None
+
+            if guard_tripped:
+                await self._timeout_cleanup(run, runtime_ref, budget)
+                raise RuntimeError(
+                    _TIMEOUT_CLEANUP_REASON
+                    if run.state is RunState.TIMED_OUT
+                    else _CLEANUP_FAILED_REASON
+                ) from None
+
+            run.runtime_ref = execution.runtime_ref
+            run.transition(RunState.RUNNING)
+            return RunSession(
+                run=run,
+                runtime_ref=execution.runtime_ref,
+                _resource_budget=budget,
             )
-        except _WorkflowExecutionFailure as exc:
-            cleanup_ok = await self._failure_cleanup(run, exc.runtime_ref, budget)
-            reason = _RUNTIME_FAILURE_REASON if cleanup_ok else _CLEANUP_FAILED_REASON
-            raise RuntimeError(reason) from None
-        except Exception as exc:
-            reason = redact_exception(exc, fallback=_RUNTIME_FAILURE_REASON)
-            run.transition(RunState.FAILED, reason=reason)
-            raise RuntimeError(reason) from None
-
-        if guard_tripped:
-            await self._timeout_cleanup(run, runtime_ref, budget)
-            raise RuntimeError(
-                _TIMEOUT_CLEANUP_REASON
-                if run.state is RunState.TIMED_OUT
-                else _CLEANUP_FAILED_REASON
-            ) from None
-
-        run.runtime_ref = execution.runtime_ref
-        run.transition(RunState.RUNNING)
-        return RunSession(
-            run=run,
-            runtime_ref=execution.runtime_ref,
-            _resource_budget=budget,
-        )
 
     async def execute_claimed_run(
         self,
@@ -377,167 +426,168 @@ class RunSupervisor:
         if task.workflow_id != workflow.id or task.workflow_version != workflow.version:
             raise ValueError("Task workflow reference must match the WorkflowDefinition")
 
-        budget = self._new_budget()
-        # Workflow executor boundary: create_run + submit
-        try:
-            execution, runtime_ref, guard_tripped = await self._execute_workflow(
-                task, context, workflow, budget
-            )
-        except _WorkflowExecutionFailure as exc:
-            await self._failure_cleanup(run, exc.runtime_ref, budget)
-            return RunExecution(
-                run=run,
-                result=None,
-                findings=(),
-                evidence=(),
-                artifacts=(),
-            )
-        except Exception:
-            run.transition(RunState.FAILED, reason=_RUNTIME_FAILURE_REASON)
-            return RunExecution(
-                run=run,
-                result=None,
-                findings=(),
-                evidence=(),
-                artifacts=(),
-            )
+        async with self._cancellation_guard(run):
+            budget = self._new_budget()
+            # Workflow executor boundary: create_run + submit
+            try:
+                execution, runtime_ref, guard_tripped = await self._execute_workflow(
+                    task, context, workflow, budget, run
+                )
+            except _WorkflowExecutionFailure as exc:
+                await self._failure_cleanup(run, exc.runtime_ref, budget)
+                return RunExecution(
+                    run=run,
+                    result=None,
+                    findings=(),
+                    evidence=(),
+                    artifacts=(),
+                )
+            except Exception:
+                run.transition(RunState.FAILED, reason=_RUNTIME_FAILURE_REASON)
+                return RunExecution(
+                    run=run,
+                    result=None,
+                    findings=(),
+                    evidence=(),
+                    artifacts=(),
+                )
 
-        if guard_tripped:
-            await self._timeout_cleanup(run, runtime_ref, budget)
-            return RunExecution(
-                run=run,
-                result=None,
-                findings=(),
-                evidence=(),
-                artifacts=(),
-            )
+            if guard_tripped:
+                await self._timeout_cleanup(run, runtime_ref, budget)
+                return RunExecution(
+                    run=run,
+                    result=None,
+                    findings=(),
+                    evidence=(),
+                    artifacts=(),
+                )
 
-        run.runtime_ref = execution.runtime_ref
-        run.transition(RunState.RUNNING)
+            run.runtime_ref = execution.runtime_ref
+            run.transition(RunState.RUNNING)
 
-        # Adapter boundary: status call
-        try:
-            adapter_status = await self._invoke(
-                lambda: self._adapter.status(run.runtime_ref), budget
-            )
-        except (_ResourceTimeout, _ResourceBudgetExceeded):
-            await self._timeout_cleanup(run, run.runtime_ref, budget)
-            return RunExecution(run=run, result=None, findings=(), evidence=(), artifacts=())
-        except Exception:
-            run.transition(RunState.FAILED, reason=_RUNTIME_FAILURE_REASON)
-            return RunExecution(
-                run=run,
-                result=None,
-                findings=(),
-                evidence=(),
-                artifacts=(),
-            )
+            # Adapter boundary: status call
+            try:
+                adapter_status = await self._invoke(
+                    lambda: self._adapter.status(run.runtime_ref), budget
+                )
+            except (_ResourceTimeout, _ResourceBudgetExceeded):
+                await self._timeout_cleanup(run, run.runtime_ref, budget)
+                return RunExecution(run=run, result=None, findings=(), evidence=(), artifacts=())
+            except Exception:
+                run.transition(RunState.FAILED, reason=_RUNTIME_FAILURE_REASON)
+                return RunExecution(
+                    run=run,
+                    result=None,
+                    findings=(),
+                    evidence=(),
+                    artifacts=(),
+                )
 
-        if adapter_status.state is RunState.FAILED:
-            run.transition(RunState.FAILED, reason=_RUNTIME_FAILURE_REASON)
-            return RunExecution(
-                run=run,
-                result=None,
-                findings=(),
-                evidence=(),
-                artifacts=(),
-            )
+            if adapter_status.state is RunState.FAILED:
+                run.transition(RunState.FAILED, reason=_RUNTIME_FAILURE_REASON)
+                return RunExecution(
+                    run=run,
+                    result=None,
+                    findings=(),
+                    evidence=(),
+                    artifacts=(),
+                )
 
-        if adapter_status.state is RunState.TIMED_OUT:
-            # Timeout: perform cleanup/verify before transitioning
-            cleanup_ok = await self._cleanup_and_verify(
-                run.runtime_ref, expected_state=RunState.TIMED_OUT, budget=budget
-            )
-            if cleanup_ok:
-                # Cleanup succeeded: RUNNING -> TIMED_OUT
-                run.transition(RunState.TIMED_OUT, reason=_TIMEOUT_CLEANUP_REASON)
-            else:
-                # Cleanup failed: RUNNING -> CANCEL_REQUESTED -> ORPHANED
+            if adapter_status.state is RunState.TIMED_OUT:
+                # Timeout: perform cleanup/verify before transitioning
+                cleanup_ok = await self._cleanup_and_verify(
+                    run.runtime_ref, expected_state=RunState.TIMED_OUT, budget=budget
+                )
+                if cleanup_ok:
+                    # Cleanup succeeded: RUNNING -> TIMED_OUT
+                    run.transition(RunState.TIMED_OUT, reason=_TIMEOUT_CLEANUP_REASON)
+                else:
+                    # Cleanup failed: RUNNING -> CANCEL_REQUESTED -> ORPHANED
+                    run.transition(RunState.CANCEL_REQUESTED)
+                    run.transition(RunState.ORPHANED, reason=_CLEANUP_FAILED_REASON)
+                return RunExecution(
+                    run=run,
+                    result=None,
+                    findings=(),
+                    evidence=(),
+                    artifacts=(),
+                )
+
+            if adapter_status.state is RunState.ORPHANED:
+                run.transition(RunState.FAILED, reason=_RUNTIME_FAILURE_REASON)
+                return RunExecution(
+                    run=run,
+                    result=None,
+                    findings=(),
+                    evidence=(),
+                    artifacts=(),
+                )
+
+            if adapter_status.state is RunState.CANCELLED:
                 run.transition(RunState.CANCEL_REQUESTED)
-                run.transition(RunState.ORPHANED, reason=_CLEANUP_FAILED_REASON)
-            return RunExecution(
-                run=run,
-                result=None,
-                findings=(),
-                evidence=(),
-                artifacts=(),
-            )
+                run.transition(RunState.CANCELLED, reason=_RUNTIME_FAILURE_REASON)
+                return RunExecution(
+                    run=run,
+                    result=None,
+                    findings=(),
+                    evidence=(),
+                    artifacts=(),
+                )
 
-        if adapter_status.state is RunState.ORPHANED:
-            run.transition(RunState.FAILED, reason=_RUNTIME_FAILURE_REASON)
-            return RunExecution(
-                run=run,
-                result=None,
-                findings=(),
-                evidence=(),
-                artifacts=(),
-            )
+            # Adapter boundary: result call
+            try:
+                runtime_result = await self._invoke(
+                    lambda: self._adapter.result(run.runtime_ref), budget
+                )
+            except (_ResourceTimeout, _ResourceBudgetExceeded):
+                await self._timeout_cleanup(run, run.runtime_ref, budget)
+                return RunExecution(run=run, result=None, findings=(), evidence=(), artifacts=())
+            except Exception:
+                run.transition(RunState.FAILED, reason=_RUNTIME_FAILURE_REASON)
+                return RunExecution(
+                    run=run,
+                    result=None,
+                    findings=(),
+                    evidence=(),
+                    artifacts=(),
+                )
 
-        if adapter_status.state is RunState.CANCELLED:
-            run.transition(RunState.CANCEL_REQUESTED)
-            run.transition(RunState.CANCELLED, reason=_RUNTIME_FAILURE_REASON)
-            return RunExecution(
-                run=run,
-                result=None,
-                findings=(),
-                evidence=(),
-                artifacts=(),
-            )
+            # Adapter boundary: artifacts call
+            try:
+                adapter_artifacts = await self._invoke(
+                    lambda: self._adapter.artifacts(run.runtime_ref), budget
+                )
+            except (_ResourceTimeout, _ResourceBudgetExceeded):
+                await self._timeout_cleanup(run, run.runtime_ref, budget)
+                return RunExecution(run=run, result=None, findings=(), evidence=(), artifacts=())
+            except Exception:
+                run.transition(RunState.FAILED, reason=_RUNTIME_FAILURE_REASON)
+                return RunExecution(
+                    run=run,
+                    result=None,
+                    findings=(),
+                    evidence=(),
+                    artifacts=(),
+                )
 
-        # Adapter boundary: result call
-        try:
-            runtime_result = await self._invoke(
-                lambda: self._adapter.result(run.runtime_ref), budget
-            )
-        except (_ResourceTimeout, _ResourceBudgetExceeded):
-            await self._timeout_cleanup(run, run.runtime_ref, budget)
-            return RunExecution(run=run, result=None, findings=(), evidence=(), artifacts=())
-        except Exception:
-            run.transition(RunState.FAILED, reason=_RUNTIME_FAILURE_REASON)
-            return RunExecution(
-                run=run,
-                result=None,
-                findings=(),
-                evidence=(),
-                artifacts=(),
-            )
+            # Guarded success preparation: fetch runtime metadata BEFORE transitioning COMPLETED
+            try:
+                runtime_version = self._adapter.version_info()
+            except Exception:
+                run.transition(RunState.FAILED, reason=_RUNTIME_FAILURE_REASON)
+                return RunExecution(
+                    run=run,
+                    result=None,
+                    findings=(),
+                    evidence=(),
+                    artifacts=(),
+                )
 
-        # Adapter boundary: artifacts call
-        try:
-            adapter_artifacts = await self._invoke(
-                lambda: self._adapter.artifacts(run.runtime_ref), budget
+            run.transition(RunState.COMPLETED)
+            return self._build_execution_from_existing(
+                run, runtime_result, adapter_artifacts,
+                runtime_version=runtime_version,
             )
-        except (_ResourceTimeout, _ResourceBudgetExceeded):
-            await self._timeout_cleanup(run, run.runtime_ref, budget)
-            return RunExecution(run=run, result=None, findings=(), evidence=(), artifacts=())
-        except Exception:
-            run.transition(RunState.FAILED, reason=_RUNTIME_FAILURE_REASON)
-            return RunExecution(
-                run=run,
-                result=None,
-                findings=(),
-                evidence=(),
-                artifacts=(),
-            )
-
-        # Guarded success preparation: fetch runtime metadata BEFORE transitioning COMPLETED
-        try:
-            runtime_version = self._adapter.version_info()
-        except Exception:
-            run.transition(RunState.FAILED, reason=_RUNTIME_FAILURE_REASON)
-            return RunExecution(
-                run=run,
-                result=None,
-                findings=(),
-                evidence=(),
-                artifacts=(),
-            )
-
-        run.transition(RunState.COMPLETED)
-        return self._build_execution_from_existing(
-            run, runtime_result, adapter_artifacts,
-            runtime_version=runtime_version,
-        )
 
     async def execute_run(
         self,
@@ -559,220 +609,223 @@ class RunSupervisor:
         if task.workflow_id != workflow.id or task.workflow_version != workflow.version:
             raise ValueError("Task workflow reference must match the WorkflowDefinition")
 
-        budget = self._new_budget()
-        run.transition(RunState.STARTING)
-        try:
-            execution, runtime_ref, guard_tripped = await self._execute_workflow(
-                task, context, workflow, budget
-            )
-        except _WorkflowExecutionFailure as exc:
-            cleanup_ok = await self._failure_cleanup(run, exc.runtime_ref, budget)
-            reason = _RUNTIME_FAILURE_REASON if cleanup_ok else _CLEANUP_FAILED_REASON
-            raise RuntimeError(reason) from None
-        except Exception as exc:
-            reason = redact_exception(exc, fallback=_RUNTIME_FAILURE_REASON)
-            run.transition(RunState.FAILED, reason=reason)
-            raise RuntimeError(reason) from None
+        async with self._cancellation_guard(run):
+            budget = self._new_budget()
+            run.transition(RunState.STARTING)
+            try:
+                execution, runtime_ref, guard_tripped = await self._execute_workflow(
+                    task, context, workflow, budget, run
+                )
+            except _WorkflowExecutionFailure as exc:
+                cleanup_ok = await self._failure_cleanup(run, exc.runtime_ref, budget)
+                reason = _RUNTIME_FAILURE_REASON if cleanup_ok else _CLEANUP_FAILED_REASON
+                raise RuntimeError(reason) from None
+            except Exception as exc:
+                reason = redact_exception(exc, fallback=_RUNTIME_FAILURE_REASON)
+                run.transition(RunState.FAILED, reason=reason)
+                raise RuntimeError(reason) from None
 
-        if guard_tripped:
-            await self._timeout_cleanup(run, runtime_ref, budget)
-            return self._build_execution_from_existing(
-                run,
-                RuntimeResult(
-                    summary=(
-                        _TIMEOUT_CLEANUP_REASON
-                        if run.state is RunState.TIMED_OUT
-                        else _CLEANUP_FAILED_REASON
-                    )
-                ),
-            )
+            if guard_tripped:
+                await self._timeout_cleanup(run, runtime_ref, budget)
+                return self._build_execution_from_existing(
+                    run,
+                    RuntimeResult(
+                        summary=(
+                            _TIMEOUT_CLEANUP_REASON
+                            if run.state is RunState.TIMED_OUT
+                            else _CLEANUP_FAILED_REASON
+                        )
+                    ),
+                )
 
-        run.runtime_ref = execution.runtime_ref
-        run.transition(RunState.RUNNING)
+            run.runtime_ref = execution.runtime_ref
+            run.transition(RunState.RUNNING)
 
-        # Collect results from the adapter
-        try:
-            status = await self._invoke(
-                lambda: self._adapter.status(run.runtime_ref), budget
-            )
-        except (_ResourceTimeout, _ResourceBudgetExceeded):
-            cleanup_ok = await self._timeout_cleanup(run, run.runtime_ref, budget)
-            return self._build_execution_from_existing(
-                run,
-                RuntimeResult(
-                    summary=(
-                        _TIMEOUT_CLEANUP_REASON
-                        if cleanup_ok
-                        else _CLEANUP_FAILED_REASON
-                    )
-                ),
-            )
-        except Exception:
-            run.transition(RunState.FAILED, reason=_RUNTIME_FAILURE_REASON)
-            return self._build_execution_from_existing(
-                run, RuntimeResult(summary=_RUNTIME_FAILURE_REASON)
-            )
-        if status.state is RunState.FAILED:
-            run.transition(RunState.FAILED, reason=_RUNTIME_FAILURE_REASON)
-            return self._build_execution_from_existing(run, RuntimeResult(summary=_RUNTIME_FAILURE_REASON))
-        if status.state is RunState.TIMED_OUT:
-            # Timeout: perform cleanup/verify before transitioning
-            cleanup_ok = await self._cleanup_and_verify(
-                run.runtime_ref, expected_state=RunState.TIMED_OUT, budget=budget
-            )
-            if cleanup_ok:
-                # Cleanup succeeded: RUNNING -> TIMED_OUT
-                run.transition(RunState.TIMED_OUT, reason=_TIMEOUT_CLEANUP_REASON)
-            else:
-                # Cleanup failed: RUNNING -> CANCEL_REQUESTED -> ORPHANED
+            # Collect results from the adapter
+            try:
+                status = await self._invoke(
+                    lambda: self._adapter.status(run.runtime_ref), budget
+                )
+            except (_ResourceTimeout, _ResourceBudgetExceeded):
+                cleanup_ok = await self._timeout_cleanup(run, run.runtime_ref, budget)
+                return self._build_execution_from_existing(
+                    run,
+                    RuntimeResult(
+                        summary=(
+                            _TIMEOUT_CLEANUP_REASON
+                            if cleanup_ok
+                            else _CLEANUP_FAILED_REASON
+                        )
+                    ),
+                )
+            except Exception:
+                run.transition(RunState.FAILED, reason=_RUNTIME_FAILURE_REASON)
+                return self._build_execution_from_existing(
+                    run, RuntimeResult(summary=_RUNTIME_FAILURE_REASON)
+                )
+            if status.state is RunState.FAILED:
+                run.transition(RunState.FAILED, reason=_RUNTIME_FAILURE_REASON)
+                return self._build_execution_from_existing(run, RuntimeResult(summary=_RUNTIME_FAILURE_REASON))
+            if status.state is RunState.TIMED_OUT:
+                # Timeout: perform cleanup/verify before transitioning
+                cleanup_ok = await self._cleanup_and_verify(
+                    run.runtime_ref, expected_state=RunState.TIMED_OUT, budget=budget
+                )
+                if cleanup_ok:
+                    # Cleanup succeeded: RUNNING -> TIMED_OUT
+                    run.transition(RunState.TIMED_OUT, reason=_TIMEOUT_CLEANUP_REASON)
+                else:
+                    # Cleanup failed: RUNNING -> CANCEL_REQUESTED -> ORPHANED
+                    run.transition(RunState.CANCEL_REQUESTED)
+                    run.transition(RunState.ORPHANED, reason=_CLEANUP_FAILED_REASON)
+                return self._build_execution_from_existing(run, RuntimeResult(summary=_TIMEOUT_CLEANUP_REASON if cleanup_ok else _CLEANUP_FAILED_REASON))
+            if status.state is RunState.ORPHANED:
+                raise ValueError("Runtime reported ORPHANED before cancel cleanup")
+            if status.state is RunState.CANCELLED:
                 run.transition(RunState.CANCEL_REQUESTED)
-                run.transition(RunState.ORPHANED, reason=_CLEANUP_FAILED_REASON)
-            return self._build_execution_from_existing(run, RuntimeResult(summary=_TIMEOUT_CLEANUP_REASON if cleanup_ok else _CLEANUP_FAILED_REASON))
-        if status.state is RunState.ORPHANED:
-            raise ValueError("Runtime reported ORPHANED before cancel cleanup")
-        if status.state is RunState.CANCELLED:
-            run.transition(RunState.CANCEL_REQUESTED)
-            run.transition(RunState.CANCELLED, reason=_CANCELLED_REASON)
-            return self._build_execution_from_existing(run, RuntimeResult(summary=_CANCELLED_REASON))
+                run.transition(RunState.CANCELLED, reason=_CANCELLED_REASON)
+                return self._build_execution_from_existing(run, RuntimeResult(summary=_CANCELLED_REASON))
 
-        try:
-            runtime_result = await self._invoke(
-                lambda: self._adapter.result(run.runtime_ref), budget
-            )
-            adapter_artifacts = await self._invoke(
-                lambda: self._adapter.artifacts(run.runtime_ref), budget
-            )
-        except (_ResourceTimeout, _ResourceBudgetExceeded):
-            cleanup_ok = await self._timeout_cleanup(run, run.runtime_ref, budget)
+            try:
+                runtime_result = await self._invoke(
+                    lambda: self._adapter.result(run.runtime_ref), budget
+                )
+                adapter_artifacts = await self._invoke(
+                    lambda: self._adapter.artifacts(run.runtime_ref), budget
+                )
+            except (_ResourceTimeout, _ResourceBudgetExceeded):
+                cleanup_ok = await self._timeout_cleanup(run, run.runtime_ref, budget)
+                return self._build_execution_from_existing(
+                    run,
+                    RuntimeResult(
+                        summary=(
+                            _TIMEOUT_CLEANUP_REASON
+                            if cleanup_ok
+                            else _CLEANUP_FAILED_REASON
+                        )
+                    ),
+                )
+            except Exception:
+                run.transition(RunState.FAILED, reason=_RUNTIME_FAILURE_REASON)
+                return self._build_execution_from_existing(
+                    run, RuntimeResult(summary=_RUNTIME_FAILURE_REASON)
+                )
+            # Guarded success preparation: fetch runtime metadata BEFORE transitioning
+            # COMPLETED so a version_info failure cannot leave a COMPLETED event with a
+            # Run state that is later regressed to FAILED (ADR-007 lifecycle).
+            try:
+                runtime_version = self._adapter.version_info()
+            except Exception:
+                run.transition(RunState.FAILED, reason=_RUNTIME_FAILURE_REASON)
+                return RunExecution(
+                    run=run,
+                    result=None,
+                    findings=(),
+                    evidence=(),
+                    artifacts=(),
+                )
+            run.transition(RunState.COMPLETED)
             return self._build_execution_from_existing(
-                run,
-                RuntimeResult(
-                    summary=(
-                        _TIMEOUT_CLEANUP_REASON
-                        if cleanup_ok
-                        else _CLEANUP_FAILED_REASON
-                    )
-                ),
+                run, runtime_result, adapter_artifacts, runtime_version=runtime_version
             )
-        except Exception:
-            run.transition(RunState.FAILED, reason=_RUNTIME_FAILURE_REASON)
-            return self._build_execution_from_existing(
-                run, RuntimeResult(summary=_RUNTIME_FAILURE_REASON)
-            )
-        # Guarded success preparation: fetch runtime metadata BEFORE transitioning
-        # COMPLETED so a version_info failure cannot leave a COMPLETED event with a
-        # Run state that is later regressed to FAILED (ADR-007 lifecycle).
-        try:
-            runtime_version = self._adapter.version_info()
-        except Exception:
-            run.transition(RunState.FAILED, reason=_RUNTIME_FAILURE_REASON)
-            return RunExecution(
-                run=run,
-                result=None,
-                findings=(),
-                evidence=(),
-                artifacts=(),
-            )
-        run.transition(RunState.COMPLETED)
-        return self._build_execution_from_existing(
-            run, runtime_result, adapter_artifacts, runtime_version=runtime_version
-        )
 
     async def collect(self, session: RunSession) -> RunExecution:
         self._require_active(session)
-        budget = session._resource_budget or self._new_budget()
-        session._resource_budget = budget
-        try:
-            status = await self._invoke(
-                lambda: self._adapter.status(session.runtime_ref), budget
-            )
-        except (_ResourceTimeout, _ResourceBudgetExceeded):
-            cleanup_ok = await self._timeout_cleanup(session.run, session.runtime_ref, budget)
-            return self._build_execution(
-                session,
-                RuntimeResult(
-                    summary=(
-                        _TIMEOUT_CLEANUP_REASON
-                        if cleanup_ok
-                        else _CLEANUP_FAILED_REASON
-                    )
-                ),
-            )
-        except Exception:
-            session.run.transition(RunState.FAILED, reason=_RUNTIME_FAILURE_REASON)
-            return self._build_execution(
-                session, RuntimeResult(summary=_RUNTIME_FAILURE_REASON)
-            )
-        if status.state is RunState.FAILED:
-            session.run.transition(RunState.FAILED, reason=_RUNTIME_FAILURE_REASON)
-            return self._build_execution(session, RuntimeResult(summary=_RUNTIME_FAILURE_REASON))
-        if status.state is RunState.TIMED_OUT:
-            # Timeout: perform cleanup/verify before transitioning
-            cleanup_ok = await self._cleanup_and_verify(
-                session.runtime_ref, expected_state=RunState.TIMED_OUT, budget=budget
-            )
-            if cleanup_ok:
-                # Cleanup succeeded: RUNNING -> TIMED_OUT
-                session.run.transition(RunState.TIMED_OUT, reason=_TIMEOUT_CLEANUP_REASON)
-            else:
-                # Cleanup failed: RUNNING -> CANCEL_REQUESTED -> ORPHANED
+        async with self._cancellation_guard(session.run):
+            budget = session._resource_budget or self._new_budget()
+            session._resource_budget = budget
+            try:
+                status = await self._invoke(
+                    lambda: self._adapter.status(session.runtime_ref), budget
+                )
+            except (_ResourceTimeout, _ResourceBudgetExceeded):
+                cleanup_ok = await self._timeout_cleanup(session.run, session.runtime_ref, budget)
+                return self._build_execution(
+                    session,
+                    RuntimeResult(
+                        summary=(
+                            _TIMEOUT_CLEANUP_REASON
+                            if cleanup_ok
+                            else _CLEANUP_FAILED_REASON
+                        )
+                    ),
+                )
+            except Exception:
+                session.run.transition(RunState.FAILED, reason=_RUNTIME_FAILURE_REASON)
+                return self._build_execution(
+                    session, RuntimeResult(summary=_RUNTIME_FAILURE_REASON)
+                )
+            if status.state is RunState.FAILED:
+                session.run.transition(RunState.FAILED, reason=_RUNTIME_FAILURE_REASON)
+                return self._build_execution(session, RuntimeResult(summary=_RUNTIME_FAILURE_REASON))
+            if status.state is RunState.TIMED_OUT:
+                # Timeout: perform cleanup/verify before transitioning
+                cleanup_ok = await self._cleanup_and_verify(
+                    session.runtime_ref, expected_state=RunState.TIMED_OUT, budget=budget
+                )
+                if cleanup_ok:
+                    # Cleanup succeeded: RUNNING -> TIMED_OUT
+                    session.run.transition(RunState.TIMED_OUT, reason=_TIMEOUT_CLEANUP_REASON)
+                else:
+                    # Cleanup failed: RUNNING -> CANCEL_REQUESTED -> ORPHANED
+                    session.run.transition(RunState.CANCEL_REQUESTED)
+                    session.run.transition(RunState.ORPHANED, reason=_CLEANUP_FAILED_REASON)
+                return self._build_execution(session, RuntimeResult(summary=_TIMEOUT_CLEANUP_REASON if cleanup_ok else _CLEANUP_FAILED_REASON))
+            if status.state is RunState.ORPHANED:
+                raise ValueError("Runtime reported ORPHANED before cancel cleanup")
+            if status.state is RunState.CANCELLED:
                 session.run.transition(RunState.CANCEL_REQUESTED)
-                session.run.transition(RunState.ORPHANED, reason=_CLEANUP_FAILED_REASON)
-            return self._build_execution(session, RuntimeResult(summary=_TIMEOUT_CLEANUP_REASON if cleanup_ok else _CLEANUP_FAILED_REASON))
-        if status.state is RunState.ORPHANED:
-            raise ValueError("Runtime reported ORPHANED before cancel cleanup")
-        if status.state is RunState.CANCELLED:
-            session.run.transition(RunState.CANCEL_REQUESTED)
-            session.run.transition(RunState.CANCELLED, reason=_CANCELLED_REASON)
-            return self._build_execution(session, RuntimeResult(summary=_CANCELLED_REASON))
+                session.run.transition(RunState.CANCELLED, reason=_CANCELLED_REASON)
+                return self._build_execution(session, RuntimeResult(summary=_CANCELLED_REASON))
 
-        try:
-            runtime_result = await self._invoke(
-                lambda: self._adapter.result(session.runtime_ref), budget
-            )
-            adapter_artifacts = await self._invoke(
-                lambda: self._adapter.artifacts(session.runtime_ref), budget
-            )
-        except (_ResourceTimeout, _ResourceBudgetExceeded):
-            cleanup_ok = await self._timeout_cleanup(session.run, session.runtime_ref, budget)
-            return self._build_execution(
-                session,
-                RuntimeResult(
-                    summary=(
-                        _TIMEOUT_CLEANUP_REASON
-                        if cleanup_ok
-                        else _CLEANUP_FAILED_REASON
-                    )
-                ),
-            )
-        except Exception:
-            session.run.transition(RunState.FAILED, reason=_RUNTIME_FAILURE_REASON)
-            return self._build_execution(
-                session, RuntimeResult(summary=_RUNTIME_FAILURE_REASON)
-            )
-        session.run.transition(RunState.COMPLETED)
-        return self._build_execution(session, runtime_result, adapter_artifacts)
+            try:
+                runtime_result = await self._invoke(
+                    lambda: self._adapter.result(session.runtime_ref), budget
+                )
+                adapter_artifacts = await self._invoke(
+                    lambda: self._adapter.artifacts(session.runtime_ref), budget
+                )
+            except (_ResourceTimeout, _ResourceBudgetExceeded):
+                cleanup_ok = await self._timeout_cleanup(session.run, session.runtime_ref, budget)
+                return self._build_execution(
+                    session,
+                    RuntimeResult(
+                        summary=(
+                            _TIMEOUT_CLEANUP_REASON
+                            if cleanup_ok
+                            else _CLEANUP_FAILED_REASON
+                        )
+                    ),
+                )
+            except Exception:
+                session.run.transition(RunState.FAILED, reason=_RUNTIME_FAILURE_REASON)
+                return self._build_execution(
+                    session, RuntimeResult(summary=_RUNTIME_FAILURE_REASON)
+                )
+            session.run.transition(RunState.COMPLETED)
+            return self._build_execution(session, runtime_result, adapter_artifacts)
 
     async def cancel(self, session: RunSession) -> RunExecution:
         self._require_active(session)
-        session.run.transition(RunState.CANCEL_REQUESTED)
-        # Shared cleanup/verification machinery (same standard as timeout):
-        # adapter cancel/cleanup/status exceptions are contained inside
-        # _cleanup_and_verify; raw errors never reach the caller or persistence.
-        cleanup_ok = await self._cleanup_and_verify(
-            session.runtime_ref,
-            expected_state=RunState.CANCELLED,
-            budget=session._resource_budget or self._new_budget(),
-        )
-        if cleanup_ok:
-            session.run.transition(
-                RunState.CANCELLED, reason="cancelled and cleanup verified"
+        async with self._cancellation_guard(session.run):
+            session.run.transition(RunState.CANCEL_REQUESTED)
+            # Shared cleanup/verification machinery (same standard as timeout):
+            # adapter cancel/cleanup/status exceptions are contained inside
+            # _cleanup_and_verify; raw errors never reach the caller or persistence.
+            cleanup_ok = await self._cleanup_and_verify(
+                session.runtime_ref,
+                expected_state=RunState.CANCELLED,
+                budget=session._resource_budget or self._new_budget(),
             )
-            summary = "Run cancelled and cleanup verified"
-        else:
-            session.run.transition(RunState.ORPHANED, reason=_CLEANUP_FAILED_REASON)
-            summary = "Run orphaned because cleanup verification failed"
-        return self._build_execution(session, RuntimeResult(summary=summary))
+            if cleanup_ok:
+                session.run.transition(
+                    RunState.CANCELLED, reason="cancelled and cleanup verified"
+                )
+                summary = "Run cancelled and cleanup verified"
+            else:
+                session.run.transition(RunState.ORPHANED, reason=_CLEANUP_FAILED_REASON)
+                summary = "Run orphaned because cleanup verification failed"
+            return self._build_execution(session, RuntimeResult(summary=summary))
 
     def _require_active(self, session: RunSession) -> None:
         if session.run.state is not RunState.RUNNING:
@@ -806,6 +859,7 @@ class RunSupervisor:
                 lambda: self._adapter.cancel(runtime_ref),
                 cleanup_budget,
                 count_budget=False,
+                cleanup=True,
             )
         except Exception:
             return False
@@ -815,6 +869,7 @@ class RunSupervisor:
                 lambda: self._adapter.cleanup(runtime_ref),
                 cleanup_budget,
                 count_budget=False,
+                cleanup=True,
             )
         except Exception:
             return False
@@ -824,6 +879,7 @@ class RunSupervisor:
                 lambda: self._adapter.status(runtime_ref),
                 cleanup_budget,
                 count_budget=False,
+                cleanup=True,
             )
         except Exception:
             return False

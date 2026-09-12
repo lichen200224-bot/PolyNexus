@@ -1,0 +1,21 @@
+{
+  "COMMAND": [
+    "D:\\AI\u5b78\u7fd2\u6559\u6750\\PolyNexus\\.venv\\Scripts\\python.exe",
+    "-B",
+    "-m",
+    "pytest",
+    "services/core/tests",
+    "-o",
+    "addopts=",
+    "-q",
+    "--tb=short",
+    "-ra",
+    "--basetemp=C:\\Users\\shawn\\AppData\\Local\\Temp\\polynexus-baseline-debt-01-g14-full",
+    "--junitxml=artifacts\\verification\\baseline-debt-01\\implementation\\g14-full.xml"
+  ],
+  "ACTUAL_EXIT_CODE": 0,
+  "EVIDENCE_PATH": "artifacts\\verification\\baseline-debt-01\\implementation\\g14-full.log",
+  "passed": 818,
+  "failed": 0,
+  "skipped": 1
+}

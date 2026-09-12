@@ -246,24 +246,24 @@ def test_success_fidelity_and_reload(tmp_path: Path):
 
 
 def test_equal_timestamp_history_ordering(ctx: _Ctx):
-    """Regression: same occurred_at, different ID must order by id."""
+    """ADR-014: equal timestamps preserve durable append order, not UUID order."""
     from datetime import datetime, timezone
     from polynexus_core.domain.models import RunEvent
     pid = ctx.create_project(); cpid = ctx.create_cp(pid); tid = ctx.create_task(pid); rid = ctx.create_run(tid, cpid)
     ts = datetime(2026, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
-    e1 = RunEvent(run_id=rid, from_state=RunState.STARTING, to_state=RunState.RUNNING, occurred_at=ts, id="aaa_run-event_1")
-    e2 = RunEvent(run_id=rid, from_state=RunState.RUNNING, to_state=RunState.COMPLETED, occurred_at=ts, id="zzz_run-event_2")
-    # Insert in reverse ID order to verify deterministic sort
+    e1 = RunEvent(run_id=rid, from_state=RunState.STARTING, to_state=RunState.RUNNING, occurred_at=ts, id="zzz_run-event_2")
+    e2 = RunEvent(run_id=rid, from_state=RunState.RUNNING, to_state=RunState.COMPLETED, occurred_at=ts, id="aaa_run-event_1")
+    # Causal append order deliberately opposes lexical ID order.
     s = ctx.sf()
     try:
         from polynexus_core.persistence.repository import SqlRunEventRepository
         repo = SqlRunEventRepository(s)
-        repo.add(e2); repo.add(e1); s.commit()
+        repo.add(e1); repo.add(e2); s.commit()
     finally: s.close()
     hist = ctx.client.get(f"/api/v1/runs/{rid}/history").json()["events"]
     # Filter to the two injected events (there may be no prior events because Run is CREATED)
     ids = [e["id"] for e in hist if e["id"] in ("aaa_run-event_1", "zzz_run-event_2")]
-    assert ids == ["aaa_run-event_1", "zzz_run-event_2"]
+    assert ids == ["zzz_run-event_2", "aaa_run-event_1"]
 
 
 # 8. multiple runs under one task do not leak

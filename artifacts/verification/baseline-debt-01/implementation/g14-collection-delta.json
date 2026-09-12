@@ -1,0 +1,11 @@
+{
+  "PREVIOUS_TOTAL_COLLECTED": 816,
+  "CURRENT_TOTAL_COLLECTED": 819,
+  "ADDED": [
+    "tests.test_baseline_debt_01::test_cancellation_persistence_failure_rolls_back[commit]",
+    "tests.test_baseline_debt_01::test_cancellation_persistence_failure_rolls_back[update]",
+    "tests.test_cp06_wp30_clean_install::test_clean_head_ordering_defaults_and_required_sequence"
+  ],
+  "REMOVED": [],
+  "EXPECTED": "YES"
+}

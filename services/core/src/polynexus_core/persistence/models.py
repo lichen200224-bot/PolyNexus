@@ -5,12 +5,14 @@ from datetime import datetime, timezone
 
 from sqlalchemy import (
     Boolean,
+    CheckConstraint,
     Column,
     DateTime,
     ForeignKey,
     Integer,
     String,
     Text,
+    UniqueConstraint,
     event,
 )
 from sqlalchemy.orm import DeclarativeBase, relationship
@@ -68,6 +70,7 @@ class RunRow(Base):
     __tablename__ = "runs"
 
     id = Column(String(64), primary_key=True)
+    next_event_sequence = Column(Integer, nullable=False, default=0, server_default="0")
     task_id = Column(String(64), ForeignKey("tasks.id"), nullable=False)
     workflow_id = Column(String(128), nullable=False)
     workflow_version = Column(Integer, nullable=False)
@@ -89,15 +92,34 @@ class RunRow(Base):
 
 class RunEventRow(Base):
     __tablename__ = "run_events"
+    __table_args__ = (
+        UniqueConstraint("run_id", "event_sequence", name="uq_run_events_sequence"),
+        CheckConstraint("event_sequence > 0", name="ck_run_events_sequence_positive"),
+    )
 
     id = Column(String(64), primary_key=True)
     run_id = Column(String(64), ForeignKey("runs.id"), nullable=False)
+    event_sequence = Column(Integer, nullable=False)
+    sequence_legacy_backfill = Column(Boolean, nullable=False, default=False, server_default="0")
     from_state = Column(String(32), nullable=False)
     to_state = Column(String(32), nullable=False)
     occurred_at = Column(DateTime, nullable=False)
     reason = Column(Text, nullable=True)
 
     run = relationship("RunRow", backref="events")
+
+
+@event.listens_for(RunEventRow.__table__, "after_create")
+def _create_event_sequence_guard(target, connection, **kw) -> None:
+    from sqlalchemy import text
+
+    connection.execute(text(
+        "CREATE TRIGGER trg_run_events_sequence_immutable "
+        "BEFORE UPDATE OF run_id, event_sequence, sequence_legacy_backfill ON run_events "
+        "WHEN NEW.run_id IS NOT OLD.run_id OR NEW.event_sequence IS NOT OLD.event_sequence "
+        "OR NEW.sequence_legacy_backfill IS NOT OLD.sequence_legacy_backfill "
+        "BEGIN SELECT RAISE(ABORT, 'Run event ordering metadata is immutable'); END"
+    ))
 
 
 class ArtifactRow(Base):

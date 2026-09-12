@@ -836,11 +836,16 @@ def test_migration_downgrade_preserves_history_and_reupgrade_identical(migration
     engine = create_engine(
         f"sqlite:///{db_path}", connect_args={"check_same_thread": False}, future=True
     )
+    # Compare original fields: downgrade intentionally removes ADR-014 metadata.
+    from sqlalchemy import inspect
+    run_columns = ','.join(c['name'] for c in inspect(engine).get_columns('runs')
+                           if c['name'] != 'next_event_sequence')
+    event_columns = 'id,run_id,from_state,to_state,occurred_at,reason'
     before_runs = engine.connect().execute(
-        text("SELECT * FROM runs ORDER BY id")
+        text(f"SELECT {run_columns} FROM runs ORDER BY id")
     ).fetchall()
     before_events = engine.connect().execute(
-        text("SELECT * FROM run_events ORDER BY id")
+        text(f"SELECT {event_columns} FROM run_events ORDER BY id")
     ).fetchall()
     before_snapshots = _fetch_all_snapshots(engine)
     engine.dispose()
@@ -857,10 +862,10 @@ def test_migration_downgrade_preserves_history_and_reupgrade_identical(migration
     )
     assert "run_binding_snapshots" not in inspector_tables
     after_down_runs = engine2.connect().execute(
-        text("SELECT * FROM runs ORDER BY id")
+        text(f"SELECT {run_columns} FROM runs ORDER BY id")
     ).fetchall()
     after_down_events = engine2.connect().execute(
-        text("SELECT * FROM run_events ORDER BY id")
+        text(f"SELECT {event_columns} FROM run_events ORDER BY id")
     ).fetchall()
     assert after_down_runs == before_runs
     assert after_down_events == before_events

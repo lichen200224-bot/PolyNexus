@@ -1,5 +1,63 @@
 # Current Handoff
 
+## Current implementation — Human architecture approval (2026-09-12)
+
+RESULT=SCOPE_EXPANSION_REQUIRED. ARCHITECTURE_DECISION=HUMAN_ACCEPTED /
+IMPLEMENTATION_AUTHORIZED. ADR-014 implementation is present on the existing
+isolated branch, start SHA `86d5939044c1d7ec2a991820f39287481ee9120f`.
+
+- Persistence-only atomic sequence allocation, migration 0003 with rowid backfill,
+  immutable metadata and downgrade; independent cleanup deadline and shielded
+  cancellation; ExecutionService durable cancellation persistence implemented.
+- Focused + migration: 47 passed, exit 0. Full Core: 810 passed, 5 failed, 1 skipped,
+  exit 1. No Full Core PASS or deterministic stability PASS claimed.
+- Scope blocker: `test_cp06_wp30_clean_install.py`,
+  `test_g17_migration_restore_authority.py`, `test_wp23_backup_restore_migration.py`
+  hard-code Alembic head=0002. These unauthorized test files remain untouched.
+  Human must extend the test allowlist before those expectations can be updated.
+- Three backup failures also require a basetemp within the permitted isolated
+  temporary root. Production backup policy must remain intact.
+- Original 26 debt cases, MCF-01 50, runtime/WP-14/15/16 pass within the full-run
+  case evidence; the full command itself fails. Windows symlink policy skip is
+  explicitly excluded from pass counts. Fixed 5-run acceptance is not executed.
+- Detailed Writer handoff, commands/logs/JUnit:
+  `artifacts/verification/baseline-debt-01/implementation/writer-handoff.md`.
+  Prior red repro/evidence and all failed implementation attempts remain intact.
+- ADR: `docs/35_ADR_014_DURABLE_EVENT_ORDERING_AND_CANCELLATION_CLEANUP.md`.
+  No Domain/API/RunState/G30/WP-20/score changes, no staged commit or remote write.
+- Immediate owner: Human scope decision. Eventual next role:
+  FRESH_INDEPENDENT_CODEX_REVIEWER after all acceptance gates pass.
+
+## Historical pre-approval Current bounded Writer handoff — BASELINE-DEBT-01 (2026-09-12)
+
+- TASK_ID: `BASELINE-DEBT-01`; ATTEMPT: `1`; WRITER: `Codex IMPLEMENTATION WRITER`;
+  REVIEWER: `NOT_STARTED`; ANTIGRAVITY_STATUS: `NOT_REQUIRED` (Core-only diagnosis).
+- RESULT: `ARCHITECTURE_GATE_REQUIRED`; NEXT_OWNER: `HUMAN_ARCHITECTURE_GATE`.
+- START_SHA / current HEAD: `86d5939044c1d7ec2a991820f39287481ee9120f`.
+- BRANCH: `feature/baseline-debt-01-deterministic-lifecycle-cleanup`, isolated lane.
+- Goal: deterministic durable event ordering and timeout/cleanup debt; start gate
+  recovered with explicit local tracking-ref fetch, persistent remote config unchanged.
+- TASK_DOC: `docs/tasks/BASELINE-DEBT-01.md` contains the schema/legacy/upgrade/restore
+  proposal and exact findings. HANDOFF_DOC: this document. Detailed local report:
+  `artifacts/verification/baseline-debt-01/writer-handoff.md` (gitignored).
+- Changed files: this document, task document, and new
+  `services/core/tests/test_baseline_debt_01.py`; generated local logs/JUnit/results
+  and repro databases are under the ignored task evidence directory.
+- Current tests: 12 ordering failures after fixing test temp-root permissions;
+  1 Event-controlled cancellation failure; 5 combined runs each 13 failures, exit 1.
+  Exact 26-case matrix: 11 passed / 15 failed / 0 skipped, exit 1. Resource guards +
+  runtime skeleton: 21 passed / 2 failed / 0 skipped, exit 1. Validators both exit 0.
+- Known issues: timestamp/UUID sorting loses append order; 0.01s tests time out in
+  setup; direct collect cancellation leaves RUNNING without cleanup. Red tests retained.
+- Unverified: schema fix/backfill/concurrency/restore; B repair; broader regression,
+  MCF-01/WP-14/15/16 and Full Core; independent review. No completion claim.
+- ADR impact: proposed persisted ordering contract under ADR-004/007/008; not approved
+  or implemented. Scope deviation: NONE. No production/schema/migration modification.
+- Do Not Change: original checkout, G30/WP-20/score, MCF extensions, vendor integrations,
+  secrets and public schemas. No stage/commit/push/merge or next-task launch.
+- Next: Human decides ordering/legacy policy and exact implementation allowlist;
+  preserve current worktree and evidence. Historical records below remain unchanged.
+
 ## Current Task — G30 final external verification and reconciliation (2026-09-03)
 
 **Result:** `NEED_ACTION` — G29 handoff is accepted as a deferred predecessor,

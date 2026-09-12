@@ -999,26 +999,25 @@ def test_participant_timeout_isolated_and_reloadable(council_session) -> None:
             task, context, specs
         )
     )
-    # Both participants retain timeout intent while durable cleanup uncertainty
-    # is fail-closed as ORPHANED (not a Council-wide crash).
+    # Council timeout intent remains TIMED_OUT; ADR-014 Supervisor cancellation
+    # now verifies Reference cleanup and durably records CANCELLED.
     assert all(p.outcome is ParticipantOutcome.TIMED_OUT for p in plan.participants)
     for p in plan.participants:
         run = SqlRunRepository(session).get(p.analysis_run_id)
         assert run is not None
-        assert run.state is RunState.ORPHANED
-        # Exactly one STARTING event and one CANCEL_REQUESTED -> ORPHANED
-        # fail-closed lifecycle; the timeout transition must not repeat
-        # STARTING -> STARTING or claim verified cleanup.
+        assert run.state is RunState.CANCELLED
+        assert adapter.was_cleaned(run.runtime_ref)
+        # Exactly one STARTING and one verified cancellation terminal event.
         starting = [e for e in run.events if e.to_state == RunState.STARTING]
         cancel_requested = [
             e for e in run.events if e.to_state == RunState.CANCEL_REQUESTED
         ]
-        orphaned = [e for e in run.events if e.to_state == RunState.ORPHANED]
+        orphaned = [e for e in run.events if e.to_state == RunState.CANCELLED]
         assert len(starting) == 1
         assert len(cancel_requested) == 1
         assert len(orphaned) == 1
-        assert run.events[-1].to_state is RunState.ORPHANED
-        assert run.events[-1].reason == "Participant analysis timed out (simulated boundary)"
+        assert run.events[-1].to_state is RunState.CANCELLED
+        assert run.events[-1].reason == "Run cancelled"
     # Council still completes with a truthful (failed) synthesis; no consensus is
     # fabricated when synthesis cannot run (no completed analysis + cross-review).
     assert plan.synthesis_run_id is not None
@@ -1066,7 +1065,8 @@ def test_outer_cancellation_fail_closed_parent_and_children(council_session) -> 
     child_runs = [run for run in runs if run.id != council_run.id]
     assert len(child_runs) == 2
     assert council_run.state is RunState.ORPHANED
-    assert all(run.state is RunState.ORPHANED for run in child_runs)
+    assert all(run.state is RunState.CANCELLED for run in child_runs)
+    assert all(adapter.was_cleaned(run.runtime_ref) for run in child_runs)
     assert all(
         SqlRuntimeBindingSnapshotRepository(session).get_by_run(run.id) is not None
         for run in [council_run, *child_runs]
@@ -1076,14 +1076,14 @@ def test_outer_cancellation_fail_closed_parent_and_children(council_session) -> 
         for run in [council_run, *child_runs]
     )
     assert all(
-        run.events[-1].reason == _REASON_UNVERIFIED_CLEANUP
+        run.events[-1].reason == "Run cancelled"
         for run in child_runs
     )
 
     reloaded = asyncio.run(
         CouncilOrchestrator(session).reload_council(council_run.id)
     )
-    assert all(p.outcome is ParticipantOutcome.TIMED_OUT for p in reloaded.participants)
+    assert all(p.outcome is ParticipantOutcome.CANCELLED for p in reloaded.participants)
 
 
 # ---------------------------------------------------------------------------
@@ -1148,7 +1148,8 @@ def test_parent_runtime_timeout_fails_closed_after_children_complete(council_ses
             for evidence in SqlEvidenceRepository(session).list_by_run(run.id)
         )
     )
-    assert parent.state is RunState.ORPHANED
+    assert parent.state is RunState.CANCELLED
+    assert adapter.was_cleaned(parent.runtime_ref)
     assert all(
         run.events[-1].to_state not in (RunState.STARTING, RunState.CANCEL_REQUESTED)
         for run in runs
@@ -1189,7 +1190,8 @@ def test_parent_runtime_cancellation_fails_closed_after_children_complete(
             for evidence in SqlEvidenceRepository(session).list_by_run(run.id)
         )
     )
-    assert parent.state is RunState.ORPHANED
+    assert parent.state is RunState.CANCELLED
+    assert adapter.was_cleaned(parent.runtime_ref)
     assert all(
         run.events[-1].to_state not in (RunState.STARTING, RunState.CANCEL_REQUESTED)
         for run in runs
@@ -1318,8 +1320,9 @@ def test_unexpected_child_setup_cancels_and_reconciles_siblings(
     )
     child = next(run for run in runs if run.id != parent.id)
     assert parent.state is RunState.ORPHANED
-    assert child.state is RunState.ORPHANED
-    assert child.events[-1].reason == _REASON_UNVERIFIED_CLEANUP
+    assert child.state is RunState.CANCELLED
+    assert adapter.was_cleaned(child.runtime_ref)
+    assert child.events[-1].reason == "Run cancelled"
     assert all(
         run.events[-1].to_state not in (RunState.STARTING, RunState.CANCEL_REQUESTED)
         for run in runs
@@ -1334,7 +1337,7 @@ def test_unexpected_child_setup_cancels_and_reconciles_siblings(
     )
     assert reloaded.partial is True
     assert all(
-        participant.outcome is ParticipantOutcome.TIMED_OUT
+        participant.outcome is ParticipantOutcome.CANCELLED
         for participant in reloaded.participants
         if participant.analysis_run_id is not None
     )

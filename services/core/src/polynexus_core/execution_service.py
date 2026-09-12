@@ -10,6 +10,7 @@ It does NOT own Domain logic, persistence schema, or runtime adapter internals.
 from __future__ import annotations
 
 import re
+import asyncio
 from pathlib import Path
 from typing import Sequence
 
@@ -211,7 +212,7 @@ class ExecutionService:
         )
         supervisor = RunSupervisor(adapter)
         execution = self._sanitize_execution(
-            await supervisor.execute_claimed_run(run, task, context, workflow)
+            await self._execute_with_cancellation_persistence(supervisor, run, task, context, workflow)
         )
 
         self._run_repo.update(execution.run)
@@ -338,7 +339,7 @@ class ExecutionService:
         assert stored_run is not None
 
         execution = self._sanitize_execution(
-            await supervisor.execute_claimed_run(stored_run, task, context, workflow)
+            await self._execute_with_cancellation_persistence(supervisor, stored_run, task, context, workflow)
         )
 
         # 5. Persist runtime outputs. The Run identity was already persisted
@@ -496,7 +497,7 @@ class ExecutionService:
         # and returns RunExecution with result=None on failure.
         # Programmer/domain validation errors (ValueError) propagate to caller.
         execution = self._sanitize_execution(
-            await supervisor.execute_claimed_run(run, task, context, workflow)
+            await self._execute_with_cancellation_persistence(supervisor, run, task, context, workflow)
         )
 
         # --- Phase 4: Persist runtime outputs ---
@@ -556,6 +557,23 @@ class ExecutionService:
         self._session.commit()
 
         return self._sanitize_execution(execution)
+
+    async def _execute_with_cancellation_persistence(
+        self, supervisor: RunSupervisor, run: Run, task: Task,
+        context: ContextPackage, workflow: WorkflowDefinition,
+    ) -> RunExecution:
+        try:
+            return await supervisor.execute_claimed_run(run, task, context, workflow)
+        except asyncio.CancelledError:
+            # Persist only the Supervisor-owned Run and events, never outputs.
+            try:
+                sanitize_run(run)
+                self._run_repo.update(run)
+                self._session.commit()
+            except BaseException:
+                self._session.rollback()
+                raise
+            raise
 
     @staticmethod
     def _sanitize_execution(execution: RunExecution) -> RunExecution:

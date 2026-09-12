@@ -69,7 +69,8 @@ def test_isolated_backup_restore_and_reupgrade_preserve_history(
 
     shutil.copy2(db_path, backup_path)
     _upgrade(db_path, "head")
-    assert _version(db_path) == "0002"
+    assert _version(db_path) == "0003"
+    _assert_ordering_metadata(db_path, "run-g17", "event-g17")
     assert _history(db_path) == before
     assert _snapshot_exists(db_path)
 
@@ -77,10 +78,12 @@ def test_isolated_backup_restore_and_reupgrade_preserve_history(
     # upgraded again without losing old projects, runs, events, or evidence.
     shutil.copy2(backup_path, db_path)
     assert _version(db_path) == "0001"
+    assert _metadata_schema(db_path) == {"runs": {}, "run_events": {}}
     assert _history(db_path) == before
 
     _upgrade(db_path, "head")
-    assert _version(db_path) == "0002"
+    assert _version(db_path) == "0003"
+    _assert_ordering_metadata(db_path, "run-g17", "event-g17")
     assert _history(db_path) == before
     assert _snapshot_exists(db_path)
 
@@ -145,6 +148,10 @@ def _seed_legacy_history(db_path: Path) -> None:
 
 
 def _history(db_path: Path) -> tuple[tuple[tuple[object, ...], ...], ...]:
+    legacy_columns = {
+        "runs": "id,task_id,workflow_id,workflow_version,context_package_id,execution_target,resume_mode,state,runtime_ref,created_at,updated_at,result_status,result_summary,result_finding_ids,result_evidence_ids,result_artifact_ids",
+        "run_events": "id,run_id,from_state,to_state,occurred_at,reason",
+    }
     engine = create_engine(f"sqlite:///{db_path}", future=True)
     try:
         with engine.connect() as connection:
@@ -152,7 +159,7 @@ def _history(db_path: Path) -> tuple[tuple[tuple[object, ...], ...], ...]:
                 tuple(
                     tuple(row)
                     for row in connection.execute(
-                        text(f"SELECT * FROM {table} ORDER BY 1")
+                        text(f"SELECT {legacy_columns.get(table, '*')} FROM {table} ORDER BY 1")
                     ).fetchall()
                 )
                 for table in ("projects", "tasks", "runs", "run_events", "evidence")
@@ -185,5 +192,43 @@ def _snapshot_exists(db_path: Path) -> bool:
                 ).scalar_one_or_none()
                 == 1
             )
+    finally:
+        engine.dispose()
+
+
+def _metadata_schema(db_path: Path) -> dict:
+    engine = create_engine(f"sqlite:///{db_path}", future=True)
+    try:
+        with engine.connect() as connection:
+            return {
+                table: {row[1]: (row[2], row[3], row[4])
+                        for row in connection.exec_driver_sql(f"PRAGMA table_info({table})")
+                        if row[1] in names}
+                for table, names in {
+                    "runs": {"next_event_sequence"},
+                    "run_events": {"event_sequence", "sequence_legacy_backfill"},
+                }.items()
+            }
+    finally:
+        engine.dispose()
+
+
+def _assert_ordering_metadata(db_path: Path, run_id: str, event_id: str) -> None:
+    # SQLite type, NOT NULL flag and server default are all exact expectations.
+    assert _metadata_schema(db_path) == {
+        "runs": {"next_event_sequence": ("INTEGER", 1, "0")},
+        "run_events": {"event_sequence": ("INTEGER", 1, None),
+                       "sequence_legacy_backfill": ("BOOLEAN", 1, "0")},
+    }
+    engine = create_engine(f"sqlite:///{db_path}", future=True)
+    try:
+        with engine.connect() as connection:
+            assert connection.exec_driver_sql(
+                "SELECT id,next_event_sequence FROM runs ORDER BY id"
+            ).all() == [(run_id, 1)]
+            assert connection.exec_driver_sql(
+                "SELECT id,run_id,event_sequence,sequence_legacy_backfill "
+                "FROM run_events ORDER BY run_id,event_sequence"
+            ).all() == [(event_id, run_id, 1, 1)]
     finally:
         engine.dispose()

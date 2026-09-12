@@ -11,7 +11,7 @@ from polynexus_core.runtime.contracts import (
     RuntimeResult,
     RuntimeStatus,
 )
-from polynexus_core.runtime.supervisor import RunSupervisor
+from polynexus_core.runtime.supervisor import RunSession, RunSupervisor
 from polynexus_core.workflows.loader import load_workflow_definition
 
 
@@ -53,6 +53,8 @@ class GuardProbeAdapter:
         self.active = False
         self.cleanup_called = False
         self.status_calls = 0
+        self.status_entered = asyncio.Event()
+        self.cleanup_entered = asyncio.Event()
 
     async def _delay(self) -> None:
         if self.shared_tracker is not None:
@@ -96,7 +98,8 @@ class GuardProbeAdapter:
         del runtime_ref
         self.status_calls += 1
         if self.block_status and self.status_calls == 1:
-            await asyncio.sleep(60)
+            self.status_entered.set()
+            await asyncio.Event().wait()
         return RuntimeStatus(state=self.state)
 
     async def result(self, runtime_ref: str) -> RuntimeResult:
@@ -122,7 +125,8 @@ class GuardProbeAdapter:
         del runtime_ref
         self.cleanup_called = True
         if self.block_cleanup:
-            await asyncio.sleep(60)
+            self.cleanup_entered.set()
+            await asyncio.Event().wait()
         self.active = False
         return True
 
@@ -130,14 +134,42 @@ class GuardProbeAdapter:
         return "wp24-probe/1"
 
 
+def _active_session(adapter):
+    task, context = _inputs()
+    run = Run(task_id=task.id, workflow_id=WORKFLOW.id, workflow_version=WORKFLOW.version,
+              context_package_id=context.id, runtime_ref="wp24:runtime")
+    run.transition(RunState.STARTING)
+    run.transition(RunState.RUNNING)
+    adapter.active = True
+    adapter.state = RunState.RUNNING
+    return RunSession(run, run.runtime_ref)
+
+
+def _expire_blocked_call(monkeypatch, supervisor, name, entered):
+    """Expire the real wait_for only after the selected coroutine is suspended."""
+    original = supervisor._wait_for_operation
+    fired = False
+
+    async def controlled(operation, *, timeout):
+        nonlocal fired
+        if not fired and operation.cr_code.co_name == name:
+            fired = True
+            pending = asyncio.create_task(operation)
+            await entered.wait()
+            return await original(pending, timeout=0)
+        return await original(operation, timeout=timeout)
+
+    monkeypatch.setattr(supervisor, "_wait_for_operation", controlled)
+
+
 def test_operation_timeout_reuses_cleanup_and_never_claims_completion(monkeypatch) -> None:
-    monkeypatch.setattr(supervisor_module, "_DEFAULT_OPERATION_TIMEOUT_SECONDS", 0.01)
     task, context = _inputs()
     adapter = GuardProbeAdapter(block_status=True)
     supervisor = RunSupervisor(adapter)
+    _expire_blocked_call(monkeypatch, supervisor, "status", adapter.status_entered)
 
     async def run() -> object:
-        session = await supervisor.start(task, context, WORKFLOW)
+        session = _active_session(adapter)
         return await supervisor.collect(session)
 
     execution = asyncio.run(run())
@@ -151,13 +183,14 @@ def test_operation_timeout_reuses_cleanup_and_never_claims_completion(monkeypatc
 
 
 def test_cleanup_timeout_fails_closed_as_orphaned(monkeypatch) -> None:
-    monkeypatch.setattr(supervisor_module, "_DEFAULT_OPERATION_TIMEOUT_SECONDS", 0.01)
+    monkeypatch.setattr(supervisor_module, "_DEFAULT_CLEANUP_TIMEOUT_SECONDS", 0.01)
     task, context = _inputs()
     adapter = GuardProbeAdapter(block_cleanup=True)
     supervisor = RunSupervisor(adapter)
+    _expire_blocked_call(monkeypatch, supervisor, "cleanup", adapter.cleanup_entered)
 
     async def run() -> object:
-        session = await supervisor.start(task, context, WORKFLOW)
+        session = _active_session(adapter)
         return await supervisor.cancel(session)
 
     execution = asyncio.run(run())

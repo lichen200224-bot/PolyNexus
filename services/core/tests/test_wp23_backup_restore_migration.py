@@ -128,7 +128,7 @@ def test_backup_restore_round_trip_preserves_legacy_history(tmp_path: Path) -> N
     assert len(receipt.sha256) == 64
 
     _upgrade(db_path, "head")
-    assert _version(db_path) == "0002"
+    assert _version(db_path) == "0003"
     assert _history(db_path) == before
 
     _downgrade(db_path, "0001")
@@ -141,7 +141,7 @@ def test_backup_restore_round_trip_preserves_legacy_history(tmp_path: Path) -> N
     assert _history(db_path) == before
 
     _upgrade(db_path, "head")
-    assert _version(db_path) == "0002"
+    assert _version(db_path) == "0003"
     assert _history(db_path) == before
     engine = create_engine(f"sqlite:///{db_path}", future=True)
     try:

@@ -1,0 +1,37 @@
+{
+  "ORIGINAL_FAILURE_1": {
+    "node_id": "services/core/tests/test_cp06_wp30_clean_install.py::test_backup_restore_downgrade_reupgrade_preserves_old_history",
+    "root_cause": "head expectation fixed at 0002; current head is 0003",
+    "fix_or_environment_resolution": "head=0003 plus complete legacy columns and separate metadata assertions",
+    "verification": "g14-full.xml: exact node passed, FULL_CORE_EXIT_CODE=0",
+    "status": "CLOSED"
+  },
+  "ORIGINAL_FAILURE_2": {
+    "node_id": "services/core/tests/test_g17_migration_restore_authority.py::test_isolated_backup_restore_and_reupgrade_preserve_history",
+    "root_cause": "head expectation fixed at 0002; current head is 0003",
+    "fix_or_environment_resolution": "head=0003 plus complete legacy columns and separate metadata assertions",
+    "verification": "g14-full.xml: exact node passed, FULL_CORE_EXIT_CODE=0",
+    "status": "CLOSED"
+  },
+  "ORIGINAL_FAILURE_3": {
+    "node_id": "services/core/tests/test_wp23_backup_restore_migration.py::test_backup_restore_round_trip_preserves_legacy_history",
+    "root_cause": "pytest basetemp outside tempfile.gettempdir()",
+    "fix_or_environment_resolution": "system TEMP independent basetemp; isolation implementation unchanged; WP23 roundtrip head=0003",
+    "verification": "g14-full.xml: exact node passed, FULL_CORE_EXIT_CODE=0",
+    "status": "CLOSED"
+  },
+  "ORIGINAL_FAILURE_4": {
+    "node_id": "services/core/tests/test_wp23_backup_restore_migration.py::test_backup_rejects_corrupt_sqlite",
+    "root_cause": "pytest basetemp outside tempfile.gettempdir()",
+    "fix_or_environment_resolution": "system TEMP independent basetemp; isolation implementation unchanged; WP23 roundtrip head=0003",
+    "verification": "g14-full.xml: exact node passed, FULL_CORE_EXIT_CODE=0",
+    "status": "CLOSED"
+  },
+  "ORIGINAL_FAILURE_5": {
+    "node_id": "services/core/tests/test_wp23_backup_restore_migration.py::test_backup_receipt_does_not_include_database_path",
+    "root_cause": "pytest basetemp outside tempfile.gettempdir()",
+    "fix_or_environment_resolution": "system TEMP independent basetemp; isolation implementation unchanged; WP23 roundtrip head=0003",
+    "verification": "g14-full.xml: exact node passed, FULL_CORE_EXIT_CODE=0",
+    "status": "CLOSED"
+  }
+}

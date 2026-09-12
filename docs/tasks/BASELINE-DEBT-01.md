@@ -1,5 +1,190 @@
 # BASELINE-DEBT-01 — Deterministic Lifecycle Ordering and Timeout Cleanup
 
+## Current implementation — Human architecture approval (2026-09-12)
+
+RESULT=SCOPE_EXPANSION_REQUIRED. ARCHITECTURE_DECISION=HUMAN_ACCEPTED /
+IMPLEMENTATION_AUTHORIZED. ADR-014 implementation is present on the existing
+isolated branch, start SHA `86d5939044c1d7ec2a991820f39287481ee9120f`.
+
+- Persistence-only atomic sequence allocation, migration 0003 with rowid backfill,
+  immutable metadata and downgrade; independent cleanup deadline and shielded
+  cancellation; ExecutionService durable cancellation persistence implemented.
+- Focused + migration: 47 passed, exit 0. Full Core: 810 passed, 5 failed, 1 skipped,
+  exit 1. No Full Core PASS or deterministic stability PASS claimed.
+- Scope blocker: `test_cp06_wp30_clean_install.py`,
+  `test_g17_migration_restore_authority.py`, `test_wp23_backup_restore_migration.py`
+  hard-code Alembic head=0002. These unauthorized test files remain untouched.
+  Human must extend the test allowlist before those expectations can be updated.
+- Three backup failures also require a basetemp within the permitted isolated
+  temporary root. Production backup policy must remain intact.
+- Original 26 debt cases, MCF-01 50, runtime/WP-14/15/16 pass within the full-run
+  case evidence; the full command itself fails. Windows symlink policy skip is
+  explicitly excluded from pass counts. Fixed 5-run acceptance is not executed.
+- Detailed Writer handoff, commands/logs/JUnit:
+  `artifacts/verification/baseline-debt-01/implementation/writer-handoff.md`.
+  Prior red repro/evidence and all failed implementation attempts remain intact.
+- ADR: `docs/35_ADR_014_DURABLE_EVENT_ORDERING_AND_CANCELLATION_CLEANUP.md`.
+  No Domain/API/RunState/G30/WP-20/score changes, no staged commit or remote write.
+- Immediate owner: Human scope decision. Eventual next role:
+  FRESH_INDEPENDENT_CODEX_REVIEWER after all acceptance gates pass.
+
+## Historical pre-approval Current Writer gate — 2026-09-12
+
+`RESULT=ARCHITECTURE_GATE_REQUIRED`. This block supersedes the historical
+proposal/start routing below for this task only. Human authorized the start and
+named Codex as IMPLEMENTATION WRITER. No independent review is claimed.
+
+- Start/HEAD: `86d5939044c1d7ec2a991820f39287481ee9120f` (terminal docs checkpoint;
+  product checkpoint `96ae53537e5501f1ef374182e7e1966b921a7883` is its ancestor).
+- Branch: `feature/baseline-debt-01-deterministic-lifecycle-cleanup`.
+- Isolated worktree created from that exact SHA; original checkout preserved.
+- Start gate PASS: direct remote SHA, explicit fetch, local HEAD, repaired remote
+  tracking ref, clean state and ancestry verified. All required commands exited 0.
+  Cause of missing tracking ref: `LOCAL_FETCH_REFSPEC_SCOPE`; persistent fetch
+  config remains scoped to `architecture/modular-core-extension-contract`.
+- Implementation: no production source/schema/migration change. Added 13 red
+  acceptance repro cases; A implementation stops at the architecture boundary.
+- Evidence: `artifacts/verification/baseline-debt-01/` (local, gitignored), including
+  JUnit, logs, exact 26 nodeids, per-case failure semantics and Writer handoff.
+- G30, WP-20 and score unchanged. No stage/commit/push/merge or self-review.
+
+### CURRENT_SCHEMA
+
+`RunEventRow` / Alembic `0001` declares `id VARCHAR(64) PRIMARY KEY`,
+`run_id VARCHAR(64) NOT NULL REFERENCES runs(id)`, `from_state VARCHAR(32) NOT NULL`,
+`to_state VARCHAR(32) NOT NULL`, `occurred_at DATETIME NOT NULL`, `reason TEXT NULL`.
+No explicit append sequence, predecessor reference or per-run ordering constraint.
+Domain event IDs use UUID4. Domain `Run.events` preserves Python append order only.
+
+### ROOT_CAUSE
+
+All four event hydration paths (`get`, `list_by_task`, `list_non_terminal`, and
+`SqlRunEventRepository.list_by_run`) sort by `(occurred_at, id)`. Equal timestamp
+ties therefore follow random identifier order rather than append/causal order.
+`add` and `update` queue events in Python order; `append_event` flushes; standalone
+event repository `add` queues a row. None persists an explicit logical ordinal.
+The execution CAS protects the CREATED claim, not general event ordering.
+
+### WHY_EXISTING_SCHEMA_CANNOT_PROVE_TOTAL_ORDER
+
+The 12 adversarial tests preserve identical timestamps and reverse lexical IDs,
+write STARTING → RUNNING → COMPLETED, commit, close/dispose, and read through a
+new engine/session. Every write/read combination returns the terminal event first.
+Council also emits same-state events (`_append_stage_event` path near line 1074),
+so state-chain reconstruction cannot order arbitrary events. It is also forbidden
+by the task. Implicit SQLite physical row identity is not a declared application
+ordering contract and is not exported in these persisted fields. Depending on it,
+rewriting timestamps, or encoding sequence into IDs would substitute an unapproved
+persisted contract. Concurrent inserts have no per-run sequence allocation or
+stale-writer check here; a SQLite transaction boundary alone does not encode that
+order in the declared event fields. Multi-process adversarial execution remains
+UNVERIFIED; no concurrency PASS is claimed.
+
+### MINIMAL_PROPOSED_SCHEMA_CHANGE
+
+Proposal only, NOT AUTHORIZED: add a positive non-null integer `sequence` to
+`run_events` with `UNIQUE(run_id, sequence)`. Keep IDs, timestamps, lifecycle states,
+Run identity and immutable binding unchanged. Sequence represents committed append
+serialization within one Run, not wall-clock chronology or inferred historical
+causality. Existing-event updates retain their ordinal; batches reserve consecutive
+ordinals atomically in list order. All four readers use sequence as sole ordering
+key. No API field addition is proposed; changed history ordering still requires
+compatibility review, including existing timestamp/ID tie-breaker assertions.
+
+Allocation must happen within a serialized SQLite write transaction before reading
+the maximum sequence (for example an approved BEGIN IMMEDIATE transaction policy).
+Do not use unguarded MAX+1. Concurrent writers must either serialize successfully
+or receive a bounded, rollback-safe failure; duplicate event identity must not add
+another event or renumber history. Exact transaction integration and busy handling
+need design review across existing callers. Do not add a second lifecycle owner.
+
+### LEGACY_DATA_POLICY / BACKFILL_POLICY
+
+No automatic reconstruction from timestamp, random ID, physical row position,
+state sorting, or reason text. Preserve existing facts exactly. Conservative
+proposal: preflight blocks upgrade of every nonempty legacy event ledger unless
+an independently verified external ordering manifest exists for every event of
+each affected Run. Such a manifest is NOT currently available. Empty ledgers can
+upgrade without backfill. Validate manifest completeness/uniqueness and retain its
+provenance; perform any approved backfill atomically. Ambiguous history remains
+unmodified on the old revision. This intentionally blocks upgrades of populated
+databases until Human chooses a legacy policy; do not silently discard events.
+
+### UPGRADE_PLAN
+
+Approve ordering/legacy/transaction contract and exact allowlist first. Stop writers,
+create and verify an existing supported backup, preflight the legacy ledger, then
+run an Alembic migration on an isolated copy. Apply constraints and approved
+backfill atomically; verify every existing field, binding and event count, reopen,
+and validate history/API behavior. Promote only through separate authorized gates.
+`create_all()` in repro tests is fixture setup, never production migration authority.
+
+### DOWNGRADE/RESTORE_PLAN
+
+Do not claim dropping sequence preserves append order. Prefer restoring the verified
+pre-upgrade backup and compatible application version with writers stopped. Any
+post-upgrade writes require a separately approved preservation/replay plan before
+restore; no silent data loss. A schema-only downgrade would lose ordering evidence
+and must be refused or explicitly approved as lossy. None was implemented/executed.
+
+### AFFECTED_FILES / TEST_PLAN
+
+Proposed future allowlist: persistence `models.py`, `repository.py`, a new Alembic
+revision, transaction owners if serialization cannot be contained in repository,
+and focused persistence/API/council/migration tests. Domain/API schemas remain
+unchanged unless later demonstrated necessary and separately approved. ADR-004/007/008
+compatibility addendum is proposed; frozen ADR text is untouched. V1 delivery timing
+is gated by legacy policy and migration validation; no completion-date claim.
+
+Required tests after approval: all four readers; add/update/append/event-repository;
+same/coarse/backward timestamps; reverse IDs; same-state council events; multiple
+batches; reopen/restart; duplicate/stale/concurrent writers with explicit barriers;
+rollback and constraint failures; empty/verified/ambiguous legacy ledgers;
+upgrade/backup/restore and existing-field/binding preservation. Then exact 26-case
+matrix, affected suites, MCF-01/runtime/WP-14/15/16, Full Core and validators.
+
+### ROOT_CAUSE_B investigation (not repaired)
+
+`_invoke` starts its timeout after acquiring the semaphore, while `_execute_workflow`
+wraps the entire setup in another timeout of the same duration. The shared 30-second
+constant also bounds cancel, cleanup and status verification separately. Cleanup
+bypasses the operation-count budget but not the timeout. Existing WP-24 tests reduce
+all of these to 0.01 seconds; even setup `_delay()` yields through `sleep(0)`.
+Both target cases in this run fail in `start()` before collect/cancel, proving they
+do not isolate the intended deadline. Exact event-loop scheduling contributions are
+not profiled; 0.01 is a test override, not the production deadline.
+
+Cleanup requires cancel → cleanup truthy → exact post-cleanup status; mismatch or
+ordinary exception fails closed to ORPHANED. The new Event-based outer-cancellation
+test also proves a separate gap: cancellation reaches the blocked status operation,
+but `collect` propagates CancelledError and leaves the Run RUNNING with no cleanup.
+CancelledError is not handled by its ordinary Exception clauses. This proof concerns
+the direct Supervisor path, not a claim that all service/council paths lack recovery.
+
+Preferred next B work: a deadline seam scoped to the deliberately blocked call,
+Event synchronization before expiry, and cancellation-safe bounded cleanup with
+truthful terminal persistence. Cover cleanup timeout/exception, resource still active,
+wrong status, repeated outer cancellation and sanitized/no-fabricated output.
+No timeout increase, retry, weakened assertion, or production workaround was applied.
+
+### Current evidence and stop
+
+- Initial focused attempt: exit 1, 12 setup errors due to inaccessible default
+  pytest temp root; retained in `ordering.log/xml`, not product failures.
+- Fresh task-specific temp directory: exit 1, 12 ordering failures, no errors/skips.
+- Event-controlled cancellation: exit 1, 1 failure (12 deselected), no errors/skips.
+- Five fixed combined executions: each exit 1, 13 failed / 0 passed / 0 skipped;
+  all five logs/XML retained. This proves reproducible defects, not repaired stability.
+- Exact original 26 nodeids: exit 1, 11 passed / 15 failed / 0 skipped.
+- Resource guards + runtime skeleton: exit 1, 21 passed / 2 failed / 0 skipped.
+- Baseline validator: exit 0. Governance validator: exit 0.
+- Full Core, broader affected suites, MCF-01 and WP-14/15/16: NOT_RUN at Architecture
+  Gate; no acceptance or regression PASS claimed. No Windows symlink case was run.
+- NEXT_REQUIRED_ROLE: `HUMAN_ARCHITECTURE_GATE`. Writer stops with red repro tests
+  retained. Independent review and Git promotion remain separate future gates.
+
+## Historical scope proposal (superseded start authorization above)
+
 - Priority: `P1`
 - Status: `SCOPE_PROPOSED / IMPLEMENTATION_NOT_STARTED`
 - Created by Human routing: 2026-09-12, `MCF01_DECISION=ACCEPT_WITH_PRE_EXISTING_BASELINE_DEBT`.

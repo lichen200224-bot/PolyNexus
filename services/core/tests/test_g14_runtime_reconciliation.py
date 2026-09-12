@@ -327,8 +327,21 @@ def test_completed_runtime_retains_owned_safe_normalized_outputs(db) -> None:
     assert len(SqlFindingRepository(reloaded_session).list_by_run(run.id)) == 1
     assert len(SqlArtifactRepository(reloaded_session).list_by_run(run.id)) == 1
     evidence = SqlEvidenceRepository(reloaded_session).list_by_run(run.id)
-    assert evidence[0].metadata["safe_key"] == "safe_value"
-    assert evidence[-1].metadata["adapter_version"] == "test-restart-adapter/1"
+    by_id = {item.id: item for item in evidence}
+    assert safe_evidence.id in by_id
+    retained = by_id[safe_evidence.id]
+    assert retained.actor_id == safe_evidence.actor_id
+    assert retained.source == safe_evidence.source
+    assert retained.type is EvidenceType.RUNTIME_EVIDENCE
+    assert retained.status is EvidenceStatus.OBSERVED
+    assert retained.metadata["safe_key"] == "safe_value"
+    provenance = [item for item in evidence
+                  if item.actor_id == "system:restart-reconciliation"
+                  and item.source == "runtime-adapter"]
+    assert len(provenance) == 1
+    assert provenance[0].type is EvidenceType.RUNTIME_EVIDENCE
+    assert provenance[0].status is EvidenceStatus.PASS
+    assert provenance[0].metadata["adapter_version"] == "test-restart-adapter/1"
     reloaded_session.close()
 
 

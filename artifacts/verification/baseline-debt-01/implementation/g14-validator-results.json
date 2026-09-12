@@ -1,0 +1,48 @@
+[
+  {
+    "COMMAND": [
+      "D:\\AI\u5b78\u7fd2\u6559\u6750\\PolyNexus\\.venv\\Scripts\\python.exe",
+      "-B",
+      "scripts/validate_baseline.py"
+    ],
+    "RESULT": "PASS",
+    "ACTUAL_EXIT_CODE": 0,
+    "EVIDENCE_PATH": "artifacts\\verification\\baseline-debt-01\\implementation\\g14-baseline.log"
+  },
+  {
+    "COMMAND": [
+      "powershell",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "tools/validate-polynexus-governance.ps1",
+      "."
+    ],
+    "RESULT": "PASS",
+    "ACTUAL_EXIT_CODE": 0,
+    "EVIDENCE_PATH": "artifacts\\verification\\baseline-debt-01\\implementation\\g14-governance.log"
+  },
+  {
+    "COMMAND": [
+      "git",
+      "-c",
+      "safe.directory=C:/Users/shawn/OneDrive/\u6587\u4ef6/PONYNEXUS/baseline-debt-01",
+      "diff",
+      "--check"
+    ],
+    "RESULT": "PASS",
+    "ACTUAL_EXIT_CODE": 0,
+    "EVIDENCE_PATH": "artifacts\\verification\\baseline-debt-01\\implementation\\g14-diff.log"
+  },
+  {
+    "COMMAND": [
+      "D:\\AI\u5b78\u7fd2\u6559\u6750\\PolyNexus\\.venv\\Scripts\\python.exe",
+      "-B",
+      "artifacts\\verification\\baseline-debt-01\\implementation\\g14-scope-check.py"
+    ],
+    "RESULT": "PASS",
+    "ACTUAL_EXIT_CODE": 0,
+    "EVIDENCE_PATH": "artifacts\\verification\\baseline-debt-01\\implementation\\g14-scope.log"
+  }
+]

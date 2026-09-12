@@ -1,5 +1,16 @@
 # PolyNexus Decision Log
 
+## ADR-014 — Human-approved durable ordering and cancellation cleanup (2026-09-12)
+
+Status: HUMAN_ACCEPTED / IMPLEMENTATION_AUTHORIZED. See
+[ADR-014](35_ADR_014_DURABLE_EVENT_ORDERING_AND_CANCELLATION_CLEANUP.md).
+BASELINE-DEBT-01 may add persistence-only event_sequence, atomic per-Run allocation,
+0003 rowid legacy backfill/downgrade, separate cleanup deadlines and durable external
+cancellation handling. Domain/API/RunState/runtime binding contracts are unchanged.
+This supersedes the earlier BASELINE-DEBT-01 architecture proposal only; G30,
+WP-20 and score remain unchanged. Independent code review is still required.
+
+
 ## Current Human routing override — external verification moved to G30 (2026-09-03)
 
 The Human changed the current Goal routing: authenticated external ChatGPT /

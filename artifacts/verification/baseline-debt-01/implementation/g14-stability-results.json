@@ -1,0 +1,107 @@
+[
+  {
+    "ROUND": 1,
+    "COMMAND": [
+      "D:/AI\u5b78\u7fd2\u6559\u6750/PolyNexus/.venv/Scripts/python.exe",
+      "-B",
+      "-m",
+      "pytest",
+      "services/core/tests/test_baseline_debt_01.py",
+      "-o",
+      "addopts=",
+      "-q",
+      "--tb=short",
+      "--basetemp=artifacts\\verification\\baseline-debt-01\\implementation\\tmp-g14-stability-1",
+      "--junitxml=artifacts\\verification\\baseline-debt-01\\implementation\\g14-stability-1.xml"
+    ],
+    "passed": 40,
+    "failed": 0,
+    "skipped": 0,
+    "exit_code": 0,
+    "EVIDENCE_PATH": "artifacts\\verification\\baseline-debt-01\\implementation\\g14-stability-1.log"
+  },
+  {
+    "ROUND": 2,
+    "COMMAND": [
+      "D:/AI\u5b78\u7fd2\u6559\u6750/PolyNexus/.venv/Scripts/python.exe",
+      "-B",
+      "-m",
+      "pytest",
+      "services/core/tests/test_baseline_debt_01.py",
+      "-o",
+      "addopts=",
+      "-q",
+      "--tb=short",
+      "--basetemp=artifacts\\verification\\baseline-debt-01\\implementation\\tmp-g14-stability-2",
+      "--junitxml=artifacts\\verification\\baseline-debt-01\\implementation\\g14-stability-2.xml"
+    ],
+    "passed": 40,
+    "failed": 0,
+    "skipped": 0,
+    "exit_code": 0,
+    "EVIDENCE_PATH": "artifacts\\verification\\baseline-debt-01\\implementation\\g14-stability-2.log"
+  },
+  {
+    "ROUND": 3,
+    "COMMAND": [
+      "D:/AI\u5b78\u7fd2\u6559\u6750/PolyNexus/.venv/Scripts/python.exe",
+      "-B",
+      "-m",
+      "pytest",
+      "services/core/tests/test_baseline_debt_01.py",
+      "-o",
+      "addopts=",
+      "-q",
+      "--tb=short",
+      "--basetemp=artifacts\\verification\\baseline-debt-01\\implementation\\tmp-g14-stability-3",
+      "--junitxml=artifacts\\verification\\baseline-debt-01\\implementation\\g14-stability-3.xml"
+    ],
+    "passed": 40,
+    "failed": 0,
+    "skipped": 0,
+    "exit_code": 0,
+    "EVIDENCE_PATH": "artifacts\\verification\\baseline-debt-01\\implementation\\g14-stability-3.log"
+  },
+  {
+    "ROUND": 4,
+    "COMMAND": [
+      "D:/AI\u5b78\u7fd2\u6559\u6750/PolyNexus/.venv/Scripts/python.exe",
+      "-B",
+      "-m",
+      "pytest",
+      "services/core/tests/test_baseline_debt_01.py",
+      "-o",
+      "addopts=",
+      "-q",
+      "--tb=short",
+      "--basetemp=artifacts\\verification\\baseline-debt-01\\implementation\\tmp-g14-stability-4",
+      "--junitxml=artifacts\\verification\\baseline-debt-01\\implementation\\g14-stability-4.xml"
+    ],
+    "passed": 40,
+    "failed": 0,
+    "skipped": 0,
+    "exit_code": 0,
+    "EVIDENCE_PATH": "artifacts\\verification\\baseline-debt-01\\implementation\\g14-stability-4.log"
+  },
+  {
+    "ROUND": 5,
+    "COMMAND": [
+      "D:/AI\u5b78\u7fd2\u6559\u6750/PolyNexus/.venv/Scripts/python.exe",
+      "-B",
+      "-m",
+      "pytest",
+      "services/core/tests/test_baseline_debt_01.py",
+      "-o",
+      "addopts=",
+      "-q",
+      "--tb=short",
+      "--basetemp=artifacts\\verification\\baseline-debt-01\\implementation\\tmp-g14-stability-5",
+      "--junitxml=artifacts\\verification\\baseline-debt-01\\implementation\\g14-stability-5.xml"
+    ],
+    "passed": 40,
+    "failed": 0,
+    "skipped": 0,
+    "exit_code": 0,
+    "EVIDENCE_PATH": "artifacts\\verification\\baseline-debt-01\\implementation\\g14-stability-5.log"
+  }
+]
