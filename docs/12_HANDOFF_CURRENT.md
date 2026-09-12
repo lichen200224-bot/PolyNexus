@@ -1,6 +1,41 @@
 # Current Handoff
 
-## Current implementation — Human architecture approval (2026-09-12)
+## Current task — BASELINE-DEBT-01 final acceptance (2026-09-12)
+
+- `CURRENT_TASK=BASELINE-DEBT-01`
+- `RESULT=FINAL_ACCEPTED`
+- `STATE_SYNC_WRITER=GOVERNANCE_STATE_SYNC_WRITER`
+- `BRANCH=feature/baseline-debt-01-deterministic-lifecycle-cleanup`
+- `NEXT_OWNER=GOVERNANCE_PROMOTION_DECISION`
+- `ACCEPTED_SHA=aac597579ee6d369007343930d3a5b3ca7b929c5`
+- `FUNCTIONAL_BASELINE_SHA=86d5939044c1d7ec2a991820f39287481ee9120f`
+- `REJECTED_PUBLICATION_CANDIDATE=180432d03f6d423bb3152c233fb4f0a5072868f5`
+- `INDEPENDENT_REACCEPTANCE=PASS`; `PUBLICATION_INTEGRITY=PASS`;
+  `FINAL_ACCEPTANCE=GRANTED`; `BASELINE_DEBT_01=CLOSED`.
+- Fresh accepted evidence: focused + migration `47 passed / exit 0`; G14
+  single `1 passed / exit 0`, module `13 passed / exit 0`; Full Core
+  `818 passed / 0 failed / 1 existing Windows symlink-policy skip / exit 0`;
+  stability `5 rounds × 40 passed / 0 failed / exit 0`; canonical collection
+  `771 -> 819`, delta `+48`, explained; freeze hashes `20/20`.
+- State-sync scope: nine authorized governance/state files only; product source,
+  tests, migration and ADR-014 semantics are protected and unchanged.
+- Changed files: `docs/10_DECISION_LOG.md`, `docs/11_PROJECT_STATE.md`,
+  `docs/12_HANDOFF_CURRENT.md`, `docs/28_MASTER_DEVELOPMENT_ROADMAP.md`,
+  `docs/32_KNOWN_LIMITATIONS.md`,
+  `docs/33_DEVELOPMENT_PROGRESS_AND_GOAL_EXECUTION_STANDARD.md`,
+  `docs/GOAL_COMPLETION_CONTROL_PANEL.md`,
+  `docs/GOAL_COMPLETION_CONTROL_PANEL.html`, and
+  `docs/tasks/BASELINE-DEBT-01.md`.
+- Pre-commit validation: baseline validator `PASS / exit 0`; governance validator
+  `PASS / exit 0`; `git diff --check` `PASS / exit 0`; protected-tree diffs
+  (`services/core/src`, tests, Alembic and ADR-014) `NONE`.
+- `PRODUCT_CHANGES_ALLOWED=NO`
+- `MERGE_AUTHORIZATION=NOT_GRANTED`
+- `PROMOTION_AUTHORIZATION=NOT_GRANTED`
+- `NEXT_STEP=determine canonical promotion target and perform bounded promotion gate`
+- Do not amend, rebase, squash, force-push, merge, tag, freeze or start product work.
+
+## Historical superseded implementation gate — Human architecture approval (2026-09-12)
 
 RESULT=SCOPE_EXPANSION_REQUIRED. ARCHITECTURE_DECISION=HUMAN_ACCEPTED /
 IMPLEMENTATION_AUTHORIZED. ADR-014 implementation is present on the existing

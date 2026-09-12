@@ -1,6 +1,25 @@
 # PolyNexus Decision Log
 
-## ADR-014 — Human-approved durable ordering and cancellation cleanup (2026-09-12)
+## BASELINE-DEBT-01 final acceptance (2026-09-12)
+
+DECISION: `BASELINE-DEBT-01 FINAL ACCEPTANCE`
+
+- `ACCEPTED_SHA=aac597579ee6d369007343930d3a5b3ca7b929c5`.
+- `REJECTED_SHA=180432d03f6d423bb3152c233fb4f0a5072868f5`.
+- Rejected reason: publication integrity used CRLF working-tree hashes instead
+  of canonical Git blob hashes.
+- Repair: one publication-only successor commit; executable, test, migration,
+  ADR-014 and functional-contract trees are exactly unchanged.
+- `FRESH_REACCEPTANCE=PASS`; `FUNCTIONAL_RETEST_AFTER_REPAIR=NOT_REQUIRED`
+  because the executable/test/migration/functional-contract trees are exactly
+  equivalent.
+- `FINAL_ACCEPTANCE=GRANTED`; the accepted functional anchor is frozen.
+- `MERGE_AUTHORIZATION=NOT_GRANTED`; `PROMOTION_AUTHORIZATION=NOT_GRANTED`.
+- BASELINE-DEBT-01 does not change the G24–G30 bounded development score,
+  `WP20`, `G30`, overall completion, Plugin Platform or external-runtime status.
+
+
+## Historical ADR-014 implementation authorization (2026-09-12; superseded by final acceptance above)
 
 Status: HUMAN_ACCEPTED / IMPLEMENTATION_AUTHORIZED. See
 [ADR-014](35_ADR_014_DURABLE_EVENT_ORDERING_AND_CANCELLATION_CLEANUP.md).
@@ -8,7 +27,8 @@ BASELINE-DEBT-01 may add persistence-only event_sequence, atomic per-Run allocat
 0003 rowid legacy backfill/downgrade, separate cleanup deadlines and durable external
 cancellation handling. Domain/API/RunState/runtime binding contracts are unchanged.
 This supersedes the earlier BASELINE-DEBT-01 architecture proposal only; G30,
-WP-20 and score remain unchanged. Independent code review is still required.
+WP-20 and score remain unchanged. At this historical gate, independent code
+review was still required.
 
 
 ## Current Human routing override — external verification moved to G30 (2026-09-03)

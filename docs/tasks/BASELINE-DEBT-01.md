@@ -1,6 +1,42 @@
 # BASELINE-DEBT-01 — Deterministic Lifecycle Ordering and Timeout Cleanup
 
-## Current implementation — Human architecture approval (2026-09-12)
+## Current closure — final accepted (2026-09-12)
+
+```text
+STATUS=FINAL_ACCEPTED
+IMPLEMENTATION=COMPLETE
+INDEPENDENT_REVIEW=PASS
+PUBLICATION_REACCEPTANCE=PASS
+BASELINE_DEBT_01=CLOSED
+
+ACCEPTED_CANDIDATE_SHA=
+aac597579ee6d369007343930d3a5b3ca7b929c5
+
+MERGE_STATUS=
+NOT_YET_AUTHORIZED
+
+PROMOTION_STATUS=
+PENDING_GOVERNANCE_TARGET_DECISION
+```
+
+- Functional baseline: `86d5939044c1d7ec2a991820f39287481ee9120f`.
+- Publication-rejected Candidate: `180432d03f6d423bb3152c233fb4f0a5072868f5`;
+  rejection was limited to CRLF working-tree hashes versus canonical Git blob
+  hashes. Its publication-only successor passed fresh independent re-acceptance.
+- Accepted evidence: focused + migration `47 passed / exit 0`; G14 single
+  `1 passed / exit 0`, module `13 passed / exit 0`; Full Core
+  `818 passed / 0 failed / 1 existing Windows symlink-policy skip / exit 0`;
+  stability `5 rounds × 40 passed / 0 failed / exit 0`; canonical collection
+  `771 -> 819`, delta `+48`, explained; publication freeze hashes `20/20`.
+- `FINAL_ACCEPTANCE=GRANTED`; accepted functional Candidate is frozen.
+- BASELINE-DEBT-01 adds no G24–G30 development points. Current project bounds
+  remain `V1_BOUNDED_DEVELOPMENT_ACCEPTANCE_SCORE=95/100`,
+  `OVERALL_PROJECT_COMPLETION=NOT_DEFINED`, `WP20=NOT_COMPLETE`, and
+  `G30=NEED_ACTION`.
+- No merge or promotion is authorized. Product source, tests, migration and
+  ADR-014 semantics must not change in this state-sync.
+
+## Historical superseded implementation gate — Human architecture approval (2026-09-12)
 
 RESULT=SCOPE_EXPANSION_REQUIRED. ARCHITECTURE_DECISION=HUMAN_ACCEPTED /
 IMPLEMENTATION_AUTHORIZED. ADR-014 implementation is present on the existing

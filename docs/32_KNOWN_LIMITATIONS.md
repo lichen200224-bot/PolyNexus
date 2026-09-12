@@ -1,6 +1,28 @@
 # V1 Known Limitations
 
-## MCF-01 accepted with pre-existing baseline debt — 2026-09-12
+## Current BASELINE-DEBT-01 acceptance boundary — 2026-09-12
+
+- `BASELINE-DEBT-01=FINAL_ACCEPTED`; `BASELINE_DEBT=CLOSED` for the accepted
+  deterministic lifecycle ordering and cancellation-cleanup scope.
+- Accepted frozen functional anchor:
+  `aac597579ee6d369007343930d3a5b3ca7b929c5`; functional baseline
+  `86d5939044c1d7ec2a991820f39287481ee9120f`; publication-rejected Candidate
+  `180432d03f6d423bb3152c233fb4f0a5072868f5`.
+- Independent re-acceptance and publication integrity passed; freeze hashes are
+  `20/20`. Full Core is `818 passed / 0 failed / 1 existing Windows
+  symlink-policy skip / exit 0`.
+- This closure does not add G24–G30 points or remove other limitations:
+  `V1_BOUNDED_DEVELOPMENT_ACCEPTANCE_SCORE=95/100`,
+  `OVERALL_PROJECT_COMPLETION=NOT_DEFINED`, `WP20=NOT_COMPLETE`, and
+  `G30=NEED_ACTION` remain current.
+- Dynamic Plugin Platform, external-runtime integration, live vendor
+  verification and production readiness remain outside this acceptance.
+- `MERGE_AUTHORIZATION=NOT_GRANTED`; `PROMOTION_AUTHORIZATION=NOT_GRANTED`.
+
+## Historical MCF-01 acceptance with pre-existing baseline debt — 2026-09-12 (superseded for BASELINE-DEBT-01 current state)
+
+The following bullets retain the state at the MCF-01 checkpoint. They are
+historical and do not override the current BASELINE-DEBT-01 closure above.
 
 - Human decision: `MCF01_DECISION=ACCEPT_WITH_PRE_EXISTING_BASELINE_DEBT`; 僅限 MCF-01 bounded implementation，不是全域 differential acceptance，也不是 release/production readiness。
 - `DIFFERENTIAL_REGRESSION=PASS`；`REGRESSION_SUITE_STATE=FAIL`；`FULL_CORE_REGRESSION=FAIL`；reason `PRE_EXISTING_BASELINE_REGRESSION_DEBT`。保留所有非零 exit code 與 Windows symlink skip。
