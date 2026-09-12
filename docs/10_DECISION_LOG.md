@@ -1,5 +1,33 @@
 # PolyNexus Decision Log
 
+## G30 / WP-20 final governance acceptance (2026-09-12)
+
+DECISION: `WP20_FINAL_ACCEPTANCE_GRANTED`
+
+- `WP20=FINAL_ACCEPTED`; `WP20_SCORE=5/5`.
+- `G30=FINAL_ACCEPTED / CLOSED`; `G30_SCORE_DELTA=0`.
+- `V1_BOUNDED_DEVELOPMENT_ACCEPTANCE_SCORE=100/100` applies only to the
+  existing G24-G30 development denominator.
+- `OVERALL_PROJECT_COMPLETION=NOT_DEFINED`; production readiness, completion
+  of the Plugin Platform, MCF-02, and external-runtime expansion are not
+  claimed.
+- Live Level 3A results are `CHATGPT=PASS`, `CLAUDE=PASS`, and `GEMINI=PASS`;
+  Human confirmation boundary, 21/21 failure rows, egress review, and
+  sanitization passed.
+- Claude's truthful result is retained as
+  `CLAUDE_RESPONSE_FORMAT_MATCH=NO`, `CLAUDE_CAPTURE=PASS`, and
+  `CLAUDE_NORMALIZATION=PASS`; it is not rewritten to `CHECKED`.
+- Independent review returned `INDEPENDENT_G30_WP20_REVIEW_PASS`, recommended
+  `ACCEPT`, `5/5`, and `READY`; final Human governance acceptance is
+  `GRANTED`.
+- Historical rejected attempt `chatgpt/invalid-attempt-01` / matrix row
+  `CG-01` remains `REJECTED` with `HISTORICAL_UNAUTHORIZED_SENDS=1`, cause
+  `HUMAN_MIS_OPERATION`, and `PRODUCT_AUTO_SEND=NO`. Separately,
+  `ACCEPTED_ATTEMPT_UNAUTHORIZED_SENDS=0`.
+- `BASELINE-DEBT-01=FINAL_ACCEPTED / CLOSED`; `MCF01=CHECKPOINTED`.
+- Promotion to `feature/mcf-01-static-module-contract` is not executed by this
+  decision and remains a separate governance action.
+
 ## BASELINE-DEBT-01 final acceptance (2026-09-12)
 
 DECISION: `BASELINE-DEBT-01 FINAL ACCEPTANCE`

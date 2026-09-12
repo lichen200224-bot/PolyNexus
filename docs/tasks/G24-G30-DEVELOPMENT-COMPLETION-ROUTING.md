@@ -1,6 +1,16 @@
 # G24–G30 Development Completion Routing
 
-## Current Human routing override — G29 external work moved to G30 (2026-09-03)
+## Current G30 closure — FINAL_ACCEPTED / CLOSED (2026-09-12)
+
+- `WP20=FINAL_ACCEPTED`; `WP20_SCORE=5/5`.
+- `G30=FINAL_ACCEPTED / CLOSED`; `G30_SCORE_DELTA=0`.
+- `V1_BOUNDED_DEVELOPMENT_ACCEPTANCE_SCORE=100/100`.
+- `OVERALL_PROJECT_COMPLETION=NOT_DEFINED`.
+- Live ChatGPT, Claude, and Gemini Level 3A verification, independent review,
+  and final Human governance acceptance are `PASS` / `GRANTED`.
+- Promotion to the canonical continuation branch is not executed here.
+
+## Historical Human routing override — G29 external work moved to G30 (2026-09-03; superseded)
 
 The current routing decision moves authenticated external ChatGPT / Claude /
 Gemini Web verification from G29 to G30. G29 completes its preflight,

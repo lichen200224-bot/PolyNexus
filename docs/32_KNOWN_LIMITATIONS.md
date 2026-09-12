@@ -1,6 +1,18 @@
 # V1 Known Limitations
 
-## Current BASELINE-DEBT-01 acceptance boundary — 2026-09-12
+## Current G30 closure and remaining boundaries — 2026-09-12
+
+- `WP20=FINAL_ACCEPTED` at `5/5`; `G30=FINAL_ACCEPTED / CLOSED`.
+- `V1_BOUNDED_DEVELOPMENT_ACCEPTANCE_SCORE=100/100` is limited to the existing
+  G24-G30 development denominator; `OVERALL_PROJECT_COMPLETION=NOT_DEFINED`.
+- Live ChatGPT, Claude, and Gemini Level 3A evidence is accepted for WP-20.
+  This does not claim broad vendor certification, native MV3 completeness, or
+  compatibility beyond the accepted evidence.
+- `PRODUCTION_READINESS=NOT_CLAIMED`; `PLUGIN_PLATFORM=NOT_COMPLETE`;
+  `MCF02=NOT_STARTED`; `EXTERNAL_RUNTIME_EXPANSION=NOT_COMPLETE`.
+- `BASELINE-DEBT-01=FINAL_ACCEPTED / CLOSED`; `MCF01=CHECKPOINTED`.
+
+## Historical BASELINE-DEBT-01 acceptance boundary — 2026-09-12 (superseded for G30 current state)
 
 - `BASELINE-DEBT-01=FINAL_ACCEPTED`; `BASELINE_DEBT=CLOSED` for the accepted
   deterministic lifecycle ordering and cancellation-cleanup scope.
@@ -11,7 +23,7 @@
 - Independent re-acceptance and publication integrity passed; freeze hashes are
   `20/20`. Full Core is `818 passed / 0 failed / 1 existing Windows
   symlink-policy skip / exit 0`.
-- This closure does not add G24–G30 points or remove other limitations:
+- At this historical checkpoint, this closure did not add G24–G30 points or remove other limitations:
   `V1_BOUNDED_DEVELOPMENT_ACCEPTANCE_SCORE=95/100`,
   `OVERALL_PROJECT_COMPLETION=NOT_DEFINED`, `WP20=NOT_COMPLETE`, and
   `G30=NEED_ACTION` remain current.

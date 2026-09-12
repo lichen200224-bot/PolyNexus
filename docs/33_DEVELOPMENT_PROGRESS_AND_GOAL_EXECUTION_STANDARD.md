@@ -2,11 +2,12 @@
 
 ## Current bounded acceptance state — 2026-09-12
 
-- `V1_BOUNDED_DEVELOPMENT_ACCEPTANCE_SCORE=95/100`: G24–G30 DEVELOPMENT-ONLY / V1 BOUNDED DEVELOPMENT ACCEPTANCE SCORE。
-- `OVERALL_PROJECT_COMPLETION=NOT_DEFINED`；95/100 不是 PolyNexus 整體完成率、roadmap 完成率、product readiness、MCF architecture 或 Plugin Platform 完成率。
-- `WP20=NOT_COMPLETE`（0/5）；`G30=NEED_ACTION`。
-- `MCF01=CHECKPOINTED / ACCEPTED_WITH_PRE_EXISTING_BASELINE_DEBT`；checkpoint `96ae53537e5501f1ef374182e7e1966b921a7883`。
-- `BASELINE-DEBT-01=FINAL_ACCEPTED` at `aac597579ee6d369007343930d3a5b3ca7b929c5`；`BASELINE_DEBT=CLOSED` for its accepted scope；MCF-01 與 BASELINE-DEBT-01 均不增加 development points。
+- `V1_BOUNDED_DEVELOPMENT_ACCEPTANCE_SCORE=100/100`: G24–G30 DEVELOPMENT-ONLY / V1 BOUNDED DEVELOPMENT ACCEPTANCE SCORE。
+- `OVERALL_PROJECT_COMPLETION=NOT_DEFINED`；100/100 不是 PolyNexus 整體完成率、roadmap 完成率、production readiness、MCF architecture 或 Plugin Platform 完成率。
+- `WP20=FINAL_ACCEPTED`（5/5）；`G30=FINAL_ACCEPTED / CLOSED`；`G30_SCORE_DELTA=0`。
+- `MCF01=CHECKPOINTED`；checkpoint `96ae53537e5501f1ef374182e7e1966b921a7883`。
+- `BASELINE-DEBT-01=FINAL_ACCEPTED / CLOSED` at `aac597579ee6d369007343930d3a5b3ca7b929c5`；MCF-01 與 BASELINE-DEBT-01 均不增加 development points。
+- `PRODUCTION_READINESS=NOT_CLAIMED`；`PLUGIN_PLATFORM=NOT_COMPLETE`；`MCF02=NOT_STARTED`；`EXTERNAL_RUNTIME_EXPANSION=NOT_COMPLETE`。
 - Independent re-acceptance/publication integrity `PASS`；Full Core `818 passed / 0 failed / 1 existing Windows symlink-policy skip / exit 0`；focused + migration `47 passed / exit 0`；G14 `1 + 13 passed / exit 0`；stability `5 × 40 passed / exit 0`；collection `771 -> 819 (+48 explained)`；freeze hashes `20/20`。
 - `DIFFERENTIAL_REGRESSION=PASS`；`REGRESSION_SUITE_STATE=PASS`；`FULL_CORE_REGRESSION=PASS`；`FINAL_ACCEPTANCE=GRANTED`。
 - `MERGE_AUTHORIZATION=NOT_GRANTED`；`PROMOTION_AUTHORIZATION=NOT_GRANTED`。
@@ -16,7 +17,7 @@
 
 原 G24–G30 分母不涵蓋 ADR-013 Modular Core expansion、MCF-01 follow-up architecture work、BASELINE-DEBT-01、MCF-02、holaOS/OpenHands external runtime integration、dynamic Plugin Platform、marketplace、remote install/update/signing、multi-device、Enterprise IAM、distributed scheduler、full RAG / knowledge graph、fully autonomous agent teams，以及 later V1.x / Future roadmap。這些工作不得自動加入既有計分或推導 overall percentage。
 
-## Current routing override — G29 external work deferred to G30 (2026-09-03)
+## Historical routing override — G29 external work deferred to G30 (2026-09-03; superseded)
 
 By the current Human instruction, G29 performs no live external vendor run.
 Its sanitized operator materials and preflight evidence are carried forward to

@@ -1,6 +1,29 @@
 # G30 Final External Verification and 100-Point Reconciliation
 
-## Task identity
+## Current final closure — 2026-09-12
+
+- `TASK_ID`: `G30-FINAL-EXTERNAL-VERIFICATION-AND-100-POINT-RECONCILIATION`
+- `STATUS`: `FINAL_ACCEPTED / CLOSED`
+- `WP20`: `ACCEPTED / 5 OF 5`
+- `V1_BOUNDED_DEVELOPMENT_ACCEPTANCE_SCORE`: `100/100`
+- `OVERALL_PROJECT_COMPLETION`: `NOT_DEFINED`
+- `LIVE_VENDOR_VERIFICATION`: `PASS`
+- `CHATGPT`: `PASS`
+- `CLAUDE`: `PASS`
+- `GEMINI`: `PASS`
+- `INDEPENDENT_REVIEW`: `PASS`
+- `FINAL_HUMAN_GOVERNANCE_ACCEPTANCE`: `GRANTED`
+- `G30_SCORE_DELTA`: `0`
+- `PRODUCT_CHANGE`: `NONE`
+- `PROMOTION_TO_CANONICAL_CONTINUATION`: `NOT_YET_EXECUTED`
+
+The accepted Claude result truthfully retains
+`CLAUDE_RESPONSE_FORMAT_MATCH=NO`, while capture and normalization are `PASS`;
+no fabricated `CHECKED` result is introduced. The historical rejected ChatGPT
+attempt is retained separately from the accepted attempt, as recorded in
+[G30 WP-20 final acceptance record](G30-WP20-FINAL-ACCEPTANCE-RECORD.md).
+
+## Historical predecessor attempt identity (2026-09-03; superseded)
 
 - `TASK_ID`: `G30-FINAL-EXTERNAL-VERIFICATION-AND-100-POINT-RECONCILIATION`
 - `ATTEMPT`: `1`
@@ -10,7 +33,7 @@
 - `REVIEWER`: `UNVERIFIED` — no separate read-only reviewer result is available
 - `NEXT_OWNER`: `Human operator`, then Codex validation/review
 
-## Start gate and provenance
+## Historical start gate and provenance
 
 - `G29_HANDOFF`: `ACCEPTED` as a handoff-only predecessor.
 - `G29_EXTERNAL_VERIFICATION`: `DEFERRED_TO_G30`.
@@ -25,7 +48,7 @@
 - Protected primary checkout remained outside this lane and was not changed by
   G30.
 
-## Current execution result
+## Historical execution result
 
 No authorized Human operator, authenticated browser session, or sanitized
 ChatGPT/Claude/Gemini report was available in this run. Codex did not log in,
@@ -50,7 +73,7 @@ external-request observations are not satisfied.
   Playwright binding, Playwright import was unavailable, and local Chrome CDP
   endpoints at `127.0.0.1:9222` were unreachable. No browser action occurred.
 
-## Acceptance disposition
+## Historical acceptance disposition
 
 - `EXTERNAL_REPORTS`: `NONE` — required three-vendor sanitized reports absent.
 - `INDEPENDENT_REVIEW`: `NEED_ACTION / UNVERIFIED`; bounded read-only review is

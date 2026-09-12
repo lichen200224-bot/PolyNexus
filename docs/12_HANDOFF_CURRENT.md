@@ -1,5 +1,90 @@
 # Current Handoff
 
+## Current task — G30-WP20-FINAL-CLOSURE-AND-STATE-SYNC (2026-09-12)
+
+- `TASK_ID`: `G30-FINAL-EXTERNAL-VERIFICATION-AND-100-POINT-RECONCILIATION`
+- `STATUS`: `FINAL_ACCEPTED / CLOSED`
+- `WP20`: `ACCEPTED / 5 OF 5`
+- `V1_BOUNDED_DEVELOPMENT_ACCEPTANCE_SCORE`: `100/100`
+- `OVERALL_PROJECT_COMPLETION`: `NOT_DEFINED`
+- `LIVE_VENDOR_VERIFICATION`: `PASS`
+- `CHATGPT`: `PASS`
+- `CLAUDE`: `PASS`
+- `GEMINI`: `PASS`
+- `INDEPENDENT_REVIEW`: `PASS`
+- `FINAL_HUMAN_GOVERNANCE_ACCEPTANCE`: `GRANTED`
+- `BASELINE-DEBT-01`: `FINAL_ACCEPTED / CLOSED`
+- `MCF01`: `CHECKPOINTED`
+- `PRODUCTION_READINESS`: `NOT_CLAIMED`
+- `PLUGIN_PLATFORM`: `NOT_COMPLETE`
+- `MCF02`: `NOT_STARTED`
+- `EXTERNAL_RUNTIME_EXPANSION`: `NOT_COMPLETE`
+- `EVIDENCE_ROOT`: `artifacts/verification/g30-wp20-live-20260912-codex/`
+- `SANITIZED_ACCEPTANCE_RECORD`: `docs/tasks/G30-WP20-FINAL-ACCEPTANCE-RECORD.md`
+- `PROMOTION_TO_CANONICAL_CONTINUATION`: `NOT_YET_EXECUTED`
+- `NEXT_REQUIRED_ROLE`: `GOVERNANCE_FINAL_PROMOTION`
+
+## Historical task — G30-WP20-LIVE-VENDOR-EXECUTION (2026-09-12; superseded by final acceptance)
+
+- `TASK_ID`: `G30-WP20-LIVE-VENDOR-EXECUTION`
+- `ROLE`: `AUTHORIZED_G30_WP20_LIVE_VENDOR_OPERATOR`
+- `RESULT`: `G30_WP20_LIVE_EVIDENCE_READY_FOR_REVIEW`
+- `BRANCH`: `feature/g30-wp20-live-vendor-closure`
+- `CANONICAL_START_SHA`: `08d00294bf826f27eeb82fc799836dbb39f024de`
+- `HEAD_AT_EXECUTION`: `08d00294bf826f27eeb82fc799836dbb39f024de`
+- `G30_STATUS`: `PENDING_INDEPENDENT_REVIEW`
+- `WP20_STATUS`: `0/5_PENDING_INDEPENDENT_REVIEW`
+- `OPERATOR`: `Antigravity`
+- `HUMAN_ACCOUNT_OWNER_ROLE`: `Account Owner & Exact Send Approver`
+- `NEXT_OWNER`: `INDEPENDENT_REVIEWER`
+- `EVIDENCE_ROOT`: `artifacts/verification/g30-wp20-live-20260912/`
+- `REPORTS`:
+  - `chatgpt/report.md` (CG-01: LIVE PASS, 24 words, Human confirmed)
+  - `claude/report.md` (CL-01: LIVE PASS, 40 words, Human confirmed)
+  - `gemini/report.md` (GM-01: LIVE PASS, 18 words, Human confirmed)
+  - `execution-summary.md` (3/3 live vendors, failure paths 02-08, zero secrets)
+- `HUMAN_CONFIRMATION_BOUNDARY`: `PASS` (each vendor required explicit and independent Human authorization before send)
+- `SANITIZATION`: `PASS` (zero passwords, cookies, session tokens, recovery codes, account IDs, or request headers exposed)
+- `SECRETS_EXPOSED`: `NO`
+- `OPEN_SECURITY_BLOCKER`: `NO`
+- `OPEN_EGRESS_BLOCKER`: `NO`
+- `PRODUCT_CODE_CHANGE`: `NONE` (protected `services/**`, `apps/**`, `extensions/**`, `tests/**`, `migration/**`, `ADR/**` untouched)
+- `ACCEPTANCE_BOUNDARY`: Score remains 95/100; WP-20 final 5 points withheld pending independent review.
+- `NEXT_ACTION`: Independent review of live evidence and 100-point project reconciliation.
+
+## Historical task — G30-WP20-REENTRY-01 (2026-09-12; superseded)
+
+- `TASK_ID`: `G30-WP20-REENTRY-01`
+- `ROLE`: `G30_REENTRY_PLANNER_AND_VALIDATOR`
+- `RESULT`: `G30_WP20_OPERATOR_READY`
+- `BRANCH`: `feature/g30-wp20-live-vendor-closure`
+- `CANONICAL_START_SHA`: `08d00294bf826f27eeb82fc799836dbb39f024de`
+- `HEAD_AT_REVALIDATION`: `08d00294bf826f27eeb82fc799836dbb39f024de`
+- `G30_STATUS`: `READY_FOR_HUMAN_LIVE_VENDOR_EXECUTION`
+- `WP20_STATUS`: `0/5_PENDING_LIVE_EVIDENCE`
+- `OPERATOR_PACK_DECISION`: `REUSE_AS_IS`
+- `BASELINE_DEBT_01_IMPACT`: `NONE`
+- `WRITER`: `Codex`
+- `REVIEWER`: `Codex deterministic revalidation`
+- `ANTIGRAVITY_STATUS`: `NOT_REQUIRED_FOR_REVALIDATION`; live vendor execution remains Human/authorized operator work.
+- `NEXT_OWNER`: `HUMAN_OR_ANTIGRAVITY_LIVE_VENDOR_OPERATOR`
+- `TASK_DOC`: `docs/tasks/G30-WP20-REENTRY-01.md`
+- `Changed files`: `docs/tasks/G30-WP20-REENTRY-01.md`, `docs/12_HANDOFF_CURRENT.md`
+- Deterministic evidence: baseline validator `PASS / exit 0` using the existing
+  `D:\AI學習教材\PolyNexus\.venv\Scripts\python.exe`; governance validator
+  `PASS / exit 0`; browser companion tests `10 passed / 0 failed / 0 skipped /
+  exit 0`; `git diff --check` clean / exit `0`.
+- Revalidation found no stale safety or contract conflict. ADR-014 deterministic
+  ordering, cancellation cleanup, runtime reconciliation and persistence
+  migration do not affect live-vendor operator steps or result interpretation.
+- Live boundary: Codex did not log in, access credentials/cookies/tokens/private
+  page content, send real messages, or convert fixtures into live PASS evidence.
+- `PRODUCT_CODE_CHANGE_REQUIRED=NO`; `ADR_IMPACT=NONE`; `SCOPE_DEVIATION=NONE`.
+- `NEXT_ACTION`: authorized Human/Antigravity operator runs the three-vendor
+  sanitized Level 3A flow and required failure/fallback paths; return reports
+  only. Do not start MCF-02, dynamic Plugin Platform, holaOS/OpenHands,
+  marketplace, remote install/update/signing, or unrelated UI work.
+
 ## Current task — BASELINE-DEBT-01 final acceptance (2026-09-12)
 
 - `CURRENT_TASK=BASELINE-DEBT-01`
@@ -93,7 +178,7 @@ isolated branch, start SHA `86d5939044c1d7ec2a991820f39287481ee9120f`.
 - Next: Human decides ordering/legacy policy and exact implementation allowlist;
   preserve current worktree and evidence. Historical records below remain unchanged.
 
-## Current Task — G30 final external verification and reconciliation (2026-09-03)
+## Historical Task — G30 final external verification and reconciliation (2026-09-03; superseded)
 
 **Result:** `NEED_ACTION` — G29 handoff is accepted as a deferred predecessor,
 but no authorized Human vendor reports were supplied and no live browser session

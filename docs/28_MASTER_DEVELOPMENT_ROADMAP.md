@@ -2,17 +2,19 @@
 
 ## Current bounded acceptance state — 2026-09-12
 
-- `V1_BOUNDED_DEVELOPMENT_ACCEPTANCE_SCORE=95/100`: G24–G30 DEVELOPMENT-ONLY / V1 BOUNDED DEVELOPMENT ACCEPTANCE SCORE。
-- `OVERALL_PROJECT_COMPLETION=NOT_DEFINED`；95/100 不是 PolyNexus 整體完成率、roadmap 完成率、product readiness、MCF architecture 或 Plugin Platform 完成率。
-- `WP20=NOT_COMPLETE`（0/5）；`G30=NEED_ACTION`。
-- `MCF01=CHECKPOINTED / ACCEPTED_WITH_PRE_EXISTING_BASELINE_DEBT`；checkpoint `96ae53537e5501f1ef374182e7e1966b921a7883`。
-- `BASELINE-DEBT-01=FINAL_ACCEPTED` at `aac597579ee6d369007343930d3a5b3ca7b929c5`；`BASELINE_DEBT=CLOSED` for its accepted scope；MCF-01 與 BASELINE-DEBT-01 均不增加 development points。
+- `V1_BOUNDED_DEVELOPMENT_ACCEPTANCE_SCORE=100/100`: G24–G30 DEVELOPMENT-ONLY / V1 BOUNDED DEVELOPMENT ACCEPTANCE SCORE。
+- `OVERALL_PROJECT_COMPLETION=NOT_DEFINED`；100/100 不是 PolyNexus 整體完成率、roadmap 完成率、production readiness、MCF architecture 或 Plugin Platform 完成率。
+- `WP20=FINAL_ACCEPTED`（5/5）；`G30=FINAL_ACCEPTED / CLOSED`；G30 score delta remains `0`。
+- `CHATGPT_LIVE_LEVEL3A=PASS`；`CLAUDE_LIVE_LEVEL3A=PASS`；`GEMINI_LIVE_LEVEL3A=PASS`；independent review and final Human governance acceptance passed。
+- `MCF01=CHECKPOINTED`；checkpoint `96ae53537e5501f1ef374182e7e1966b921a7883`。
+- `BASELINE-DEBT-01=FINAL_ACCEPTED / CLOSED` at `aac597579ee6d369007343930d3a5b3ca7b929c5`；MCF-01 與 BASELINE-DEBT-01 均不增加 development points。
+- `PRODUCTION_READINESS=NOT_CLAIMED`；`PLUGIN_PLATFORM=NOT_COMPLETE`；`MCF02=NOT_STARTED`；`EXTERNAL_RUNTIME_EXPANSION=NOT_COMPLETE`。
 - Independent re-acceptance and publication integrity `PASS`；Full Core `818 passed / 0 failed / 1 existing Windows symlink-policy skip / exit 0`；focused + migration `47 passed / exit 0`；G14 `1 + 13 passed / exit 0`；stability `5 × 40 passed / exit 0`；collection `771 -> 819 (+48 explained)`；freeze hashes `20/20`。
 - `DIFFERENTIAL_REGRESSION=PASS`；`REGRESSION_SUITE_STATE=PASS`；`FULL_CORE_REGRESSION=PASS`；`FINAL_ACCEPTANCE=GRANTED`。
 - `MERGE_AUTHORIZATION=NOT_GRANTED`；`PROMOTION_AUTHORIZATION=NOT_GRANTED`；accepted SHA is a frozen functional anchor, not a merge or promotion record。
 - 以下有日期的既有 checkpoint、Writer／Reviewer 結果與 forecast 保留為歷史紀錄；其中 `PROJECT_SCORE` 是 legacy G24–G30 development-only acceptance score，不代表 overall completion。當前狀態以上列欄位為準。
 
-## G29 handoff — HANDOFF_COMPLETE / DEFERRED_TO_G30 (2026-09-03)
+## Historical G29 handoff — HANDOFF_COMPLETE / DEFERRED_TO_G30 (2026-09-03; superseded)
 
 - G28 is `HUMAN_ACCEPTED / PASS / COMPLETE` at `95/100`.
 - Approved remote `D:/GitBackup/PolyNexus_Backup.git`, ref
@@ -150,7 +152,7 @@ The G24–G30 program uses a bounded, development-only 100-point acceptance mode
 | WP-17 local endpoint profiles | 4 | 4 | G26 — HUMAN_ACCEPTED / PASS / CHECKPOINTED |
 | WP-18 classification/routing | 4 | 4 | G26 — HUMAN_ACCEPTED / PASS / CHECKPOINTED |
 | WP-19 WebSurface/MV3 boundary | 4 | 4 | G26 — HUMAN_ACCEPTED / PASS / CHECKPOINTED |
-| WP-20 authenticated Level 3A vendor flow | 5 | 0 | NOT_COMPLETE; 0/5; external/Human-operated verification deferred to G30 |
+| WP-20 authenticated Level 3A vendor flow | 5 | 5 | G30 — FINAL_ACCEPTED; ChatGPT/Claude/Gemini PASS |
 | WP-21 bounded browser fixture | 3 | 3 | Accepted through G21–G23 |
 | WP-22 workflow templates | 3 | 3 | G27 — HUMAN_ACCEPTED / PASS / CHECKPOINTED |
 | WP-23 backup/restore/migration | 2 | 2 | Accepted through G17/G22/G23 |
@@ -159,7 +161,7 @@ The G24–G30 program uses a bounded, development-only 100-point acceptance mode
 | WP-26 UX progressive disclosure | 2 | 2 | G28 — HUMAN_ACCEPTED / PASS / COMPLETE |
 | WP-27 Golden Workflow regression | 3 | 3 | G28 — HUMAN_ACCEPTED / PASS / COMPLETE |
 | CP-06 bounded RC hardening/closeout | 10 | 10 | Accepted through G19/G20/G22/G23 |
-| **Development total** | **100** | **95** | **5 points remain** |
+| **Development total** | **100** | **100** | **Bounded denominator complete; overall completion not defined** |
 | Competition | **—** | **—** | `NOTE_ONLY_NON_SCORING` |
 
 #### Ordered Goal forecast

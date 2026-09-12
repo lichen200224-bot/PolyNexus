@@ -2,11 +2,13 @@
 
 ## Current bounded acceptance state — 2026-09-12
 
-- `V1_BOUNDED_DEVELOPMENT_ACCEPTANCE_SCORE=95/100`: G24–G30 DEVELOPMENT-ONLY / V1 BOUNDED DEVELOPMENT ACCEPTANCE SCORE。
-- `OVERALL_PROJECT_COMPLETION=NOT_DEFINED`；95/100 不是 PolyNexus 整體完成率、roadmap 完成率、product readiness、MCF architecture 或 Plugin Platform 完成率。
-- `WP20=NOT_COMPLETE`（0/5）；`G30=NEED_ACTION`。
-- `MCF01=CHECKPOINTED / ACCEPTED_WITH_PRE_EXISTING_BASELINE_DEBT`；checkpoint `96ae53537e5501f1ef374182e7e1966b921a7883`。
-- `BASELINE-DEBT-01=FINAL_ACCEPTED`；`BASELINE_DEBT=CLOSED` for the accepted BASELINE-DEBT-01 scope；MCF-01 與 BASELINE-DEBT-01 均不增加 development points。
+- `V1_BOUNDED_DEVELOPMENT_ACCEPTANCE_SCORE=100/100`: G24–G30 DEVELOPMENT-ONLY / V1 BOUNDED DEVELOPMENT ACCEPTANCE SCORE。
+- `OVERALL_PROJECT_COMPLETION=NOT_DEFINED`；100/100 不是 PolyNexus 整體完成率、roadmap 完成率、production readiness、MCF architecture 或 Plugin Platform 完成率。
+- `WP20=FINAL_ACCEPTED`（5/5）；`G30=FINAL_ACCEPTED / CLOSED`；`G30_SCORE_DELTA=0`。
+- `CHATGPT_LIVE_LEVEL3A=PASS`；`CLAUDE_LIVE_LEVEL3A=PASS`；`GEMINI_LIVE_LEVEL3A=PASS`；`INDEPENDENT_REVIEW=PASS`；`FINAL_HUMAN_GOVERNANCE_ACCEPTANCE=GRANTED`。
+- `MCF01=CHECKPOINTED`；checkpoint `96ae53537e5501f1ef374182e7e1966b921a7883`。
+- `BASELINE-DEBT-01=FINAL_ACCEPTED / CLOSED`；MCF-01 與 BASELINE-DEBT-01 均不增加 development points。
+- `PRODUCTION_READINESS=NOT_CLAIMED`；`PLUGIN_PLATFORM=NOT_COMPLETE`；`MCF02=NOT_STARTED`；`EXTERNAL_RUNTIME_EXPANSION=NOT_COMPLETE`。
 - `ACCEPTED_CANDIDATE_SHA=aac597579ee6d369007343930d3a5b3ca7b929c5`；functional baseline `86d5939044c1d7ec2a991820f39287481ee9120f`；publication-rejected Candidate `180432d03f6d423bb3152c233fb4f0a5072868f5`。
 - `INDEPENDENT_REACCEPTANCE=PASS`；`PUBLICATION_INTEGRITY=PASS`；canonical freeze hashes `20/20`。
 - Fresh evidence：focused + migration `47 passed / exit 0`；G14 single `1 passed / exit 0`、module `13 passed / exit 0`；Full Core `818 passed / 0 failed / 1 existing Windows symlink-policy skip / exit 0`；stability `5 rounds × 40 passed / 0 failed / exit 0`。
@@ -14,7 +16,7 @@
 - `FINAL_ACCEPTANCE=GRANTED`；`MERGE_AUTHORIZATION=NOT_GRANTED`；`PROMOTION_AUTHORIZATION=NOT_GRANTED`。
 - 以下有日期的既有 checkpoint、Writer／Reviewer 結果與 forecast 保留為歷史紀錄；其中 `PROJECT_SCORE` 是 legacy G24–G30 development-only acceptance score，不代表 overall completion。當前狀態以上列欄位為準。
 
-## Current G29 Candidate State — HANDOFF_COMPLETE / DEFERRED_TO_G30 (2026-09-03)
+## Historical G29 Candidate State — HANDOFF_COMPLETE / DEFERRED_TO_G30 (2026-09-03; superseded)
 
 G29 preflight is complete in an isolated lane. By current Human routing,
 authenticated external Web verification is deferred to G30 and is not run in
