@@ -579,6 +579,60 @@ def test_missing_binding_stops_before_partial_mutation(db) -> None:
     reloaded_session.close()
 
 
+def test_unbound_created_run_survives_restart_without_launch(db) -> None:
+    session, SessionFactory, engine = db
+    run = _seed_run(
+        session,
+        state=RunState.CREATED,
+        runtime_ref="",
+        bind=False,
+    )
+    adapter = _RestartAdapter({})
+
+    report = asyncio.run(reconcile_non_terminal_runs(session, _registry(adapter)))
+    session.commit()
+    session.close()
+
+    reloaded_session = SessionFactory()
+    reloaded = SqlRunRepository(reloaded_session).get(run.id)
+    assert report == type(report)(examined=1, reconciled=0, orphaned=0)
+    assert reloaded is not None
+    assert reloaded.state is RunState.CREATED
+    assert reloaded.events == []
+    assert SqlRuntimeBindingSnapshotRepository(reloaded_session).get_by_run(run.id) is None
+    assert adapter.cancel_calls == 0
+    assert adapter.cleanup_calls == 0
+    assert adapter.status_calls == 0
+    reloaded_session.close()
+
+
+def test_created_run_with_claimed_binding_fails_closed(db) -> None:
+    session, SessionFactory, engine = db
+    run = _seed_run(
+        session,
+        state=RunState.CREATED,
+        runtime_ref="runtime:impossible-created-binding",
+        bind=True,
+    )
+    adapter = _RestartAdapter(
+        {"runtime:impossible-created-binding": RunState.RUNNING}
+    )
+
+    with pytest.raises(RestartReconciliationError, match="cannot own"):
+        asyncio.run(reconcile_non_terminal_runs(session, _registry(adapter)))
+
+    session.rollback()
+    session.close()
+    with SessionFactory() as reloaded_session:
+        reloaded = SqlRunRepository(reloaded_session).get(run.id)
+        assert reloaded is not None
+        assert reloaded.state is RunState.CREATED
+        assert reloaded.events == []
+    assert adapter.status_calls == 0
+    assert adapter.cancel_calls == 0
+    assert adapter.cleanup_calls == 0
+
+
 def test_app_lifespan_unbound_run_stops_and_disposes_engine(monkeypatch, tmp_path: Path) -> None:
     import polynexus_core.app as app_module
     from polynexus_core.persistence.database import dispose_engine
@@ -611,6 +665,47 @@ def test_app_lifespan_unbound_run_stops_and_disposes_engine(monkeypatch, tmp_pat
 
     with pytest.raises(RuntimeError):
         get_engine()
+
+
+def test_app_lifespan_preserves_unbound_created_run(monkeypatch, tmp_path: Path) -> None:
+    import polynexus_core.app as app_module
+    from polynexus_core.persistence.database import dispose_engine
+
+    db_path = tmp_path / "g14-app-created.db"
+    _upgrade_to_head(db_path)
+    engine = create_engine(
+        f"sqlite:///{db_path}",
+        connect_args={"check_same_thread": False},
+        future=True,
+    )
+    SessionFactory = sessionmaker(bind=engine, expire_on_commit=False, future=True)
+    seed_session = SessionFactory()
+    run = _seed_run(
+        seed_session,
+        state=RunState.CREATED,
+        runtime_ref="",
+        bind=False,
+    )
+    seed_session.close()
+    engine.dispose()
+
+    monkeypatch.setenv("POLYNEXUS_DATABASE_URL", f"sqlite:///{db_path}")
+    dispose_engine()
+    with TestClient(app_module.create_app()) as client:
+        response = client.get("/api/v1/health")
+        assert response.status_code == 200
+
+    engine = create_engine(f"sqlite:///{db_path}", future=True)
+    with Session(engine) as reloaded_session:
+        reloaded = SqlRunRepository(reloaded_session).get(run.id)
+        assert reloaded is not None
+        assert reloaded.state is RunState.CREATED
+        assert reloaded.events == []
+        assert (
+            SqlRuntimeBindingSnapshotRepository(reloaded_session).get_by_run(run.id)
+            is None
+        )
+    engine.dispose()
 
 
 def test_app_lifespan_runs_reconciliation_before_serving(monkeypatch, tmp_path: Path) -> None:

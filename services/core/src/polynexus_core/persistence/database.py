@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Generator
 
 from sqlalchemy import create_engine, event, inspect, text
+from sqlalchemy.engine import make_url
 from sqlalchemy.orm import Session, sessionmaker
 
 from polynexus_core.persistence.models import Base
@@ -13,22 +15,127 @@ _session_factory = None
 _ALEMBIC_DIR = Path(__file__).resolve().parents[3] / "alembic"
 _SCHEMA_NOT_AT_HEAD = "Database schema is not at the Alembic head"
 _SCHEMA_VERSION_UNAVAILABLE = "Database schema version could not be verified"
+_RELATIONSHIP_INTEGRITY_FAILED = "Database relationship integrity audit failed"
+
+
+@dataclass(frozen=True)
+class RelationshipViolation:
+    """One public-safe relationship violation found by the read-only audit."""
+
+    source_table: str
+    source_identity: str
+    relation: str
+    target_table: str
+    target_identity: str | None
+
+
+@dataclass(frozen=True)
+class RelationshipAudit:
+    """Read-only SQLite FK and application-owned relationship audit result."""
+
+    foreign_key_violations: tuple[RelationshipViolation, ...]
+    application_violations: tuple[RelationshipViolation, ...]
+
+    @property
+    def clean(self) -> bool:
+        return not self.foreign_key_violations and not self.application_violations
+
+
+_APPLICATION_RELATION_QUERIES = (
+    (
+        "tasks",
+        "context_package_id",
+        "context_packages",
+        """
+        SELECT task.id, task.context_package_id
+        FROM tasks AS task
+        LEFT JOIN context_packages AS context
+          ON context.id = task.context_package_id
+        WHERE task.context_package_id IS NOT NULL
+          AND (context.id IS NULL OR context.project_id != task.project_id)
+        """,
+    ),
+    (
+        "runs",
+        "context_package_id",
+        "context_packages",
+        """
+        SELECT run.id, run.context_package_id
+        FROM runs AS run
+        JOIN tasks AS task ON task.id = run.task_id
+        LEFT JOIN context_packages AS context
+          ON context.id = run.context_package_id
+        WHERE context.id IS NULL OR context.project_id != task.project_id
+        """,
+    ),
+    (
+        "artifacts",
+        "task_id",
+        "tasks",
+        """
+        SELECT artifact.id, artifact.task_id
+        FROM artifacts AS artifact
+        LEFT JOIN tasks AS task ON task.id = artifact.task_id
+        WHERE artifact.task_id IS NOT NULL
+          AND (task.id IS NULL OR task.project_id != artifact.project_id)
+        """,
+    ),
+    (
+        "artifacts",
+        "run_id",
+        "runs",
+        """
+        SELECT artifact.id, artifact.run_id
+        FROM artifacts AS artifact
+        LEFT JOIN runs AS run ON run.id = artifact.run_id
+        LEFT JOIN tasks AS task ON task.id = run.task_id
+        WHERE artifact.run_id IS NOT NULL
+          AND (
+            run.id IS NULL
+            OR task.project_id != artifact.project_id
+            OR (artifact.task_id IS NOT NULL AND artifact.task_id != run.task_id)
+          )
+        """,
+    ),
+    (
+        "findings",
+        "run_id",
+        "runs",
+        """
+        SELECT finding.id, finding.run_id
+        FROM findings AS finding
+        LEFT JOIN runs AS run ON run.id = finding.run_id
+        WHERE run.id IS NULL OR run.task_id != finding.task_id
+        """,
+    ),
+    (
+        "evidence",
+        "run_id",
+        "runs",
+        """
+        SELECT evidence.id, evidence.run_id
+        FROM evidence AS evidence
+        LEFT JOIN runs AS run ON run.id = evidence.run_id
+        WHERE run.id IS NULL OR run.task_id != evidence.task_id
+        """,
+    ),
+)
 
 
 def init_engine(database_url: str | None = None) -> None:
     global _engine, _session_factory
     if database_url is None:
         database_url = "sqlite:///poly.db"
+    is_sqlite = make_url(database_url).get_backend_name() == "sqlite"
     _engine = create_engine(
         database_url,
-        connect_args={"check_same_thread": False} if "sqlite" in database_url else {},
+        connect_args={"check_same_thread": False} if is_sqlite else {},
         future=True,
     )
-    if "sqlite" in _engine.url.database:
+    if _engine.dialect.name == "sqlite":
         @event.listens_for(_engine, "connect")
         def _set_sqlite_pragma(dbapi_connection, connection_record):
             cursor = dbapi_connection.cursor()
-            cursor.execute("PRAGMA journal_mode=WAL")
             cursor.execute("PRAGMA foreign_keys=ON")
             cursor.close()
 
@@ -92,6 +199,70 @@ def schema_head_status() -> bool:
     except Exception:
         return False
     return True
+
+
+def audit_relationships() -> RelationshipAudit:
+    """Inspect SQLite relationships without repairing or deleting any rows.
+
+    The audit combines SQLite's authoritative ``foreign_key_check`` with the
+    application-owned references that intentionally have no database FK.  It
+    performs no backup and no repair: callers must take an external backup
+    before using the result in any recovery workflow.
+    """
+    if _engine is None:
+        raise RuntimeError("Engine not initialized. Call init_engine() first.")
+    if _engine.dialect.name != "sqlite":
+        raise RuntimeError("Relationship audit is available only for SQLite")
+
+    with _engine.connect() as connection:
+        foreign_key_violations = tuple(
+            RelationshipViolation(
+                source_table=str(row[0]),
+                source_identity=str(row[1]),
+                relation=f"sqlite-fk:{row[3]}",
+                target_table=str(row[2]),
+                target_identity=None,
+            )
+            for row in connection.exec_driver_sql("PRAGMA foreign_key_check").all()
+        )
+        tables = set(inspect(connection).get_table_names())
+        application_violations: list[RelationshipViolation] = []
+        for source_table, relation, target_table, query in _APPLICATION_RELATION_QUERIES:
+            if source_table not in tables or target_table not in tables:
+                continue
+            application_violations.extend(
+                RelationshipViolation(
+                    source_table=source_table,
+                    source_identity=str(row[0]),
+                    relation=relation,
+                    target_table=target_table,
+                    target_identity=None if row[1] is None else str(row[1]),
+                )
+                for row in connection.exec_driver_sql(query).all()
+            )
+
+    return RelationshipAudit(
+        foreign_key_violations=foreign_key_violations,
+        application_violations=tuple(application_violations),
+    )
+
+
+def relationship_integrity_status() -> bool:
+    """Return a bounded readiness signal without exposing row identities."""
+    try:
+        return audit_relationships().clean
+    except Exception:
+        return False
+
+
+def verify_relationship_integrity() -> None:
+    """Fail startup closed when durable relationships cannot be trusted."""
+    try:
+        clean = audit_relationships().clean
+    except Exception:
+        raise RuntimeError(_RELATIONSHIP_INTEGRITY_FAILED) from None
+    if not clean:
+        raise RuntimeError(_RELATIONSHIP_INTEGRITY_FAILED)
 
 
 def drop_all() -> None:

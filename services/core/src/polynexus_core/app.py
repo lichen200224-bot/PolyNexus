@@ -28,6 +28,7 @@ async def _lifespan(app: FastAPI):
         dispose_engine,
         get_session,
         init_engine,
+        verify_relationship_integrity,
         verify_schema_head,
     )
     from polynexus_core.runtime.reconciliation import reconcile_non_terminal_runs
@@ -39,6 +40,7 @@ async def _lifespan(app: FastAPI):
         # upgrades schema implicitly and fails closed on an unknown/non-head
         # revision.
         verify_schema_head()
+        verify_relationship_integrity()
 
         # A restart must never resubmit a durable Run.  Reconcile existing
         # non-terminal Runs only after the schema exists and before serving routes.

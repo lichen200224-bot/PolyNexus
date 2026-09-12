@@ -17,6 +17,11 @@ from polynexus_core.persistence.database import get_session
 _LOOPBACK_TOKEN = os.environ.get("LOOPBACK_TOKEN", "")
 
 
+def loopback_auth_configured() -> bool:
+    """Return readiness only; never expose the configured credential."""
+    return bool(_LOOPBACK_TOKEN)
+
+
 def require_loopback(
     request: Request,
     x_loopback_token: Annotated[str | None, Header()] = None,

@@ -44,6 +44,7 @@ from polynexus_core.runtime.registry import (
 
 
 _UNBOUND_RUN_REASON = "Startup reconciliation requires an immutable runtime binding"
+_CREATED_BOUND_REASON = "CREATED Run cannot own an execution binding"
 _BINDING_UNAVAILABLE_REASON = "Run orphaned because its runtime binding is unavailable"
 _STATUS_UNAVAILABLE_REASON = "Run orphaned because runtime status could not be verified"
 _CLEANUP_UNVERIFIED_REASON = "Run orphaned because restart cleanup could not be verified"
@@ -97,7 +98,9 @@ async def reconcile_non_terminal_runs(
 ) -> ReconciliationReport:
     """Reconcile all non-terminal durable Runs without resubmission.
 
-    Missing or legacy-only bindings are a startup stop condition.  They are
+    Missing or legacy-only bindings on a claimed Run are a startup stop
+    condition.  An unclaimed CREATED Run is durable pending intent and is
+    deliberately left unchanged.  Claimed Runs are
     preflighted before any Run mutation so one bad row cannot leave a partial
     reconciliation pass.  A present binding whose adapter/status/cleanup is
     unavailable is instead persisted as ORPHANED through the legal lifecycle
@@ -118,6 +121,13 @@ async def reconcile_non_terminal_runs(
     bindings: dict[str, RuntimeBindingSnapshot] = {}
     for run in runs:
         binding = binding_repo.get_by_run(run.id)
+        if run.state is RunState.CREATED:
+            if binding is None or binding.legacy_backfill:
+                # A create-without-execute request has not crossed the execution
+                # claim boundary.  Restart must preserve it without fabricating a
+                # binding, contacting an adapter, or launching duplicate work.
+                continue
+            raise RestartReconciliationError(_CREATED_BOUND_REASON)
         if (
             binding is None
             or binding.legacy_backfill
@@ -134,6 +144,8 @@ async def reconcile_non_terminal_runs(
     orphaned = 0
 
     for run in runs:
+        if run.id not in bindings:
+            continue
         binding = bindings[run.id]
         try:
             profile = registry.resolve(binding.runtime_profile_ref)
