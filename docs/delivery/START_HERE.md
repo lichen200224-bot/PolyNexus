@@ -1,47 +1,46 @@
-# 完整初版＋新版擴充：文件與開工入口
+# 完整初版＋新版擴充：唯一文件與開工入口
 
 Date: 2026-09-12 (Asia/Taipei)
 Task: PREP-FULL-DELIVERY-01
 State: DOCUMENTATION_CANDIDATE / INDEPENDENT_DESIGN_REVIEW_REQUIRED
-Product implementation: HOLD
+Active branch: planning/full-delivery-design-consolidation
+Product implementation: HOLD_PENDING_START_GATES
 Product version: UNCHANGED
 
-## 1. 已授權與尚未授權
+Human已授權ChatGPT補齊前置文件、Git/GitHub發布與文件整併，正式產品開工交Codex；正常開發/UT/SIT/review/fix由AI處理，Human最後檢核。新增要求是各功能開發範圍、限制、子項及依賴必須事先清楚。本文件包實現這個規劃，不縮減Git定稿初版＋確認的新版增量。
 
-Human 已同意完整文件先行、AI 負責正常開發/測試/審查/修復、最後由 Human 檢核，並明確授權 ChatGPT 處理本次前置文件及 Git/GitHub。這個授權不是模擬或 Agent 自行核准。本輪可在專用分支新增/整理文件、保存來源、commit、non-force publish、建立 draft PR；不得順帶接受 MCF-02 程式、改寫凍結契約或執行產品程式變更。
+## 閱讀順序與單一來源
 
-完整目標 = Git 定稿初版功能 + 已確認的新版增量 - 有明確來源的取代項。B01 第一條真實閉環只是里程碑，不是完整產品終點。P0/N1 與 CORE/BASELINE/COMPATIBILITY/FUTURE 保持來源分級；不得用分批執行之名刪掉 required 功能。
-
-## 2. 單一導航，分開記錄事實
-
-| 閱讀目的 | 文件 |
+| 目的 | 入口 |
 |---|---|
-| 來源/接受邊界 | [SOURCE_INDEX](SOURCE_INDEX.md)、[SOURCE_LOCK](SOURCE_LOCK.json) |
-| 分支狀況/整併/回退 | [GIT_RECONCILIATION](GIT_RECONCILIATION.md) |
-| 已作出的設計梳理及未通過 Gate | [DECISION_AND_GAP_REGISTER](DECISION_AND_GAP_REGISTER.md) |
-| 完整需求/驗收追溯 | [PRD](PRD.md)、[REQUIREMENTS](REQUIREMENTS.md) |
-| 系統分析 | [SA](SA.md) |
-| 系統設計及資料/API | [SD](SD.md)、[DATA_AND_API](DATA_AND_API.md) |
-| 使用介面 | [UX_SPEC](UX_SPEC.md) |
-| 安全/Runtime | [SECURITY](SECURITY.md)、[RUNTIME_AND_MODULES](RUNTIME_AND_MODULES.md) |
-| 測試/非功能/操作 | [TEST_PLAN](TEST_PLAN.md)、[OPERATIONS](OPERATIONS.md) |
-| AI 分批執行 | [GOAL_PLAN](GOAL_PLAN.md)、[EXECUTION_CONTRACT](EXECUTION_CONTRACT.md) |
-| 獨立設計驗證 | [DESIGN_REVIEW](DESIGN_REVIEW.md) |
-| 最後交付給 Human | [UAT_AND_RELEASE](UAT_AND_RELEASE.md) |
+| 每個功能做什麼/不能做什麼 | [FEATURE_WORK_PACKAGES](FEATURE_WORK_PACKAGES.md)、[FEATURE_SCOPE_MATRIX](FEATURE_SCOPE_MATRIX.json) |
+| PN來源、完整功能與AC | [REQUIREMENTS](REQUIREMENTS.md)、[PRD](PRD.md)、[TARGET_AND_TEMPLATE_CONTRACTS](TARGET_AND_TEMPLATE_CONTRACTS.md) |
+| 來源身份與接受範圍 | [SOURCE_LOCK](SOURCE_LOCK.json)、[SOURCE_INDEX](SOURCE_INDEX.md) |
+| 全分支處置與衝突 | [BRANCH_DISPOSITION](BRANCH_DISPOSITION.md)、[GIT_RECONCILIATION](GIT_RECONCILIATION.md) |
+| 系統分析/設計 | [SA](SA.md)、[SD](SD.md)、[DATA_AND_API](DATA_AND_API.md) |
+| UX、Runtime、安全 | [UX_SPEC](UX_SPEC.md)、[RUNTIME_AND_MODULES](RUNTIME_AND_MODULES.md)、[SECURITY](SECURITY.md) |
+| 測試/安裝/備份/可攜 | [TEST_PLAN](TEST_PLAN.md)、[OPERATIONS](OPERATIONS.md) |
+| 批次執行及既有成果 | [GOAL_PLAN](GOAL_PLAN.md)、[EXECUTION_CONTRACT](EXECUTION_CONTRACT.md)、[IMPLEMENTATION_LEDGER](IMPLEMENTATION_LEDGER.md) |
+| 作者自檢與尚未關閉的Gate | [PREPARATION_VALIDATION](PREPARATION_VALIDATION.json)、[DECISION_AND_GAP_REGISTER](DECISION_AND_GAP_REGISTER.md) |
+| 獨立審查與Codex交接 | [DESIGN_REVIEW](DESIGN_REVIEW.md)、[CODEX_HANDOFF](CODEX_HANDOFF.md) |
+| 最後交Human | [UAT_AND_RELEASE](UAT_AND_RELEASE.md) |
 
-引用的詳細原件保存在 `references/`，以原 blob 重用；原件是有範圍的設計/歷史權威，不代表其舊 routing 或測試結果仍是本輪狀態。原主庫文件不大量覆寫，避免摧毀既有驗收履歷；本目錄是這次新文件基線的唯一工作入口。
+22功能包/77 PN/245規劃子項是可追溯分解，不是已完成產品或已通過全部原子source審查。每包包含allowed areas、forbidden、inputs/outputs、deps、正負SIT、UAT，每PN另有細部分解與limits；原frozen義務不因摘要刪除。
 
-## 3. 狀態不能混在一起
+## 來源與狀態分離
 
-- 產品保留 SHA：f0c0b986380dc21d103d4e856057cb8ac435a8f9。
-- Track A 正式文件接受來源：43aa27c8b7a1b950645acc0d41234ec7679b653e；TA-F4 receipt 記錄接受，不代表本輪重新獨立驗收。
-- Track A 凍結詳細來源：fe2eb2318dc6558afe1aa6c5361756b082c90c74。
-- 新治理來源：1ea8ce3df9bf6b1fc0899fcafaedeba2f4052af4；與產品線尚非同一合併基線。
-- MCF-02 修復候選：030890b30160f1063ac2cef1d36705a9ea70bddb；READY_FOR_FRESH_INDEPENDENT_REVIEW / IMPLEMENTATION_ACCEPTED=NO。既有候選不是 NOT_STARTED，也不是已接受。
-- G24–G30 100/100 僅是原 bounded acceptance；OVERALL_PROJECT_COMPLETION=NOT_DEFINED。
+產品保留SHA為f0c0b986380dc21d103d4e856057cb8ac435a8f9。Track A正式增量與TA-F4接受receipt來自43aa27c8b7a1b950645acc0d41234ec7679b653e，Frozen REV1/Work Packages來自fe2eb2318dc6558afe1aa6c5361756b082c90c74；GOV來源1ea8ce3df9bf6b1fc0899fcafaedeba2f4052af4。選定原件以exact blob保存，不直接覆蓋最新產品tree或舊接受歷史。
 
-## 4. 進入正式實作的必要條件
+MCF-02候選030890b30160f1063ac2cef1d36705a9ea70bddb仍待獨立review、未接受且未合入產品碼。原G24–G30 bounded100/100不是整個PolyNexus完成。兩個歷史ADR-013以ADR-MOD-013及ADR-ID-013消歧，不改原text/Golden。
 
-本文件包須先完成 exact-SHA 的 fresh independent design review、來源/需求/契約/測試對照、乾淨取得與工具可行性檢查；所有 design-blocking finding 必須關閉。之後由 Human 一次確認實際設計/授權範圍及資源預算，或留下同等明確的有條件開工授權 receipt，Codex 才可啟動 GOAL_PLAN。不得把「同意規劃」或建立本分支自動當成未來所有安全/遷移/外傳操作的授權。
+## 發布與開工邊界
 
-文件作者不能自我聲稱獨立設計驗收完成。Remote read-back 成功不等於 clean clone、Windows 實測、產品測試、live conformance 或 Human UAT。
+前置docs的commit與non-force發布已獲授權；整併為一條文件接續線不等於盲merge全部未審程式。原分支/default與產品source保留。原件內過期NEXT_GOAL/NOT_STARTED/95分是歷史，不是本branch的routing。入口為AGENTS＋docs/37＋本頁。
+
+作者可報結構self-check、actual exits、GitHub API publication；不可自行Independent PASS。正式開工先達設計審查、source closure、實機ownership/clean取得、target/安全/有限資源及有效start receipt。已具Human條件授權者不逐GOAL重問；缺不可委派條件者集中報例外。
+
+B01-TECH是內部技術里程碑，不縮小全功能或冒Human接受。必要Human-only UAT在最後集中完成；Agent credentials、fixture principal、Git授權不能替代真正Human決定。
+
+## 實際驗證範圍
+
+本次已執行scope matrix結構檢查與檢查器正反例；檢查器與矩陣upload blob與本地byte一致。它們只證明所列結構約束，不代表產品tests、全文件semantic/link closure或獨立審查完成。此環境Git CLI DNS失敗exit128，GitHub connector可用；API發布不是CLI push/clean-clone PASS。發布後exact commit與read-back證據以PR外部receipt記錄，避免文件自引用push循環。

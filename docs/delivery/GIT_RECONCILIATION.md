@@ -1,45 +1,52 @@
-# Git / GitHub 整併與衝突處置
+# Git / GitHub 整併、保全與接續
 
-## 1. 本輪觀察基準
+Task: PREP-FULL-DELIVERY-01
+Active preparation: planning/full-delivery-design-consolidation
+Canonical repository: lichen200224-bot/PolyNexus
+Product base: f0c0b986380dc21d103d4e856057cb8ac435a8f9
 
-Canonical repository: lichen200224-bot/PolyNexus。2026-09-12 以 GitHub REST 讀取 refs、trees、commit/compare。原 default branch 為 feature/g24-g30-development-completion-routing；未變更。原 13 branches 的 SHA 保存在 SOURCE_LOCK.json。
+## 1. 整併範圍
 
-本機 `git ls-remote --heads https://github.com/lichen200224-bot/PolyNexus.git` 實際 exit 128，原因為 DNS 無法解析 github.com；不能報成 Git CLI PASS。GitHub connector 的 remote reads/writes 可用，API 結果獨立記錄。沒有存取使用者電腦的工作樹，因此 local dirty/staged/untracked、尚存的 Agent process、clean-clone readiness 均未由本輪證明。
+Human授權本次文件/Git前置工作並要求單一接續線。採curated documentation integration：以f0產品tree為基礎，保存Track A正式/凍結、模組/MCF、跨機治理原件，集中PRD/SA/SD/功能scope/測試/批次/UAT文件。這不是未審程式的自動接受，也不以偽merge parents宣稱所有分支已合併。
 
-## 2. 已核對的關係
+寫入allowlist：AGENTS.md、DELIVERY_START_HERE.md、docs/37_CURRENT_ROUTING_INDEX.md、docs/delivery/**。其中docs/delivery/checks是前置文件結構檢查helper，不是產品runtime/code變更。原services/apps/extensions/workflows/schemas/scripts/tools及既有tests/migrations/dependencies保持不變。
 
-| Source | 相對 f0c0b986 的關係 | 處置 |
-|---|---|---|
-| feature/mcf-01-static-module-contract | product anchor 本身 | 本次文件 commit 的唯一 parent 起點；產品 bytes 保留 |
-| feature/g30-wp20-live-vendor-closure | 同一 f0c0b986 | 保留原 alias，不刪 |
-| codex/track-a-formalization@43aa27c8 | diverged；merge base f34e6b29；source ahead 6、behind 10 | 只匯入明確設計原件及接受來源，不能用整條分支覆蓋產品 |
-| governance/current@1ea8ce3d | 與產品 diverged；共同祖先86d59390 | 移植治理語意，重建 current routing；不採用過期95/100/IMPLEMENTING |
-| feature/mcf-02-opencode-acp-runtime@030890b3 | ahead 4、behind 0；祖先為 f0c0b986 | candidate-only；需獨立審查後才可作產品整合 |
-| codex/ta-lr-01@fe2eb231 | 已觀察為以 docs/AGENTS/skills 為主的來源樹 | 非產品完整樹；絕不直接拿來替代產品 checkout |
-| 其餘 architecture/tooling/history 分支 | ref 已盤點；未逐一驗收所有內容 | SOURCE_REFERENCE_ONLY，不宣稱無 merge conflict，也不任意清理 |
+舊docs/11/12/ADR/正式文件保留原bytes與歷史；當前routing由AGENTS＋docs/37＋delivery/START_HERE給出。來源文件內舊NEXT_GOAL不自行活化。原分支保留追溯，不作多個active Writer。原default/protection未在本次變更，不宣稱平台已強制停用舊Agent。
 
-## 3. 選擇的安全整併方法
+## 2. 分支及parent關係
 
-在 f0c0b986 的既有 tree 上建立 planning/full-delivery-design-consolidation。只改根 AGENTS、增加 DELIVERY_START_HERE 及 docs/delivery/**。來源原件以 exact blob pin 保存。新 commit 只有 product anchor 一個 parent，不假造其他分支已被 merge 或已接受。後續要整合產品時，使用已審查的明確候選及 integration receipt，不以本次文件 commit 充當產品 merge。
+完整原refs與SHA见SOURCE_LOCK，全分支逐項處置见BRANCH_DISPOSITION。已檢查：Track A正式線與f0 diverged，merge-base f34e6b29；GOV與產品線diverged，merge-base 86d59390；MCF修復030890b3在f0之後ahead 4/behind 0但仍未接受。
 
-保持 services/**、apps/**、extensions/**、workflows/**、schemas/**、scripts/**、tools/**、dependencies、既有 tests/migrations 與版號不變。以 top-level tree SHA 及 changed-path allowlist 驗證。文件驗證不需要把全部產品 tests 重跑一遍；但是不因此稱產品 regression PASS。
+準備分支從f0建立。先前成功保存的未掛branch tree已由aa7a2e398d2116c071b50ced52178756bcf9ae86恢復為SYNC_CHECKPOINT；之後功能scope與source補強用新增子commit接續。新發布SHA在外部receipt回讀，不寫自引用『本commit已push』。
 
-## 4. ADR 與狀態衝突的處理
+每次ref update皆force=false；父SHA取當前已核對的planning tip。若remote非預期即停止寫入，不能用force把其他人的進度蓋掉。已review candidate不amend/rebase，fix新增commit。
 
-歷史 ADR-013 有兩份：`docs/34_ADR_013_MODULAR_CORE_EXTENSION_ARCHITECTURE.md` 與 Track A `docs/34_ADR_013_WORK_GENERATION_CANDIDATE_AND_ACCEPTANCE.md`。本包使用 ADR-MOD-013 / ADR-ID-013 語意別名，SOURCE_INDEX 記 exact path/SHA。這是消歧，並非刪除、重新編號、升版或修改 frozen semantics。ADR-014 lifecycle 與 D11-A-LP 各有獨立 authority。
+## 3. 語意衝突處置
 
-舊 SA/SD 的 RuntimeBinding NOT_IMPLEMENTED、舊 current routing 的95/100、MCF02 NOT_STARTED 屬其來源 checkpoint 的歷史敘述；本包分開記 design authority、observed implementation、acceptance state。不得把舊文件整份覆蓋新狀態，也不得直接把所有 NOT_IMPLEMENTED 改成 PASS。
+兩份ADR-013分別用ADR-MOD-013和ADR-ID-013別名＋path/SHA解析；不更動原決議/Golden、不自行升版。舊RuntimeBinding未實作文字保留為source歷史；新entry分開actual source、bounded acceptance與待實作scope。
 
-## 5. 之後的開發接續
+MCF-02 proposal仍有NOT_STARTED文字，但030890候選已實作；new routing將它列candidate pending independent review。不得把兩種狀態拼成已接受，也不得重新從頭寫掉候選。將來要採用必須exact review＋與generation/lineage/ownership的新契約做semantic integration test；Git textual merge成功不代表接口正確。
 
-開工 receipt 鎖定 documentation candidate、selected product base、reviewed existing candidate 與允許的 task/integration refs。從該組合產生唯一 reviewed integration checkpoint，才派正式 Writer。MCF-02 與 Track A 同時涉及 execution_service/registry/identity 的部分，須在隔離整合 lane 做 semantic diff；不得因 Git 無 textual conflict 就判為契約相容。
+四類資料分開：已接受產品source、已接受設計source、本次設計候選、未接受產品候選。Source完整匯入同一文件checkout，不提升其maturity。其他歷史tooling/source refs只在需要時按exact scope重用，不整repo覆蓋。
 
-普通工作採一條 integration chain、single Writer、immutable review snapshots。必要子分支可用，但每輪都以記錄的 base SHA/reviewed SHA 整合。改動已凍結候選後要新 SHA 與受影響重驗；不能保留舊 PASS 貼在新 tree 上。
+## 4. 前置檢查與驗證限制
 
-新 develop/main、default branch 變更、rulesets/branch protection、merge strategy 平台強制不在本次文件發布內執行。若後續採用，另提供精確設定變更及 fallback；現時不宣稱 GitHub 已強制獨立審查。
+本輪本地Git CLI `git ls-remote --heads https://github.com/lichen200224-bot/PolyNexus.git`實際exit128，DNS無法解析github.com。GitHub connector可讀寫，屬API證據，不偽造成CLI push成功或clean clone完成。
 
-## 6. 實機接續與回退
+本地已執行FEATURE_SCOPE_MATRIX結構檢查、檢查器正例與四個強制失敗變體；GitHub接受的matrix/validator/selftest blobs與本地byte hash一致。詳見PREPARATION_VALIDATION。這是作者結構自檢，不等whole-repo tests、Windows/live conformance或independent semantic review。
 
-在使用者電腦讀取 remote exact ref 後，先查 `git status --short --branch`、`git diff --cached --name-status`、`git worktree list --porcelain`。dirty lane 不 checkout/reset/stash/clean；新建隔離 worktree，不能假設原 Agent 已停。無法確認 ownership 就禁止派新 Writer。
+發布後須回讀branch exact SHA、commit parent/tree、changed paths及protected root tree IDs；在PR receipt列實際結果。未執行的clean clone、原子source完整性、全部歷史reference closure仍明示待review，不能靠推送成功轉PASS。
 
-本包如被拒絕，保留 branch/commit 並停止採用即可；不需回退產品碼。已推送文件修正以新增 commit 處理，不改寫受審歷史。使用者既有分支與檔案未由本次操作删除，不能宣稱所有可能衝突已永久消除。
+## 5. Codex接續與衝突防止
+
+正式開工先鎖定reviewed docs commit、selected product/integration SHA、既有MCF處置、roles/allowlist/有限resources與target權限。新電腦不能只clone舊default後就猜是當前設計；明確使用本planning branch與receipt。
+
+實機先查repo root、remote、HEAD、staged/unstaged/untracked、worktree list及Agent ownership。原Human dirty lane不checkout/reset/clean/stash；新建隔離工作區。lease/CLEAN/PID不單獨代表安全，owner未知就不派新Writer。
+
+一個active Writer依功能包順序處理shared execution_service、registry、schema與UI shell。Migration從實際head線性新增、測restore；不預占相同revision。每個interface改動有impact与消費者回歸，不用整檔覆蓋或跳過previous contract。
+
+## 6. 回退與最終邊界
+
+若文件候選未被接受，保留branch/commit並停止採用；產品未改，不需rollback user code。修訂用新commit。舊branches、default、accepted source、不可變歷史皆保留，未擅刪。
+
+本次完成的是單一文件接續線與待審前置候選，不是宣稱所有程式分支已merge、所有潛在衝突永久不存在或正式release。最終產品接續仍須獨立設計審查與實機Start Gate。

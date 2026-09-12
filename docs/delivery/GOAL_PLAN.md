@@ -1,67 +1,47 @@
-# Codex 完整交付執行計畫與依賴
+# Codex 完整交付批次與依賴
 
-Status: PLAN_READY_FOR_DESIGN_REVIEW / PRODUCT_START_HOLD。目標是全初版＋確認擴充，不是只做B01。D0/D1/D2等為本交付包的分組，不改舊WP/Goal身份或計分；精確scope以PN需求＋原來源義務共同構成。
+Status: DRAFT_FOR_INDEPENDENT_DESIGN_REVIEW / PRODUCT_START_HOLD
+Primary scope: [FEATURE_WORK_PACKAGES](FEATURE_WORK_PACKAGES.md)及[FEATURE_SCOPE_MATRIX](FEATURE_SCOPE_MATRIX.json)。原PN、WORK S0/W1–W6/B01與frozen invariants保持；批次代號不是新產品版本，也不是每個都需Human批准。
 
-## 1. 正確的依賴順序
+## 1. 正常接續順序
 
-```text
-PREP docs + source/Git reconciliation
-  -> independent design review + bounded start receipt
-  -> D0 (S0 stability)
-  -> D1a (W1 input/workspace/generation/lineage)
-  -> D2a (W2 real-executor feasibility and controlled execution)
-  -> D1b (W3 Candidate -> W4 verification -> W5 Human -> W6 accepted result/P0)
-  -> B01 independent real working-product verification
-  -> D2b (remaining required runtimes/modules/local capabilities)
-  -> D3 (full workflow/Council/templates/policy collaboration)
-  -> D4 (full daily UX/Web/Doctor/maintenance)
-  -> D4-NEXT (N1 and WebSocket target completion under original scope)
-  -> T1 full functional SIT
-  -> T2 reliability/security/migration/clean-install SIT
-  -> DELIVERY rehearsal/package
-  -> HUMAN_UAT
-```
+| Unit | 工作範圍 | 技術完成與下一步 |
+|---|---|---|
+| PREP | ChatGPT整合文件/source/Git；FD-22 | exact docs checkpoint、fresh independent design review與一次性有界start receipt；未達不開產品 |
+| D0 | FD-01、FD-20.MIG基礎核對；WORK S0 | FK、CREATED restart、schema/auth/health正負測試；不重做已接受ordering/cleanup |
+| D1a | FD-02/03/04、FD-10.BASE、FD-18.BASE及必要migration | Project/input/context/generation/lineage/ownership、REST最小操作、政策/秘密邊界 |
+| D2a | FD-05/06/07/08的第一核准target；WORK W2 | 先feasibility，再真cwd/change/cancel/cleanup/output；MCF候選先獨立審查再按責任整合 |
+| D1b | FD-11→FD-12→FD-13→FD-14；WORK W3–W6 | Candidate/verification/Human協議/accepted result/P0；可用fixtures驗局部但不冒live |
+| B01-TECH | FD-21.B01 subset | 小型真bug fix與failure/retry的技術鏈；Human-only尚未做標PENDING_FINAL_HUMAN_UAT，不稱B01_HUMAN_ACCEPTED |
+| D2b | FD-08其餘required深度Runtime、FD-09、FD-06剩餘相容性 | 完整原定Codex/OpenCode/Local能力，逐target證據，不互借PASS |
+| D3 | FD-15/16、FD-10.MIXED、FD-12 workflow gates | Council、九範本、完整workflow、安全雲地混用、真實證據 |
+| D4 | FD-17/18、FD-19、FD-20.OPS及FD-02/03生命週期差額 | Web/UX/Doctor/guards/metrics/backup/clean install日用能力 |
+| D4-NEXT | FD-18.WS、FD-20.N1 | 按原scope交付後續live通知與selected-task可攜，不變cloud sync/Enterprise |
+| T1 | FD-21功能SIT | 全required正常情境，UI→Core→target→資料/證據完整串接 |
+| T2 | FD-21可靠性/安全SIT | failure/race/ownership/egress/secret/migration/restore/clean-install等required evidence |
+| DELIVERY | FD-21/22 | 完整PN/子項核銷、繁中手冊、exact套件/證據/限制、AI操作演練 |
+| HUMAN_UAT | UAT_AND_RELEASE的HU-01–12 | Human集中完成必要真實操作与最後接受；同scope問題仍交AI修復回歸 |
 
-D1/D2在REQUIREMENTS是責任群，不能解讀成先做完所有D1才做D2。D1b的凍結/驗證/接受可以先實作純邏輯tests，但不得在W2可行性前宣告真實working-product成果。D0必要S0不能被既有BASELINE-DEBT PASS整包替代。D3/D4在dependency成立時可做只讀設計/測試規劃，仍只一個active coding Writer。
+B01-TECH不變更產品Human接受語意；只是避免開發流程在中途等待每個Human Gate。後續有必要依賴真實Human決定/帳號/外傳的步驟仍不得自動繞過。可以安全獨立開發的功能按依賴繼續。沒有實際Human Accept不能把fixture或test principal算成使用者接受。
 
-## 2. 交付包定義
+## 2. 每批執行協議
 
-| Unit | Inputs / scope | Output / exit | 禁止偷渡 |
-|---|---|---|---|
-| PREP | f0產品＋FORMAL/FROZEN/MOD/GOV/MCF來源 | 唯一文件入口、exact docs candidate、完整需求/設計/測試、independent review | 不匯入未接受MCF source、不改default/history |
-| D0 | PN064–067；WORK S0；已有ordering/cleanup成果 | FK每連線、legacy audit、CREATED restart、schema/auth/UI分層health；正負測試與review | 不fakebinding、WAL強制、真DB repair |
-| D1a | PN043–048；S0通過 | input snapshots、generation/control、workspace four axes、same-generation lineage；late-Abort/dirty preservation | 不parallelcoding、不以lease/PID當ownership |
-| D2a | PN016–021/068–073；WORK W2；D1a | 先real feasibility，再核准單target實作；cwd/change/cancel/timeout/cleanup/Artifact真證據 | 不把deny-all fixture當可改碼、不默認direct Human workspace |
-| D1b-W3 | PN010/049/050；D2a真outcome | REV1 snapshots/changeset/candidate/publication、quiescence/source closure、fixed Golden tests | 不重算expected IDs、不混generation入CandidateID |
-| D1b-W4 | PN012/015/051/052 | exact Candidate EvidenceSet/verification、四軸結果及validity | 不跨Candidate借PASS、不可改被驗source |
-| D1b-W5 | PN053–058；A-LP正式語意 | Human-only enrollment/session/challenge/append history、D11-C fallback、API+UI負例 | 不以Agent/chat/Git auth代Human，無Override |
-| D1b-W6 | PN059/060/062；W3–W5 | accepted managed result、explicit takeover label、P0 source重建、durable monitor | Accept不autoapply/Git；N1不擋P0 |
-| B01 | PN060/067/072/073及S0/W1–W6必需case | 一個真bug fix＋一次failure→retry/recovery，actual Source/Test/Evidence/Human/Open/P0 | 不當完整release，不靠simulator |
-| D2b | PN016–023/030/032/033/040–042；B01 | 完整required Codex/OpenCode、local endpoints、交換module、Doctor/conformance差額 | 無未授權backuptarget/marketplace，無支援成熟度虛報 |
-| D3 | PN004–015/027–029 | workflow step execution、Council/cross review/synthesis、九範本、policy/local-mixed | 不造generic BPM、同一答覆冒多角色 |
-| D4 | PN001–003/011/024–026/031–039及UX | UI/日用/三Web fallback/guard/metrics/backup/clean install差額 | 不靠人工改DB/重貼log完成正常工作 |
-| D4-NEXT | PN061/063；完整目標中的後續階段 | N1 selected-task portability與WS目標，保持durable truth與import信任隔離 | 不變成cloud sync/enterprise或native session保證 |
-| T1/T2 | AT001–077與所有source required oracles | 完整SIT、安全/恢復/upgrade/restore/clean install，zero unresolved BLOCKER/MAJOR | 缺必做不改N/A；歷史測試不冒current |
-| DELIVERY | 全需求核銷、exact final candidate | 可用套件、繁中手冊、報告、Evidence index及AI rehearsal | 不產生Human Accept/production release |
+每包先固定doc/base/candidate SHA、主責PN和所有子項、input/output、exact file allowlist、protected areas、角色、test profile/commands/oracles、finite resource、stop conditions。當次read-only inventory可解析內部symbol/path與現有可重用成果；不重問已決定的需求。
 
-## 3. 每個執行單元的工作契約
+Writer依設計完成code＋UT＋contract＋integration smoke，request fresh review；finding回Writer修復、新candidate、受影響重驗，再接下一已批准包。所有低風險同scope操作包含於批次授權，不逐GOAL請Human。
 
-開始時鎖定：unit id、predecessor/selected integration SHA、required PN/source clauses、入口依賴、exact allowed existing paths與新增path rules、protected paths、owner/reviewer、test commands/expected oracles、resource envelope、stop conditions、預期artifact/交接。
+JSON deps是技術facet依賴，不是全部UAT接受依賴。共享DB/migration/registry/execution_service/UI入口依FEATURE_WORK_PACKAGES§4由single Writer序列處理；不能因工具不同就平行覆盖。
 
-Path allowlist由SD責任邊界與actual diff形成，不使用`git add .`。新增private file可以在已批准責任內自行決定，但不能借『新檔』增加子系統。每unit範圍包括實作、UT、contract、integration smoke、review、同範圍defect修復、回歸與sanitized ledger；不得把UT延後至最後SIT才開始。
+## 3. 既有成果與Git整合
 
-## 4. 既有候選與差額重用
+唯一前置文件線是planning/full-delivery-design-consolidation，從f0產品保留錨點接續。Track A正式/凍結、GOV、MCF文件在同一文件tree可讀；source pins保留原始lineage，不假造全分支merge。
 
-先讀IMPLEMENTATION_LEDGER。f0的accepted bounded成果保留，只有受影響/required release tests重跑。MCF030890先在其exact source做獨立候選審查，再與D1工作區/identity設計做相容性整合；若有修復新SHA保留舊lineage，不能在已review snapshot上amend。
+MCF030890是待審程式候選，不能因把文件帶入就算accepted。獨立審查後，在指定integration checkpoint做semantic diff與新generation/ownership/publication契約整合；不能只看textual merge。原已接受成果保留，實作差額與required final tests按影響判定，不從頭重做整個產品。
 
-Formal/Freeze已接受的是契約，不等產品實作。需要改資料schema按DATA_AND_API/additive migration及fixtures演練，原Human DB保持不動。來源分支不符合完整producttree者只作文件來源，不能選成implementationbase。
+舊F5/S0/Goal的Human逐項路由不自動活化。本次新start receipt會指定實際Codex base與整批權限，不抹掉舊決議也不由文件作者私自給未具條件的產品開工。
 
-## 5. Continuation與中斷
+## 4. 接續與完成
 
-Controller保存PN/unit/checkpoint/review/findings/evidence references，不把全部log與歷史塞下一context。Quota/timeout中斷前保存safe SYNC checkpoint及下一精確工作；未驗completed不標PASS。新context先驗base/branch/ownership、只讀必要delta，再接續。某UI沒有自動重啟能力時，結果應是CONTINUATION_READY，不宣稱背景必定自行工作。
+Context/quota中斷保存safe SYNC及精簡handoff，record exact refs、已完成/未驗、findings及下一動作。新context重驗remote/owner/branch後接續；没有自动重啟能力就報CONTINUATION_READY，不承諾背景工作。
 
-同根因多次失敗先改由fresh root-cause review，不重跑無關suite製造活動。接續單元不等自主recursive delegation，只有execution receipt列明的角色與routing可啟動。
-
-## 6. Progress model
-
-分開呈現需求設計覆蓋、功能實作狀態、有效測試、独立審查、Human acceptance五層。原G24–G30分數保留，不將這些新單元自動加進100分分母。B01只是working-product milestone；完整交付須核銷所有required PN和原件義務，不以『七個Goal都跑過』代替。
+进度分設計覆蓋、差額實作、有效tests、independent review、Human接受。原100分分母不擴張；B01只是里程碑，不能替全功能交付。最終所有required PN/原條款/子項都要核銷，不能只報執行了多少GOAL。

@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "goal_id": "TA-F4",
+  "result_type": "GOVERNANCE_FORMAL_SYNC_VERIFICATION",
+  "status": "HUMAN_ACCEPTED",
+  "checkpoint_type": "ACCEPTED",
+  "reviewed_result_sha": "f62d3ec1d0afa72191d1a63ae43f3bfb4089d296",
+  "acceptance_receipt_sha": "SELF_RECEIPT",
+  "parent_rule": "DIRECT_SINGLE_PARENT_C",
+  "independent_review": "PASS",
+  "push_recommendation": "APPROVE_TO_PUSH",
+  "human_acceptance": "APPROVED",
+  "receipt_scope": "METADATA_ONLY",
+  "remote_branch": "codex/track-a-formalization",
+  "remote_c_verified": "YES",
+  "f4": "COMPLETED",
+  "f5": "NOT_AUTHORIZED",
+  "s0": "NOT_AUTHORIZED",
+  "s0_predecessor": "UNASSIGNED",
+  "product_implementation": "HOLD",
+  "next_goal": "TA-F5",
+  "next_goal_authorization": "HUMAN_AUTHORIZATION_REQUIRED",
+  "eligible_s0_predecessor_candidate": "SELF_RECEIPT",
+  "independent_review_package": "PolyNexus_TA-F4_External_Review_20260911_135026.zip",
+  "independent_review_package_sha256": "59018bb0a6fb301e357c0a12d4542ca3905f789787bca2ecd1c9e1faffd44dd7",
+  "changed_files": [
+    "docs/handoffs/TA-F4/accepted.md",
+    "docs/reviews/TA-F4/acceptance-receipt.json",
+    "docs/reviews/TA-F4/human-decision.md",
+    "docs/reviews/TA-F4/independent-review.md",
+    "docs/reviews/TA-F4/remote-c-proof.json"
+  ],
+  "payload_manifest": [
+    {"path":"docs/handoffs/TA-F4/accepted.md","size":929,"sha256":"51b0dbae6908f0cd9e79fdf59c1404d91dc483bfb57baebea870e139fd263f9f"},
+    {"path":"docs/reviews/TA-F4/human-decision.md","size":1159,"sha256":"75d3ad6a42b8c16a1ce32c512a2f6561f7544a20580b4de03357c8b358bcbb1f"},
+    {"path":"docs/reviews/TA-F4/independent-review.md","size":864,"sha256":"d7510c2335c94d619b5b84c17434a284bc47e81ba092cff4b4346bc6a4b922b2"},
+    {"path":"docs/reviews/TA-F4/remote-c-proof.json","size":1104,"sha256":"6c5434102cdefaf93472a382c21c8c8d2b2de2b3816667cb2476259acd231847"}
+  ],
+  "reviewed_candidate_files_preserved": [
+    "docs/goals/TA-F4.md",
+    "docs/handoffs/TA-F4/review-ready.md",
+    "docs/reviews/TA-F4/ENVIRONMENT_FINGERPRINT.md",
+    "docs/reviews/TA-F4/FORMAL_SYNC_VERIFICATION_REPORT.md",
+    "docs/reviews/TA-F4/REVIEW_PACKET.md",
+    "docs/reviews/TA-F4/VALIDATION_RESULTS.md",
+    "docs/reviews/TA-F4/evidence/cross-reference-report.json",
+    "docs/reviews/TA-F4/evidence/formal-delta-report.json"
+  ]
+}
