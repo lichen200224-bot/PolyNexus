@@ -55,3 +55,7 @@ REQUIREMENTS.md是核銷索引，不取代原件完整條款。P0先完成S0穩�
 完整交付的AI終点為READY_FOR_HUMAN_UAT：本輪required需求對應有效證據、沒有未解BLOCKER/MAJOR、套件與被驗source一致、操作手冊經演練。Human最終檢核用途/操作/成果接受；AI不產生Human Accept。
 
 必要live帳號/明確send保留真實操作邊界，可集中於預先安排的操作清單，但不得以fixture冒充。不能把未完required功能藏成known limitation。原2026-10-18/10-31為來源時程，未重新完成估算前不承諾新的日期。
+
+## 7. Assurance 與指標補齊（F001／F002）
+
+PN-078 是既有 BASELINE 必做能力，唯一主責 FD-12。Mode＝FLEXIBLE／STANDARD／VERIFIED；Status＝UNREVIEWED／SELF_REVIEWED／CROSS_REVIEWED／VERIFIED。Mode 是要求的審查策略，Status 是已證實深度，不能代替 outcome、maturity 或 Human acceptance。具體選擇、變更、可觀察結果與限制見 [ASSURANCE_CONTRACT §1–4](ASSURANCE_CONTRACT.md#authority)。PN-038 的 human override 保留為非權限性人機建議分歧遙測，唯一語意見[§5](ASSURANCE_CONTRACT.md#metric)；正負驗收見[§6–7](ASSURANCE_CONTRACT.md#tests)。

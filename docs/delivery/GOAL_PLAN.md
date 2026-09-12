@@ -11,7 +11,7 @@ Primary scope: [FEATURE_WORK_PACKAGES](FEATURE_WORK_PACKAGES.md)及[FEATURE_SCOP
 | D0 | FD-01、FD-20.MIG基礎核對；WORK S0 | FK、CREATED restart、schema/auth/health正負測試；不重做已接受ordering/cleanup |
 | D1a | FD-02/03/04、FD-10.BASE、FD-18.BASE及必要migration | Project/input/context/generation/lineage/ownership、REST最小操作、政策/秘密邊界 |
 | D2a | FD-05/06/07/08的第一核准target；WORK W2 | 先feasibility，再真cwd/change/cancel/cleanup/output；MCF候選先獨立審查再按責任整合 |
-| D1b | FD-11→FD-12→FD-13→FD-14；WORK W3–W6 | Candidate/verification/Human協議/accepted result/P0；可用fixtures驗局部但不冒live |
+| D1b | FD-11→FD-12→FD-13→FD-14；WORK W3–W6 | Candidate/verification/Assurance assessment/Human協議/accepted result/P0；可用fixtures驗局部但不冒live |
 | B01-TECH | FD-21.B01 subset | 小型真bug fix與failure/retry的技術鏈；Human-only尚未做標PENDING_FINAL_HUMAN_UAT，不稱B01_HUMAN_ACCEPTED |
 | D2b | FD-08其餘required深度Runtime、FD-09、FD-06剩餘相容性 | 完整原定Codex/OpenCode/Local能力，逐target證據，不互借PASS |
 | D3 | FD-15/16、FD-10.MIXED、FD-12 workflow gates | Council、九範本、完整workflow、安全雲地混用、真實證據 |
@@ -45,3 +45,8 @@ MCF030890是待審程式候選，不能因把文件帶入就算accepted。獨立
 Context/quota中斷保存safe SYNC及精簡handoff，record exact refs、已完成/未驗、findings及下一動作。新context重驗remote/owner/branch後接續；没有自动重啟能力就報CONTINUATION_READY，不承諾背景工作。
 
 进度分設計覆蓋、差額實作、有效tests、independent review、Human接受。原100分分母不擴張；B01只是里程碑，不能替全功能交付。最終所有required PN/原條款/子項都要核銷，不能只報執行了多少GOAL。
+
+
+## 5. F001／F002 的批次補充
+
+PN-078/FD-12在D1b-W4交付Assurance基礎、D3串workflow/Council、D4串UI；依[ASSURANCE_CONTRACT](ASSURANCE_CONTRACT.md)及SIT-15/HU-03/06核銷。PN-038/FD-19在D4完成受限human override metric，SIT-13/06及HU-12驗無接受副作用。這是恢復既定範圍，不新增工作包、不改DAG、不多開coding Writer；修復Candidate仍待獨立重審。

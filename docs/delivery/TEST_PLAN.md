@@ -1,6 +1,6 @@
 # Master Test Plan — 完整功能、SIT、可靠性與證據
 
-Status: TEST_DESIGN_DRAFT / TEST_EXECUTION_NOT_RUN。AT-001–AT-077 是 REQUIREMENTS.md 中的規劃案例ID，不是假稱目前已有這些test functions。原WORK各WP正負案例、REV1 Golden與I-01–I-23仍是必要oracle；此文件整併執行方式，不減少原驗收義務。
+Status: TEST_DESIGN_DRAFT / TEST_EXECUTION_NOT_RUN。AT-001–AT-078 是 REQUIREMENTS.md 中的規劃案例ID，不是假稱目前已有這些test functions。原WORK各WP正負案例、REV1 Golden與I-01–I-23仍是必要oracle；此文件整併執行方式，不減少原驗收義務。
 
 ## 1. 測試層次與責任
 
@@ -39,6 +39,8 @@ Case implementation與oracle分開。REV1的expected IDs固定引用原值；不
 | SIT-12 | PN-034/035/039/061–063 | 代表性legacy DB upgrade/restore、P0/N1差異、跨路徑重建、REST cursor/WS重連去重、乾淨安裝 |
 | SIT-13 | PN-036–038/077 | 按UX所有empty/loading/error/offline/keyboard/focus分支演練；metric來源可定位；無log才能完成的常態工作 |
 | SIT-14 | PN-074–076 | 指定owned process故障/斷線/quota/重啟、batch checkpoint恢復、same-scope修復→獨立重驗；不因中斷重跑已接受全部歷史 |
+
+| SIT-15 | PN-078、PN-038及FD-12/19 | [ASSURANCE_CONTRACT §6](ASSURANCE_CONTRACT.md#tests)：三Mode、四Status、快照/衍生/失效/DTO，metric不產生接受事件；每值有P/N oracle |
 
 每Scenario仍細分AT案例，不以SIT-xx一列覆蓋全部細節。B01必須真實完成SIT-02–07適用部分，不能拿SIT-01 reference流程取代。T1/T2對完整交付的required功能核銷，不只B01。
 
@@ -89,3 +91,9 @@ Manual Human/browser操作無OS exit時寫`N/A`並保留操作與觀察證據；
 所有適用required案例執行、有效/精確綁定、actual exits及oracles符合，無BLOCKER/MAJOR且完整需求核銷才可進UAT rehearsal。Optional skip須理由與影響；required skip/unknown/blocked不轉N/A。既有Windows symlink skip不可在新required security test上自動沿用豁免。
 
 同範圍defect→Writer→new immutable checkpoint→targeted/affected/full-required regression→fresh review→close finding；不逐次找Human授權。若需改scope、frozen trust、不可逆資料或資源上限，依execution exception。測試全部綠不等Human接受或production release。
+
+## 9. F001／F002 修復驗收與結構檢查
+
+PN-078 的11個子項逐一使用[ASSURANCE_CONTRACT §6](ASSURANCE_CONTRACT.md#tests)的AT-078-P01–11／N01–11。PN-038新增AT-038-MP01/MP02/MN01/MN02：合法分歧/去重/UNKNOWN與metric不建立Human acceptance。具體source→子項→primary FD→design→oracle→SIT/HU在[ASSURANCE_TRACEABILITY](ASSURANCE_TRACEABILITY.json)。這26個是後續產品案例規格，不是本輪已執行測試。
+
+本轮planning checker從REQUIREMENTS與matrix動態計數，並比對三份pinned source及七個Assurance值的完整映射；selftest移除各value/mapping/source/owner/oracle或偷偷賦予metric接受權必須fail。它只證明明列結構/引用，不能替代完整semantic review或產品test。舊PREPARATION_VALIDATION.json屬前身1489cd7f作者紀錄，本次結果另見REPAIR_RECORD.md及REPAIR_VALIDATION.json。

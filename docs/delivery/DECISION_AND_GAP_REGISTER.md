@@ -16,7 +16,7 @@
 | D10 | MCF deny-all不等於可真實改碼 | 原candidate的限制保留；live可行性/受控write與config支援單獨Gate | 版本固定、真實cwd/change/cancel/cleanup證據；不得直接關閉permission gate |
 | D11 | Native工作副本與external staging差異 | Core managed worktree管理generation；external adapter只取得projected staging；Core驗證import後形成result snapshot | containment、ownership、drift、quiescence正負案例 |
 | D12 | Git/default分支與保護未整合 | 只建立文件lane，不改default/protection，不假稱已強制review | 後續integration receipt與實際平台設定或procedural fallback |
-| G01 | 獨立設計審查 | NOT_RUN；本作者不可自我獨立驗收 | Fresh AI Reviewer exact-SHA報告、無BLOCKER/MAJOR |
+| G01 | 獨立設計審查 | 前身1489cd7f=NEED_FIX；本修復Candidate待fresh re-review，作者不得自判關閉 | Fresh AI Reviewer exact-SHA報告、無BLOCKER/MAJOR |
 | G02 | clean clone與實機能力 | NOT_RUN；本環境git DNS exit128；API readback不替代 | Codex開工前隔離取得、branch/HEAD/source/test-tool檢核 |
 | G03 | 完整逐原子需求/source覆蓋 | 本包需求清單與繼承原件共同構成規格，不能只按列表數量算完整率 | Reviewer逐原件條款覆蓋與例外清單；必做項不可遺漏 |
 | G04 | 真實target/API/配額/帳號 | 不在Git保存值；可行性於環境 Gate驗證 | 事先配置可用target與有限預算，Human-only動作列操作清單 |
@@ -27,3 +27,9 @@
 本包新增的SQL表名、HTTP路由/DTO、UI呈現、操作參數是依凍結語意提出的實作設計草稿，不是假稱已存在的API，也不擅改Golden身份。Frozen invariant或public RuntimeAdapter/RuntimeBindingSnapshot語意需要改動時，須提出impact與Human決議；正常内部實作選擇可在已接受設計與批次授權內自行決定。
 
 設計審查發現一般文字/映射/缺測問題，回前置文件Writer修正並重新發布，無需讓Human逐條再次批准已同意的產品需求。若涉及實質範圍/信任變更，才集中提交例外決策。
+
+### D13／D14：同範圍修復與來源消歧
+
+D13：Formal Scope§2/§5、PRD§7的Assurance未映射，現新增PN-078，由FD-12唯一主責，詳細設計與三Mode/四Status對應[ASSURANCE_CONTRACT](ASSURANCE_CONTRACT.md)。未改source literals、PN-052四軸、Frozen或D11。新詳細轉移/DTO為待審實作映射，不冒原文逐字規定。
+
+D14：Formal PRD§10的human override與D11 no Override Accept並存。保留舊名稱，限為合法可歸因Human相對AI建議分歧的單向遙測；[唯一metric contract](ASSURANCE_CONTRACT.md#metric)及AT-038-MN02明定不建立/推論/授權/繞過Human接受。未刪metric，未增加Override Accept。F001/F002作者修復狀態為WRITER_REPAIRED_PENDING_REVIEW；獨立關閉權屬Fresh Reviewer，G05維持HOLD。

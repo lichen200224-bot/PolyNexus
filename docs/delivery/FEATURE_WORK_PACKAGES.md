@@ -4,7 +4,7 @@ Status: DRAFT_FOR_INDEPENDENT_DESIGN_REVIEW
 Task: PREP-FULL-DELIVERY-01
 範圍：Git 已定稿初版＋最後確認的擴充增量；產品版本不變。
 
-[功能契約資料](FEATURE_SCOPE_MATRIX.json)是本文件的逐項附錄：22個FD工作包、77個PN主需求、245個以分號拆分的功能子項。這是本次規劃的分解數量，不是產品完成率，也不是宣稱所有原子來源條款已經獨立審查。每個PN恰有一個primary owner；其他包透過依賴使用其契約，不重造同一能力。
+[功能契約資料](FEATURE_SCOPE_MATRIX.json)是本文件的逐項附錄：22個FD工作包、78個PN主需求、257個以分號拆分的功能子項。這是本次規劃的分解數量，不是產品完成率，也不是宣稱所有原子來源條款已經獨立審查。每個PN恰有一個primary owner；其他包透過依賴使用其契約，不重造同一能力。
 
 ## 1. 三份文件的分工
 
@@ -41,7 +41,7 @@ Task: PREP-FULL-DELIVERY-01
 | Stop | 範圍/公開契約/安全/不可逆動作/資源上限/unknown ownership等依EXECUTION_CONTRACT停止相應動作 |
 | Handoff | 本包具體產物、版本/相容性差額、未驗項、下一可執行單元及stop條件 |
 
-245個子項不是245份各自重複的主規格；共用安全/事件/驗證規範以引用繼承。不能因共用而只驗一個子項就標整PN PASS。尤其九範本、三Web vendor、三Local endpoint、兩深度Runtime分別保存結果。
+257個子項不是257份各自重複的主規格；共用安全/事件/驗證規範以引用繼承。不能因共用而只驗一個子項就標整PN PASS。尤其九範本、三Web vendor、三Local endpoint、兩深度Runtime分別保存結果。
 
 ## 3. 功能責任總表
 
@@ -58,7 +58,7 @@ Task: PREP-FULL-DELIVERY-01
 | FD-09 | Local AI；022/023 | 三類endpoint、模型/串流/能力及identity | 不支援取消/格式不假裝支持 |
 | FD-10 | Policy/Secret；027–030 | 最高分類、三modes、逐step egress、SecretRef | 不silent fallback，不洩secret，不以local判安全 |
 | FD-11 | Snapshot/Candidate；049/050 | REV1 identity、quiescence、freeze/publication | 不重算Golden，不採caller diff作truth |
-| FD-12 | Evidence/Verification；012/015/051/052 | 五types、exact binding、mandatory/四軸validity | AI票數不改FAIL，缺證不當N/A |
+| FD-12 | Evidence/Verification/Assurance；012/015/051/052/078 | 原Evidence/四軸不變；新增三Mode/四Status、assessment與DTO | Mode/Status不等PASS或Human接受，缺證不當N/A |
 | FD-13 | Human Protocol；053–058 | principal/session/challenge、exact view及append-only歷史 | 不Agent冒Human，無Override，不改舊Accept |
 | FD-14 | Accepted/P0；059/060 | 開accepted副本、takeover標示、source可重建套件 | Accept不自動Git/apply，P0不靠私有session |
 | FD-15 | Council/Findings；004–006/013 | 獨立role、cross review、synthesis、位置/severity | 不偽多AI、不無限輪次、不自動Human接受 |
@@ -104,4 +104,11 @@ UT與Contract先驗局部，SIT驗真實串接；Human UAT按HU情境觀察用�
 
 每包完成：所有in-scope子項有實際行為和測試、source/contract精確、protected areas未越界、獨立review、必要修復與重驗關閉。普通bug不回Human逐項批准；真正scope/安全/不可逆/未知預算例外集中提出。
 
-結構驗證通過不保證所有設計皆正確；尤其MCF real-write/config feasibility、完整source-to-clause核對與Windows/live工具能力仍需獨立設計/實機Gate。不能因本文件有245子項就自行解鎖。
+結構驗證通過不保證所有設計皆正確；尤其MCF real-write/config feasibility、完整source-to-clause核對與Windows/live工具能力仍需獨立設計/實機Gate。不能因本文件有257子項就自行解鎖。
+
+
+## 8. F001／F002 的逐項契約
+
+PN-078唯一主責FD-12，11子項及三Mode/四Status的來源、行為、持久化/衍生/DTO/UX與正負UT/Contract/SIT/UAT見[ASSURANCE_CONTRACT](ASSURANCE_CONTRACT.md)及[ASSURANCE_TRACEABILITY](ASSURANCE_TRACEABILITY.json)。它是原Formal必做Assurance的恢復，不併入PN-052。FD-16/18只消費共同契約，D1b-W4→D3→D4按技術facet接續，無新並行Writer。
+
+PN-038/FD-19新增human override的受限遙測子項及負例；不能建立、推論或授權Human Accept。舊245子項是前身分解，新矩陣257為245＋PN-078的11項＋PN-038的1項；不是功能完成率。

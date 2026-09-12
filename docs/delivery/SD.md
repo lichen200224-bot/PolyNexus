@@ -77,3 +77,7 @@ Terminal event排序沿用ADR-014 durable per-Run sequence，不依同timestamp�
 ## 8. 實作退出條件
 
 每個批次的required test oracle見TEST_PLAN及原WORK正負案例。沒有same-generation負例、late-Abort、quiescence、exact-candidate binding、legacy/FK、Human credential拒絕等證據不得以happy-path通過代替。任何需要public runtime/Golden語意變更須先停止該變更並提出architecture exception。
+
+## 9. Assurance assessment 實作映射（PN-078）
+
+[ASSURANCE_CONTRACT §2–4](ASSURANCE_CONTRACT.md#modes)定義三模式、四狀態、選擇/CAS/不可變快照、衍生優先序/合法轉移/失效重算及 Repository/DTO 邊界。Status VERIFIED 不把有效 FAIL 改為 PASS；模式變更不能洗掉已發布 required checks。這是待獨立審查的補充設計，不修改 Frozen vocabulary/identity/Human authority。[§6](ASSURANCE_CONTRACT.md#tests)提供每個子項的明確正負 oracle。

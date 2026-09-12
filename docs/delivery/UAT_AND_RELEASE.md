@@ -48,3 +48,7 @@ UAT缺陷分功能不符、操作不可用、資料/安全、環境、需求變�
 AI輸出READY_FOR_HUMAN_UAT不是SIGNED/ACCEPTED/PRODUCTION_READY。Human接受exact delivered candidate與限制後才記對應接受。Product Accept不自動Git merge/push/tag/release/apply；release publication是獨立授權副作用。
 
 後續任何source/contract/dependency改動形成新候選和impact驗證；交付包hash必須對上被驗bytes。記錄當前disposition與歷史Human decision，不以日期或branch名推導成功。產品版本不因本文件或前置commit自行增加。
+
+## 6. F001／F002 必做UAT延伸
+
+PN-078在HU-03逐值檢核三Mode／四Status及分軸顯示，在HU-06確認VERIFIED Status不把FAIL變成可接受。PN-038在HU-12檢核合法分歧/去重/UNKNOWN與0的區別，並確認metric無接受或override操作。具體步驟、預期與禁止效果見[ASSURANCE_CONTRACT §6–7](ASSURANCE_CONTRACT.md#uat)。不得以既有77項核銷取代新增PN-078；目前為規劃，Human UAT仍NOT_RUN。

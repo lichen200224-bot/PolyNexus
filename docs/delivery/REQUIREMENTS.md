@@ -41,7 +41,7 @@
 | PN-035 | BASE PRD§7 | metadata+artifact backup/restore/export可驗證 | 秘密排除，real DB不自動repair | OPERATIONS / D4 / AT-035 |
 | PN-036 | BASE PRD§9 | progressive disclosure；loading/empty/error/offline/retry | 正常流程不必讀log才知道操作 | UX_SPEC / D4 / AT-036 |
 | PN-037 | BASE WP-26 | keyboard/focus/labels及可讀錯誤、無障礙路徑 | 不只截圖驗外觀 | UX_SPEC / D4 / AT-037 |
-| PN-038 | BASE PRD§10 | duration/manual action/usage/quality/fallback等真實metric | 未觀察usage不是0；不捏造ROI | OPERATIONS / D4 / AT-038 |
+| PN-038 | FORMAL PRD§10＋D11-A-LP | 原metric清單完整繼承；human override僅為合法Human與AI建議分歧的遙測 | 指標不產生/授權/繞過Human Accept；UNKNOWN非0 | [ASSURANCE_CONTRACT §5/6](ASSURANCE_CONTRACT.md#metric) / FD-19 D4 / AT-038-MP01/02/MN01/02 |
 | PN-039 | BASE WP-30/31 | clean install、package compatibility、可重現build | 開發機可用不等乾淨環境可用 | OPERATIONS / T2 / AT-039 |
 | PN-040 | MOD§3-8 | static manifest/registry、version/capability/duplicate驗證 | 不引入remote loader/marketplace | RUNTIME_AND_MODULES / D2 / AT-040 |
 | PN-041 | MOD§8/13 | generic module bridge重用RuntimeRegistry，至少兩個可交換註冊 | 不加vendor-specific Core分支 | RUNTIME_AND_MODULES / D2 / AT-041 |
@@ -81,6 +81,7 @@
 | PN-075 | GOV, Human current | portable repo identity、exact checkpoint、single writer/fresh reviewer | 不以本機路徑或未push候選作跨機正式truth | EXECUTION_CONTRACT / PREP / AT-075 |
 | PN-076 | Human current | 有界批次開發、自動同範圍修復/重驗、集中例外 | 不逐GOAL要Human，亦不自行擴scope/費用 | EXECUTION_CONTRACT / ALL / AT-076 |
 | PN-077 | Human current, BASE acceptance | 全功能技術驗證＋繁中操作手冊＋最後Human UAT | AI rehearsal不是Human acceptance | UAT_AND_RELEASE / DELIVERY / AT-077 |
+| PN-078 | FORMAL Scope§2/§5、PRD§7、SA§4 | Assurance Mode三值與Status四值、選擇/快照/轉移/DTO/UX/legacy；BASELINE必做 | 不等PN-052四軸、Runtime maturity或Human接受；禁止Mode/Status權限旁路 | [ASSURANCE_CONTRACT](ASSURANCE_CONTRACT.md) / FD-12 D1b-W4→D3/D4 / AT-078-P01–11/N01–11 / SIT-15 / HU-03/06 |
 
 ## 每列的實作與證據記錄
 

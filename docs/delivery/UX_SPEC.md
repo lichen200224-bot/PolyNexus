@@ -51,3 +51,7 @@ Cancel是Run、Abort是generation，確認對話框列exact target與影響範�
 ## 6. UX oracle
 
 UJ-01–UJ-10逐一以測試使用者操作記錄route、輸入、預期/實際、artifact/screenshot與negative path。成功要能從UI→server durable state→evidence交叉確認；screenshot不是內容完整性證據。人工體驗最終由Human UAT接受，AI rehearsal只能說準備就緒。
+
+## 7. Assurance／metric 畫面補充
+
+PN-078的Task模式選擇、read-only Status badge、失效理由及分軸Candidate view，依[ASSURANCE_CONTRACT §2–4](ASSURANCE_CONTRACT.md#data-api)；Mode/Status不得與PASS或Human accepted混成一個成功圖示。PN-038的human override顯示為人機建議分歧遙測，無接受或override操作；UNKNOWN不顯0。HU-03／HU-06／HU-12的具體新增步驟見[§7](ASSURANCE_CONTRACT.md#uat)，不以AI演練代Human接受。

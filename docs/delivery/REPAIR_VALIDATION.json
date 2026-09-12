@@ -1,0 +1,280 @@
+{
+  "task_id": "PREP-FULL-DELIVERY-01-F001-F002-DOCS-REPAIR",
+  "role": "PREPARATION_DOCUMENT_WRITER",
+  "predecessor_sha": "1489cd7f7d54800317cc5558c92041a38c229008",
+  "scope": "AUTHOR_PLANNING_CHECKS_ONLY",
+  "materialization": "BYTE_VERIFIED_FILE_SUBSET_NOT_FULL_GIT_CLONE",
+  "checked_input_files": [
+    {
+      "path": "ASSURANCE_CONTRACT.md",
+      "size": 13599,
+      "sha256": "5ec98f574f0d64aa91c215e761aaf05bfd9ece18e4afe5604a1a5bfc1d27779d",
+      "git_blob_sha": "0f70aae9376b2063dc456427c899269926485b5a"
+    },
+    {
+      "path": "ASSURANCE_TRACEABILITY.json",
+      "size": 12085,
+      "sha256": "5a8901bf52e45529a14b80fa6c462c46da69be65951dcc2bb99eb6f0f6bb4a56",
+      "git_blob_sha": "5f8326be6ea8a4dc3001884868b72cbfed1935d3"
+    },
+    {
+      "path": "DATA_AND_API.md",
+      "size": 10402,
+      "sha256": "2ae49377f95e0f6a71f6d032fc52d6dc8b2b13a422bfd456fcd1359672779e0b",
+      "git_blob_sha": "7d62801cfe876de00652c85b6a4dc02994eed389"
+    },
+    {
+      "path": "DECISION_AND_GAP_REGISTER.md",
+      "size": 4721,
+      "sha256": "818915c67da461c9238f2902413109ecee68059ad83b5a36462b85957152635e",
+      "git_blob_sha": "cb68bac1b9c0aa01e5322a6536162140423e068a"
+    },
+    {
+      "path": "FEATURE_SCOPE_MATRIX.json",
+      "size": 31563,
+      "sha256": "2b56038cf278fe6a7ce80d1323d8d8005101b565d7c87cc175dbdcab5b0fb733",
+      "git_blob_sha": "fb146c081a88d45f3eb0c113e0ed570edecf70b2"
+    },
+    {
+      "path": "FEATURE_WORK_PACKAGES.md",
+      "size": 11777,
+      "sha256": "1a6cc342233f34e22d60cb8296f5cea815d254646433687d7e9c02bf30c84d80",
+      "git_blob_sha": "5419d370fb48840c3ae6f9907e331d20d123a5cb"
+    },
+    {
+      "path": "GOAL_PLAN.md",
+      "size": 5217,
+      "sha256": "0778ddd3fb9faa1a00cc38e7d71c4ea3afa76b69288a8b7c6845e890ce6e2958",
+      "git_blob_sha": "58926c8c2bb65bb11e4f4e3a0b5c062694d40856"
+    },
+    {
+      "path": "IMPLEMENTATION_LEDGER.md",
+      "size": 3628,
+      "sha256": "a33735ac70de93b88be87f64d8e864d6d4c01c0e6f8b653917f79b39f45a42f8",
+      "git_blob_sha": "4a00401aef652364d8567bc74feb7e7754aa8c1f"
+    },
+    {
+      "path": "OPERATIONS.md",
+      "size": 7280,
+      "sha256": "2ac02b8ef0d1b0aa02855177bcc59163e6c6f0f9674bf815d91753faf176a9fb",
+      "git_blob_sha": "6a0b05013241cc8dffc38ae3e4bb30993f8b8d14"
+    },
+    {
+      "path": "PRD.md",
+      "size": 7044,
+      "sha256": "3bdee628fe6e98428e781df3ffd0d5a48483b6826fb063fa77a42dee1d7e5e6a",
+      "git_blob_sha": "973c0d86a2adf08ae69675b8943f73ac46032650"
+    },
+    {
+      "path": "REQUIREMENTS.md",
+      "size": 13870,
+      "sha256": "fff0f0782162c2bf8e97350b548266e243868a40b5df77ab3b62c8ca91b99731",
+      "git_blob_sha": "c60f0ddd6773268484978a441941dcae8768d6f7"
+    },
+    {
+      "path": "SA.md",
+      "size": 6678,
+      "sha256": "26eaf3a84f978b246f4b9e00d54acab233759396d149bad67dd81979073abb0c",
+      "git_blob_sha": "9ea4342f07c5b1a9936f9f0b58d874616d639977"
+    },
+    {
+      "path": "SD.md",
+      "size": 8575,
+      "sha256": "2dcbe8bc2865e3cba390c4fbd0a697ab90c2fa4a353d8903a151158b800f63ff",
+      "git_blob_sha": "bf3c8048ba7c055714c2ae445c05e99302ed7c2e"
+    },
+    {
+      "path": "START_HERE.md",
+      "size": 4721,
+      "sha256": "e5e54cdb4af9fd0c85aa411a7bee8b06dc93992109f4c4012cfa9e225fc93834",
+      "git_blob_sha": "fc5f83c7b2b6b749bf4690b3631f4501a941b225"
+    },
+    {
+      "path": "TEST_PLAN.md",
+      "size": 10033,
+      "sha256": "27d64e29683f1b27f45c88db4d41f94dcb8b47b10184f1a429544e02afe127a4",
+      "git_blob_sha": "0de990acf730983c7c3067666c6ae81704c9d258"
+    },
+    {
+      "path": "UAT_AND_RELEASE.md",
+      "size": 5463,
+      "sha256": "07fdceffac5874d8cac0f15dce460c978156f170480f134f5951562f4adb85f1",
+      "git_blob_sha": "8ec2990b7ec3cd0fec02474a79a90bed2f226467"
+    },
+    {
+      "path": "UX_SPEC.md",
+      "size": 5963,
+      "sha256": "358ca0694cb416c2274a572143f3dfc34041c5076f869ad675aaf7e9e3f45d03",
+      "git_blob_sha": "b78529b12f9073478092cd7206a584aabed2c401"
+    },
+    {
+      "path": "checks/selftest_feature_scope.py",
+      "size": 4039,
+      "sha256": "9155e2948bf9b84b2b853b6fe62bb88778246e0924d5878f6f16f7010885b069",
+      "git_blob_sha": "e8c80e1560bdc27d06631d869486ec3b1298d91d"
+    },
+    {
+      "path": "checks/validate_feature_scope.py",
+      "size": 13493,
+      "sha256": "6141f49d84e8f52d484a610b8a2d8d6b1290e4d77658fc9a2eab70668cc4c061",
+      "git_blob_sha": "b21fc582774ade7127b479a0d55678f5ab28f497"
+    },
+    {
+      "path": "references/formal/00_SCOPE_BASELINE.md",
+      "size": 5042,
+      "sha256": "78b14325f51f40fac05f0ca13efc5d0264683fbb10823250f48b2c90965a7fe3",
+      "git_blob_sha": "57558a3643ff37538d84fc560d23e0c9e28b6cee"
+    },
+    {
+      "path": "references/formal/01_PRD.md",
+      "size": 8018,
+      "sha256": "e2998bad1f6ba43bf90de05e31b93fb5c6610649b029d6ef53278a7e86138383",
+      "git_blob_sha": "fc34c1a734d62e9025eea2f99aaca42bc655b22d"
+    },
+    {
+      "path": "references/formal/35_D11_A_LP_LOCAL_HUMAN_DECISION_PROTOCOL.md",
+      "size": 2833,
+      "sha256": "e861ec3e27bde672dfb4678e47e252105f64fb8ffd64e11da1ce0f2ee22352b6",
+      "git_blob_sha": "e8d143fe1e5e4166ba132a185130b22df54ebbb1"
+    }
+  ],
+  "commands": [
+    {
+      "id": "validator",
+      "argv": [
+        "/opt/pyvenv/bin/python",
+        "-B",
+        "docs/delivery/checks/validate_feature_scope.py",
+        "--requirements",
+        "docs/delivery/REQUIREMENTS.md"
+      ],
+      "cwd": "/mnt/data/polynexus-prep-repair/work",
+      "start": "2026-09-12T21:52:36.670852+00:00",
+      "end": "2026-09-12T21:52:37.248191+00:00",
+      "actual_exit": 0,
+      "stdout": "{\n  \"packages\": 22,\n  \"requirement_rows\": 78,\n  \"functional_subitems\": 257,\n  \"planned_positive_negative_ut_case_groups\": 156,\n  \"case_group_basis\": \"PN count times P/N naming rule, NOT implemented/executed tests\",\n  \"assurance_source_values\": 7,\n  \"declared_repair_test_cases\": 26,\n  \"unique_primary_assignment\": true,\n  \"package_dependency_dag\": true,\n  \"topological_order\": [\n    \"FD-01\",\n    \"FD-02\",\n    \"FD-03\",\n    \"FD-04\",\n    \"FD-05\",\n    \"FD-06\",\n    \"FD-10\",\n    \"FD-07\",\n    \"FD-08\",\n    \"FD-09\",\n    \"FD-11\",\n    \"FD-12\",\n    \"FD-13\",\n    \"FD-14\",\n    \"FD-15\",\n    \"FD-16\",\n    \"FD-18\",\n    \"FD-17\",\n    \"FD-19\",\n    \"FD-20\",\n    \"FD-21\",\n    \"FD-22\"\n  ],\n  \"requirements_file_id_check\": \"PASS\",\n  \"pinned_assurance_mapping_check\": \"PASS_LIMITED_EXPLICIT_MAPPING_ONLY\",\n  \"full_semantic_source_coverage\": \"INDEPENDENT_REVIEW_REQUIRED\",\n  \"product_test_execution\": \"NOT_RUN\",\n  \"independent_design_review\": \"NOT_RUN\",\n  \"result\": \"PASS_PLANNING_STRUCTURE_ONLY\",\n  \"matrix_sha256\": \"2b56038cf278fe6a7ce80d1323d8d8005101b565d7c87cc175dbdcab5b0fb733\",\n  \"matrix_git_blob_sha\": \"fb146c081a88d45f3eb0c113e0ed570edecf70b2\"\n}\n",
+      "stderr": "",
+      "scope": "AUTHOR_SELF_CHECK_PLANNING_ONLY"
+    },
+    {
+      "id": "selftest",
+      "argv": [
+        "/opt/pyvenv/bin/python",
+        "-B",
+        "docs/delivery/checks/selftest_feature_scope.py"
+      ],
+      "cwd": "/mnt/data/polynexus-prep-repair/work",
+      "start": "2026-09-12T21:52:37.248550+00:00",
+      "end": "2026-09-12T21:52:53.675637+00:00",
+      "actual_exit": 0,
+      "stdout": "{\n  \"result\": \"PASS\",\n  \"scope\": \"PLANNING_VALIDATOR_SELFTEST_ONLY\",\n  \"cases\": [\n    {\n      \"case\": \"valid\",\n      \"expected_exit\": 0,\n      \"actual_exit\": 0,\n      \"expected_reason_observed\": true,\n      \"matched\": true\n    },\n    {\n      \"case\": \"duplicate-PN\",\n      \"expected_exit\": 1,\n      \"actual_exit\": 1,\n      \"expected_reason_observed\": true,\n      \"matched\": true\n    },\n    {\n      \"case\": \"cycle\",\n      \"expected_exit\": 1,\n      \"actual_exit\": 1,\n      \"expected_reason_observed\": true,\n      \"matched\": true\n    },\n    {\n      \"case\": \"missing-limits\",\n      \"expected_exit\": 1,\n      \"actual_exit\": 1,\n      \"expected_reason_observed\": true,\n      \"matched\": true\n    },\n    {\n      \"case\": \"silent-start\",\n      \"expected_exit\": 1,\n      \"actual_exit\": 1,\n      \"expected_reason_observed\": true,\n      \"matched\": true\n    },\n    {\n      \"case\": \"missing-PN078\",\n      \"expected_exit\": 1,\n      \"actual_exit\": 1,\n      \"expected_reason_observed\": true,\n      \"matched\": true\n    },\n    {\n      \"case\": \"remove-mapping-mode-FLEXIBLE\",\n      \"expected_exit\": 1,\n      \"actual_exit\": 1,\n      \"expected_reason_observed\": true,\n      \"matched\": true\n    },\n    {\n      \"case\": \"remove-subitem-value-mode-FLEXIBLE\",\n      \"expected_exit\": 1,\n      \"actual_exit\": 1,\n      \"expected_reason_observed\": true,\n      \"matched\": true\n    },\n    {\n      \"case\": \"remove-mapping-mode-STANDARD\",\n      \"expected_exit\": 1,\n      \"actual_exit\": 1,\n      \"expected_reason_observed\": true,\n      \"matched\": true\n    },\n    {\n      \"case\": \"remove-subitem-value-mode-STANDARD\",\n      \"expected_exit\": 1,\n      \"actual_exit\": 1,\n      \"expected_reason_observed\": true,\n      \"matched\": true\n    },\n    {\n      \"case\": \"remove-mapping-mode-VERIFIED\",\n      \"expected_exit\": 1,\n      \"actual_exit\": 1,\n      \"expected_reason_observed\": true,\n      \"matched\": true\n    },\n    {\n      \"case\": \"remove-subitem-value-mode-VERIFIED\",\n      \"expected_exit\": 1,\n      \"actual_exit\": 1,\n      \"expected_reason_observed\": true,\n      \"matched\": true\n    },\n    {\n      \"case\": \"remove-mapping-status-UNREVIEWED\",\n      \"expected_exit\": 1,\n      \"actual_exit\": 1,\n      \"expected_reason_observed\": true,\n      \"matched\": true\n    },\n    {\n      \"case\": \"remove-subitem-value-status-UNREVIEWED\",\n      \"expected_exit\": 1,\n      \"actual_exit\": 1,\n      \"expected_reason_observed\": true,\n      \"matched\": true\n    },\n    {\n      \"case\": \"remove-mapping-status-SELF_REVIEWED\",\n      \"expected_exit\": 1,\n      \"actual_exit\": 1,\n      \"expected_reason_observed\": true,\n      \"matched\": true\n    },\n    {\n      \"case\": \"remove-subitem-value-status-SELF_REVIEWED\",\n      \"expected_exit\": 1,\n      \"actual_exit\": 1,\n      \"expected_reason_observed\": true,\n      \"matched\": true\n    },\n    {\n      \"case\": \"remove-mapping-status-CROSS_REVIEWED\",\n      \"expected_exit\": 1,\n      \"actual_exit\": 1,\n      \"expected_reason_observed\": true,\n      \"matched\": true\n    },\n    {\n      \"case\": \"remove-subitem-value-status-CROSS_REVIEWED\",\n      \"expected_exit\": 1,\n      \"actual_exit\": 1,\n      \"expected_reason_observed\": true,\n      \"matched\": true\n    },\n    {\n      \"case\": \"remove-mapping-status-VERIFIED\",\n      \"expected_exit\": 1,\n      \"actual_exit\": 1,\n      \"expected_reason_observed\": true,\n      \"matched\": true\n    },\n    {\n      \"case\": \"remove-subitem-value-status-VERIFIED\",\n      \"expected_exit\": 1,\n      \"actual_exit\": 1,\n      \"expected_reason_observed\": true,\n      \"matched\": true\n    },\n    {\n      \"case\": \"missing-source\",\n      \"expected_exit\": 1,\n      \"actual_exit\": 1,\n      \"expected_reason_observed\": true,\n      \"matched\": true\n    },\n    {\n      \"case\": \"missing-clause\",\n      \"expected_exit\": 1,\n      \"actual_exit\": 1,\n      \"expected_reason_observed\": true,\n      \"matched\": true\n    },\n    {\n      \"case\": \"missing-oracle\",\n      \"expected_exit\": 1,\n      \"actual_exit\": 1,\n      \"expected_reason_observed\": true,\n      \"matched\": true\n    },\n    {\n      \"case\": \"wrong-owner\",\n      \"expected_exit\": 1,\n      \"actual_exit\": 1,\n      \"expected_reason_observed\": true,\n      \"matched\": true\n    },\n    {\n      \"case\": \"metric-authority\",\n      \"expected_exit\": 1,\n      \"actual_exit\": 1,\n      \"expected_reason_observed\": true,\n      \"matched\": true\n    },\n    {\n      \"case\": \"metric-event\",\n      \"expected_exit\": 1,\n      \"actual_exit\": 1,\n      \"expected_reason_observed\": true,\n      \"matched\": true\n    },\n    {\n      \"case\": \"metric-missing-case\",\n      \"expected_exit\": 1,\n      \"actual_exit\": 1,\n      \"expected_reason_observed\": true,\n      \"matched\": true\n    }\n  ],\n  \"case_count\": 27,\n  \"product_tests\": \"NOT_RUN\",\n  \"independent_review\": \"NOT_RUN\"\n}\n",
+      "stderr": "",
+      "scope": "AUTHOR_SELF_CHECK_PLANNING_ONLY"
+    },
+    {
+      "id": "no_index_doc_check",
+      "argv": [
+        "git",
+        "diff",
+        "--no-index",
+        "--check",
+        "/mnt/data/polynexus-prep-repair/parent/docs/delivery",
+        "/mnt/data/polynexus-prep-repair/work/docs/delivery"
+      ],
+      "cwd": "/mnt/data/polynexus-prep-repair",
+      "start": "2026-09-12T21:53:35.419813+00:00",
+      "end": "2026-09-12T21:53:35.423645+00:00",
+      "actual_exit": 1,
+      "stdout": "",
+      "stderr": "",
+      "scope": "PARTIAL_DOC_FILE_COMPARISON_NOT_EXACT_GIT_COMMIT_CHECK",
+      "interpretation": "Exit 1 is observed for changed no-index inputs; no whitespace diagnostic. This does not establish full git diff --check or a clone."
+    }
+  ],
+  "git_ls_remote": {
+    "command": [
+      "git",
+      "ls-remote",
+      "--heads",
+      "https://github.com/lichen200224-bot/PolyNexus.git",
+      "refs/heads/planning/full-delivery-design-consolidation"
+    ],
+    "cwd": "/mnt/data/polynexus-prep-repair",
+    "start": "2026-09-12T21:31:48.801916+00:00",
+    "end": "2026-09-12T21:31:48.823785+00:00",
+    "actual_exit": 128,
+    "stdout": "",
+    "stderr": "fatal: unable to access 'https://github.com/lichen200224-bot/PolyNexus.git/': Could not resolve host: github.com\n"
+  },
+  "no_index_calibration": [
+    {
+      "case": "equal",
+      "actual_exit": 0,
+      "output": ""
+    },
+    {
+      "case": "clean_difference",
+      "actual_exit": 1,
+      "output": ""
+    },
+    {
+      "case": "trailing_whitespace",
+      "actual_exit": 3,
+      "output": "/tmp/tmptqnhvago/b:1: trailing whitespace.\n+different \n"
+    }
+  ],
+  "counts": {
+    "packages": 22,
+    "requirement_rows": 78,
+    "functional_subitems": 257,
+    "planned_positive_negative_ut_case_groups": 156,
+    "case_group_basis": "PN count times P/N naming rule, NOT implemented/executed tests",
+    "assurance_source_values": 7,
+    "declared_repair_test_cases": 26,
+    "unique_primary_assignment": true,
+    "package_dependency_dag": true,
+    "topological_order": [
+      "FD-01",
+      "FD-02",
+      "FD-03",
+      "FD-04",
+      "FD-05",
+      "FD-06",
+      "FD-10",
+      "FD-07",
+      "FD-08",
+      "FD-09",
+      "FD-11",
+      "FD-12",
+      "FD-13",
+      "FD-14",
+      "FD-15",
+      "FD-16",
+      "FD-18",
+      "FD-17",
+      "FD-19",
+      "FD-20",
+      "FD-21",
+      "FD-22"
+    ],
+    "requirements_file_id_check": "PASS",
+    "pinned_assurance_mapping_check": "PASS_LIMITED_EXPLICIT_MAPPING_ONLY",
+    "full_semantic_source_coverage": "INDEPENDENT_REVIEW_REQUIRED",
+    "product_test_execution": "NOT_RUN",
+    "independent_design_review": "NOT_RUN",
+    "result": "PASS_PLANNING_STRUCTURE_ONLY",
+    "matrix_sha256": "2b56038cf278fe6a7ce80d1323d8d8005101b565d7c87cc175dbdcab5b0fb733",
+    "matrix_git_blob_sha": "fb146c081a88d45f3eb0c113e0ed570edecf70b2"
+  },
+  "selftest_summary": {
+    "cases": 27,
+    "valid_expected_exit_0": 1,
+    "negative_expected_exit_1": 26,
+    "actual_parent_exit": 0,
+    "all_expected_reasons_matched": true
+  },
+  "full_commit_git_diff_check": "NOT_RUN_NO_EXACT_GIT_CLONE",
+  "product_tests": "NOT_RUN",
+  "independent_re_review": "NOT_RUN",
+  "product_start_authorized": false
+}

@@ -67,3 +67,7 @@ Repo存source/tests/design/sanitized receipts，小型execution ledger；大型J
 Clean install必須由所交付source/locks和手冊完成，不借Writer隱藏venv/global配置。最終安裝包/來源包/手冊/驗證報告記各自hash與對應Candidate，明確支援host/版本與限制，不由branch名推導production readiness。
 
 本準備環境Git CLI DNS受阻，實際exit128；API取得/發布的commit可供後續clean clone，但本文件未替使用者電腦確認clone、driver或所有Agent已停止。
+
+## 9. Assurance／human override 遙測的操作限制
+
+PN-078 assessment的mode/profile/target引用及失效理由需可追溯，但不當新權限；詳[ASSURANCE_CONTRACT](ASSURANCE_CONTRACT.md#data-api)。PN-038的human override唯一含義是[§5](ASSURANCE_CONTRACT.md#metric)定義的人機建議分歧：合法audit事件單向消費、去重、coverage不足UNKNOWN。export/replay/重算指標不恢復Human session、不產生AcceptanceRecorded、不改变eligibility；AT-038-MN02與HU-12驗此邊界。

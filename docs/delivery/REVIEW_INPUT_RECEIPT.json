@@ -1,0 +1,42 @@
+{
+  "task_id": "PREP-FULL-DELIVERY-01",
+  "input_type": "HUMAN_SUPPLIED_REVIEWER_ARTIFACTS",
+  "reviewed_candidate": "1489cd7f7d54800317cc5558c92041a38c229008",
+  "review_task": "PREP-FULL-DELIVERY-01-INDEPENDENT-DESIGN-REVIEW",
+  "reported_verdict": "NEED_FIX",
+  "reported_counts": {
+    "blocker": 0,
+    "major": 1,
+    "minor": 1,
+    "observation": 1
+  },
+  "inputs": [
+    {
+      "file": "COVERAGE_MATRIX(1).json",
+      "size": 60638,
+      "sha256": "021c7268281f056a4714705a323f099fe847fe1c850353545b70fbf539e66692"
+    },
+    {
+      "file": "FIX_PROMPT(1).md",
+      "size": 4708,
+      "sha256": "cae358ddb1a204378ffc4a14d7b9e4126e73c67010ad690cafd60dea6ee5e20c"
+    },
+    {
+      "file": "RE_REVIEW_PROMPT(1).md",
+      "size": 3364,
+      "sha256": "4d13d630e99340912e845d3110968a856789279813ca18cba1a41f19b4a68e70"
+    },
+    {
+      "file": "REVIEW_REPORT.zh-TW(1).html",
+      "size": 19668,
+      "sha256": "55aa95843a8da1fa5286d90ae8b1d8a7af0728318682edc7e569941e334e5190"
+    },
+    {
+      "file": "REVIEW_RESULT(1).json",
+      "size": 17584,
+      "sha256": "92616bb05dcdbf230426b8783e0109c935f6e29c2c37d277f6871a477871804f"
+    }
+  ],
+  "source": "User-uploaded files in this conversation; no additional identity attestation inferred",
+  "new_candidate_independent_review": "PENDING"
+}

@@ -1,0 +1,44 @@
+{
+  "reviewed_predecessor": "1489cd7f7d54800317cc5558c92041a38c229008",
+  "scope": "FOUR_PREVIOUS_GAP_OR_CONFLICT_ENTRIES_ONLY",
+  "original_reviewer_matrix_unchanged": true,
+  "independent_closure": "PENDING",
+  "entries": [
+    {
+      "clause_id": "SCOPE-BASE-04",
+      "prior_status": "GAP",
+      "prior_note": "PREP-IDR-F001：Formal V1 clause 無 primary owner/contract/test。",
+      "writer_mapping_status": "REPAIRED_MAPPING_PENDING_INDEPENDENT_REVIEW",
+      "pn": "PN-078",
+      "fd": "FD-12",
+      "contract": "ASSURANCE_CONTRACT.md#authority"
+    },
+    {
+      "clause_id": "ASSURANCE-MODE",
+      "prior_status": "GAP",
+      "prior_note": "PREP-IDR-F001",
+      "writer_mapping_status": "REPAIRED_MAPPING_PENDING_INDEPENDENT_REVIEW",
+      "pn": "PN-078",
+      "fd": "FD-12",
+      "contract": "ASSURANCE_CONTRACT.md#authority"
+    },
+    {
+      "clause_id": "ASSURANCE-STATUS",
+      "prior_status": "GAP",
+      "prior_note": "PREP-IDR-F001",
+      "writer_mapping_status": "REPAIRED_MAPPING_PENDING_INDEPENDENT_REVIEW",
+      "pn": "PN-078",
+      "fd": "FD-12",
+      "contract": "ASSURANCE_CONTRACT.md#authority"
+    },
+    {
+      "clause_id": "METRIC-08",
+      "prior_status": "CONFLICT",
+      "prior_note": "PREP-IDR-F002：需與 D11 no Override Accept 消歧",
+      "writer_mapping_status": "REPAIRED_MAPPING_PENDING_INDEPENDENT_REVIEW",
+      "pn": "PN-038",
+      "fd": "FD-19",
+      "contract": "ASSURANCE_CONTRACT.md#metric"
+    }
+  ]
+}

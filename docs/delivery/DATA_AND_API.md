@@ -77,3 +77,9 @@ Mandatory eligibility = 所有適用required checks有符合contract且valid/fre
 Additive tables/nullable legacy link先建立；有deterministic authority才能backfill。沒有可信generation、candidate或Human principal的舊記錄保持可讀、LEGACY_UNBOUND/UNVERIFIED並保留原accepted歷史標籤的範圍，不賦予新A-LP權限。RuntimeBinding insert-once與舊Run身份不變。
 
 測試新DB、代表性舊DB、dangling FK、重複資料、interrupt at each migration step、reopen、backup restore與原content hash。無法lossless downgrade的部分明確拒絕並走tested restore；不擅自drop已接受歷史或repair真實使用者DB。API新字段按相容策略漸進，舊資料不能因新NOT NULL要求導致整庫無法開啟。
+
+## 8. PN-078 Assurance 與 PN-038 metric contract
+
+[ASSURANCE_CONTRACT §2–4](ASSURANCE_CONTRACT.md#data-api)是本附錄的Assurance設計延伸：mode/profile隨固定input保存，Status由Core對exact target/contract衍生，不接受caller寫入；與verification四軸、runtime maturity及Human disposition分欄。未知/legacy/stale依該契約拒絕或明示不可判定，不回填可信狀態。
+
+[§5 metric contract](ASSURANCE_CONTRACT.md#metric)保留human override的受限遙測含義：從合法可歸因audit facts單向衍生、source_event_id去重，coverage不足為UNKNOWN。metric query/recording不能建立或改寫Human decision、eligibility/outcome，也不存在Override Accept。[§6](ASSURANCE_CONTRACT.md#tests)的AT-038-MN02驗證這項無副作用邊界。

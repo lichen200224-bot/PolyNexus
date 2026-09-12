@@ -61,3 +61,7 @@ DB/artifact部分寫入用content staging→hash→atomic publish＋metadata tra
 S0先驗FK/create-restart/auth-health，不重做已接受ordering/cleanup。W1工作區/lineage → W2真實executor可行性 → W3 frozen source identity → W4 verification → W5 Human → W6 open/package → B01。模組/其他初版功能與完整workflow/UI在同一完整計畫的後續群補齊。N1/WebSocket後續交付不作B01擋板，也不從總目標消失。
 
 細部實作需對existing API/DB/registry做compatibility mapping；若需要改public RuntimeAdapter/Binding/Golden而非内部實作，列architecture exception，不能自行擴張。
+
+## 8. Assurance 責任補充（PN-078）
+
+[ASSURANCE_CONTRACT §1–4](ASSURANCE_CONTRACT.md#authority)補足 Mode/Status 的責任、資料流及失效邊界。FD-12 由 exact target/contract 的可信 facts 衍生 assessment，FD-16/18 只消費，不另造 evaluator；與 PN-052 四軸及 FD-13 Human 信任分開。PN-038 的 metric 單向讀取合法 audit facts，不能反向建立/改寫 decision；[指標定義](ASSURANCE_CONTRACT.md#metric)。

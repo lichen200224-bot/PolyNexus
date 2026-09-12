@@ -1,6 +1,6 @@
 # 既有成果與新交付差額 Ledger
 
-Status: SOURCE_BASED_INVENTORY / NOT_FRESH_PRODUCT_VERIFICATION。這份初始表不是本輪產品測試結果。PN-001–PN-077全部仍需逐條建立implementation/evidence映射；不能因列在同一群組就統一判PASS。
+Status: SOURCE_BASED_INVENTORY / NOT_FRESH_PRODUCT_VERIFICATION。這份初始表不是本輪產品測試結果。PN-001–PN-078全部仍需逐條建立implementation/evidence映射；不能因列在同一群組就統一判PASS。
 
 | Source/area | 已觀察記錄 | 可以重用什麼 | 不能推論什麼 / next |
 |---|---|---|---|
@@ -38,3 +38,7 @@ next_action: MAP_EXISTING_AND_VERIFY_DELTA
 這是格式示例，不新增產品Domain schema。實作ledger可用JSON/YAML產生human摘要，避免同狀態維護八份報告；repo只存sanitized references，不混入user資料。欄位缺失是缺失，不猜測日期、版本、passed數或接受身份。
 
 MCF待審結果、design review與S0實機檢查完成後，依exact結果更新相應項；歷史closed記錄不重開、不抹去，後續新問題另立finding並標受影響scope。
+
+## PN-078／PN-038 文件修復差額
+
+Assurance由PN-078/FD-12承接；PN-038 metric由FD-19承接。見[ASSURANCE_CONTRACT](ASSURANCE_CONTRACT.md)及REPAIR_RECORD。這次只補文件、oracle與planning checker；existing AssuranceMode enum存在不等完整Mode/Status產品能力已實作或已驗收。Product tests、Human UAT與本Candidate獨立重審仍未完成。

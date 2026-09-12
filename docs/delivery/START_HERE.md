@@ -1,6 +1,6 @@
 # 完整初版＋新版擴充：唯一文件與開工入口
 
-Date: 2026-09-12 (Asia/Taipei)
+Date: 2026-09-13 (Asia/Taipei)
 Task: PREP-FULL-DELIVERY-01
 State: DOCUMENTATION_CANDIDATE / INDEPENDENT_DESIGN_REVIEW_REQUIRED
 Active branch: planning/full-delivery-design-consolidation
@@ -21,11 +21,12 @@ Human已授權ChatGPT補齊前置文件、Git/GitHub發布與文件整併，正�
 | UX、Runtime、安全 | [UX_SPEC](UX_SPEC.md)、[RUNTIME_AND_MODULES](RUNTIME_AND_MODULES.md)、[SECURITY](SECURITY.md) |
 | 測試/安裝/備份/可攜 | [TEST_PLAN](TEST_PLAN.md)、[OPERATIONS](OPERATIONS.md) |
 | 批次執行及既有成果 | [GOAL_PLAN](GOAL_PLAN.md)、[EXECUTION_CONTRACT](EXECUTION_CONTRACT.md)、[IMPLEMENTATION_LEDGER](IMPLEMENTATION_LEDGER.md) |
-| 作者自檢與尚未關閉的Gate | [PREPARATION_VALIDATION](PREPARATION_VALIDATION.json)、[DECISION_AND_GAP_REGISTER](DECISION_AND_GAP_REGISTER.md) |
+| 本次修復與驗證 | [REPAIR_RECORD](REPAIR_RECORD.md)、[REPAIR_VALIDATION](REPAIR_VALIDATION.json)、[DECISION_AND_GAP_REGISTER](DECISION_AND_GAP_REGISTER.md) |
+| F001／F002逐值契約 | [ASSURANCE_CONTRACT](ASSURANCE_CONTRACT.md)、[ASSURANCE_TRACEABILITY](ASSURANCE_TRACEABILITY.json) |
 | 獨立審查與Codex交接 | [DESIGN_REVIEW](DESIGN_REVIEW.md)、[CODEX_HANDOFF](CODEX_HANDOFF.md) |
 | 最後交Human | [UAT_AND_RELEASE](UAT_AND_RELEASE.md) |
 
-22功能包/77 PN/245規劃子項是可追溯分解，不是已完成產品或已通過全部原子source審查。每包包含allowed areas、forbidden、inputs/outputs、deps、正負SIT、UAT，每PN另有細部分解與limits；原frozen義務不因摘要刪除。
+22功能包/78 PN/257規劃子項是可追溯分解，不是已完成產品或已通過全部原子source審查。每包包含allowed areas、forbidden、inputs/outputs、deps、正負SIT、UAT，每PN另有細部分解與limits；原frozen義務不因摘要刪除。
 
 ## 來源與狀態分離
 
@@ -41,6 +42,8 @@ MCF-02候選030890b30160f1063ac2cef1d36705a9ea70bddb仍待獨立review、未接�
 
 B01-TECH是內部技術里程碑，不縮小全功能或冒Human接受。必要Human-only UAT在最後集中完成；Agent credentials、fixture principal、Git授權不能替代真正Human決定。
 
-## 實際驗證範圍
+## 修復與實際驗證範圍
 
-本次已執行scope matrix結構檢查與檢查器正反例；檢查器與矩陣upload blob與本地byte一致。它們只證明所列結構約束，不代表產品tests、全文件semantic/link closure或獨立審查完成。此環境Git CLI DNS失敗exit128，GitHub connector可用；API發布不是CLI push/clean-clone PASS。發布後exact commit與read-back證據以PR外部receipt記錄，避免文件自引用push循環。
+前身1489cd7f的Human轉交獨立審查為NEED_FIX（F001 MAJOR、F002 MINOR、F003 OBSERVATION）；本次是原Writer同範圍修復，不能自判independent closure。PN-078恢復Assurance、PN-038澄清human override遙測。新評估與驗證結果見REPAIR_RECORD/REPAIR_VALIDATION；PREPARATION_VALIDATION.json是前身作者自檢歷史，SOURCE_LOCK原source pins及references不變。
+
+本次planning validator/selftest對已驗byte的文件子集執行；不是完整Git clone，也不是產品測試或獨立審查。Git CLI DNS仍受阻exit128，API發布/readback另記，不能冒CLI push/clean-clone PASS。exact新Candidate/tree/parent以PR publication receipt為準。修復後仍須fresh Reviewer按新SHA完整DR-01–14重審，不只看兩項修正。產品HOLD不變。
