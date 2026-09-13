@@ -26,7 +26,7 @@
       "exit_code": 0
     },
     "core_full_final": {
-      "result": "828 passed, 1 skipped, 192 warnings in 52.41s",
+      "result": "830 passed, 1 skipped, 192 warnings in 51.51s",
       "exit_code": 0,
       "skip": "Existing WP07 real-symlink escape case skipped because Windows policy denied symlink creation; sibling-prefix and regex containment tests still ran."
     },
@@ -44,11 +44,26 @@
       "audit_detected_application_reference_damage": true,
       "database_sha256_unchanged_by_fk_audit": true,
       "damaged_rows_preserved": true
+    },
+    "web_environment": {
+      "npm_ci": "exit 0 using the existing lockfile and default registry after a sandbox-permission retry",
+      "tests": "2 files passed, 85 tests passed; exit 0",
+      "typecheck_and_build": "tsc -b and Vite build passed; exit 0",
+      "dependency_audit": "npm reported 2 existing moderate vulnerabilities; no audit fix or dependency change was authorized"
     }
   },
   "known_non_product_probe_issue": "The first live startup attempt exited 1 because the shared venv editable install resolved to the untouched human repo. The retry used a process-local PYTHONPATH pointing at the isolated D0 checkout and passed; the shared environment was not modified.",
   "repair_passes": [
     "Test-only expectation corrected from tuple to ORM list after the first targeted run; no product root cause recurred.",
-    "CREATED plus a non-legacy claimed binding was added as an explicit fail-closed corruption case during writer review."
-  ]
+    "Independent review of candidate 894cdc407874099f7c29ffb1b9ea72da4b8073f8 found missing RunResult JSON reference auditing and missing authenticated API create/restart evidence; both were repaired in the same Core scope."
+  ],
+  "independent_review": {
+    "reviewed_candidate": "894cdc407874099f7c29ffb1b9ea72da4b8073f8",
+    "verdict": "NEED_FIX",
+    "resolved_core_findings": [
+      "RunResult JSON references now fail closed on invalid JSON, missing targets, duplicate IDs, and ownership mismatch without mutation.",
+      "Authenticated API CreateRun followed by a fresh app restart now proves stable CREATED identity, no events, no binding, and no execution."
+    ],
+    "open_governance_exception": "Frozen S0 requires UI/Core pairing and a Fresh client from START journey, but apps/** remains outside the current write ceiling."
+  }
 }

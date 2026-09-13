@@ -160,6 +160,129 @@ def test_relationship_audit_detects_application_reference_without_deleting(
         ).scalar_one() == 1
 
 
+def test_relationship_audit_rejects_dangling_and_invalid_run_result_refs(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "legacy-result-reference-damage.db"
+    _upgrade_to_head(db_path)
+    with sqlite3.connect(db_path) as connection:
+        connection.execute(
+            "INSERT INTO projects (id, name, created_at) "
+            "VALUES ('project-1', 'Project', CURRENT_TIMESTAMP)"
+        )
+        connection.execute(
+            "INSERT INTO context_packages "
+            "(id, project_id, version, created_at) "
+            "VALUES ('context-1', 'project-1', 1, CURRENT_TIMESTAMP)"
+        )
+        connection.execute(
+            "INSERT INTO tasks "
+            "(id, project_id, title, workflow_id, workflow_version, mode, "
+            "context_package_id, created_at) "
+            "VALUES ('task-1', 'project-1', 'Task', 'review-minimal', 1, "
+            "'REVIEW', 'context-1', CURRENT_TIMESTAMP)"
+        )
+        connection.execute(
+            "INSERT INTO runs "
+            "(id, task_id, workflow_id, workflow_version, context_package_id, "
+            "execution_target, resume_mode, state, created_at, updated_at, "
+            "result_status, result_finding_ids, result_evidence_ids, result_artifact_ids) "
+            "VALUES ('run-1', 'task-1', 'review-minimal', 1, 'context-1', "
+            "'LOCAL', 'NONE', 'COMPLETED', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, "
+            "'COMPLETED', '[\"missing-finding\"]', 'not-json', '[]')"
+        )
+        connection.commit()
+    before = hashlib.sha256(db_path.read_bytes()).hexdigest()
+
+    init_engine(f"sqlite:///{db_path}")
+    audit = audit_relationships()
+    after = hashlib.sha256(db_path.read_bytes()).hexdigest()
+
+    assert not audit.clean
+    assert any(
+        item.relation == "result_finding_ids"
+        and item.target_identity == "missing-finding"
+        for item in audit.application_violations
+    )
+    assert any(
+        item.relation == "result_evidence_ids" and item.target_identity is None
+        for item in audit.application_violations
+    )
+    assert before == after
+    with sqlite3.connect(db_path) as connection:
+        assert connection.execute(
+            "SELECT result_finding_ids, result_evidence_ids FROM runs WHERE id = 'run-1'"
+        ).fetchone() == ('["missing-finding"]', "not-json")
+
+
+def test_authenticated_api_created_run_survives_real_app_restart(
+    monkeypatch, tmp_path: Path
+) -> None:
+    import polynexus_core.runtime.reconciliation as reconciliation_module
+    from polynexus_core.runtime.registry import RuntimeRegistry
+
+    db_path = tmp_path / "api-created-restart.db"
+    _upgrade_to_head(db_path)
+    monkeypatch.setenv("POLYNEXUS_DATABASE_URL", f"sqlite:///{db_path}")
+    monkeypatch.setattr(dependencies_module, "_LOOPBACK_TOKEN", "d0-api-token")
+    registry = RuntimeRegistry()
+    monkeypatch.setattr(
+        reconciliation_module,
+        "build_default_registry",
+        lambda: registry,
+    )
+    headers = {"X-Loopback-Token": "d0-api-token"}
+
+    with TestClient(create_app(), client=("127.0.0.1", 50100)) as client:
+        project = client.post(
+            "/api/v1/projects",
+            json={"name": "D0 restart"},
+            headers=headers,
+        )
+        assert project.status_code == 201
+        project_id = project.json()["id"]
+        context = client.post(
+            f"/api/v1/projects/{project_id}/context-packages",
+            json={"version": 1},
+            headers=headers,
+        )
+        assert context.status_code == 201
+        context_id = context.json()["id"]
+        task = client.post(
+            f"/api/v1/projects/{project_id}/tasks",
+            json={
+                "title": "Create without execute",
+                "workflow_id": "review-minimal",
+                "workflow_version": 1,
+                "context_package_id": context_id,
+            },
+            headers=headers,
+        )
+        assert task.status_code == 201
+        task_id = task.json()["id"]
+        created = client.post(
+            f"/api/v1/tasks/{task_id}/runs",
+            json={"context_package_id": context_id},
+            headers=headers,
+        )
+        assert created.status_code == 201
+        run_id = created.json()["id"]
+        assert created.json()["state"] == "CREATED"
+
+    with TestClient(create_app(), client=("127.0.0.1", 50101)) as restarted:
+        reloaded = restarted.get(f"/api/v1/runs/{run_id}", headers=headers)
+        assert reloaded.status_code == 200
+        assert reloaded.json()["id"] == run_id
+        assert reloaded.json()["state"] == "CREATED"
+        assert reloaded.json()["events"] == []
+
+    with sqlite3.connect(db_path) as connection:
+        assert connection.execute(
+            "SELECT COUNT(*) FROM run_binding_snapshots WHERE run_id = ?",
+            (run_id,),
+        ).fetchone() == (0,)
+
+
 def test_health_reports_layers_and_never_claims_unobserved_readiness(
     monkeypatch, tmp_path: Path
 ) -> None:

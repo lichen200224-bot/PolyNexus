@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Generator
@@ -121,6 +122,12 @@ _APPLICATION_RELATION_QUERIES = (
     ),
 )
 
+_RUN_RESULT_REFERENCE_SPECS = (
+    ("result_finding_ids", "findings"),
+    ("result_evidence_ids", "evidence"),
+    ("result_artifact_ids", "artifacts"),
+)
+
 
 def init_engine(database_url: str | None = None) -> None:
     global _engine, _session_factory
@@ -240,11 +247,79 @@ def audit_relationships() -> RelationshipAudit:
                 )
                 for row in connection.exec_driver_sql(query).all()
             )
+        if "runs" in tables:
+            application_violations.extend(
+                _audit_run_result_references(connection, tables)
+            )
 
     return RelationshipAudit(
         foreign_key_violations=foreign_key_violations,
         application_violations=tuple(application_violations),
     )
+
+
+def _audit_run_result_references(connection, tables: set[str]) -> list[RelationshipViolation]:
+    """Validate serialized RunResult IDs and their Run/Task ownership."""
+    violations: list[RelationshipViolation] = []
+    target_rows: dict[str, dict[str, tuple[str | None, str | None]]] = {}
+    for _, target_table in _RUN_RESULT_REFERENCE_SPECS:
+        if target_table not in tables:
+            target_rows[target_table] = {}
+            continue
+        rows = connection.exec_driver_sql(
+            f"SELECT id, task_id, run_id FROM {target_table}"
+        ).all()
+        target_rows[target_table] = {
+            str(row[0]): (
+                None if row[1] is None else str(row[1]),
+                None if row[2] is None else str(row[2]),
+            )
+            for row in rows
+        }
+
+    run_rows = connection.exec_driver_sql(
+        "SELECT id, task_id, result_finding_ids, result_evidence_ids, "
+        "result_artifact_ids FROM runs"
+    ).all()
+    for row in run_rows:
+        run_id = str(row[0])
+        task_id = str(row[1])
+        for index, (relation, target_table) in enumerate(
+            _RUN_RESULT_REFERENCE_SPECS,
+            start=2,
+        ):
+            try:
+                references = json.loads(row[index])
+            except (TypeError, ValueError, json.JSONDecodeError):
+                references = None
+            if (
+                not isinstance(references, list)
+                or any(not isinstance(item, str) or not item for item in references)
+                or len(references) != len(set(references))
+            ):
+                violations.append(
+                    RelationshipViolation(
+                        source_table="runs",
+                        source_identity=run_id,
+                        relation=relation,
+                        target_table=target_table,
+                        target_identity=None,
+                    )
+                )
+                continue
+            for reference in references:
+                ownership = target_rows[target_table].get(reference)
+                if ownership != (task_id, run_id):
+                    violations.append(
+                        RelationshipViolation(
+                            source_table="runs",
+                            source_identity=run_id,
+                            relation=relation,
+                            target_table=target_table,
+                            target_identity=reference,
+                        )
+                    )
+    return violations
 
 
 def relationship_integrity_status() -> bool:
