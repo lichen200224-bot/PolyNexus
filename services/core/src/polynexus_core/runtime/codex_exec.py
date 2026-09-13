@@ -40,6 +40,7 @@ from polynexus_core.runtime.external_contracts import (
     EgressDisposition,
     ExecutionEnvelope,
     ExternalContractError,
+    executable_digest,
     make_envelope,
 )
 from polynexus_core.storage.content import ContentStore, MAX_CONTENT_BYTES
@@ -50,7 +51,22 @@ CODEX_EXECUTABLE_ENV = "POLYNEXUS_CODEX_EXECUTABLE"
 CODEX_PROFILE_REF = "codex.local"
 CODEX_ADAPTER_ID = "builtin.codex.exec"
 _SAFE_VERSION = re.compile(r"^[a-z0-9][a-z0-9._-]{0,127}$")
+_SHA256 = re.compile(r"^[0-9a-f]{64}$")
 _MAX_DIFF_BYTES = min(MAX_CONTENT_BYTES, 8 * 1024 * 1024)
+_MAX_JSON_RESULT_BYTES = min(MAX_CONTENT_BYTES, 4 * 1024 * 1024)
+_NORMALIZED_RESULT_TERMINALS = frozenset({"turn.completed", "result", "task.completed"})
+_SAFE_ENVIRONMENT_NAMES = frozenset(
+    {
+        "COMSPEC",
+        "PATHEXT",
+        "PATH",
+        "SYSTEMDRIVE",
+        "SYSTEMROOT",
+        "TEMP",
+        "TMP",
+        "WINDIR",
+    }
+)
 
 
 def _safe_version(value: str) -> str:
@@ -114,6 +130,7 @@ class _CodexRun:
     stdout: bytes = b""
     stderr: bytes = b""
     prompt_sha256: str = ""
+    normalized_result: dict[str, object] | None = None
 
 
 class CodexExecRuntimeAdapter:
@@ -151,6 +168,101 @@ class CodexExecRuntimeAdapter:
             self._version = self._version_probe(self._executable)
         return self._version
 
+    @staticmethod
+    def _base_arguments() -> tuple[str, ...]:
+        return (
+            "exec",
+            "--ephemeral",
+            "--ignore-user-config",
+            "--sandbox",
+            "workspace-write",
+            "--json",
+        )
+
+    @staticmethod
+    def _fingerprint(value: object) -> str:
+        return hashlib.sha256(
+            json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode(
+                "utf-8"
+            )
+        ).hexdigest()
+
+    def _configuration_preflight(self, version: str) -> dict[str, object]:
+        """Resolve the closed Codex configuration boundary without secrets.
+
+        Codex is launched with user configuration disabled and an explicit
+        child-environment allowlist.  The snapshot fingerprints the actual
+        executable, flags, environment names/value digests, and explicit
+        NONE plugin/MCP/skill state; it never reads a credential or config
+        file.  Unknown configuration sources fail closed.
+        """
+
+        arguments = self._base_arguments()
+        if "--ignore-user-config" not in arguments or "--json" not in arguments:
+            raise ExternalContractError("codex_configuration_boundary_invalid")
+        environment = self._executor_environment()
+        if set(environment) - _SAFE_ENVIRONMENT_NAMES:
+            raise ExternalContractError("codex_environment_boundary_invalid")
+        environment_value_digests = {
+            name: hashlib.sha256(value.encode("utf-8")).hexdigest()
+            for name, value in sorted(environment.items())
+        }
+        environment_fingerprint = self._fingerprint(
+            {
+                "names": tuple(sorted(environment)),
+                "value_sha256": environment_value_digests,
+            }
+        )
+        config_sources = (
+            "cli.flags",
+            "child.environment.allowlist",
+        )
+        enabled_plugins = ("NONE",)
+        enabled_mcps = ("NONE",)
+        remote_skills = "NONE"
+        payload = {
+            "executable_path": os.path.normcase(str(self._executable)),
+            "executable_sha256": executable_digest(self._executable),
+            "executable_version": version,
+            "arguments": arguments,
+            "config_sources": config_sources,
+            "child_environment_fingerprint": environment_fingerprint,
+            "auth_ownership": AuthOwnership.RUNTIME_MANAGED.value,
+            "enabled_plugin_set": enabled_plugins,
+            "enabled_mcp_set": enabled_mcps,
+            "remote_skill_catalog_state": remote_skills,
+            "workspace_scope_mode": "PROJECTED_STAGING",
+        }
+        return {
+            "arguments": arguments,
+            "config_sources": config_sources,
+            "enabled_plugin_set": enabled_plugins,
+            "enabled_mcp_set": enabled_mcps,
+            "remote_skill_catalog_state": remote_skills,
+            "child_environment_fingerprint": environment_fingerprint,
+            "fingerprint": self._fingerprint(payload),
+        }
+
+    @staticmethod
+    def _permission_fingerprint(
+        *,
+        allowed_inputs: tuple[str, ...],
+        allowed_outputs: tuple[str, ...],
+        route_policy_evidence_sha256: str,
+    ) -> str:
+        if not _SHA256.fullmatch(route_policy_evidence_sha256):
+            raise ExternalContractError("policy_preflight_missing")
+        return CodexExecRuntimeAdapter._fingerprint(
+            {
+                "allowed_inputs": allowed_inputs,
+                "allowed_outputs": allowed_outputs,
+                "route_policy_evidence_sha256": route_policy_evidence_sha256,
+                "provider_model_egress": EgressDisposition.RUNTIME_MANAGED.value,
+                "agent_extension_egress": EgressDisposition.DENY.value,
+                "workspace_scope_mode": "PROJECTED_STAGING",
+            }
+        )
+
     async def health(self) -> bool:
         try:
             self._probe()
@@ -159,9 +271,14 @@ class CodexExecRuntimeAdapter:
             return False
 
     async def readiness(self) -> bool:
-        # Readiness is only the bounded executable identity probe.  It is not a
-        # live-provider or conformance verdict and never launches a task.
-        return await self.health()
+        # Readiness is a no-side-effect executable/configuration boundary
+        # probe.  It is not live-provider or conformance evidence and never
+        # launches a task.
+        try:
+            self._configuration_preflight(self._probe())
+            return True
+        except ExternalContractError:
+            return False
 
     def capabilities(self) -> RuntimeCapabilities:
         return RuntimeCapabilities(
@@ -193,6 +310,15 @@ class CodexExecRuntimeAdapter:
         if not allowed_outputs:
             raise ExternalContractError("output_allowlist_empty")
         project_id = context.project_id
+        policy_digest = facts.get("runtime_policy_evidence_sha256")
+        if not isinstance(policy_digest, str) or not _SHA256.fullmatch(policy_digest):
+            raise ExternalContractError("policy_preflight_missing")
+        preflight = self._configuration_preflight(version)
+        arguments = tuple(preflight["arguments"])
+        config_sources = tuple(preflight["config_sources"])
+        enabled_plugins = tuple(preflight["enabled_plugin_set"])
+        enabled_mcps = tuple(preflight["enabled_mcp_set"])
+        remote_skills = str(preflight["remote_skill_catalog_state"])
         envelope = make_envelope(
             run_id=self._run_id,
             task_id=self._task_id,
@@ -202,19 +328,22 @@ class CodexExecRuntimeAdapter:
             allowed_outputs=allowed_outputs,
             executable_path=self._executable,
             executable_version=version,
-            arguments=(
-                "exec",
-                "--ephemeral",
-                "--ignore-user-config",
-                "--sandbox",
-                "workspace-write",
-                "--json",
-            ),
-            config_sources=("cli.flags", "runtime-managed-auth"),
+            arguments=arguments,
+            config_sources=config_sources,
             egress={
                 EgressChannel.PROVIDER_MODEL: EgressDisposition.RUNTIME_MANAGED,
                 EgressChannel.AGENT_EXTENSION: EgressDisposition.DENY,
             },
+            effective_runtime_configuration_fingerprint=str(preflight["fingerprint"]),
+            permission_policy_fingerprint=self._permission_fingerprint(
+                allowed_inputs=allowed_inputs,
+                allowed_outputs=allowed_outputs,
+                route_policy_evidence_sha256=policy_digest,
+            ),
+            enabled_plugin_set=enabled_plugins,
+            enabled_mcp_set=enabled_mcps,
+            remote_skill_catalog_state=remote_skills,
+            route_policy_evidence_sha256=policy_digest,
         )
         runtime_ref = f"codex-exec:{uuid4().hex}"
         self._runs[runtime_ref] = _CodexRun(
@@ -277,6 +406,10 @@ class CodexExecRuntimeAdapter:
             record.state = RunState.FAILED
             raise ExternalContractError("codex_process_failed")
         try:
+            normalized_result = self._parse_normalized_result(record)
+            preflight = self._configuration_preflight(record.envelope.executable_version)
+            if preflight["fingerprint"] != record.envelope.effective_runtime_configuration_fingerprint:
+                raise ExternalContractError("runtime_configuration_changed")
             record.envelope.verify_staging()
             record.envelope.assert_quiescent_input()
             diff, source_after_manifest = self._stable_allowlisted_diff(record)
@@ -308,9 +441,12 @@ class CodexExecRuntimeAdapter:
                     "workspace_scope_mode": record.envelope.workspace_scope_mode,
                     "effective_runtime_configuration_fingerprint": record.envelope.effective_runtime_configuration_fingerprint,
                     "permission_policy_fingerprint": record.envelope.permission_policy_fingerprint,
+                    "route_policy_evidence_sha256": record.envelope.route_policy_evidence_sha256,
+                    "config_sources": json.dumps(record.envelope.config_sources, separators=(",", ":")),
                     "enabled_plugin_set": json.dumps(record.envelope.enabled_plugin_set, separators=(",", ":")),
                     "enabled_mcp_set": json.dumps(record.envelope.enabled_mcp_set, separators=(",", ":")),
                     "remote_skill_catalog_state": record.envelope.remote_skill_catalog_state,
+                    "child_environment_fingerprint": preflight["child_environment_fingerprint"],
                     "executable_sha256": record.envelope.executable_sha256,
                     "executable_version": record.envelope.executable_version,
                     "exit_code": str(record.exit_code),
@@ -323,6 +459,10 @@ class CodexExecRuntimeAdapter:
                     "stderr_sha256": hashlib.sha256(record.stderr).hexdigest(),
                     "stdout_bytes": str(len(record.stdout)),
                     "stderr_bytes": str(len(record.stderr)),
+                    "normalized_result_json": json.dumps(
+                        normalized_result, sort_keys=True, separators=(",", ":")
+                    ),
+                    "normalized_result_sha256": self._fingerprint(normalized_result),
                     "signal": str(record.process_facts[0].get("signal", "unknown"))
                     if record.process_facts else "unknown",
                     "auth_ownership": AuthOwnership.RUNTIME_MANAGED.value,
@@ -536,6 +676,46 @@ class CodexExecRuntimeAdapter:
         except Exception as exc:
             raise ExternalContractError("codex_process_observation_invalid") from exc
 
+    @classmethod
+    def _parse_normalized_result(cls, record: _CodexRun) -> dict[str, object]:
+        """Require bounded, uncontaminated Codex JSONL terminal output."""
+
+        if not record.stdout or len(record.stdout) > _MAX_JSON_RESULT_BYTES:
+            raise ExternalContractError("codex_result_missing_or_oversize")
+        try:
+            text = record.stdout.decode("utf-8")
+        except UnicodeDecodeError as exc:
+            raise ExternalContractError("codex_result_not_utf8") from exc
+        events: list[dict[str, object]] = []
+        for line in text.splitlines():
+            if not line.strip():
+                continue
+            try:
+                value = json.loads(line)
+            except (TypeError, ValueError, json.JSONDecodeError) as exc:
+                raise ExternalContractError("codex_result_malformed") from exc
+            if not isinstance(value, dict) or not isinstance(value.get("type"), str):
+                raise ExternalContractError("codex_result_schema_invalid")
+            if value["type"] in {"error", "turn.failed", "task.failed", "fatal"}:
+                raise ExternalContractError("codex_result_failed")
+            events.append(value)
+        if not events:
+            raise ExternalContractError("codex_result_empty")
+        terminal = events[-1]
+        terminal_type = terminal["type"]
+        if terminal_type not in _NORMALIZED_RESULT_TERMINALS:
+            raise ExternalContractError("codex_result_terminal_missing")
+        if terminal.get("status") in {"failed", "error", "cancelled"}:
+            raise ExternalContractError("codex_result_failed")
+        normalized = {
+            "format": "codex.exec.jsonl.v1",
+            "event_count": len(events),
+            "terminal_type": terminal_type,
+            "terminal_sha256": cls._fingerprint(terminal),
+        }
+        record.normalized_result = normalized
+        return normalized
+
     @staticmethod
     def _safe_argv(record: _CodexRun) -> tuple[str, ...]:
         values = list(record.argv)
@@ -559,17 +739,11 @@ class CodexExecRuntimeAdapter:
     def _executor_environment() -> dict[str, str]:
         """Return the explicit non-secret environment given to the child."""
 
-        names = {
-            "COMSPEC",
-            "PATHEXT",
-            "PATH",
-            "SYSTEMDRIVE",
-            "SYSTEMROOT",
-            "TEMP",
-            "TMP",
-            "WINDIR",
+        return {
+            name: value
+            for name, value in os.environ.items()
+            if name in _SAFE_ENVIRONMENT_NAMES
         }
-        return {name: value for name, value in os.environ.items() if name in names}
 
     def _get(self, runtime_ref: str) -> _CodexRun:
         try:

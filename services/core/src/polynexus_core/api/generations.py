@@ -24,6 +24,7 @@ class PrepareInput(StrictBody):
     repository:str|None=None
     baseline:str|None=None
     selected:list[str]=Field(default_factory=list,max_length=10000)
+    output_paths:list[str]|None=Field(default=None,max_length=10000)
 class BeginWork(StrictBody):
     command_id:str=Field(min_length=1,max_length=128)
     expected_revision:int=Field(ge=0)

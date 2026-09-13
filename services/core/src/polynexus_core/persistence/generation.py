@@ -24,7 +24,7 @@ class GenerationRepository:
         if project_id is None:raise GenerationConflict('task_not_found')
         if not SqlProjectRepository(self.session).reserve_write(project_id):raise GenerationConflict('project_archived')
 
-    def prepare(self, *, task_id, context_package_id, requirements, validation, repository=None, baseline=None, selected=(), execution_mode='STANDARD', secret_ref=None):
+    def prepare(self, *, task_id, context_package_id, requirements, validation, repository=None, baseline=None, selected=(), output_paths=None, execution_mode='STANDARD', secret_ref=None):
         from dataclasses import asdict
         from polynexus_core.persistence.repository import SqlTaskRepository,SqlContextPackageRepository,SqlProjectRepository,SqlArtifactRepository
         from polynexus_core.storage.content import ContentStore,ContentError
@@ -56,9 +56,17 @@ class GenerationRepository:
         if repository:
             manager=ManagedInputs(store,Path(os.environ['POLYNEXUS_SOURCE_ROOT']),Path(os.environ['POLYNEXUS_WORK_ROOT']))
             source=manager.capture(repository,baseline,list(selected))
+            from polynexus_core.workspace.managed import relative_path as validate_input_path
+            if output_paths is None:
+                normalized_outputs=list(selected)
+            else:
+                normalized_outputs=[validate_input_path(path) for path in output_paths]
+            if len(normalized_outputs)!=len(set(path.casefold() for path in normalized_outputs)):
+                raise ContentError('output_path_collision')
+            source['output_paths']=normalized_outputs
         else:
-            if selected or baseline:raise GenerationConflict('input_repository_required')
-            source={'baseline':snapshot([]),'input':snapshot([]),'repository':None,'baseline_commit':None,'selected':[]}
+            if selected or output_paths or baseline:raise GenerationConflict('input_repository_required')
+            source={'baseline':snapshot([]),'input':snapshot([]),'repository':None,'baseline_commit':None,'selected':[],'output_paths':[]}
         project=SqlProjectRepository(self.session).get(task.project_id)
         if project.archived:raise GenerationConflict('project_archived')
         if not set(context.source_refs) <= {e['path'] for e in source['input']['entries']}:raise GenerationConflict('context_source_not_captured')

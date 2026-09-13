@@ -57,6 +57,9 @@ class _FakeJob:
     def facts(self) -> list[dict[str, object]]:
         return [{"pid": 1, "exit_code": 0, "stopped": self._stopped}]
 
+    def output(self) -> tuple[bytes, bytes]:
+        return b'{"type":"turn.completed"}\n', b""
+
     def dispose(self) -> None:
         self._disposed = True
 
@@ -68,6 +71,11 @@ class _LongJob(_FakeJob):
         self.changed_path = None
         self._stopped = False
         self._disposed = False
+
+
+class _MalformedResultJob(_FakeJob):
+    def output(self) -> tuple[bytes, bytes]:
+        return b"not-json\n", b""
 
 
 def _git(cwd: Path, *args: str) -> None:
@@ -127,6 +135,9 @@ def _context(
             "projected_staging": str(staging),
             "allowed_input_paths": json.dumps(paths),
             "allowed_output_paths": json.dumps(outputs),
+            "runtime_policy_evidence_sha256": hashlib.sha256(
+                b"synthetic-policy-allow"
+            ).hexdigest(),
         },
     )
 
@@ -288,6 +299,47 @@ def test_codex_adapter_separates_empty_inputs_from_approved_outputs(tmp_path: Pa
         assert result.artifacts
 
     asyncio.run(execute())
+
+
+def test_codex_adapter_rejects_malformed_json_result(tmp_path: Path) -> None:
+    repo, content = _repo(tmp_path)
+    adapter = CodexExecRuntimeAdapter(
+        executable=Path(sys.executable),
+        content_root=content,
+        version_probe=lambda _path: "codex-cli-0.0.0",
+        job_factory=lambda argv, cwd: _MalformedResultJob(argv, cwd),
+    )
+    task = _task()
+    adapter.bind_run_identity(run_id="run_malformed", task_id=task.id)
+
+    async def execute():
+        ref = await adapter.create_run(_context(repo))
+        await adapter.submit(ref, task)
+        with pytest.raises(ExternalContractError, match="codex_result_malformed"):
+            await adapter.result(ref)
+        return ref
+
+    ref = asyncio.run(execute())
+    assert asyncio.run(adapter.status(ref)).state is RunState.FAILED
+
+
+def test_projected_staging_rejects_nested_reparse_path(tmp_path: Path) -> None:
+    repo, _content = _repo(tmp_path)
+    nested = repo / "nested"
+    nested.mkdir()
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    try:
+        os.symlink(outside, nested / "linked", target_is_directory=True)
+    except OSError:
+        pytest.skip("symlink creation is unavailable in this Windows test environment")
+    with pytest.raises(ExternalContractError, match="path_(escape|reparse_unsupported)"):
+        create_projected_staging(
+            source_root=repo,
+            staging_root=repo.parent / "projected-reparse",
+            allowed_inputs=("nested/linked/bug.py",),
+            allowed_outputs=("nested/linked/bug.py",),
+        )
 
 
 def test_controlled_job_observes_output_and_excludes_unallowlisted_environment(

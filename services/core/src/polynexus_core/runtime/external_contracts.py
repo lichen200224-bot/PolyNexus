@@ -84,6 +84,35 @@ def relative_path(value: object) -> str:
     return value
 
 
+def _safe_relative(root: Path, value: str) -> Path:
+    """Resolve one relative path while rejecting every reparse ancestor."""
+
+    relative = relative_path(value)
+    base = root.resolve(strict=False)
+    candidate = base / relative
+    try:
+        canonical = candidate.resolve(strict=False)
+    except OSError as exc:
+        raise ExternalContractError("path_unavailable") from exc
+    if not canonical.is_relative_to(base):
+        raise ExternalContractError("path_escape")
+    current = candidate
+    while current != base and current != current.parent:
+        try:
+            current.lstat()
+            exists = True
+        except FileNotFoundError:
+            exists = False
+        except OSError as exc:
+            raise ExternalContractError("path_unavailable") from exc
+        if exists:
+            _plain(current)
+        current = current.parent
+    if current != base:
+        raise ExternalContractError("path_escape")
+    return candidate
+
+
 def _canonical(value: object) -> bytes:
     return json.dumps(
         value,
@@ -98,7 +127,7 @@ def _file_digest(root: Path, paths: tuple[str, ...]) -> str:
 
     observations: list[dict[str, object]] = []
     for relative in paths:
-        path = root / relative
+        path = _safe_relative(root, relative)
         try:
             _plain(path)
             info = path.stat()
@@ -195,7 +224,7 @@ def create_projected_staging(
     staging.mkdir()
     try:
         for relative in tuple(sorted(set(inputs) | set(outputs))):
-            source_path = source / relative
+            source_path = _safe_relative(source, relative)
             if not source_path.exists():
                 continue
             _plain(source_path)
@@ -269,6 +298,7 @@ class ExecutionEnvelope:
     workspace_scope_mode: str = "PROJECTED_STAGING"
     effective_runtime_configuration_fingerprint: str = ""
     permission_policy_fingerprint: str = ""
+    route_policy_evidence_sha256: str = ""
     enabled_plugin_set: tuple[str, ...] = ("NONE",)
     enabled_mcp_set: tuple[str, ...] = ("NONE",)
     remote_skill_catalog_state: str = "NONE"
@@ -333,6 +363,7 @@ class ExecutionEnvelope:
                     "allowed_inputs": inputs,
                     "allowed_outputs": outputs,
                     "egress": {key.value: value.value for key, value in egress.items()},
+                    "route_policy_evidence_sha256": self.route_policy_evidence_sha256,
                 }
             )
         ).hexdigest()
@@ -342,6 +373,10 @@ class ExecutionEnvelope:
         ):
             if not _SHA256.fullmatch(value):
                 raise ExternalContractError(f"{field}_invalid")
+        if self.route_policy_evidence_sha256 and not _SHA256.fullmatch(
+            self.route_policy_evidence_sha256
+        ):
+            raise ExternalContractError("route_policy_evidence_invalid")
         quiescence_manifest = self.input_quiescence_manifest_sha256 or _file_digest(
             staging, tuple(path for path in inputs if path not in outputs)
         )
@@ -382,6 +417,7 @@ class ExecutionEnvelope:
             "workspace_scope_mode": self.workspace_scope_mode,
             "effective_runtime_configuration_fingerprint": self.effective_runtime_configuration_fingerprint,
             "permission_policy_fingerprint": self.permission_policy_fingerprint,
+            "route_policy_evidence_sha256": self.route_policy_evidence_sha256,
             "enabled_plugin_set": self.enabled_plugin_set,
             "enabled_mcp_set": self.enabled_mcp_set,
             "remote_skill_catalog_state": self.remote_skill_catalog_state,
@@ -399,6 +435,8 @@ class ExecutionEnvelope:
             raise ExternalContractError("projected_staging_required")
         if executable_digest(self.executable_path) != self.executable_sha256:
             raise ExternalContractError("executable_identity_changed")
+        for relative in (*self.allowed_inputs, *self.allowed_outputs):
+            _safe_relative(self.staging_root, relative)
         expected = hashlib.sha256(_canonical(self._fingerprint_payload())).hexdigest()
         if expected != self.envelope_sha256:
             raise ExternalContractError("envelope_identity_changed")
@@ -431,6 +469,12 @@ def make_envelope(
     arguments: tuple[str, ...],
     config_sources: tuple[str, ...],
     egress: Mapping[EgressChannel, EgressDisposition],
+    effective_runtime_configuration_fingerprint: str = "",
+    permission_policy_fingerprint: str = "",
+    enabled_plugin_set: tuple[str, ...] = ("NONE",),
+    enabled_mcp_set: tuple[str, ...] = ("NONE",),
+    remote_skill_catalog_state: str = "NONE",
+    route_policy_evidence_sha256: str = "",
 ) -> ExecutionEnvelope:
     """Build and hash a new envelope after observing the staged inputs."""
 
@@ -452,4 +496,10 @@ def make_envelope(
         config_sources=config_sources,
         egress=egress,
         input_manifest_sha256=manifest,
+        effective_runtime_configuration_fingerprint=effective_runtime_configuration_fingerprint,
+        permission_policy_fingerprint=permission_policy_fingerprint,
+        enabled_plugin_set=enabled_plugin_set,
+        enabled_mcp_set=enabled_mcp_set,
+        remote_skill_catalog_state=remote_skill_catalog_state,
+        route_policy_evidence_sha256=route_policy_evidence_sha256,
     )

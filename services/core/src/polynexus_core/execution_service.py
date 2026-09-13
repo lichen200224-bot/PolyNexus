@@ -638,8 +638,13 @@ class ExecutionService:
         from polynexus_core.runtime.external_contracts import create_projected_staging
         import os
         import hashlib
+        import json
         store=ContentStore(Path(os.environ["POLYNEXUS_CONTENT_ROOT"]))
         facts=dict(context.project_facts)
+        policy_audit = self._policy_audit_for_run(run.id)
+        facts['runtime_policy_evidence_sha256'] = hashlib.sha256(
+            json.dumps(policy_audit.metadata, sort_keys=True, separators=(',', ':')).encode('utf-8')
+        ).hexdigest()
         if record['source']['repository']:
             managed_workspace = Path(os.environ['POLYNEXUS_WORK_ROOT']) / workspace_id
             facts['managed_workspace']=str(managed_workspace)
@@ -648,8 +653,9 @@ class ExecutionService:
             # an external runtime receives only a Core-created projection.
             import json as _json
             selected_paths=tuple(record['source'].get('selected', ()))
+            output_paths=tuple(record['source'].get('output_paths', selected_paths))
             facts['allowed_input_paths']=_json.dumps(selected_paths, separators=(',', ':'))
-            facts['allowed_output_paths']=_json.dumps(selected_paths, separators=(',', ':'))
+            facts['allowed_output_paths']=_json.dumps(output_paths, separators=(',', ':'))
             try:
                 runtime_managed = (
                     supervisor._adapter.capabilities().auth_ownership
@@ -665,7 +671,7 @@ class ExecutionService:
                     source_root=managed_workspace,
                     staging_root=Path(os.environ['POLYNEXUS_WORK_ROOT']) / staging_id,
                     allowed_inputs=selected_paths,
-                    allowed_outputs=selected_paths,
+                    allowed_outputs=output_paths,
                 )
                 facts['projected_staging']=str(projected)
                 facts['workspace_scope_mode']='PROJECTED_STAGING'

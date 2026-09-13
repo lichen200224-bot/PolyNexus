@@ -18,7 +18,7 @@ performed.
 | FD-05 process ownership | Existing Windows controlled Job Object path exercised with a real root plus retained child; cleanup, late abort isolation, and registry-loss fail-closed cases exercised; child environment is explicitly allowlisted and bounded stdout/stderr/process facts are retained | Pass for the controlled ownership contract |
 | FD-05 reconciliation | Existing restart reconciliation path retained; cleanup target hint is applied on restart cleanup; no resubmission path added | Targeted reconciliation regression pass |
 | FD-06 static module | `module.codex` is statically registered through the existing `RuntimeModuleBridge` into the existing `RuntimeRegistry`; module disable isolates Codex while reference remains available | D2a contract tests and MCF-01 regression pass |
-| FD-07 external envelope | Immutable run/task/project envelope, Core-created per-Run `PROJECTED_STAGING`, independent input/output allowlists, executable/config/policy fingerprints, provider-model vs agent-extension egress declarations, launch/import quiescence, stable output observation, and Core-owned blob import | D2a contract tests pass (`9 passed`) |
+| FD-07 external envelope | Immutable run/task/project envelope, Core-created per-Run `PROJECTED_STAGING`, independent input/output allowlists, executable/config/policy fingerprints, provider-model vs agent-extension egress declarations, launch/import quiescence, stable output observation, and Core-owned blob import | D2a contract tests pass (`10 passed`, `1 skipped` on Windows symlink privilege) |
 | FD-07 negative paths | Traversal/credential-like argument rejection, non-allowlisted source change rejection, output mutation between two import reads rejection | Pass in D2a contract tests |
 | FD-08 W2 real target | Feasibility first, then installed `codex` CLI attempt in synthetic managed worktree | Blocked by CLI API transport/network permission before model execution; no real source write or target cleanup evidence |
 
@@ -33,11 +33,16 @@ The fresh implementation is confined to:
 - `services/core/src/polynexus_core/runtime/supervisor.py`
 - `services/core/src/polynexus_core/runtime/reconciliation.py`
 - `services/core/src/polynexus_core/execution_service.py`
+- `services/core/src/polynexus_core/persistence/generation.py`
+- `services/core/src/polynexus_core/api/generations.py`
 - `services/core/src/polynexus_core/workspace/ownership.py`
 - `services/core/tests/test_d2a_external_runtime.py`
 
-The public `RuntimeAdapter` method set, Run schema, API/UI, migrations, and
-binding insert-once behavior were not changed.
+The public `RuntimeAdapter` method set, Run schema, migrations, and binding
+insert-once behavior were not changed. `PrepareInput.output_paths` is an
+optional additive API field so the durable generation record can keep input
+and output allowlists distinct; existing callers retain the selected-path
+fallback.
 
 ## Commands and exits
 
@@ -46,11 +51,13 @@ All commands below ran in the D2a lane unless another cwd is shown.
 | Purpose | Command / cwd | Exit |
 | --- | --- | ---: |
 | Python compile | `D:\AI學習教材\PolyNexus\.venv\Scripts\python.exe -m compileall -q services/core/src/polynexus_core services/core/tests` / lane root | `0` |
-| D2a contract tests | `...python.exe -m pytest -q --basetemp <lane-temp> tests/test_d2a_external_runtime.py` / `services/core` | `0` (`9 passed`) |
+| D2a contract tests | `...python.exe -m pytest -q --basetemp <lane-temp> tests/test_d2a_external_runtime.py` / `services/core` | `0` (`10 passed`, `1 skipped` on Windows symlink privilege) |
 | D1a runtime/module/reconciliation/policy regression | `...pytest -q --basetemp <lane-temp> tests/test_runtime_skeleton.py tests/test_mcf01_static_modules.py tests/test_g16_runtime_selection_policy.py tests/test_g14_runtime_reconciliation.py tests/test_d1a_policy_secret.py` / `services/core` | `0` |
 | Ownership and real controlled Job regression | `...pytest -q --basetemp <lane-temp> tests/test_d1a_generation_ownership.py::test_real_owned_tree_retry_late_abort_and_registry_loss tests/test_d1a_generation_ownership.py::test_public_rest_execution_controls_real_job_and_terminal_cancel_is_inert` / `services/core` | `0` (`2 passed`) |
 | Failure/timeout cleanup regression | `...pytest -q --basetemp <lane-temp> tests/test_cp06_wp28_failure_injection.py tests/test_wp24_resource_guards.py` / `services/core` | `0` (`10 passed`) |
-| Full Core regression | `TEMP/TMP=<lane>\\d2a-full-core3-root; ...python.exe -m pytest -q --basetemp <lane>\\d2a-full-core3-root\\pytest tests` / `services/core` | `0` (all Core tests passed; warnings only) |
+| Remediation affected regression | `...pytest -q --basetemp <lane-temp> tests/test_d2a_external_runtime.py tests/test_d1a_generation_ownership.py::<real-job cases> tests/test_g16_runtime_selection_policy.py tests/test_mcf01_static_modules.py tests/test_g14_runtime_reconciliation.py tests/test_cp06_wp28_failure_injection.py tests/test_g15_runtime_output_redaction.py` / `services/core` | `0` (all collected cases passed; one symlink case skipped) |
+| Codex/runtime regression | `...pytest -q --basetemp <lane-temp> tests/test_wp14_codex_runtime.py tests/test_wp14b_runtime_binding.py tests/test_wp16_runtime_doctor.py tests/test_runtime_skeleton.py` / `services/core` | `0` (all collected cases passed; warnings only) |
+| Full Core regression after remediation | `TEMP/TMP=<lane>\\d2a-full-core4-root; ...python.exe -m pytest -q --basetemp <lane>\\d2a-full-core4-root\\pytest tests` / `services/core` | `0` (all Core tests passed; warnings only) |
 | Web dependency install | `npm ci --ignore-scripts --no-audit --no-fund --fetch-timeout=15000 --fetch-retries=1 --cache <lane>\\d2a-npm-cache-final` / `apps/web` | `0` (90 packages) |
 | Web tests | `npm test -- --run` / `apps/web` | `0` (`4 files`, `94 tests`) |
 | Web build | `npm run build` / `apps/web` | `0` |
@@ -75,6 +82,24 @@ environment allowlist; require verified timeout cleanup for runtime-managed
 dispatch; and retain bounded argv/cwd/exit/signal/process/stdout/stderr plus
 version/auth/provenance evidence. A second independent review is required for
 the resulting immutable candidate.
+
+The second fresh read-only review of candidate `e19ff4c555ed03630102502a7108c3f09fd3024d`
+returned `FAIL_REVIEW` with P0=0 and P1=4. It confirmed candidate identity,
+ancestry, MCF-02 non-adoption, and the static module bridge, while identifying
+three implementation gaps in addition to the still-blocking real-target gate:
+synthetic rather than resolved effective-config/policy fingerprints, incomplete
+nested reparse containment, and acceptance of exit-zero output without parsing
+the required `--json` normalized result. It also noted that execution service
+was still assigning the same durable selected-path set to both input and output.
+
+The post-review remediation in this lane adds an actual Codex configuration
+preflight snapshot (executable/flags/child-environment digests with explicit
+`NONE` plugin/MCP/skill state), binds the persisted route-policy audit digest
+into the immutable envelope, checks every existing relative-path ancestor for
+reparse/symlink escape, adds durable independent `output_paths`, and requires
+bounded JSONL terminal-result validation before importing a diff. Malformed,
+empty, failed, or drifted results fail closed. A new immutable candidate and a
+new fresh independent review are still required.
 
 ## Real Codex feasibility evidence
 
