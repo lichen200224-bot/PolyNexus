@@ -1,30 +1,45 @@
-# Writer handoff: source quiescent, acceptance incomplete
+# D1a writer handoff
 
-The final complete Core suite passed on the recorded stable source fingerprint.
-See execution-ledger.json and external core-full-final3.command.json for actual
-count, PID, timestamps and exit. Earlier full Web92, cursor Web90 and Vite build
-exit0 are source-bound evidence; Controller owns final Web/build/browser/START
-and immutable candidate gates. No product PASS or Human acceptance is claimed.
+The five D1a evidence files are refreshed for the final technical source
+state and are ready for an immutable candidate commit followed by fresh
+independent review.
 
-Repair aggregate12/12 includes one Controller external harness repair. The
-resumed fixes preserve historical migration/identity/restart assertions.
-Durable Start/Cancel receipts, real Windows Job ownership test, migration
-27-step restore matrix, DPAPI SecretRef dispatch/redaction, explicit Web controls
-and stable public cursor/reconnect contracts are now implemented and tested.
-Old stage5 patch was not blindly applied; reviewed SecretRef implementation was
-applied separately. Prior cap6 evidence is historical and superseded by this
-current incomplete acceptance ledger, not erased from external records.
+Source binding:
 
-All12 cases remain conservatively partial pending full acceptance. In particular,
-real Job proof currently exercises repository/registry rather than the complete
-public adapter journey; human ownership actions, full natural-terminal/restart
-matrix, all reference consumers, policy tools/effects and full browser/keyboard
-matrix remain unverified. prior_decision_refs/memory_refs are rejected fail closed.
-Do not replace these missing oracles with suite counts. See case-map.json.
+- Branch: `codex/product-d1a`.
+- Current HEAD: `1b79c511ec0b7358525d8ca1101d4c07b57551f6`.
+- The only source delta after that commit is the uncommitted, test-only repair
+  #26 in `services/core/tests/test_baseline_debt_01.py`. It changes the
+  cancellation oracle to require one `runtime.routing_policy` audit and zero
+  non-policy evidence.
+- The browser journey ran on the same product/Web fingerprint at
+  `1b79c511ec0b7358525d8ca1101d4c07b57551f6); #26 does not change product or
+  Web bytes.
 
-The lane is uncommitted and unstaged; no commit, push, merge, MCF adoption or
-Human/Assurance authority. All paths are within the accepted77-path scope.
-No retained Writer runner/service remains after final Core. Real owned tree
-facts are in owned-tree-targeted stdout; historical global child inventory and
-older inaccessible fixture storage totals remain UNKNOWN. No broad process kill
-or ACL changes. Controller will perform fresh source/evidence/candidate review.
+Final evidence:
+
+- Repair #26 targeted: 24 passed, exit 0.
+- D1a affected Core: 183 passed, exit 0.
+- Policy/security affected Core: 74 passed, exit 0.
+- Full Core with the system tempfile root: 873 passed, 193 warnings, exit 0,
+  122.25s.
+- Web full: 94 passed, exit 0.
+- `npm run build`: exit 0.
+- Browser journey: observed pass on synthetic local-only data. Readiness,
+  explicit generation/context selection, CREATED empty-output semantics,
+  offline Retry, restart/reconnect identity, archive write boundaries and
+  Abort/Cancel readability were observed. Both probes recorded Core 200, Web
+  200, anonymous 403 and wrong-token 403, with zero remaining listeners and
+  zero owned instances alive after cleanup.
+
+Case-map status is technical evidence only. No Human product acceptance,
+Assurance authority or independent fresh review is claimed. The remaining
+non-blocking review note is the P2 API-contract follow-up for
+`prepare_claimed_run(commit=False)` denial-audit persistence; the sole
+production caller uses an isolated session and current tests prove the
+required durable audit. It is not a current observed D1a P0/P1 defect.
+
+No remote push of a new candidate, merge, release/tag, D1b work, MCF adoption
+or production database operation was performed. The next owner may commit the
+repaired source plus these five evidence files as one explicit immutable
+candidate and request fresh review.

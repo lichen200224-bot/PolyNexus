@@ -14,6 +14,7 @@ from polynexus_core.domain.models import ContextPackage, Project, Run, Task
 from polynexus_core.persistence.models import Base
 from polynexus_core.persistence.repository import (
     SqlContextPackageRepository,
+    SqlEvidenceRepository,
     SqlProjectRepository,
     SqlRunEventRepository,
     SqlRunRepository,
@@ -247,7 +248,12 @@ def test_service_cancellation_durable_after_reopen(tmp_path, monkeypatch, entry,
             assert run.result is None
             assert [e.to_state for e in run.events][-2:] == [RunState.CANCEL_REQUESTED, expected]
             assert 'PRIVATE_CLEANUP_MARKER' not in repr(run)
-            for table in ['evidence','artifacts','findings']:
+            evidence = SqlEvidenceRepository(s).list_by_run(run.id)
+            policy_audits = [e for e in evidence if e.source == 'runtime.routing_policy']
+            non_policy_evidence = [e for e in evidence if e.source != 'runtime.routing_policy']
+            assert len(policy_audits) == 1
+            assert non_policy_evidence == []
+            for table in ['artifacts','findings']:
                 assert s.execute(text(f'SELECT COUNT(*) FROM {table}')).scalar_one() == 0
     finally:
         reopened.dispose()

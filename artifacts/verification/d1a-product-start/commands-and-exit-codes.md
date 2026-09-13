@@ -1,214 +1,52 @@
-# Actual command evidence
+# D1a final command and exit evidence
 
-Paths are sanitized labels; external JSON records retain exact argv/env/cwd, PID/start/end/exit and source fingerprints. Older missing facts remain unknown.
+This is the compact final receipt for the source fingerprint at HEAD
+`1b79c511ec0b7358525d8ca1101d4c07b57551f6`. Paths are sanitized labels; long
+raw logs and process details remain in the external evidence bundle. The
+browser evidence was collected before repair #26, and #26 changes only the
+Core test oracle, so the production and Web trees are identical to the
+observed browser fingerprint.
 
-- stage2-targeted: 39 passed, 35 warnings in 4.68s; actual runner exit 0.
-  - argv: `["${PYTHON}", "-B", "-m", "pytest", "-p", "no:cacheprovider", "--basetemp", "${OUT}\\fixtures\\stage2-targeted", "tests/test_d1a_project_context.py", "tests/test_domain_models.py", "tests/test_api.py", "--tb=short", "-rs"]`
-  - cwd: `"${LANE}\\services\\core"`; env: `{"PYTHONPATH": "${LANE}\\services\\core\\src", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONIOENCODING": "utf-8", "POLYNEXUS_DATABASE_URL": "sqlite:///${OUT}/fixtures/never-default.db"}`
-  - start 2026-09-13T02:16:26.308264+00:00; end 2026-09-13T02:16:32.106653+00:00; PID None; stopped None; source None.
-  - stage2-targeted.command.json SHA256 643fc0665dd01a5e86724d2495db6c0d8b8c9362426d0cb6a6c8b306791b3ade; stdout SHA256 4d39809498f0f4fceabce6150a4716338a696a486cf77c8eff86b844cace925d.
-- stage3-targeted: 38 passed, 35 warnings in 7.68s; actual runner exit 0.
-  - argv: `["${PYTHON}", "-B", "-m", "pytest", "-p", "no:cacheprovider", "--basetemp", "${OUT}\\fixtures\\stage3-targeted", "tests/test_d1a_generation_ownership.py", "tests/test_d1a_project_context.py", "tests/test_api.py", "--tb=short", "-rs"]`
-  - cwd: `"${LANE}\\services\\core"`; env: `{"PYTHONPATH": "${LANE}\\services\\core\\src", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONIOENCODING": "utf-8", "POLYNEXUS_DATABASE_URL": "sqlite:///${OUT}/fixtures/never-default.db"}`
-  - start 2026-09-13T02:20:20.633390+00:00; end 2026-09-13T02:20:30.056935+00:00; PID None; stopped None; source None.
-  - stage3-targeted.command.json SHA256 cb0e49e41c196edbeae7ca628c6ce5e4f49d54deced69f2f95df1c0c25358b57; stdout SHA256 58c0114a393054f1fe9b05321f9cdbdff6e32811f497487a36b0d22fb20fd7a8.
-- stage4-migration: 2 passed in 0.74s; actual runner exit 0.
-  - argv: `["${PYTHON}", "-B", "-m", "pytest", "-p", "no:cacheprovider", "--basetemp", "${OUT}\\fixtures\\stage4-migration", "tests/test_d1a_migration_restore.py", "--tb=short", "-rs"]`
-  - cwd: `"${LANE}\\services\\core"`; env: `{"PYTHONPATH": "${LANE}\\services\\core\\src", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONIOENCODING": "utf-8", "POLYNEXUS_DATABASE_URL": "sqlite:///${OUT}/fixtures/never-default.db"}`
-  - start 2026-09-13T02:22:32.433768+00:00; end 2026-09-13T02:22:34.322757+00:00; PID None; stopped None; source None.
-  - stage4-migration.command.json SHA256 63160e25815033e0cc213e57a0c06c2f633b1f93b3dd7cb7e5affd08670bf658; stdout SHA256 87ebf53f228432f7bdea3ac6b4c86ed77163a35c918bc34d97d983b479019123.
-- stage4-full-core: 11 failed, 827 passed, 1 skipped, 189 warnings in 60.13s (0:01:00); actual runner exit 1.
-  - argv: `["${PYTHON}", "-B", "-m", "pytest", "-p", "no:cacheprovider", "--basetemp", "${OUT}\\fixtures\\stage4-full-core", "tests", "--tb=short", "-rs"]`
-  - cwd: `"${LANE}\\services\\core"`; env: `{"PYTHONPATH": "${LANE}\\services\\core\\src", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONIOENCODING": "utf-8", "POLYNEXUS_DATABASE_URL": "sqlite:///${OUT}/fixtures/never-default.db"}`
-  - start 2026-09-13T02:22:43.586188+00:00; end 2026-09-13T02:23:47.220784+00:00; PID None; stopped None; source None.
-  - stage4-full-core.command.json SHA256 3f849f57c35aea1d19509c170bff4e5ad2e3ad6dcb88c949343f0a0a1c03964a; stdout SHA256 dc8911dac415504fcb94ca97d983abd4e76578047228c6cb4356f77ec26f7cb8.
-- resume-regression: 2 failed, 157 passed, 44 warnings in 8.49s; actual runner exit 1.
-  - argv: `["${PYTHON}", "-B", "-m", "pytest", "-p", "no:cacheprovider", "--basetemp", "${OUT}\\fixtures\\resume-regression", "tests/test_baseline_debt_01_migration.py", "tests/test_cp06_wp30_clean_install.py", "tests/test_g17_migration_restore_authority.py", "tests/test_persistence.py", "tests/test_wp07_integration.py", "tests/test_wp14b_runtime_binding.py", "tests/test_wp23_backup_restore_migration.py", "--tb=short", "-rs"]`
-  - cwd: `"${LANE}\\services\\core"`; env: `{"PYTHONPATH": "${LANE}\\services\\core\\src", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONIOENCODING": "utf-8", "POLYNEXUS_DATABASE_URL": "sqlite:///${OUT}/fixtures/never-default.db"}`
-  - start 2026-09-13T02:42:31.420118+00:00; end 2026-09-13T02:42:41.474926+00:00; PID None; stopped None; source None.
-  - resume-regression.command.json SHA256 bcca2f80cfe721126cdf1fc079bbc2120171e6b0796cfa48b16cb60d654955c0; stdout SHA256 1704ebc02f414e644787dafdb8171070e2bc9af4e761a95e8374cb48f254a132.
-- resume-regression2: 161 passed, 44 warnings in 9.33s; actual runner exit 0.
-  - argv: `["${PYTHON}", "-B", "-m", "pytest", "-p", "no:cacheprovider", "--basetemp", "${OUT}\\fixtures\\resume-regression2", "tests/test_baseline_debt_01_migration.py", "tests/test_cp06_wp30_clean_install.py", "tests/test_g17_migration_restore_authority.py", "tests/test_persistence.py", "tests/test_wp07_integration.py", "tests/test_wp14b_runtime_binding.py", "tests/test_wp23_backup_restore_migration.py", "tests/test_d1a_migration_restore.py", "--tb=short", "-rs"]`
-  - cwd: `"${LANE}\\services\\core"`; env: `{"PYTHONPATH": "${LANE}\\services\\core\\src", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONIOENCODING": "utf-8", "POLYNEXUS_DATABASE_URL": "sqlite:///${OUT}/fixtures/never-default.db"}`
-  - start 2026-09-13T02:43:52.341716+00:00; end 2026-09-13T02:44:03.218109+00:00; PID None; stopped None; source None.
-  - resume-regression2.command.json SHA256 747025a8dd7f1060f705b2640b25cbb472d5599d576104b041d5352ed9c6e76b; stdout SHA256 7dfad340a2d18b5c4af82269a4ef164c9ceb117168eebdae9b84eb0fc7975e78.
-- inputs-targeted: 8 passed in 1.67s; actual runner exit 0.
-  - argv: `["${PYTHON}", "-B", "-m", "pytest", "-p", "no:cacheprovider", "--basetemp", "${OUT}\\fixtures\\inputs-targeted", "tests/test_d1a_generation_ownership.py", "tests/test_d1a_project_context.py", "tests/test_d1a_migration_restore.py", "--tb=short", "-rs"]`
-  - cwd: `"${LANE}\\services\\core"`; env: `{"PYTHONPATH": "${LANE}\\services\\core\\src", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONIOENCODING": "utf-8", "POLYNEXUS_DATABASE_URL": "sqlite:///${OUT}/fixtures/never-default.db"}`
-  - start 2026-09-13T02:47:55.774026+00:00; end 2026-09-13T02:47:58.411358+00:00; PID None; stopped None; source None.
-  - inputs-targeted.command.json SHA256 5f2c531c1090ef8ed0b90f452a7450c27d61b9bb96fbb992533b54feca173fbc; stdout SHA256 7585d454bcad37e57baa46906a48f83490c1f042c479b3d77c4c627b27be8d19.
-- content-targeted: 1 failed, 56 passed, 48 warnings, 2 errors in 11.27s; actual runner exit 1.
-  - argv: `["${PYTHON}", "-B", "-m", "pytest", "-p", "no:cacheprovider", "--basetemp", "${OUT}\\fixtures\\content-targeted", "tests/test_d1a_project_context.py", "tests/test_d1a_generation_ownership.py", "tests/test_d1a_migration_restore.py", "tests/test_wp08_context_packages.py", "tests/test_domain_models.py", "tests/test_api.py", "--tb=short", "-rs"]`
-  - cwd: `"${LANE}\\services\\core"`; env: `{"PYTHONPATH": "${LANE}\\services\\core\\src", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONIOENCODING": "utf-8", "POLYNEXUS_DATABASE_URL": "sqlite:///${OUT}/fixtures/never-default.db"}`
-  - start 2026-09-13T02:59:22.432401+00:00; end 2026-09-13T02:59:36.001461+00:00; PID None; stopped None; source None.
-  - content-targeted.command.json SHA256 a943e1966dd7a08d2369676d3807f014fc2bede8e2ce54700b4d042c5411d734; stdout SHA256 e3dfb287a11528f1337b32ce6004d6ef70717f8db988bdd1a9a454b17275b77e.
-- content-targeted2: 59 passed, 48 warnings in 10.73s; actual runner exit 0.
-  - argv: `["${PYTHON}", "-B", "-m", "pytest", "-p", "no:cacheprovider", "--basetemp", "${OUT}\\fixtures\\content-targeted2", "tests/test_d1a_project_context.py", "tests/test_d1a_generation_ownership.py", "tests/test_d1a_migration_restore.py", "tests/test_wp08_context_packages.py", "tests/test_domain_models.py", "tests/test_api.py", "--tb=short", "-rs"]`
-  - cwd: `"${LANE}\\services\\core"`; env: `{"PYTHONPATH": "${LANE}\\services\\core\\src", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONIOENCODING": "utf-8", "POLYNEXUS_DATABASE_URL": "sqlite:///${OUT}/fixtures/never-default.db"}`
-  - start 2026-09-13T03:01:08.411933+00:00; end 2026-09-13T03:01:20.204649+00:00; PID None; stopped None; source None.
-  - content-targeted2.command.json SHA256 c86b85bea1abadf2db2478bf989cc7233e2792c1acfc8f25066fa02419bb9340; stdout SHA256 111392a937efd8ce56f8e556d64c1192f01be01b9cda4c7145b00f8b3883cc4b.
-- binding-targeted: 11 passed, 1 warning in 6.12s; actual runner exit 0.
-  - argv: `["${PYTHON}", "-B", "-m", "pytest", "-p", "no:cacheprovider", "--basetemp", "${OUT}\\fixtures\\binding-targeted", "tests/test_d1a_generation_ownership.py", "tests/test_d1a_project_context.py", "tests/test_d1a_migration_restore.py", "--tb=short", "-rs"]`
-  - cwd: `"${LANE}\\services\\core"`; env: `{"PYTHONPATH": "${LANE}\\services\\core\\src", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONIOENCODING": "utf-8", "POLYNEXUS_DATABASE_URL": "sqlite:///${OUT}/fixtures/never-default.db", "TEMP": "${OUT}\\fixtures", "TMP": "${OUT}\\fixtures"}`
-  - start 2026-09-13T03:14:15.658173+00:00; end 2026-09-13T03:14:24.569524+00:00; PID 56656; stopped True; source 938ac3bd79abadcf955c0761f53a5132849281e4fe6c8184f7b333a0412ac949.
-  - binding-targeted.command.json SHA256 ba6a4c2c88be6be6aedd7216dda56819a64a979beb74c1c949532c1e4b64f1ed; stdout SHA256 e9d76da80b77993d4fa454d401f5b409e2586ada65525b15fd65734cb5d85c75.
-- api-generation: 1 failed, 109 passed, 119 warnings in 26.46s; actual runner exit 1.
-  - argv: `["${PYTHON}", "-B", "-m", "pytest", "-p", "no:cacheprovider", "--basetemp", "${OUT}\\fixtures\\api-generation", "tests/test_api.py", "tests/test_wp08_context_packages.py", "tests/test_wp09_execution_api.py", "tests/test_wp09_query_api.py", "tests/test_d1a_generation_ownership.py", "--tb=short", "-rs"]`
-  - cwd: `"${LANE}\\services\\core"`; env: `{"PYTHONPATH": "${LANE}\\services\\core\\src", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONIOENCODING": "utf-8", "POLYNEXUS_DATABASE_URL": "sqlite:///${OUT}/fixtures/never-default.db", "TEMP": "${OUT}\\fixtures", "TMP": "${OUT}\\fixtures"}`
-  - start 2026-09-13T03:20:35.019005+00:00; end 2026-09-13T03:21:03.206960+00:00; PID 46732; stopped True; source 3f92bf4640d43796851b4b5de9059315a8148f26518af7fe9f6dabf269eef085.
-  - api-generation.command.json SHA256 3bb8d8947062e7dc5c107e578c99bc96cdc6d8b60c3572a0e8035a103f8724a1; stdout SHA256 4f8f43d5542519f287519a7d341e23bc6e041b19a8be7e7b8e29911bc600918e.
-- api-generation2: 110 passed, 119 warnings in 28.97s; actual runner exit 0.
-  - argv: `["${PYTHON}", "-B", "-m", "pytest", "-p", "no:cacheprovider", "--basetemp", "${OUT}\\fixtures\\api-generation2", "tests/test_api.py", "tests/test_wp08_context_packages.py", "tests/test_wp09_execution_api.py", "tests/test_wp09_query_api.py", "tests/test_d1a_generation_ownership.py", "--tb=short", "-rs"]`
-  - cwd: `"${LANE}\\services\\core"`; env: `{"PYTHONPATH": "${LANE}\\services\\core\\src", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONIOENCODING": "utf-8", "POLYNEXUS_DATABASE_URL": "sqlite:///${OUT}/fixtures/never-default.db", "TEMP": "${OUT}\\fixtures", "TMP": "${OUT}\\fixtures"}`
-  - start 2026-09-13T03:22:06.799273+00:00; end 2026-09-13T03:22:37.680438+00:00; PID 57472; stopped True; source 604822ba9040cd6a1a29e0880f304d8d48353a192128db80917ede717c07e200.
-  - api-generation2.command.json SHA256 68a179925283a61b7564a6f5225a27227c21ec8ac05242d9cdd96b20d256a23e; stdout SHA256 639477e3a858e2f4c28a6ace1cc4740722df78474e0e3216a720327e7b22afdf.
-- consumer-generation: 11 failed, 372 passed, 19 warnings in 70.55s (0:01:10); actual runner exit 1.
-  - argv: `["${PYTHON}", "-B", "-m", "pytest", "-p", "no:cacheprovider", "--basetemp", "${OUT}\\fixtures\\consumer-generation", "tests/test_wp07_integration.py", "tests/test_wp12_council.py", "tests/test_wp14b_runtime_binding.py", "tests/test_wp13_workflow_gates.py", "tests/test_baseline_debt_01.py", "tests/test_mcf01_static_modules.py", "--tb=short", "-rs"]`
-  - cwd: `"${LANE}\\services\\core"`; env: `{"PYTHONPATH": "${LANE}\\services\\core\\src", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONIOENCODING": "utf-8", "POLYNEXUS_DATABASE_URL": "sqlite:///${OUT}/fixtures/never-default.db", "TEMP": "${OUT}\\fixtures", "TMP": "${OUT}\\fixtures"}`
-  - start 2026-09-13T03:26:28.279581+00:00; end 2026-09-13T03:27:41.265757+00:00; PID 54916; stopped True; source a179b3c59adc42e22bc5353b18ad1e11a30075574a107f26d586d4747e22aea2.
-  - consumer-generation.command.json SHA256 ddd99e38c7db01a979b95d1e8905440f0986aa3ba96c8f209723388505ddd2db; stdout SHA256 a48c34dad5d27b9f14183ef3b89cb63c123a32b1d0d9fe9208134d0b9c8e9e22.
-- consumer-generation2: 1 failed, 383 passed, 21 warnings in 65.39s (0:01:05); actual runner exit 1.
-  - argv: `["${PYTHON}", "-B", "-m", "pytest", "-p", "no:cacheprovider", "--basetemp", "${OUT}\\fixtures\\consumer-generation2", "tests/test_wp07_integration.py", "tests/test_wp12_council.py", "tests/test_wp14b_runtime_binding.py", "tests/test_wp13_workflow_gates.py", "tests/test_baseline_debt_01.py", "tests/test_mcf01_static_modules.py", "--tb=short", "-rs"]`
-  - cwd: `"${LANE}\\services\\core"`; env: `{"PYTHONPATH": "${LANE}\\services\\core\\src", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONIOENCODING": "utf-8", "POLYNEXUS_DATABASE_URL": "sqlite:///${OUT}/fixtures/never-default.db", "TEMP": "${OUT}\\fixtures", "TMP": "${OUT}\\fixtures"}`
-  - start 2026-09-13T03:37:22.856060+00:00; end 2026-09-13T03:38:30.603195+00:00; PID 10276; stopped True; source 5f213fc004d7d7f9d318e04e567c61a69dcc4b3f333305878862ed62b09cb238.
-  - consumer-generation2.command.json SHA256 4523aac794998900cade0f5c1168d99fab6bba75dbb39b9e030d448fae69009e; stdout SHA256 1b1e2e27e4b60b5f6730d8d91afbac964576cf00b1ddeddc74a665a0bb7a9eb3.
-- repair7-narrow: 1 passed in 0.90s; actual runner exit 0.
-  - argv: `["${PYTHON}", "-B", "-m", "pytest", "-p", "no:cacheprovider", "--basetemp", "${OUT}\\fixtures\\repair7-narrow", "tests/test_wp13_workflow_gates.py::test_run_task_id_mismatch_raises_identity_error", "--tb=short", "-rs"]`
-  - cwd: `"${LANE}\\services\\core"`; env: `{"PYTHONPATH": "${LANE}\\services\\core\\src", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONIOENCODING": "utf-8", "POLYNEXUS_DATABASE_URL": "sqlite:///${OUT}/fixtures/never-default.db", "TEMP": "${OUT}\\fixtures", "TMP": "${OUT}\\fixtures"}`
-  - start 2026-09-13T03:54:17.224131+00:00; end 2026-09-13T03:54:19.571417+00:00; PID 32076; stopped True; source 6e341cedf379dcea13bca457c594233c7e48aca56063924f51d79e25cc9e06cd.
-  - repair7-narrow.command.json SHA256 741bd389cf2229ebba274c0aed319046970e40be731fadde7b01c7ade95e2180; stdout SHA256 407add23468e8ccfb9f6648b27acd74ffe888bcd9eb23c572641f8566a6fef08.
-- repair7-consumer: 384 passed, 21 warnings in 67.90s (0:01:07); actual runner exit 0.
-  - argv: `["${PYTHON}", "-B", "-m", "pytest", "-p", "no:cacheprovider", "--basetemp", "${OUT}\\fixtures\\repair7-consumer", "tests/test_wp07_integration.py", "tests/test_wp12_council.py", "tests/test_wp14b_runtime_binding.py", "tests/test_wp13_workflow_gates.py", "tests/test_baseline_debt_01.py", "tests/test_mcf01_static_modules.py", "--tb=short", "-rs"]`
-  - cwd: `"${LANE}\\services\\core"`; env: `{"PYTHONPATH": "${LANE}\\services\\core\\src", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONIOENCODING": "utf-8", "POLYNEXUS_DATABASE_URL": "sqlite:///${OUT}/fixtures/never-default.db", "TEMP": "${OUT}\\fixtures", "TMP": "${OUT}\\fixtures"}`
-  - start 2026-09-13T03:54:34.543289+00:00; end 2026-09-13T03:55:44.490543+00:00; PID 51528; stopped True; source 6e341cedf379dcea13bca457c594233c7e48aca56063924f51d79e25cc9e06cd.
-  - repair7-consumer.command.json SHA256 df57bbe21b8f980ced0d5cf4552458d1844ae88ed4cdddc21683a504955e7c2c; stdout SHA256 c23c65d43ebc941ec940744fa5b99972ebcdfcbb595158b12c690d0dbc8c49fe.
-- commands-targeted: 42 passed, 39 warnings in 17.00s; actual runner exit 0.
-  - argv: `["${PYTHON}", "-B", "-m", "pytest", "-p", "no:cacheprovider", "--basetemp", "${OUT}\\fixtures\\commands-targeted", "tests/test_wp09_execution_api.py", "tests/test_d1a_generation_ownership.py", "--tb=short", "-rs"]`
-  - cwd: `"${LANE}\\services\\core"`; env: `{"PYTHONPATH": "${LANE}\\services\\core\\src", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONIOENCODING": "utf-8", "POLYNEXUS_DATABASE_URL": "sqlite:///${OUT}/fixtures/never-default.db", "TEMP": "${OUT}\\fixtures", "TMP": "${OUT}\\fixtures"}`
-  - start 2026-09-13T03:58:33.182670+00:00; end 2026-09-13T03:58:51.873924+00:00; PID 60144; stopped True; source f6e883669db945359993fabf2289aa4a094f7d0e10807baaaeb7f2502a207ec7.
-  - commands-targeted.command.json SHA256 5fcab4cdf30c8d18feef7b25cd015c82a0ffe12c6a32700784f412bc2d797782; stdout SHA256 7e95e1450c8724e7bb60f1e4a1dcdc7ed3160834e2baca7b23eebe4e2df3088a.
-- owned-tree-targeted: 44 passed, 40 warnings in 21.50s; actual runner exit 0.
-  - argv: `["${PYTHON}", "-B", "-m", "pytest", "-p", "no:cacheprovider", "--basetemp", "${OUT}\\fixtures\\owned-tree-targeted", "tests/test_d1a_generation_ownership.py", "tests/test_wp09_execution_api.py", "-s", "--tb=short", "-rs"]`
-  - cwd: `"${LANE}\\services\\core"`; env: `{"PYTHONPATH": "${LANE}\\services\\core\\src", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONIOENCODING": "utf-8", "POLYNEXUS_DATABASE_URL": "sqlite:///${OUT}/fixtures/never-default.db", "TEMP": "${OUT}\\fixtures", "TMP": "${OUT}\\fixtures"}`
-  - start 2026-09-13T04:03:41.300415+00:00; end 2026-09-13T04:04:04.272208+00:00; PID 53824; stopped True; source f22782a9b7f745073a9bc3ccfa96332da30f82840c8709ae9e7726268701dac5.
-  - owned-tree-targeted.command.json SHA256 1598292df1f70e5e189ef8b00b83e4f1c02bbe5e04e685940b9e00f0a0928f99; stdout SHA256 f1d6d473af89bf5079cce23584c88de89d501ea643f8d45e7508deda7c642444.
-- migration-final: 1 failed, 110 passed, 32 warnings in 12.18s; actual runner exit 1.
-  - argv: `["${PYTHON}", "-B", "-m", "pytest", "-p", "no:cacheprovider", "--basetemp", "${OUT}\\fixtures\\migration-final", "tests/test_d1a_migration_restore.py", "tests/test_baseline_debt_01_migration.py", "tests/test_cp06_wp30_clean_install.py", "tests/test_g17_migration_restore_authority.py", "tests/test_wp23_backup_restore_migration.py", "tests/test_wp14b_runtime_binding.py", "-s", "--tb=short", "-rs"]`
-  - cwd: `"${LANE}\\services\\core"`; env: `{"PYTHONPATH": "${LANE}\\services\\core\\src", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONIOENCODING": "utf-8", "POLYNEXUS_DATABASE_URL": "sqlite:///${OUT}/fixtures/never-default.db", "TEMP": "${OUT}\\fixtures", "TMP": "${OUT}\\fixtures"}`
-  - start 2026-09-13T04:08:12.836734+00:00; end 2026-09-13T04:08:26.696204+00:00; PID 58188; stopped True; source f337df5ff8c80aa2c6d41e134367d4db38af61716d369808579e59ea2adfeb09.
-  - migration-final.command.json SHA256 3d41c61876024ea9d1ee3746d6c16a2b8fc68fc28897a80b6b6d20d8b105cd42; stdout SHA256 f5190cbfb8b6fcfd65a360883f48c542e68edab0da170a01dd0b63a6a92111d1.
-- repair8-narrow: 1 passed, 3 warnings in 0.71s; actual runner exit 0.
-  - argv: `["${PYTHON}", "-B", "-m", "pytest", "-p", "no:cacheprovider", "--basetemp", "${OUT}\\fixtures\\repair8-narrow", "tests/test_baseline_debt_01_migration.py::test_update_preserves_counter_and_new_append_continues", "--tb=short", "-rs"]`
-  - cwd: `"${LANE}\\services\\core"`; env: `{"PYTHONPATH": "${LANE}\\services\\core\\src", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONIOENCODING": "utf-8", "POLYNEXUS_DATABASE_URL": "sqlite:///${OUT}/fixtures/never-default.db", "TEMP": "${OUT}\\fixtures", "TMP": "${OUT}\\fixtures"}`
-  - start 2026-09-13T04:11:44.509754+00:00; end 2026-09-13T04:11:46.421346+00:00; PID 62312; stopped True; source 9fcbece0bb7826b4170ae306246dd5306f4f5c6a61ebf0cd53b38dc886dbe732.
-  - repair8-narrow.command.json SHA256 e4cc3e30fe1b0ce228a87b2258c04f97af3eaf37481adc17b63cdf8e5cfcb210; stdout SHA256 ef18a5f795d226278fea7167fe2c65a57aa611701543fa1e08dafc33e93d8171.
-- migration-final2: 111 passed, 33 warnings in 11.10s; actual runner exit 0.
-  - argv: `["${PYTHON}", "-B", "-m", "pytest", "-p", "no:cacheprovider", "--basetemp", "${OUT}\\fixtures\\migration-final2", "tests/test_d1a_migration_restore.py", "tests/test_baseline_debt_01_migration.py", "tests/test_cp06_wp30_clean_install.py", "tests/test_g17_migration_restore_authority.py", "tests/test_wp23_backup_restore_migration.py", "tests/test_wp14b_runtime_binding.py", "-s", "--tb=short", "-rs"]`
-  - cwd: `"${LANE}\\services\\core"`; env: `{"PYTHONPATH": "${LANE}\\services\\core\\src", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONIOENCODING": "utf-8", "POLYNEXUS_DATABASE_URL": "sqlite:///${OUT}/fixtures/never-default.db", "TEMP": "${OUT}\\fixtures", "TMP": "${OUT}\\fixtures"}`
-  - start 2026-09-13T04:12:02.548955+00:00; end 2026-09-13T04:12:15.046415+00:00; PID 42952; stopped True; source 9fcbece0bb7826b4170ae306246dd5306f4f5c6a61ebf0cd53b38dc886dbe732.
-  - migration-final2.command.json SHA256 fdfd70cf3f0eea0d39a44ebe390459d459b5a447eb794fcfffdb050717d16281; stdout SHA256 db6740ee8fcd52a51410761e982cfb501fa189d6ee51437f98c14f977cc74191.
-- secret-targeted: 1 failed, 70 passed, 40 warnings in 12.24s; actual runner exit 1.
-  - argv: `["${PYTHON}", "-B", "-m", "pytest", "-p", "no:cacheprovider", "--basetemp", "${OUT}\\fixtures\\secret-targeted", "tests/test_d1a_policy_secret.py", "tests/test_g15_runtime_output_redaction.py", "tests/test_cp04_wp17_wp18_local_routing.py", "tests/test_cp06_wp29_security_policy.py", "tests/test_wp09_execution_api.py", "--tb=short", "-rs"]`
-  - cwd: `"${LANE}\\services\\core"`; env: `{"PYTHONPATH": "${LANE}\\services\\core\\src", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONIOENCODING": "utf-8", "POLYNEXUS_DATABASE_URL": "sqlite:///${OUT}/fixtures/never-default.db", "TEMP": "${OUT}\\fixtures", "TMP": "${OUT}\\fixtures"}`
-  - start 2026-09-13T04:13:38.859382+00:00; end 2026-09-13T04:13:52.650479+00:00; PID 57612; stopped True; source ad914eec65fca57b3390f0e5f106cdb407772fa314a305878150135697cf9219.
-  - secret-targeted.command.json SHA256 d110283e4d7c144125f6c76d812a6d30d9c3c1bdedfd20ff7e3b181f8d6b5b07; stdout SHA256 834e3954a9e12257dbe4f6ec1fd0f3be9e447339ff80d2c32c51be492f4e1c83.
-- repair9-narrow: 1 passed in 0.88s; actual runner exit 0.
-  - argv: `["${PYTHON}", "-B", "-m", "pytest", "-p", "no:cacheprovider", "--basetemp", "${OUT}\\fixtures\\repair9-narrow", "tests/test_d1a_policy_secret.py::test_secret_ref_adapter_output_never_persists_plaintext", "--tb=short", "-rs"]`
-  - cwd: `"${LANE}\\services\\core"`; env: `{"PYTHONPATH": "${LANE}\\services\\core\\src", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONIOENCODING": "utf-8", "POLYNEXUS_DATABASE_URL": "sqlite:///${OUT}/fixtures/never-default.db", "TEMP": "${OUT}\\fixtures", "TMP": "${OUT}\\fixtures"}`
-  - start 2026-09-13T04:15:35.604391+00:00; end 2026-09-13T04:15:37.658175+00:00; PID 62616; stopped True; source 4d57c679ef44a62509fbfab08f2fd047446d8e6cfc1cc4951b083a1c1e8328ba.
-  - repair9-narrow.command.json SHA256 d084fc3fc0d276310261031e842c87670f20304454e9553208f81f52754f635a; stdout SHA256 45fba5e3ff1e0757561d13974b7e359f42ac96b867119feb36bfc48dc1d7f620.
-- secret-targeted2: 71 passed, 40 warnings in 12.19s; actual runner exit 0.
-  - argv: `["${PYTHON}", "-B", "-m", "pytest", "-p", "no:cacheprovider", "--basetemp", "${OUT}\\fixtures\\secret-targeted2", "tests/test_d1a_policy_secret.py", "tests/test_g15_runtime_output_redaction.py", "tests/test_cp04_wp17_wp18_local_routing.py", "tests/test_cp06_wp29_security_policy.py", "tests/test_wp09_execution_api.py", "--tb=short", "-rs"]`
-  - cwd: `"${LANE}\\services\\core"`; env: `{"PYTHONPATH": "${LANE}\\services\\core\\src", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONIOENCODING": "utf-8", "POLYNEXUS_DATABASE_URL": "sqlite:///${OUT}/fixtures/never-default.db", "TEMP": "${OUT}\\fixtures", "TMP": "${OUT}\\fixtures"}`
-  - start 2026-09-13T04:15:55.606577+00:00; end 2026-09-13T04:16:09.256547+00:00; PID 62468; stopped True; source 4d57c679ef44a62509fbfab08f2fd047446d8e6cfc1cc4951b083a1c1e8328ba.
-  - secret-targeted2.command.json SHA256 a9028f1589fc0c43405a930beee7fd9cfa46aff0c0b91306c8c22670d6342093; stdout SHA256 da0f16833fa3370cf7cceaf6c8d47fc5c8afea19ad87868b158eddd9bcb14e62.
-- web-typecheck: SEE_RAW_LOG; actual runner exit 0.
-  - argv: `["C:\\Program Files\\nodejs\\node.exe", "${LANE}\\apps\\web\\node_modules\\typescript\\bin\\tsc", "--noEmit", "--incremental", "false"]`
-  - cwd: `"${LANE}\\apps\\web"`; env: `{"TEMP": "${OUT}\\fixtures", "TMP": "${OUT}\\fixtures", "tokens": "explicitly absent"}`
-  - start 2026-09-13T04:24:18.985427+00:00; end 2026-09-13T04:24:19.381906+00:00; PID 46216; stopped True; source c823097fc36e1288ba25fc5ef45d03f43ba9928888bd208e8da1c34613052a82.
-  - web-typecheck.web-command.json SHA256 ce69819b7d80de45aa43ff48260ab8f950b3ddef46705aba127eb4ad4ae8a0c2; stdout SHA256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.
-- web-targeted: Tests  88 passed (88); actual runner exit 0.
-  - argv: `["C:\\Program Files\\nodejs\\node.exe", "${LANE}\\apps\\web\\node_modules\\vitest\\vitest.mjs", "run", "--config", "${OUT}\\web-targeted.config.mjs", "src/components/GenerationControls.test.tsx", "src/App.test.tsx", "src/WP26.test.tsx"]`
-  - cwd: `"${LANE}\\apps\\web"`; env: `{"TEMP": "${OUT}\\fixtures", "TMP": "${OUT}\\fixtures", "tokens": "explicitly absent"}`
-  - start 2026-09-13T04:25:09.550870+00:00; end 2026-09-13T04:25:49.316483+00:00; PID 63016; stopped True; source c823097fc36e1288ba25fc5ef45d03f43ba9928888bd208e8da1c34613052a82.
-  - web-targeted.web-command.json SHA256 abe6065b553ccd7a3b98b810e2272ace8b4250d69f7229ee2c29e75c62bb7376; stdout SHA256 205f5237675c1892803ab09e9c581f43ba52c7bcbfba9ef27a6671d911b17b37.
-- web-race: Tests  89 passed (89); actual runner exit 0.
-  - argv: `["C:\\Program Files\\nodejs\\node.exe", "${LANE}\\apps\\web\\node_modules\\vitest\\vitest.mjs", "run", "--config", "${OUT}\\web-race.config.mjs", "src/components/GenerationControls.test.tsx", "src/App.test.tsx", "src/WP26.test.tsx"]`
-  - cwd: `"${LANE}\\apps\\web"`; env: `{"TEMP": "${OUT}\\fixtures", "TMP": "${OUT}\\fixtures", "tokens": "explicitly absent"}`
-  - start 2026-09-13T04:30:08.251075+00:00; end 2026-09-13T04:30:32.545621+00:00; PID 63384; stopped True; source 7f95cf91310683c36350eb713a00425e9ebda044c5f11ba2a0400f848d767264.
-  - web-race.web-command.json SHA256 675513a5b25587ac0147d14fe8778979e84baa810d947262d685dcc232ac5a63; stdout SHA256 9d92cec6032a166ff9e8eee5080c2e372150459c7fe233852fef54d1be6799cf.
-- web-full: Tests  92 passed (92); actual runner exit 0.
-  - argv: `["C:\\Program Files\\nodejs\\node.exe", "${LANE}\\apps\\web\\node_modules\\vitest\\vitest.mjs", "run", "--config", "${OUT}\\web-full.config.mjs"]`
-  - cwd: `"${LANE}\\apps\\web"`; env: `{"TEMP": "${OUT}\\fixtures", "TMP": "${OUT}\\fixtures", "tokens": "explicitly absent"}`
-  - start 2026-09-13T04:30:59.977610+00:00; end 2026-09-13T04:31:25.234093+00:00; PID 40368; stopped True; source 7f95cf91310683c36350eb713a00425e9ebda044c5f11ba2a0400f848d767264.
-  - web-full.web-command.json SHA256 395d03d5f28cc1823f3e34cc29aaa401b1b44b4bb382ad0f0da15e22d640a770; stdout SHA256 5357905adeeef1203a6f39e746475d0bac9e4cdd776165ff2af1375ac7791943.
-- web-build: SEE_RAW_LOG; actual runner exit 0.
-  - argv: `["C:\\Program Files\\nodejs\\node.exe", "${LANE}\\apps\\web\\node_modules\\vite\\bin\\vite.js", "build", "--config", "${OUT}\\web-build.config.mjs"]`
-  - cwd: `"${LANE}\\apps\\web"`; env: `{"TEMP": "${OUT}\\fixtures", "TMP": "${OUT}\\fixtures", "tokens": "explicitly absent"}`
-  - start 2026-09-13T04:31:51.903569+00:00; end 2026-09-13T04:31:52.421687+00:00; PID 61888; stopped True; source 7f95cf91310683c36350eb713a00425e9ebda044c5f11ba2a0400f848d767264.
-  - web-build.web-command.json SHA256 cc647564f350c9aac2016fdd8a576d4219425dff07d8b0e03087780c95308407; stdout SHA256 b21886b800c3e30d16a3469c6975b8849796f81235ba19b5f13093bc709024d3.
-- core-full-final: 1 failed, 861 passed, 193 warnings in 114.09s (0:01:54); actual runner exit 1.
-  - argv: `["${PYTHON}", "-B", "-m", "pytest", "-p", "no:cacheprovider", "--basetemp", "${OUT}\\fixtures\\core-full-final", "tests", "--tb=short", "-rs"]`
-  - cwd: `"${LANE}\\services\\core"`; env: `{"PYTHONPATH": "${LANE}\\services\\core\\src", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONIOENCODING": "utf-8", "POLYNEXUS_DATABASE_URL": "sqlite:///${OUT}/fixtures/never-default.db", "TEMP": "${OUT}\\fixtures", "TMP": "${OUT}\\fixtures"}`
-  - start 2026-09-13T04:32:20.590705+00:00; end 2026-09-13T04:34:16.892984+00:00; PID 56008; stopped True; source 7f95cf91310683c36350eb713a00425e9ebda044c5f11ba2a0400f848d767264.
-  - core-full-final.command.json SHA256 6648d7604f2df5ef956e01009fbccece9c81f9e54ed3b01aca0209ee309add94; stdout SHA256 3b7b5d9856d46e7af37c425689fd58ce29f267f289a14c51fb7484d6798f7574.
-- repair10-narrow: 1 passed, 1 warning in 1.15s; actual runner exit 0.
-  - argv: `["${PYTHON}", "-B", "-m", "pytest", "-p", "no:cacheprovider", "--basetemp", "${OUT}\\fixtures\\repair10-narrow", "tests/test_d0_product_start.py::test_authenticated_api_created_run_survives_real_app_restart", "--tb=short", "-rs"]`
-  - cwd: `"${LANE}\\services\\core"`; env: `{"PYTHONPATH": "${LANE}\\services\\core\\src", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONIOENCODING": "utf-8", "POLYNEXUS_DATABASE_URL": "sqlite:///${OUT}/fixtures/never-default.db", "TEMP": "${OUT}\\fixtures", "TMP": "${OUT}\\fixtures"}`
-  - start 2026-09-13T04:36:29.217655+00:00; end 2026-09-13T04:36:31.544559+00:00; PID 56008; stopped True; source 46553a7b3e150aa0f06527dbe685fa7978b99f131edbf34ecd84cb11552924c4.
-  - repair10-narrow.command.json SHA256 b22fb4f8d6e77f087aa85e09ef315735393a4d90dc0d0f5297ca5338dc2fa824; stdout SHA256 f98689e83cc789303fc9e7984d2a800995c3c07334fa55910a004f7386631ee1.
-- repair10-affected: 9 passed, 1 warning in 1.61s; actual runner exit 0.
-  - argv: `["${PYTHON}", "-B", "-m", "pytest", "-p", "no:cacheprovider", "--basetemp", "${OUT}\\fixtures\\repair10-affected", "tests/test_d0_product_start.py", "--tb=short", "-rs"]`
-  - cwd: `"${LANE}\\services\\core"`; env: `{"PYTHONPATH": "${LANE}\\services\\core\\src", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONIOENCODING": "utf-8", "POLYNEXUS_DATABASE_URL": "sqlite:///${OUT}/fixtures/never-default.db", "TEMP": "${OUT}\\fixtures", "TMP": "${OUT}\\fixtures"}`
-  - start 2026-09-13T04:36:43.820307+00:00; end 2026-09-13T04:36:46.632227+00:00; PID 63100; stopped True; source 46553a7b3e150aa0f06527dbe685fa7978b99f131edbf34ecd84cb11552924c4.
-  - repair10-affected.command.json SHA256 eacefed5f165150915bdd4a527c7f9d86c672412f876665f0de64f898c3daeaa; stdout SHA256 d1f231cefd57c13c148f5ea4f1463f1236049fe3af40ab35773950c1f3d5ba67.
-- cursors-core: 1 failed, 29 passed, 36 warnings in 13.76s; actual runner exit 1.
-  - argv: `["${PYTHON}", "-B", "-m", "pytest", "-p", "no:cacheprovider", "--basetemp", "${OUT}\\fixtures\\cursors-core", "tests/test_d1a_generation_ownership.py", "tests/test_wp09_query_api.py", "--tb=short", "-rs"]`
-  - cwd: `"${LANE}\\services\\core"`; env: `{"PYTHONPATH": "${LANE}\\services\\core\\src", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONIOENCODING": "utf-8", "POLYNEXUS_DATABASE_URL": "sqlite:///${OUT}/fixtures/never-default.db", "TEMP": "${OUT}\\fixtures", "TMP": "${OUT}\\fixtures"}`
-  - start 2026-09-13T04:41:10.407381+00:00; end 2026-09-13T04:41:25.525009+00:00; PID 57148; stopped True; source f3202b39e36c0670951937ac16d2258a0f5dad8707f782f60e5aa0dcaeccb907.
-  - cursors-core.command.json SHA256 a1dc19a9f9358f33fa63c59075f4e314e9992d39089f09dfaf725cfd9fd43cfe; stdout SHA256 eb80fb0294526c34c74e61c3ed2ae5d8de5779ba69e5c0416bb9914e56a010c7.
-- cursors-web: Tests  90 passed (90); actual runner exit 0.
-  - argv: `["C:\\Program Files\\nodejs\\node.exe", "${LANE}\\apps\\web\\node_modules\\vitest\\vitest.mjs", "run", "--config", "${OUT}\\cursors-web.config.mjs", "src/components/GenerationControls.test.tsx", "src/App.test.tsx", "src/WP26.test.tsx"]`
-  - cwd: `"${LANE}\\apps\\web"`; env: `{"TEMP": "${OUT}\\fixtures", "TMP": "${OUT}\\fixtures", "tokens": "explicitly absent"}`
-  - start 2026-09-13T04:41:32.634101+00:00; end 2026-09-13T04:41:57.176432+00:00; PID 24376; stopped True; source f3202b39e36c0670951937ac16d2258a0f5dad8707f782f60e5aa0dcaeccb907.
-  - cursors-web.web-command.json SHA256 7b3d1596f84799f359e7ced037a61f8735666ea4bab35056af7ef7c0f8a08502; stdout SHA256 16ee1206fd4b0cebff291698f814f8c9d63a618a2ac24e8236d81fe6c3cf0a2b.
-- repair11-narrow: 1 passed, 1 warning in 1.14s; actual runner exit 0.
-  - argv: `["${PYTHON}", "-B", "-m", "pytest", "-p", "no:cacheprovider", "--basetemp", "${OUT}\\fixtures\\repair11-narrow", "tests/test_d1a_generation_ownership.py::test_durable_public_cursors_survive_restart_and_reject_foreign", "--tb=short", "-rs"]`
-  - cwd: `"${LANE}\\services\\core"`; env: `{"PYTHONPATH": "${LANE}\\services\\core\\src", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONIOENCODING": "utf-8", "POLYNEXUS_DATABASE_URL": "sqlite:///${OUT}/fixtures/never-default.db", "TEMP": "${OUT}\\fixtures", "TMP": "${OUT}\\fixtures"}`
-  - start 2026-09-13T04:42:55.294405+00:00; end 2026-09-13T04:42:57.635037+00:00; PID 62668; stopped True; source 33fc805d24afa704726497e33590c07f05e13c3b82742b93c406a7083be7dd24.
-  - repair11-narrow.command.json SHA256 27ebe8f79c5e208509920d95a290e6fbac215641d4f0ef2c6c7cbf78eaebc462; stdout SHA256 5b7021f53e8652f9a11f52afb83a58871c96e771d6454c4770a6186738c92aae.
-- repair11-affected: 30 passed, 36 warnings in 13.59s; actual runner exit 0.
-  - argv: `["${PYTHON}", "-B", "-m", "pytest", "-p", "no:cacheprovider", "--basetemp", "${OUT}\\fixtures\\repair11-affected", "tests/test_d1a_generation_ownership.py", "tests/test_wp09_query_api.py", "--tb=short", "-rs"]`
-  - cwd: `"${LANE}\\services\\core"`; env: `{"PYTHONPATH": "${LANE}\\services\\core\\src", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONIOENCODING": "utf-8", "POLYNEXUS_DATABASE_URL": "sqlite:///${OUT}/fixtures/never-default.db", "TEMP": "${OUT}\\fixtures", "TMP": "${OUT}\\fixtures"}`
-  - start 2026-09-13T04:43:10.161824+00:00; end 2026-09-13T04:43:25.036262+00:00; PID 61684; stopped True; source 33fc805d24afa704726497e33590c07f05e13c3b82742b93c406a7083be7dd24.
-  - repair11-affected.command.json SHA256 e9b10fb18cdd909ce1a62fd0b7801fc7263bd28e324525a0cca2e03d1233064a; stdout SHA256 acd83d3a81d6d3799f44a99bab10ba014274c380aac847306714ac0b59a98f7a.
-- core-full-final2: 1 failed, 862 passed, 193 warnings in 129.77s (0:02:09); actual runner exit 1.
-  - argv: `["${PYTHON}", "-B", "-m", "pytest", "-p", "no:cacheprovider", "--basetemp", "${OUT}\\fixtures\\core-full-final2", "tests", "--tb=short", "-rs"]`
-  - cwd: `"${LANE}\\services\\core"`; env: `{"PYTHONPATH": "${LANE}\\services\\core\\src", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONIOENCODING": "utf-8", "POLYNEXUS_DATABASE_URL": "sqlite:///${OUT}/fixtures/never-default.db", "TEMP": "${OUT}\\fixtures", "TMP": "${OUT}\\fixtures"}`
-  - start 2026-09-13T04:43:49.489819+00:00; end 2026-09-13T04:46:01.544864+00:00; PID 59988; stopped True; source 33fc805d24afa704726497e33590c07f05e13c3b82742b93c406a7083be7dd24.
-  - core-full-final2.command.json SHA256 c1bd3d0b45ef98d9ba9749d041561690c10097cd3caeb5c2cd70d86b3e00c7e8; stdout SHA256 c8e6229b0183a8a03192ab7f391e95ce0d9bfc9bf21f44117a45cc5f3e7d0c67.
-- web-final-build: SEE_RAW_LOG; actual runner exit 0.
-  - argv: `["C:\\Program Files\\nodejs\\node.exe", "${LANE}\\apps\\web\\node_modules\\vite\\bin\\vite.js", "build", "--config", "${OUT}\\web-final-build.config.mjs"]`
-  - cwd: `"${LANE}\\apps\\web"`; env: `{"TEMP": "${OUT}\\fixtures", "TMP": "${OUT}\\fixtures", "tokens": "explicitly absent"}`
-  - start 2026-09-13T04:43:57.894783+00:00; end 2026-09-13T04:43:58.257856+00:00; PID 61444; stopped True; source 33fc805d24afa704726497e33590c07f05e13c3b82742b93c406a7083be7dd24.
-  - web-final-build.web-command.json SHA256 06fa9975168dba0b219ce995dc9c9f437868de1310f7d54974ba43cee3cb6608; stdout SHA256 5a2334777edb7784dce245f6edfb80be233b5e1c7d769f07d1f83016820e751b.
-- repair12-narrow: 1 passed, 1 warning in 0.83s; actual runner exit 0.
-  - argv: `["${PYTHON}", "-B", "-m", "pytest", "-p", "no:cacheprovider", "--basetemp", "${OUT}\\fixtures\\repair12-narrow", "tests/test_api.py::TestStaticChecks::test_no_hardcoded_secrets", "--tb=short", "-rs"]`
-  - cwd: `"${LANE}\\services\\core"`; env: `{"PYTHONPATH": "${LANE}\\services\\core\\src", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONIOENCODING": "utf-8", "POLYNEXUS_DATABASE_URL": "sqlite:///${OUT}/fixtures/never-default.db", "TEMP": "${OUT}\\fixtures", "TMP": "${OUT}\\fixtures"}`
-  - start 2026-09-13T04:47:26.236888+00:00; end 2026-09-13T04:47:28.625438+00:00; PID 55056; stopped True; source 8b570a54ff8f76e0c4051cda4f4ef6c13ba6d5b5f377c1a8e7ca8a7b2f9e69a2.
-  - repair12-narrow.command.json SHA256 09b4bd03a9c038dd2a3beb10db45860c4a82a683d457465deb6696d0a175fa3d; stdout SHA256 2b593532887cc9b4f4ddf484007c1331240f5234595a6975070c7e6b3e78ca44.
-- repair12-affected: 30 passed, 36 warnings in 15.83s; actual runner exit 0.
-  - argv: `["${PYTHON}", "-B", "-m", "pytest", "-p", "no:cacheprovider", "--basetemp", "${OUT}\\fixtures\\repair12-affected", "tests/test_d1a_generation_ownership.py", "tests/test_wp09_query_api.py", "--tb=short", "-rs"]`
-  - cwd: `"${LANE}\\services\\core"`; env: `{"PYTHONPATH": "${LANE}\\services\\core\\src", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONIOENCODING": "utf-8", "POLYNEXUS_DATABASE_URL": "sqlite:///${OUT}/fixtures/never-default.db", "TEMP": "${OUT}\\fixtures", "TMP": "${OUT}\\fixtures"}`
-  - start 2026-09-13T04:47:55.853038+00:00; end 2026-09-13T04:48:13.243135+00:00; PID 52976; stopped True; source 8b570a54ff8f76e0c4051cda4f4ef6c13ba6d5b5f377c1a8e7ca8a7b2f9e69a2.
-  - repair12-affected.command.json SHA256 489969ab238518323084037e85508ce07e28958240a9a1d2663ab05640b29d7c; stdout SHA256 82ad55536fb81557e50aa63ce6936486f2b040cf8c51f453406f8abb3787f574.
-- core-full-final3: 863 passed, 193 warnings in 112.50s (0:01:52); actual runner exit 0.
-  - argv: `["${PYTHON}", "-B", "-m", "pytest", "-p", "no:cacheprovider", "--basetemp", "${OUT}\\fixtures\\core-full-final3", "tests", "--tb=short", "-rs"]`
-  - cwd: `"${LANE}\\services\\core"`; env: `{"PYTHONPATH": "${LANE}\\services\\core\\src", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONIOENCODING": "utf-8", "POLYNEXUS_DATABASE_URL": "sqlite:///${OUT}/fixtures/never-default.db", "TEMP": "${OUT}\\fixtures", "TMP": "${OUT}\\fixtures"}`
-  - start 2026-09-13T04:48:40.770476+00:00; end 2026-09-13T04:50:35.379721+00:00; PID 59688; stopped True; source 8b570a54ff8f76e0c4051cda4f4ef6c13ba6d5b5f377c1a8e7ca8a7b2f9e69a2.
-  - core-full-final3.command.json SHA256 e41e7bab19e81b90df09f3e7094b68ea19935fd9a1f943a7a8333aa55e79e8cb; stdout SHA256 29507a1ddc425558a481dc56c3da1783490bdb0c33c1bcad3ff684c89ba3fe12.
+## Final bound runs
 
-Vite web-build actual runner exit0; Python report wrapper subsequently failed printing Unicode checkmark under cp950 after durable logs were saved. No rebuild was claimed; subsequent runners set PYTHONIOENCODING=utf-8.
-Stage1 original full stdout not saved; tool chunk999640 reports37passed. No fabricated PID/source binding.
-Controller START evidence remains externally indexed; final browser/START/build/candidate conclusions are not inferred here.
-All source changes uncommitted, unstaged and inside77allowlist; no source outside, installs, global config/ACL changes, merge or push.
+| Run | Exact command | cwd | Exit | Observed summary |
+|---|---|---|---:|---|
+| Repair #26 targeted | `python -B -m pytest -p no:cacheprovider --basetemp <system-temp>\\d1a-repair26-targeted tests/test_baseline_debt_01.py::test_service_cancellation_durable_after_reopen --tb=short -rs` | `<lane>\\services\\core` | 0 | 24 passed |
+| D1a affected Core | `python -B -m pytest -p no:cacheprovider --basetemp <system-temp>\\d1a-affected-final <affected-test-selection> --tb=short -rs` | `<lane>\\services\\core` | 0 | 183 passed |
+| Policy/security affected Core | `python -B -m pytest -p no:cacheprovider --basetemp <system-temp>\\policy-security-affected-final <policy-security-test-selection> --tb=short -rs` | `<lane>\\services\\core` | 0 | 74 passed |
+| Full Core after repair #26 | `python -B -m pytest -p no:cacheprovider tests --tb=short -rs` | `<lane>\\services\\core` | 0 | 873 passed, 193 warnings, 122.25s; pytest temporary files used the system tempfile root |
+| Web full | `npm test` (package script: `vitest run`) | `<lane>\\apps\\web` | 0 | 94 passed |
+| Web production build | `npm run build` (package script: `tsc -b && vite build`) | `<lane>\\apps\\web` | 0 | build passed |
+| Browser probe 1 | `powershell -NoProfile -ExecutionPolicy Bypass -File <evidence>\\start_browser_probe.ps1 -ProbeName cap25-browser -Seconds 110 -DbName browser.db` | `<evidence>` | 0 | Core 200, Web 200, anonymous 403, wrong token 403; owned processes/listeners cleaned |
+| Browser probe 2 | `powershell -NoProfile -ExecutionPolicy Bypass -File <evidence>\\start_browser_probe.ps1 -ProbeName cap25-reconnect -Seconds 60 -DbName browser.db` | `<evidence>` | 0 | Core 200, Web 200, anonymous 403, wrong token 403; owned processes/listeners cleaned |
+| Browser UI journey | Codex in-app browser via cua_repl at `http://127.0.0.1:5173/` | product/Web at commit above | N/A | OBSERVED_PASS; visible readiness, explicit selection, reconnect, offline Retry, archive boundaries and empty CREATED outputs |
+
+The affected-test and policy/security selections are retained in the
+controller's external command records; this file records their exact runner
+shape, cwd class, exit and sanitized result without copying large raw argv,
+PID or hash payloads.
+
+## Browser observations
+
+The synthetic local-only journey reopened Project
+`project_2ff8e3f9109c4aa6b6795bf5139aec59`, Task count 1, ContextPackage count 1,
+generation revision 1 and one Run
+`run_80d3810197bd43f4ad0149719b33739b` in state CREATED. Generation selection
+was explicit; context restored to
+`context_ca242ef4198f4442b7ab27c53ccfc725`; no auto-begin, auto-latest
+selection, duplicate reconnect Run, runtime-readiness inference, external send
+or live provider was observed. The archived Project retained readable history
+and exact controls while disabling new work.
+
+## Superseded history
+
+The pre-repair checkpoint's 24 cancellation failures were stale assertions
+expecting zero evidence rows. Repair #26 updates the oracle to require one
+`runtime.routing_policy` audit and zero non-policy evidence; the final
+targeted and full Core runs passed. The earlier three backup failures caused
+by a non-system custom basetemp are superseded by the final system-temp-root
+run. No raw hash is asserted here for a superseded run.
+
+No command in this receipt performed a remote push, merge, release/tag, D1b
+work, MCF adoption, Human product acceptance, production-database migration
+or live-provider/external-egress action.

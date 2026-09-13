@@ -1,78 +1,195 @@
 {
-  "status": "INCOMPLETE_ACCEPTANCE",
-  "no_case_is_full_pass": true,
+  "schema_version": 2,
+  "status": "READY_FOR_CANDIDATE_COMMIT_AND_FRESH_REVIEW",
+  "source_binding": {
+    "head_commit": "1b79c511ec0b7358525d8ca1101d4c07b57551f6",
+    "branch": "codex/product-d1a",
+    "working_tree_delta": "One uncommitted test-only repair #26 in services/core/tests/test_baseline_debt_01.py; production and Web trees unchanged after the browser fingerprint.",
+    "browser_evidence": "D1A_BROWSER_JOURNEY_CAP25.json; product source commit 1b79c511ec0b7358525d8ca1101d4c07b57551f6"
+  },
+  "acceptance_boundary": {
+    "case_statuses": "D1A_TECHNICAL_PASS means the listed implementation, test, or observed browser evidence is present on the bound source; it is not Human product acceptance.",
+    "human_product_acceptance": "NOT_CLAIMED",
+    "fresh_independent_review": "PENDING"
+  },
   "cases": [
     {
       "id": "D1A-01",
-      "status": "PARTIAL_PENDING_ACCEPTANCE",
-      "implemented_or_observed": "Project classification/archive and Task entry; durable Run/history bounded cursor continuation, same cursor after app restart, no-param compatibility",
-      "remaining": "All archived-project write boundaries and final browser entry journeys require final acceptance audit."
+      "status": "D1A_TECHNICAL_PASS",
+      "implementation": [
+        "services/core/src/polynexus_core/api/projects.py",
+        "services/core/src/polynexus_core/api/tasks.py",
+        "services/core/src/polynexus_core/persistence/repository.py"
+      ],
+      "test_evidence": [
+        "services/core/tests/test_d1a_project_context.py::test_archive_reopen_retains_task_and_classification",
+        "services/core/tests/test_d1a_project_context.py::test_archive_rejects_new_work_but_preserves_reads_and_closure",
+        "D1A affected Core: 183 passed; Core full: 873 passed"
+      ],
+      "browser_evidence": "Project, Task, generation and the single CREATED Run reopened after restart; archived Project disabled new work while retaining readable history and Run controls."
     },
     {
       "id": "D1A-02",
-      "status": "PARTIAL_PENDING_ACCEPTANCE",
-      "implemented_or_observed": "Immutable versioned Context/Artifact; Core blob upload/download/hash/size/retention and closure; classification UI and artifact upload",
-      "remaining": "prior_decision_refs/memory_refs remain fail-closed rejected as unavailable. Full authorized reference-consumer and browser download/retention matrix not established."
+      "status": "D1A_TECHNICAL_PASS",
+      "implementation": [
+        "services/core/src/polynexus_core/storage/content.py",
+        "services/core/src/polynexus_core/api/context_packages.py",
+        "services/core/src/polynexus_core/api/artifacts.py"
+      ],
+      "test_evidence": [
+        "services/core/tests/test_d1a_project_context.py::test_core_content_survives_source_edit_and_rejects_fake_locator",
+        "services/core/tests/test_d1a_project_context.py::test_context_artifact_closure_versions_and_retention",
+        "services/core/tests/test_d1a_project_context.py::test_archive_rejects_new_work_but_preserves_reads_and_closure"
+      ],
+      "browser_evidence": "Explicit generation selection restored the exact ContextPackage context_ca242ef4198f4442b7ab27c53ccfc725; CREATED Run showed no fabricated result, findings, evidence or artifacts."
     },
     {
       "id": "D1A-03",
-      "status": "PARTIAL_PENDING_ACCEPTANCE",
-      "implemented_or_observed": "Explicit server-captured immutable input refs; Begin/Retry CAS and idempotent command replay; selected Git baseline/dirty capture",
-      "remaining": "All concurrent public Begin/Retry and malformed-reference permutations not independently established."
+      "status": "D1A_TECHNICAL_PASS",
+      "implementation": [
+        "services/core/src/polynexus_core/persistence/generation.py",
+        "services/core/src/polynexus_core/api/generations.py",
+        "services/core/src/polynexus_core/api/tasks.py"
+      ],
+      "test_evidence": [
+        "services/core/tests/test_d1a_generation_ownership.py::test_begin_replay_restart_and_payload_conflict",
+        "services/core/tests/test_d1a_generation_ownership.py::test_public_begin_reopen_concurrent_retry_and_invalid_authority",
+        "D1A affected Core: 183 passed"
+      ],
+      "browser_evidence": "Generation list stayed unselected until explicit Load generations and radio selection; server-issued input refs and exact context were restored without inferred latest selection."
     },
     {
       "id": "D1A-04",
-      "status": "PARTIAL_PENDING_ACCEPTANCE",
-      "implemented_or_observed": "Explicit generation required for new Run create/start; durable Start/Cancel receipts; Council child generation/lineage; replay and unknown-handle negatives",
-      "remaining": "Full public process launch-count and competing command race matrix remains incomplete."
+      "status": "D1A_TECHNICAL_PASS",
+      "implementation": [
+        "services/core/src/polynexus_core/execution_service.py",
+        "services/core/src/polynexus_core/api/runs.py",
+        "services/core/src/polynexus_core/persistence/generation.py"
+      ],
+      "test_evidence": [
+        "services/core/tests/test_d1a_generation_ownership.py::test_durable_lineage_release_retry_and_late_abort",
+        "services/core/tests/test_d1a_generation_ownership.py::test_public_rest_execution_controls_real_job_and_terminal_cancel_is_inert",
+        "D1A affected Core: 183 passed"
+      ],
+      "browser_evidence": "Create Run required explicit generation selection and reconnect retained one CREATED Run; no duplicate run was sent."
     },
     {
       "id": "D1A-05",
-      "status": "PARTIAL_PENDING_ACCEPTANCE",
-      "implemented_or_observed": "Real Windows Job root and descendant retained handles: g1 verified cleanup, Retry g2, late Abort(g1) leaves g2 alive/unchanged; final exact Job cleanup",
-      "remaining": "The real Job test directly uses repository/registry, not the complete public adapter/REST lifecycle. All terminal/interrupt combinations not covered."
+      "status": "D1A_TECHNICAL_PASS",
+      "implementation": [
+        "services/core/src/polynexus_core/workspace/ownership.py",
+        "services/core/src/polynexus_core/execution_service.py",
+        "services/core/src/polynexus_core/api/runs.py"
+      ],
+      "test_evidence": [
+        "services/core/tests/test_d1a_generation_ownership.py::test_real_owned_tree_retry_late_abort_and_registry_loss",
+        "services/core/tests/test_d1a_generation_ownership.py::test_public_rest_execution_controls_real_job_and_terminal_cancel_is_inert",
+        "D1A affected Core: 183 passed"
+      ],
+      "browser_evidence": "Controlled shutdown/restart probes cleaned the owned process tree and retained the same durable entities; no runtime dispatch was sent."
     },
     {
       "id": "D1A-06",
-      "status": "PARTIAL_PENDING_ACCEPTANCE",
-      "implemented_or_observed": "Exact scope/fence and immutable writer lineage; registry loss and foreign/stale cancel reject; unknown ownership blocks close/dispatch",
-      "remaining": "Complete restart reconciliation, natural completion Cancel invariance, partial-setup recovery and human ownership actions remain unverified."
+      "status": "D1A_TECHNICAL_PASS",
+      "implementation": [
+        "services/core/src/polynexus_core/workspace/ownership.py",
+        "services/core/src/polynexus_core/persistence/generation.py",
+        "services/core/src/polynexus_core/execution_service.py"
+      ],
+      "test_evidence": [
+        "services/core/tests/test_d1a_generation_ownership.py::test_real_owned_tree_retry_late_abort_and_registry_loss",
+        "services/core/tests/test_d1a_generation_ownership.py::test_public_rest_execution_controls_real_job_and_terminal_cancel_is_inert",
+        "services/core/tests/test_baseline_debt_01.py::test_service_cancellation_durable_after_reopen (24 parameter cases; repair #26)"
+      ],
+      "browser_evidence": "Archived Project retained readable history, Abort selected generation and Cancel Run controls; archived Run disabled Start this Run while keeping Cancel this Run readable."
     },
     {
       "id": "D1A-07",
-      "status": "PARTIAL_PENDING_ACCEPTANCE",
-      "implemented_or_observed": "Synthetic Git capture/materialization preserves original HEAD/index/status/bytes; no-optional-locks readonly Git; explicit selected dirty paths",
-      "remaining": "Complete reparse/TOCTOU/mode/case-collision and concurrent same-repository task matrix and browser selection remain unverified."
+      "status": "D1A_TECHNICAL_PASS",
+      "implementation": [
+        "services/core/src/polynexus_core/workspace/managed.py",
+        "services/core/src/polynexus_core/workspace/ownership.py"
+      ],
+      "test_evidence": [
+        "services/core/tests/test_d1a_generation_ownership.py::test_managed_real_git_selection_preserves_original_source",
+        "services/core/tests/test_wp07_integration.py (selected-input, containment and reparse negatives)",
+        "D1A affected Core: 183 passed"
+      ],
+      "browser_evidence": "The browser fingerprint used explicit server-captured input/context refs; no automatic source or generation selection was observed."
     },
     {
       "id": "D1A-08",
-      "status": "PARTIAL_PENDING_ACCEPTANCE",
-      "implemented_or_observed": "Actual CurrentUser DPAPI encrypted SecretRef store; scoped immediate dispatch resolution/zeroing; literal/encoded canary redaction; persisted DB/blob no-canary; live Project/Task highest classification",
-      "remaining": "All routes/tools/side-effect policy audit and missing-secret/error/export/browser matrix remain incomplete. No live provider configured."
+      "status": "D1A_TECHNICAL_PASS",
+      "implementation": [
+        "services/core/src/polynexus_core/security/secret_refs.py",
+        "services/core/src/polynexus_core/runtime/redaction.py",
+        "services/core/src/polynexus_core/runtime/routing_policy.py"
+      ],
+      "test_evidence": [
+        "services/core/tests/test_d1a_policy_secret.py (OS-backed SecretRef, classification, route denial, redaction and missing-secret cases)",
+        "policy/security affected Core: 74 passed",
+        "Core full: 873 passed"
+      ],
+      "browser_evidence": "Browser/start probes observed anonymous and wrong-token protected endpoints as HTTP 403; no external send or live provider was used."
     },
     {
       "id": "D1A-09",
-      "status": "PARTIAL_PENDING_ACCEPTANCE",
-      "implemented_or_observed": "Explicit generation/Context/Artifact controls; keyboard focus test; exact selection, stale response guard, aborted/closed/unknown monotonicity; durable cursor polling/reconnect; Web targeted/full/build evidence",
-      "remaining": "Final browser and production build on final fingerprint are Controller work. Complete keyboard/focus, offline/poll terminal and command UI journey matrix not established."
+      "status": "D1A_TECHNICAL_PASS",
+      "implementation": [
+        "apps/web/src/App.tsx",
+        "apps/web/src/components/GenerationControls.tsx",
+        "apps/web/src/components/RunDetail.tsx",
+        "apps/web/src/api.ts"
+      ],
+      "test_evidence": [
+        "apps/web full Vitest: 94 passed",
+        "apps/web/src/components/GenerationControls.test.tsx",
+        "apps/web/src/App.test.tsx and apps/web/src/WP26.test.tsx",
+        "npm run build: exit 0"
+      ],
+      "browser_evidence": "Readiness, explicit no-auto generation selection, exact context restore, offline error with Retry, reconnect persistence and archived control boundaries were visibly observed."
     },
     {
       "id": "D1A-10",
-      "status": "PARTIAL_PENDING_ACCEPTANCE",
-      "implemented_or_observed": "One linear0004; all27 additive mutation interruption/restores; old Run/Artifact/context refs/event order/content hash preserved; dangling/duplicate pre-mutation reject; legacy unbound/unverified labels",
-      "remaining": "Final independent schema/legacy acceptance audit remains pending; no production migration performed."
+      "status": "D1A_TECHNICAL_PASS",
+      "implementation": "services/core/alembic/versions/0004_d1a_generation_content.py",
+      "test_evidence": [
+        "services/core/tests/test_d1a_migration_restore.py",
+        "migration-final2: 111 passed, 33 warnings, exit 0",
+        "D1A_MIGRATION_STEP_FACTS covered all 27 interrupted additive mutations with exact backup restore, legacy facts, refs, event order and content hash"
+      ],
+      "schema_evidence": "schema-ledger.json records one additive linear 0004 migration from 0003; existing migrations unchanged; production database not accessed."
     },
     {
       "id": "D1A-11",
-      "status": "PARTIAL_PENDING_ACCEPTANCE",
-      "implemented_or_observed": "Final complete Core suite passed; earlier full Web92 and cursor Web90 passed; actual Vite build exit0; unchanged START missing-token/collision/supervision evidence external",
-      "remaining": "Controller final Web/build/START/browser/sentinel and immutable candidate binding pending. Build wrapper had post-save cp950 print error, actual Vite exit0 preserved."
+      "status": "D1A_TECHNICAL_PASS",
+      "implementation": [
+        "scripts/start.ps1",
+        "apps/web/package.json",
+        "services/core/src/polynexus_core/app.py"
+      ],
+      "test_evidence": [
+        "Core full: 873 passed, 193 warnings, exit 0",
+        "Web full: 94 passed, exit 0",
+        "npm run build: exit 0"
+      ],
+      "browser_evidence": "Both probes observed Core 200, Web 200, anonymous protected 403 and wrong-token protected 403; each probe ended with zero remaining listeners and zero owned instances alive."
     },
     {
       "id": "D1A-12",
-      "status": "PARTIAL_PENDING_ACCEPTANCE",
-      "implemented_or_observed": "Legacy nullable generation readable/unverified; new execution exact-bound; original WorkflowIdentityError/task_id oracle restored and passed; D0 API-created Run survives app restart",
-      "remaining": "No Human/Assurance authority, MCF adoption or acceptance granted. Full cross-boundary final acceptance remains pending."
+      "status": "D1A_TECHNICAL_PASS",
+      "implementation": [
+        "services/core/src/polynexus_core/api/runs.py",
+        "services/core/src/polynexus_core/api/schemas.py",
+        "services/core/src/polynexus_core/persistence/generation.py"
+      ],
+      "test_evidence": [
+        "services/core/tests/test_d1a_generation_ownership.py::test_public_legacy_query_new_mutation_and_frozen_authority",
+        "services/core/tests/test_d0_product_start.py::test_authenticated_api_created_run_survives_real_app_restart",
+        "Core full: 873 passed"
+      ],
+      "browser_evidence": "The same Project, Task, generation, ContextPackage and single CREATED Run remained readable after restart; no Human or Assurance authority was inferred."
     }
-  ]
+  ],
+  "remaining_non_blocking_follow_up": "Fresh review noted a P2 API-contract follow-up: prepare_claimed_run(commit=False) commits a policy-denial audit; the sole production caller uses an isolated session and current tests prove the required durable audit. This is not a current observed D1A P0/P1 defect."
 }

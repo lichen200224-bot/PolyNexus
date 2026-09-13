@@ -1,23 +1,40 @@
 {
-  "revision": "0004",
-  "down_revision": "0003",
-  "migration_sha256": "91fbb4217c0790d8054ac5ca431a5a9a567d31cbae05f1ab4625df80a4258c31",
-  "status": "IMPLEMENTED_TARGETED_TESTED_PENDING_INDEPENDENT_ACCEPTANCE",
-  "existing_migrations_changed": false,
-  "new_revision_count": 1,
-  "legacy_labels": "NULL generation => LEGACY_UNBOUND_UNVERIFIED; no inferred trust",
+  "schema_version": 2,
+  "status": "TECHNICAL_PASS_READY_FOR_FRESH_REVIEW",
+  "migration": {
+    "revision": "0004",
+    "down_revision": "0003",
+    "file": "services/core/alembic/versions/0004_d1a_generation_content.py",
+    "migration_sha256": "91fbb4217c0790d8054ac5ca431a5a9a567d31cbae05f1ab4625df80a4258c31",
+    "linear_additive": true,
+    "new_revision_count": 1,
+    "existing_migrations_changed": false
+  },
   "pre_mutation_audits": [
     "foreign_key_check",
     "duplicate Context project/version",
-    "dangling/cross-project Task Context",
+    "dangling or cross-project Task Context",
     "Run Task/Context references",
     "Artifact Task/Run references",
     "Evidence/Finding Run/Task scope",
-    "Context Artifact refs valid unique same-project"
+    "Context Artifact refs valid and unique within project"
   ],
-  "restore_evidence": "migration-final2:111passed; D1A_MIGRATION_STEP_FACTS all27 interrupted mutations restored exact backup SHA, legacy rows/IDs/refs/event order/content hash; historical0003 ordering/downgrade assertions retained",
-  "legacy_current_orm": "Only current-ORM consumer test upgrades head explicitly; historical0003 tests remain historical",
-  "downgrade": "0004 rejects lossy downgrade; use verified backup restore",
-  "production_database": "NOT_ACCESSED; explicit synthetic fixtures only",
-  "remaining": "Final independent schema/legacy acceptance audit remains pending; no production migration performed."
+  "verification": {
+    "command_record": "migration-final2",
+    "command": "python -B -m pytest -p no:cacheprovider --basetemp <external>\\fixtures\\migration-final2 tests/test_d1a_migration_restore.py tests/test_baseline_debt_01_migration.py tests/test_cp06_wp30_clean_install.py tests/test_g17_migration_restore_authority.py tests/test_wp23_backup_restore_migration.py tests/test_wp14b_runtime_binding.py -s --tb=short -rs",
+    "cwd": "<lane>\\services\\core",
+    "exit": 0,
+    "summary": "111 passed, 33 warnings in 11.10s",
+    "representative_evidence": [
+      "Upgrade from representative legacy 0003 fixture preserves legacy rows, IDs, references, event order and content hash.",
+      "All 27 interrupted additive mutation points restore from the verified backup and then upgrade cleanly to 0004.",
+      "Dangling and duplicate pre-mutation audits fail closed without changing the 0003 fixture.",
+      "Legacy nullable generation is labeled LEGACY_UNBOUND_UNVERIFIED; no trust or ownership is inferred."
+    ]
+  },
+  "downgrade": {
+    "behavior": "0004 rejects lossy downgrade; verified backup restore is the rollback path.",
+    "historical_0003_ordering_and_downgrade_assertions": "Retained by the migration regression suite."
+  },
+  "production_database": "NOT_ACCESSED; all migration and backup verification used synthetic fixtures only."
 }
