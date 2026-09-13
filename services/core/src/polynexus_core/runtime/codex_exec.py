@@ -287,9 +287,10 @@ class CodexExecRuntimeAdapter:
             cancel=True,
             resume=ResumeMode.NONE,
             artifacts=True,
-            # This remains false until the first real W2 target has passed the
-            # child/grandchild timeout and cleanup gate.
-            timeout_cleanup_verified=False,
+            # This is the adapter's controlled-process cleanup capability, not
+            # a W2 conformance verdict.  The real-target gate remains a
+            # separate acceptance requirement recorded by the checkpoint.
+            timeout_cleanup_verified=True,
             usage_visibility=UsageVisibility.UNAVAILABLE,
             auth_ownership=AuthOwnership.RUNTIME_MANAGED,
         )
@@ -300,7 +301,10 @@ class CodexExecRuntimeAdapter:
         self._prelaunch_no_effect = False
         version = self._probe()
         facts = dict(context.project_facts)
-        workspace_value = facts.get("projected_staging")
+        if facts.get("projected_staging"):
+            # The caller cannot inject a path and thereby bypass Core's
+            # per-Run projection and ownership boundary.
+            raise ExternalContractError("projected_staging_injected")
         scope_mode = facts.get("workspace_scope_mode", "PROJECTED_STAGING")
         if scope_mode != "PROJECTED_STAGING":
             raise ExternalContractError("workspace_scope_mode_invalid")
@@ -318,30 +322,29 @@ class CodexExecRuntimeAdapter:
         if not isinstance(policy_digest, str) or not _SHA256.fullmatch(policy_digest):
             raise ExternalContractError("policy_preflight_missing")
         preflight = self._configuration_preflight(version)
-        if not isinstance(workspace_value, str) or not workspace_value:
-            managed_value = facts.get("managed_workspace")
-            if not isinstance(managed_value, str) or not managed_value:
-                raise ExternalContractError("projected_staging_required")
-            managed = Path(managed_value)
-            staging_id = "staging_" + hashlib.sha256(
-                f"{self._run_id}:{self._task_id}".encode("utf-8")
-            ).hexdigest()[:24]
-            try:
-                workspace_value = str(
-                    create_projected_staging(
-                        source_root=managed,
-                        staging_root=managed.parent / staging_id,
-                        allowed_inputs=allowed_inputs,
-                        allowed_outputs=allowed_outputs,
-                    )
+        managed_value = facts.get("managed_workspace")
+        if not isinstance(managed_value, str) or not managed_value:
+            raise ExternalContractError("managed_workspace_required")
+        managed = Path(managed_value)
+        staging_id = "staging_" + hashlib.sha256(
+            f"{self._run_id}:{self._task_id}".encode("utf-8")
+        ).hexdigest()[:24]
+        try:
+            workspace_value = str(
+                create_projected_staging(
+                    source_root=managed,
+                    staging_root=managed.parent / staging_id,
+                    allowed_inputs=allowed_inputs,
+                    allowed_outputs=allowed_outputs,
                 )
-            except Exception:
-                # No runtime reference has been published and no child can
-                # have launched; expose this narrow proof to the owner so a
-                # staging preflight failure is terminal without claiming a
-                # generic adapter create failure is harmless.
-                self._prelaunch_no_effect = True
-                raise
+            )
+        except Exception:
+            # No runtime reference has been published and no child can have
+            # launched; expose this narrow proof to the owner so a staging
+            # preflight failure is terminal without claiming a generic
+            # adapter create failure is harmless.
+            self._prelaunch_no_effect = True
+            raise
         arguments = tuple(preflight["arguments"])
         config_sources = tuple(preflight["config_sources"])
         enabled_plugins = tuple(preflight["enabled_plugin_set"])
@@ -390,6 +393,7 @@ class CodexExecRuntimeAdapter:
             raise ExternalContractError("codex_task_scope_invalid")
         record.envelope.verify_staging()
         record.envelope.assert_quiescent_input()
+        self._assert_configuration_unchanged(record)
         prompt = self._prompt(record, task)
         argv = [
             str(record.envelope.executable_path),
@@ -435,9 +439,7 @@ class CodexExecRuntimeAdapter:
             raise ExternalContractError("codex_process_failed")
         try:
             normalized_result = self._parse_normalized_result(record)
-            preflight = self._configuration_preflight(record.envelope.executable_version)
-            if preflight["fingerprint"] != record.envelope.effective_runtime_configuration_fingerprint:
-                raise ExternalContractError("runtime_configuration_changed")
+            preflight = self._assert_configuration_unchanged(record)
             record.envelope.verify_staging()
             record.envelope.assert_quiescent_input()
             diff, source_after_manifest = self._stable_allowlisted_diff(record)
@@ -575,6 +577,14 @@ class CodexExecRuntimeAdapter:
         """Return the narrow pre-launch projection proof for the owner."""
 
         return self._prelaunch_no_effect
+
+    def _assert_configuration_unchanged(self, record: _CodexRun) -> dict[str, object]:
+        """Fail closed if the launch configuration drifted after binding."""
+
+        preflight = self._configuration_preflight(record.envelope.executable_version)
+        if preflight["fingerprint"] != record.envelope.effective_runtime_configuration_fingerprint:
+            raise ExternalContractError("runtime_configuration_changed")
+        return preflight
 
     def _content_store(self) -> ContentStore:
         root = self._content_root

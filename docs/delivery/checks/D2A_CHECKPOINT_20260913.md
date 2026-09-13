@@ -18,7 +18,7 @@ performed.
 | FD-05 process ownership | Existing Windows controlled Job Object path exercised with a real root plus retained child; cleanup, late abort isolation, and registry-loss fail-closed cases exercised; child environment is explicitly allowlisted and bounded stdout/stderr/process facts are retained | Pass for the controlled ownership contract |
 | FD-05 reconciliation | Existing restart reconciliation path retained; cleanup target hint is applied on restart cleanup; no resubmission path added | Targeted reconciliation regression pass |
 | FD-06 static module | `module.codex` is statically registered through the existing `RuntimeModuleBridge` into the existing `RuntimeRegistry`; module disable isolates Codex while reference remains available | D2a contract tests and MCF-01 regression pass |
-| FD-07 external envelope | Immutable run/task/project envelope, Core-created per-Run `PROJECTED_STAGING`, independent input/output allowlists, executable/config/policy fingerprints, provider-model vs agent-extension egress declarations, launch/import quiescence, stable output observation, and Core-owned blob import | D2a contract tests pass (`11 passed`, `1 skipped` on Windows symlink privilege) |
+| FD-07 external envelope | Immutable run/task/project envelope, Core-created per-Run `PROJECTED_STAGING`, independent input/output allowlists, executable/config/policy fingerprints, provider-model vs agent-extension egress declarations, launch/import quiescence, stable output observation, and Core-owned blob import | D2a contract tests pass (`13 passed`, `1 skipped` on Windows symlink privilege) |
 | FD-07 negative paths | Traversal/credential-like argument rejection, non-allowlisted source change rejection, output mutation between two import reads rejection | Pass in D2a contract tests |
 | FD-08 W2 real target | Feasibility first, then installed `codex` CLI attempt in synthetic managed worktree | Blocked by CLI API transport/network permission before model execution; no real source write or target cleanup evidence |
 
@@ -51,13 +51,13 @@ All commands below ran in the D2a lane unless another cwd is shown.
 | Purpose | Command / cwd | Exit |
 | --- | --- | ---: |
 | Python compile | `D:\AI學習教材\PolyNexus\.venv\Scripts\python.exe -m compileall -q services/core/src/polynexus_core services/core/tests` / lane root | `0` |
-| D2a contract tests | `...python.exe -m pytest -q --basetemp <lane-temp> tests/test_d2a_external_runtime.py` / `services/core` | `0` (`11 passed`, `1 skipped` on Windows symlink privilege) |
+| D2a contract tests | `...python.exe -m pytest -q --basetemp <lane-temp> tests/test_d2a_external_runtime.py` / `services/core` | `0` (`13 passed`, `1 skipped` on Windows symlink privilege) |
 | D1a runtime/module/reconciliation/policy regression | `...pytest -q --basetemp <lane-temp> tests/test_runtime_skeleton.py tests/test_mcf01_static_modules.py tests/test_g16_runtime_selection_policy.py tests/test_g14_runtime_reconciliation.py tests/test_d1a_policy_secret.py` / `services/core` | `0` |
 | Ownership and real controlled Job regression | `...pytest -q --basetemp <lane-temp> tests/test_d1a_generation_ownership.py::test_real_owned_tree_retry_late_abort_and_registry_loss tests/test_d1a_generation_ownership.py::test_public_rest_execution_controls_real_job_and_terminal_cancel_is_inert` / `services/core` | `0` (`2 passed`) |
 | Failure/timeout cleanup regression | `...pytest -q --basetemp <lane-temp> tests/test_cp06_wp28_failure_injection.py tests/test_wp24_resource_guards.py` / `services/core` | `0` (`10 passed`) |
 | Remediation affected regression | `...pytest -q --basetemp <lane-temp> tests/test_d2a_external_runtime.py tests/test_d1a_generation_ownership.py::<real-job cases> tests/test_g16_runtime_selection_policy.py tests/test_mcf01_static_modules.py tests/test_g14_runtime_reconciliation.py tests/test_cp06_wp28_failure_injection.py tests/test_g15_runtime_output_redaction.py` / `services/core` | `0` (all collected cases passed; one symlink case skipped) |
 | Codex/runtime regression | `...pytest -q --basetemp <lane-temp> tests/test_wp14_codex_runtime.py tests/test_wp14b_runtime_binding.py tests/test_wp16_runtime_doctor.py tests/test_runtime_skeleton.py` / `services/core` | `0` (all collected cases passed; warnings only) |
-| Full Core regression after remediation | `TEMP/TMP=<lane>\\d2a-full-core4-root; ...python.exe -m pytest -q --basetemp <lane>\\d2a-full-core4-root\\pytest tests` / `services/core` | `0` (all Core tests passed; warnings only) |
+| Full Core regression after remediation | `TEMP/TMP=<lane>\\d2a-full-core8-root; ...python.exe -m pytest -q --basetemp <lane>\\d2a-full-core8-root\\pytest tests` / `services/core` | `0` (all Core tests passed; warnings only) |
 | Web dependency install | `npm ci --ignore-scripts --no-audit --no-fund --fetch-timeout=15000 --fetch-retries=1 --cache <lane>\\d2a-npm-cache-final` / `apps/web` | `0` (90 packages) |
 | Web tests | `npm test -- --run` / `apps/web` | `0` (`4 files`, `94 tests`) |
 | Web build | `npm run build` / `apps/web` | `0` |
@@ -118,6 +118,18 @@ create failures retain the existing unknown-ownership behavior. The
 output-only and pre-launch failure cases are covered by D2a tests. A new
 immutable candidate and fresh review remain required, and the Windows reparse
 test remains skipped where symlink creation is unavailable.
+
+The next hardening revision rejects any caller-provided `projected_staging`
+fact, requires the Core-provided managed workspace, and always creates a new
+per-Run projection before publishing a runtime reference. It also rechecks the
+effective executable/flags/child-environment fingerprint immediately before
+process creation, so configuration drift has no external effect. The Codex
+adapter declares its controlled process-tree cleanup capability so the normal
+`RuntimeRegistry` dispatch path is usable; this capability declaration is not
+W2 conformance evidence. The new injected-staging, pre-launch configuration
+drift, and enabled static-dispatch cases are included in the 13 passing D2a
+tests. A fresh independent review of the resulting immutable candidate is
+still required.
 
 ## Real Codex feasibility evidence
 

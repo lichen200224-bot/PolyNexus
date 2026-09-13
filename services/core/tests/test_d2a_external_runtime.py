@@ -121,18 +121,13 @@ def _context(
     output_paths: tuple[str, ...] | None = None,
 ) -> ContextPackage:
     outputs = output_paths or paths
-    staging = create_projected_staging(
-        source_root=repo,
-        staging_root=repo.parent / "projected-staging",
-        allowed_inputs=paths,
-        allowed_outputs=outputs,
-    )
     return ContextPackage(
         project_id="project_1",
         version=1,
         instructions=("Fix the failing synthetic test.",),
         project_facts={
-            "projected_staging": str(staging),
+            "managed_workspace": str(repo),
+            "workspace_scope_mode": "PROJECTED_STAGING",
             "allowed_input_paths": json.dumps(paths),
             "allowed_output_paths": json.dumps(outputs),
             "runtime_policy_evidence_sha256": hashlib.sha256(
@@ -293,10 +288,10 @@ def test_codex_adapter_separates_empty_inputs_from_approved_outputs(tmp_path: Pa
 
     async def execute():
         context = _context(repo, paths=(), output_paths=("bug.py",))
-        output_path = Path(context.project_facts["projected_staging"]) / "bug.py"
+        ref = await adapter.create_run(context)
+        output_path = adapter._runs[ref].envelope.staging_root / "bug.py"
         assert output_path.exists()
         assert output_path.read_bytes() == b""
-        ref = await adapter.create_run(context)
         await adapter.submit(ref, task)
         result = await adapter.result(ref)
         assert result.artifacts
@@ -387,6 +382,53 @@ def test_projected_staging_failure_is_terminal_before_external_effect(tmp_path: 
     assert run.runtime_ref is None
 
 
+def test_codex_adapter_rejects_caller_injected_projected_staging(tmp_path: Path) -> None:
+    repo, content = _repo(tmp_path)
+    adapter = _adapter(repo, content)
+    task = _task()
+    adapter.bind_run_identity(run_id="run_injected_staging", task_id=task.id)
+    context = _context(repo)
+    context.project_facts["projected_staging"] = str(repo)
+    with pytest.raises(ExternalContractError, match="projected_staging_injected"):
+        asyncio.run(adapter.create_run(context))
+
+
+def test_codex_adapter_rechecks_configuration_before_process_start(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repo, content = _repo(tmp_path)
+    starts: list[tuple[list[str], Path]] = []
+
+    def factory(argv: list[str], cwd: Path) -> _FakeJob:
+        starts.append((argv, cwd))
+        return _FakeJob(argv, cwd)
+
+    adapter = CodexExecRuntimeAdapter(
+        executable=Path(sys.executable),
+        content_root=content,
+        version_probe=lambda _path: "codex-cli-0.0.0",
+        job_factory=factory,
+    )
+    task = _task()
+    adapter.bind_run_identity(run_id="run_config_drift", task_id=task.id)
+
+    async def execute() -> str:
+        ref = await adapter.create_run(_context(repo))
+        original = adapter._executor_environment()
+
+        def drifted_environment() -> dict[str, str]:
+            return {**original, "PATH": original.get("PATH", "") + ";d2a-config-drift"}
+
+        monkeypatch.setattr(adapter, "_executor_environment", drifted_environment)
+        with pytest.raises(ExternalContractError, match="runtime_configuration_changed"):
+            await adapter.submit(ref, task)
+        assert starts == []
+        assert adapter._runs[ref].state is RunState.CREATED
+        return ref
+
+    asyncio.run(execute())
+
+
 def test_controlled_job_observes_output_and_excludes_unallowlisted_environment(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -441,11 +483,15 @@ def test_supervisor_timeout_sets_target_terminal_state_and_verifies_cleanup(
     assert execution.run.state is RunState.TIMED_OUT
 
 
-def test_static_codex_module_uses_existing_registry_and_isolation() -> None:
+def test_static_codex_module_uses_existing_registry_and_isolation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     registry = build_default_registry()
     modules = registry.static_module_registry  # type: ignore[attr-defined]
     assert modules.contains("module.codex")
     assert registry.resolve("codex.local").adapter_id == "builtin.codex.exec"
+    monkeypatch.setenv("POLYNEXUS_CODEX_EXECUTABLE", str(Path(sys.executable)))
+    assert registry.create_adapter(registry.resolve("codex.local")) is not None
     modules.set_enabled("module.codex", False)
     with pytest.raises(ModuleError):
         registry.create_adapter(registry.resolve("codex.local"))
