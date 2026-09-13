@@ -51,26 +51,27 @@ All commands below ran in the D2a lane unless another cwd is shown.
 | Purpose | Command / cwd | Exit |
 | --- | --- | ---: |
 | Python compile | `D:\AI學習教材\PolyNexus\.venv\Scripts\python.exe -m compileall -q services/core/src/polynexus_core services/core/tests` / lane root | `0` |
-| D2a contract tests (final gate) | `D:\AI學習教材\PolyNexus\.venv\Scripts\python.exe -B -m pytest --override-ini addopts= -q --disable-warnings -rA --basetemp C:\Users\shawn\AppData\Local\Temp\d2a-review-targeted-20260913 C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\services\core\tests\test_d2a_external_runtime.py` / `C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\services\core` | `0` (`13 passed`, `1 skipped`; raw log §1) |
-| D1a runtime/module/reconciliation/policy regression | `...pytest -q --basetemp <lane-temp> tests/test_runtime_skeleton.py tests/test_mcf01_static_modules.py tests/test_g16_runtime_selection_policy.py tests/test_g14_runtime_reconciliation.py tests/test_d1a_policy_secret.py` / `services/core` | `0` |
-| Ownership and real controlled Job regression | `...pytest -q --basetemp <lane-temp> tests/test_d1a_generation_ownership.py::test_real_owned_tree_retry_late_abort_and_registry_loss tests/test_d1a_generation_ownership.py::test_public_rest_execution_controls_real_job_and_terminal_cancel_is_inert` / `services/core` | `0` (`2 passed`) |
-| Failure/timeout cleanup regression | `...pytest -q --basetemp <lane-temp> tests/test_cp06_wp28_failure_injection.py tests/test_wp24_resource_guards.py` / `services/core` | `0` (`10 passed`) |
-| Remediation affected regression (final gate) | `D:\AI學習教材\PolyNexus\.venv\Scripts\python.exe -B -m pytest --override-ini addopts= -q --disable-warnings --tb=no --basetemp C:\Users\shawn\AppData\Local\Temp\d2a-review-affected-compact-20260913 C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\services\core\tests\test_d2a_external_runtime.py C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\services\core\tests\test_d1a_generation_ownership.py::test_real_owned_tree_retry_late_abort_and_registry_loss C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\services\core\tests\test_d1a_generation_ownership.py::test_public_rest_execution_controls_real_job_and_terminal_cancel_is_inert C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\services\core\tests\test_g16_runtime_selection_policy.py C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\services\core\tests\test_mcf01_static_modules.py C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\services\core\tests\test_g14_runtime_reconciliation.py C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\services\core\tests\test_cp06_wp28_failure_injection.py C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\services\core\tests\test_g15_runtime_output_redaction.py` / `C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\services\core` | `0` (`100 passed`, `1 skipped`; raw log §2) |
-| Codex/runtime regression | `...pytest -q --basetemp <lane-temp> tests/test_wp14_codex_runtime.py tests/test_wp14b_runtime_binding.py tests/test_wp16_runtime_doctor.py tests/test_runtime_skeleton.py` / `services/core` | `0` (all collected cases passed; warnings only) |
-| Full Core regression (final gate) | `D:\AI學習教材\PolyNexus\.venv\Scripts\python.exe -B -m pytest --override-ini addopts= -q --disable-warnings --tb=no --basetemp C:\Users\shawn\AppData\Local\Temp\d2a-review-full-core-20260913 C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\services\core\tests` / `C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\services\core` | `0` (`886 passed`, `1 skipped`, `194 warnings`; raw log §3) |
+| D2a contract tests (final gate) | `D:\AI學習教材\PolyNexus\.venv\Scripts\python.exe -B -m pytest --override-ini addopts= -q --disable-warnings -rA --basetemp C:\Users\shawn\AppData\Local\Temp\d2a-review-targeted-20260913 C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\services\core\tests\test_d2a_external_runtime.py` / `C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\services\core` | `0` (`13 passed`, `1 skipped`; D2A_GATE_EVIDENCE §1) |
+| D1a runtime/module/reconciliation/policy regression | Historical targeted run: `tests/test_runtime_skeleton.py`, `tests/test_mcf01_static_modules.py`, `tests/test_g16_runtime_selection_policy.py`, `tests/test_g14_runtime_reconciliation.py`, `tests/test_d1a_policy_secret.py` / `services/core` | `0`; superseded by affected final gate §2 |
+| Ownership and real controlled Job regression | Historical targeted run: `tests/test_d1a_generation_ownership.py::test_real_owned_tree_retry_late_abort_and_registry_loss`, `tests/test_d1a_generation_ownership.py::test_public_rest_execution_controls_real_job_and_terminal_cancel_is_inert` / `services/core` | `0` (`2 passed`); superseded by affected final gate §2 |
+| Failure/timeout cleanup regression | Historical targeted run: `tests/test_cp06_wp28_failure_injection.py`, `tests/test_wp24_resource_guards.py` / `services/core` | `0` (`10 passed`); superseded by full Core final gate §3 |
+| Remediation affected regression (final gate) | `D:\AI學習教材\PolyNexus\.venv\Scripts\python.exe -B -m pytest --override-ini addopts= -q --disable-warnings --tb=no --basetemp C:\Users\shawn\AppData\Local\Temp\d2a-review-affected-compact-20260913 C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\services\core\tests\test_d2a_external_runtime.py C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\services\core\tests\test_d1a_generation_ownership.py::test_real_owned_tree_retry_late_abort_and_registry_loss C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\services\core\tests\test_d1a_generation_ownership.py::test_public_rest_execution_controls_real_job_and_terminal_cancel_is_inert C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\services\core\tests\test_g16_runtime_selection_policy.py C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\services\core\tests\test_mcf01_static_modules.py C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\services\core\tests\test_g14_runtime_reconciliation.py C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\services\core\tests\test_cp06_wp28_failure_injection.py C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\services\core\tests\test_g15_runtime_output_redaction.py` / `C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\services\core` | `0` (`100 passed`, `1 skipped`; D2A_GATE_EVIDENCE §2) |
+| Codex/runtime regression | Historical targeted run: `tests/test_wp14_codex_runtime.py`, `tests/test_wp14b_runtime_binding.py`, `tests/test_wp16_runtime_doctor.py`, `tests/test_runtime_skeleton.py` / `services/core` | `0` (warnings only); superseded by full Core final gate §3 |
+| Full Core regression (final gate) | `D:\AI學習教材\PolyNexus\.venv\Scripts\python.exe -B -m pytest --override-ini addopts= -q --disable-warnings --tb=no --basetemp C:\Users\shawn\AppData\Local\Temp\d2a-review-full-core-20260913 C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\services\core\tests` / `C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\services\core` | `0` (`886 passed`, `1 skipped`, `194 warnings`; D2A_GATE_EVIDENCE §3) |
 | Web dependency install | Final gate reused existing `apps/web/node_modules` (`Test-Path=True`); no install mutation was needed | `N/A` |
-| Web tests (final gate) | `npm test -- --run` / `C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\apps\web` | `0` (`4 files`, `94 tests`; raw log §4) |
-| Web build (final gate) | `npm run build` / `C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\apps\web` | `0` (Vite build; raw log §4) |
-| START scope validator (final gate) | `D:\AI學習教材\PolyNexus\.venv\Scripts\python.exe -B checks/validate_feature_scope.py` / `C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\docs\delivery` | `0` (`PASS_PLANNING_STRUCTURE_ONLY`; raw log §5) |
-| START validator selftest (final gate) | `D:\AI學習教材\PolyNexus\.venv\Scripts\python.exe -B checks/selftest_feature_scope.py` / `C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\docs\delivery` | `0` (`PASS`, 27 cases; raw log §5) |
-| Initial pytest attempt | incorrect `services/core/tests/...` paths while cwd was `services/core` | `1` (path error; not a test assertion) |
+| Web tests (final gate) | `npm test -- --run` / `C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\apps\web` | `0` (`4 files`, `94 tests`; D2A_GATE_EVIDENCE §4) |
+| Web build (final gate) | `npm run build` / `C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\apps\web` | `0` (Vite build; D2A_GATE_EVIDENCE §4) |
+| START scope validator (final gate) | `D:\AI學習教材\PolyNexus\.venv\Scripts\python.exe -B checks/validate_feature_scope.py` / `C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\docs\delivery` | `0` (`PASS_PLANNING_STRUCTURE_ONLY`; D2A_GATE_EVIDENCE §5) |
+| START validator selftest (final gate) | `D:\AI學習教材\PolyNexus\.venv\Scripts\python.exe -B checks/selftest_feature_scope.py` / `C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\docs\delivery` | `0` (`PASS`, 27 cases; D2A_GATE_EVIDENCE §5) |
+| Initial pytest attempt | incorrect `services/core/tests/` paths while cwd was `services/core` | `1` (path error; not a test assertion) |
 | Initial pytest environment attempt | default pytest temp root under `C:\Users\shawn\AppData\Local\Temp\pytest-of-shawn` | `1` (`PermissionError [WinError 5]` during fixture setup) |
 
 The corrected short `--basetemp` reruns removed the environment-temp and
 Windows path-length false failures. Exact final-gate commands, cwd, selected
 stdout, and exits are preserved in
-`docs/delivery/checks/D2A_GATE_EVIDENCE_20260913.md`; no `<lane-temp>` or
-`...python.exe` placeholder is used for the mandatory final gates.
+`docs/delivery/checks/D2A_GATE_EVIDENCE_20260913.md`; no abbreviated
+interpreter or temporary-root placeholder is used for the mandatory final
+gates.
 
 ## First independent review and remediation
 
@@ -193,13 +194,14 @@ post-approval case map, actual argv/cwd/exit, source hashes/diff, Run state,
 binding/runtime references, normalized result, process facts, PID tree
 observations, cleanup queries, version, auth transport handles, and negative
 case are preserved in the immutable candidate companion report:
-`docs/delivery/checks/D2A_W2_REAL_EXECUTOR_20260913.md`.
+`docs/delivery/checks/D2A_W2_REAL_EXECUTOR_20260913.md` and its raw evidence
+companion `docs/delivery/checks/D2A_W2_REAL_EXECUTOR_RAW_20260913.md`.
 
 The most direct candidate-adapter gate is the real Codex run in projected
 staging `staging_87f7ae23ea4a7a334038e997`:
 
 - `RunState`: `RUNNING` → `COMPLETED`; `cleanup=True`
-- real argv included `exec --ephemeral --ignore-user-config -c windows.sandbox="elevated" --sandbox workspace-write --json --cd <staging>`
+- real argv included `exec --ephemeral --ignore-user-config -c windows.sandbox="elevated" --sandbox workspace-write --json --cd C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\artifacts\verification\d2a-20260913\fixtures\staging_87f7ae23ea4a7a334038e997`
 - process exit: `0`; normalized result:
   `{"format":"codex.exec.jsonl.v1","event_count":11,"terminal_type":"turn.completed"}`
 - allowlisted `bug.py` diff imported to Core blob
@@ -213,9 +215,9 @@ staging `staging_87f7ae23ea4a7a334038e997`:
   timeout case observed manifests at 9.344 seconds and triggered at 15.047
   seconds
 
-The full raw transport log is outside the candidate at
-`C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\D2A_W2_TRANSPORT_ATTEMPT_20260913.md`;
-the companion report above is the immutable in-lane summary used for review.
+The raw transport evidence is included in the immutable in-lane companion
+`docs/delivery/checks/D2A_W2_REAL_EXECUTOR_RAW_20260913.md`; no outside raw-log
+file is required for review.
 
 ## Controlled process-tree evidence
 

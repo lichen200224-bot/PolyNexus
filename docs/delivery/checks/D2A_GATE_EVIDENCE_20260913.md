@@ -12,7 +12,8 @@ preconditions without relying on abbreviated placeholders.
 - Parent: `d59acb292e4327e975d018d23c92dd8023b21d90`.
 - Lane: `C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree`.
 - Branch: `codex/product-d2a`.
-- The source-affecting remediation was committed in `25cd760...`; the
+- The source-affecting remediation was committed in
+  `25cd76071ec2fc200ff658ac07bf44d404d335a4`; the
   subsequent commit containing this file and the checkpoint cross-reference
   is documentation-only.
 - All commands below used explicit temporary roots. The relevant

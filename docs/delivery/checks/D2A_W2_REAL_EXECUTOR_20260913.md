@@ -1,9 +1,10 @@
 # D2a W2 real executor evidence — 2026-09-13
 
 This is an immutable in-lane evidence summary for the D2a candidate. It is not
-Human product acceptance and does not adopt MCF-02. The full raw transport log
-is outside the lane at
-`C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\D2A_W2_TRANSPORT_ATTEMPT_20260913.md`.
+Human product acceptance and does not adopt MCF-02. The necessary raw
+transport evidence is included in the in-lane companion
+`D2A_W2_REAL_EXECUTOR_RAW_20260913.md`; no outside raw-log file is required to
+inspect the W2 gate.
 
 ## Boundary and provenance
 
@@ -15,10 +16,11 @@ is outside the lane at
 - Executable SHA-256:
   `081E4DE4BE8E38FAC6ED4D95E3B1A0B9F6D31C090DDC36E1696B349FE406F575`.
 - Real argv boundary after the fix:
-  `exec --ephemeral --ignore-user-config -c windows.sandbox="elevated" --sandbox workspace-write --json --cd <Core-created staging> <prompt>`.
+  `exec --ephemeral --ignore-user-config -c windows.sandbox="elevated" --sandbox workspace-write --json --cd`; each full staging cwd and the case-specific synthetic final prompt token are recorded in `D2A_W2_REAL_EXECUTOR_RAW_20260913.md`.
 - No danger/bypass flag was used. No credential value was read, printed, or
   exported. `thread.started`/`turn.started` handles from the standalone runs
-  are recorded in the raw log as non-secret transport provenance.
+  are recorded in the in-lane raw evidence as non-secret transport
+  provenance.
 
 ## Case map
 
@@ -33,10 +35,10 @@ is outside the lane at
 ## Candidate-adapter success
 
 Fresh managed source worktree:
-`...\fixtures\codex-managed-adapter-fixed-20260913`.
+`C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\artifacts\verification\d2a-20260913\fixtures\codex-managed-adapter-fixed-20260913`.
 
 Projected staging:
-`...\fixtures\staging_87f7ae23ea4a7a334038e997`.
+`C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\artifacts\verification\d2a-20260913\fixtures\staging_87f7ae23ea4a7a334038e997`.
 
 - runtime reference: `codex-exec:e6fd379e2c55489aa89c42e147299544`
 - binding was set before `create_run`: `run_adapter_fixed` / `task_1`.
@@ -78,7 +80,7 @@ synthetic PID manifests and held a root → child → grandchild process tree.
 - runtime reference:
   `codex-exec:ea8af6256dbf48ebb794ff1043b98b8b`.
 - staging:
-  `...\fixtures\staging_de2681ad98717ab7f6c5034f`.
+  `C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\artifacts\verification\d2a-20260913\fixtures\staging_de2681ad98717ab7f6c5034f`.
 - state: `RUNNING` → `CANCELLED`; `cleanup=True`.
 - manifests: executor `40504`, child `40700`, grandchild `40948`.
 - root process fact: PID `36220`, exit `1`, signal `job_terminate`, stopped
@@ -89,7 +91,7 @@ synthetic PID manifests and held a root → child → grandchild process tree.
 - runtime reference:
   `codex-exec:43bfee75fa93448f851a3b2e8595cbb8`.
 - staging:
-  `...\fixtures\staging_7780b8b14709c6e6b12395f4`.
+  `C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\artifacts\verification\d2a-20260913\fixtures\staging_7780b8b14709c6e6b12395f4`.
 - state: `RUNNING` → `TIMED_OUT`; `cleanup=True`.
 - timeout budget: `15.0` seconds; manifests became ready at `9.344` seconds;
   timeout trigger elapsed `15.047` seconds.
@@ -107,14 +109,15 @@ The independent standalone gate also ran the installed executor in fresh
 managed worktrees using the approved explicit Windows sandbox flag.
 
 - Success thread:
-  `01a09ad7-11da-7e41-9a75-8ffcb5e39d30`; outer exit `0`; cwd and inner
-  executor command were recorded in the raw log. Codex changed only `bug.py`:
+  `01a09ad7-11da-7e41-9a75-8ffcb5e39d30`; outer exit `0`; full cwd and inner
+  executor command are recorded in the in-lane raw evidence. Codex changed
+  only `bug.py`:
   blob `4564ab261c7570752a00bfe7f281a945e5fcf951` →
   `4860f406c7a4c121fe0cd7d1b1c1314b4d30d889`; filesystem SHA-256
   `FFC63EA42518CA28CBB11871A9480F74AD278991E31E421C6AC653747D62F80F` →
   `F3FF6AC5227D15099C9777C17C35E7C35FE1461F0057C57AF2665D35754611CB`.
 - Independent test:
-  `D:\AI學習教材\PolyNexus\.venv\Scripts\python.exe -B -m pytest -q -p no:cacheprovider <managed-success>\test_bug.py`, exit `0`,
+  `D:\AI學習教材\PolyNexus\.venv\Scripts\python.exe -B -m pytest -q -p no:cacheprovider C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\d2a-worktree\artifacts\verification\d2a-20260913\fixtures\codex-managed-success-evidence-20260913\test_bug.py`, exit `0`,
   `1 passed in 0.06s`.
 - Failure thread:
   `01a09ad8-f511-7c51-afdb-bb4e94d0ee03`; requested one synthetic failing
@@ -122,8 +125,9 @@ managed worktrees using the approved explicit Windows sandbox flag.
   stderr `Write-Error: D2A synthetic expected failure`; post-state source blob,
   tree, and diff were unchanged.
 - Standalone cancel/timeout runs independently observed real child/grandchild
-  trees and no exact known PIDs after external stop; their complete PID rows
-  and argv are in the raw log.
+  trees and no exact known PIDs after external stop; their complete PID rows,
+  full cwd, argv boundary, and cleanup PID sets are in the in-lane raw
+  evidence.
 
 ## Acceptance boundary
 
