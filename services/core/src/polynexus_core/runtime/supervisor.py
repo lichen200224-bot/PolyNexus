@@ -193,6 +193,13 @@ class RunSupervisor:
         self._adapter = adapter
         self._workflow_executor = workflow_executor or ReferenceWorkflowExecutor()
 
+    def _bind_adapter_identity(self, run: Run, task: Task) -> None:
+        """Use a private seam for target provenance without widening the adapter API."""
+
+        binder = getattr(self._adapter, "bind_run_identity", None)
+        if callable(binder):
+            binder(run_id=run.id, task_id=task.id)
+
     @asynccontextmanager
     async def _runtime_slot(self):
         gate = _RuntimeOperationGate.for_current_loop()
@@ -366,6 +373,7 @@ class RunSupervisor:
             context_package_id=context.id,
         )
         run.transition(RunState.STARTING)
+        self._bind_adapter_identity(run, task)
         async with self._cancellation_guard(run):
             budget = self._new_budget()
             try:
@@ -426,6 +434,7 @@ class RunSupervisor:
         if task.workflow_id != workflow.id or task.workflow_version != workflow.version:
             raise ValueError("Task workflow reference must match the WorkflowDefinition")
 
+        self._bind_adapter_identity(run, task)
         async with self._cancellation_guard(run):
             budget = self._new_budget()
             # Workflow executor boundary: create_run + submit
@@ -609,6 +618,7 @@ class RunSupervisor:
         if task.workflow_id != workflow.id or task.workflow_version != workflow.version:
             raise ValueError("Task workflow reference must match the WorkflowDefinition")
 
+        self._bind_adapter_identity(run, task)
         async with self._cancellation_guard(run):
             budget = self._new_budget()
             run.transition(RunState.STARTING)
@@ -854,6 +864,12 @@ class RunSupervisor:
         CANCEL_REQUESTED -> ORPHANED.
         """
         cleanup_budget = budget or self._new_budget()
+        target_setter = getattr(self._adapter, "set_cleanup_target", None)
+        if callable(target_setter):
+            try:
+                target_setter(runtime_ref, expected_state)
+            except Exception:
+                return False
         try:
             await self._invoke(
                 lambda: self._adapter.cancel(runtime_ref),

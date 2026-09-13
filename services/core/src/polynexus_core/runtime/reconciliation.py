@@ -149,7 +149,10 @@ async def reconcile_non_terminal_runs(
         binding = bindings[run.id]
         try:
             profile = registry.resolve(binding.runtime_profile_ref)
-            _validate_v1_profile(profile)
+            _validate_v1_profile(
+                profile,
+                static_registered=registry.is_registered_dispatch_tool(profile),
+            )
             if not _profile_matches_snapshot(profile, binding):
                 raise RuntimeError("runtime binding/profile mismatch")
             adapter = registry.create_adapter(profile)
@@ -308,6 +311,9 @@ async def _cleanup_and_verify(
     try:
         if not adapter.capabilities().cancel:
             return False
+        target_setter = getattr(adapter, "set_cleanup_target", None)
+        if callable(target_setter):
+            target_setter(runtime_ref, expected_state)
         await adapter.cancel(runtime_ref)
         if not await adapter.cleanup(runtime_ref):
             return False

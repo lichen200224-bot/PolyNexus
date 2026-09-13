@@ -637,7 +637,16 @@ class ExecutionService:
         import os
         store=ContentStore(Path(os.environ["POLYNEXUS_CONTENT_ROOT"]))
         facts=dict(context.project_facts)
-        if record['source']['repository']:facts['managed_workspace']=str(Path(os.environ['POLYNEXUS_WORK_ROOT'])/workspace_id)
+        if record['source']['repository']:
+            managed_workspace = Path(os.environ['POLYNEXUS_WORK_ROOT']) / workspace_id
+            facts['managed_workspace']=str(managed_workspace)
+            # The target receives an explicit, per-generation allowlist.  The
+            # materialized worktree may contain the complete baseline, but an
+            # external executor may only write paths selected at capture time.
+            import json as _json
+            selected_paths=tuple(record['source'].get('selected', ()))
+            facts['allowed_input_paths']=_json.dumps(selected_paths, separators=(',', ':'))
+            facts['allowed_output_paths']=_json.dumps(selected_paths, separators=(',', ':'))
         rendered=replace(context,instructions=(*context.instructions,store.read(record['requirements']['hash'],record['requirements']['size']).decode('utf-8'),store.read(record['validation']['hash'],record['validation']['size']).decode('utf-8')),project_facts=facts)
         supervisor._adapter=CleanupObservation(supervisor._adapter)
         operation=asyncio.current_task();active_operations.register(ref,run.id,operation)

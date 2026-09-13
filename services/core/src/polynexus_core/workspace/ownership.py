@@ -125,6 +125,7 @@ class ControlledJob:
         from pathlib import Path
         if os.name!='nt' or not Path(cwd).is_absolute():raise GenerationConflict('owned_job_unavailable')
         self.c=ctypes;self.handles=[];self.handle=None;self.root=None
+        self._closed=False;self._cached_facts=[]
         c=ctypes;U=c.c_uint32;P=c.c_void_p;Z=c.c_size_t;Q=c.c_uint64
         class Basic(c.Structure):
             _fields_=[('process_time',c.c_int64),('job_time',c.c_int64),('flags',U),('min_ws',Z),('max_ws',Z),('active_limit',U),('affinity',Z),('priority',U),('scheduling',U)]
@@ -190,9 +191,14 @@ class ControlledJob:
             raise GenerationConflict('owned_process_observation_failed')
         return {'pid':entry[0],'retained_handle':int(entry[1]),'created_filetime':created.value,'ended_filetime':ended.value,'exit_code':code.value,'stopped':self.k.WaitForSingleObject(entry[1],0)==0}
 
-    def facts(self):return [self._facts(entry) for entry in self.handles]
+    def facts(self):
+        if self._closed:
+            return list(self._cached_facts)
+        self._cached_facts=[self._facts(entry) for entry in self.handles]
+        return list(self._cached_facts)
 
     def stopped(self):
+        if self._closed:return bool(self._cached_facts) and all(item['stopped'] for item in self._cached_facts)
         c=self.c;accounting=self.Accounting()
         if not self.handle or not self.k.QueryInformationJobObject(self.handle,1,c.byref(accounting),c.sizeof(accounting),None):return False
         return accounting.active==0 and all(self.k.WaitForSingleObject(handle,0)==0 for _,handle in self.handles)
@@ -207,7 +213,10 @@ class ControlledJob:
         return self._facts(self.root)['exit_code']
 
     def dispose(self):
+        if self._closed:return
         if self.handle:
             self.stop()
+            self._cached_facts=self.facts()
             for _,handle in self.handles:self.k.CloseHandle(handle)
             self.k.CloseHandle(self.handle);self.handle=None
+        self._closed=True

@@ -95,7 +95,11 @@ def _select_profile_ref(
         raise RuntimeBindingError(_INVALID_SELECTION_REASON) from None
 
 
-def _validate_v1_profile(profile: RuntimeProfile) -> None:
+def _validate_v1_profile(
+    profile: RuntimeProfile,
+    *,
+    static_registered: bool = False,
+) -> None:
     """Enforce the V1 local-only policy for reference and opt-in profiles."""
     try:
         observed = (
@@ -132,7 +136,18 @@ def _validate_v1_profile(profile: RuntimeProfile) -> None:
             and profile.secret_ref_id is None
             and profile.usage_visibility is UsageVisibility.UNAVAILABLE
         )
-        allowed = reference_allowed or local_endpoint_allowed
+        # A non-NONE local runtime may be selected only when it is statically
+        # registered by the composition root. Vendor identity stays outside
+        # this generic resolver policy.
+        static_runtime_managed_allowed = (
+            static_registered
+            and profile.transport_kind is TransportKind.LOCAL
+            and profile.execution_target is ExecutionTarget.LOCAL
+            and profile.auth_ownership is AuthOwnership.RUNTIME_MANAGED
+            and profile.secret_ref_id is None
+            and profile.usage_visibility is UsageVisibility.UNAVAILABLE
+        )
+        allowed = reference_allowed or local_endpoint_allowed or static_runtime_managed_allowed
     except Exception:
         allowed = False
     if not allowed:
@@ -276,7 +291,10 @@ class RuntimeRegistry:
             environment=environment,
         )
         profile = self.resolve(profile_ref)
-        _validate_v1_profile(profile)
+        _validate_v1_profile(
+            profile,
+            static_registered=self.is_registered_dispatch_tool(profile),
+        )
         return profile
 
     def create_adapter(
@@ -350,10 +368,10 @@ class RuntimeRegistry:
 
 
 def build_default_registry() -> RuntimeRegistry:
-    """Composition root for the built-in reference binding (LOCAL/NONE)."""
-    registry = RuntimeRegistry()
-    registry.register(build_reference_profile(), ReferenceRuntimeAdapter)
-    return registry
+    """Return the static composition without making Registry vendor-aware."""
+    from polynexus_core.runtime.composition import build_default_registry as compose
+
+    return compose()
 
 
 def register_local_endpoint_profile(
