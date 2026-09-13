@@ -2,7 +2,7 @@
 
 Role: `CODEX_PRODUCT_D2A_CONTROLLER`
 
-Status: `D2A_TECHNICAL_CHECKPOINT / REAL_TARGET_GATE_BLOCKED / REVIEW_PENDING`
+Status: `D2A_TECHNICAL_CHECKPOINT / REAL_TARGET_EVIDENCED / FRESH_REVIEW_PENDING`
 
 This candidate starts exactly at Human-accepted D1a commit
 `4cc88feab4097481fa4725c659521c7431794d46` with tree
@@ -20,7 +20,7 @@ performed.
 | FD-06 static module | `module.codex` is statically registered through the existing `RuntimeModuleBridge` into the existing `RuntimeRegistry`; module disable isolates Codex while reference remains available | D2a contract tests and MCF-01 regression pass |
 | FD-07 external envelope | Immutable run/task/project envelope, Core-created per-Run `PROJECTED_STAGING`, independent input/output allowlists, executable/config/policy fingerprints, provider-model vs agent-extension egress declarations, launch/import quiescence, stable output observation, and Core-owned blob import | D2a contract tests pass (`13 passed`, `1 skipped` on Windows symlink privilege) |
 | FD-07 negative paths | Traversal/credential-like argument rejection, non-allowlisted source change rejection, output mutation between two import reads rejection | Pass in D2a contract tests |
-| FD-08 W2 real target | Feasibility first, then installed `codex` CLI attempt in synthetic managed worktree | Blocked by CLI API transport/network permission before model execution; no real source write or target cleanup evidence |
+| FD-08 W2 real target | Brand-neutral feasibility, then installed `codex` CLI in synthetic managed worktrees; standalone and candidate-adapter runs | Real source write/result, normalized JSONL terminal, cancel, true deadline timeout, child/grandchild cleanup, version/auth/provenance, and non-zero failure evidence recorded; fresh review pending |
 
 ## Changed source
 
@@ -131,6 +131,16 @@ drift, and enabled static-dispatch cases are included in the 13 passing D2a
 tests. A fresh independent review of the resulting immutable candidate is
 still required.
 
+The authorized Windows real-executor run exposed one transport-specific adapter
+gap: with `--ignore-user-config`, the adapter's former argv removed the desktop
+Windows sandbox setup, so the real CLI exited `0` without a source change and
+the adapter correctly failed closed at `allowlisted_source_change_missing`.
+The bounded fix pins `-c windows.sandbox="elevated"` only on Windows while
+retaining `--sandbox workspace-write`; it does not use a danger/bypass flag.
+The post-fix targeted suite passed, and the candidate adapter real probe now
+produces a normalized `turn.completed` result and imports only the allowlisted
+diff into Core-owned content storage.
+
 ## Real Codex feasibility evidence
 
 Fixture cwd:
@@ -170,7 +180,39 @@ with Ctrl-C; no source change, result, cancel proof, timeout proof, or target
 child/grandchild cleanup proof was produced. Login credentials were not read or
 exported, and no fallback executor was silently used.
 
-Therefore FD-08 real-target acceptance remains `BLOCKED / NOT PASS`.
+Therefore the pre-approval FD-08 attempt remained `BLOCKED / NOT PASS`; the
+post-approval evidence is recorded below.
+
+## Authorized W2 real-target evidence
+
+The pre-approval transport failure above is historical. The complete
+post-approval case map, actual argv/cwd/exit, source hashes/diff, Run state,
+binding/runtime references, normalized result, process facts, PID tree
+observations, cleanup queries, version, auth transport handles, and negative
+case are preserved in the immutable candidate companion report:
+`docs/delivery/checks/D2A_W2_REAL_EXECUTOR_20260913.md`.
+
+The most direct candidate-adapter gate is the real Codex run in projected
+staging `staging_87f7ae23ea4a7a334038e997`:
+
+- `RunState`: `RUNNING` → `COMPLETED`; `cleanup=True`
+- real argv included `exec --ephemeral --ignore-user-config -c windows.sandbox="elevated" --sandbox workspace-write --json --cd <staging>`
+- process exit: `0`; normalized result:
+  `{"format":"codex.exec.jsonl.v1","event_count":11,"terminal_type":"turn.completed"}`
+- allowlisted `bug.py` diff imported to Core blob
+  `e68e6376c03551c78ce56204c4ed6c15727ce4a4e06a02677dd371b0bf976484`
+- source managed worktree remained baseline blob
+  `4564ab261c7570752a00bfe7f281a945e5fcf951` and SHA-256
+  `FFC63EA42518CA28CBB11871A9480F74AD278991E31E421C6AC653747D62F80F`
+- real adapter cancel and actual 15-second deadline timeout probes both reached
+  terminal `CANCELLED` / `TIMED_OUT`, returned `cleanup=True`, and their exact
+  executor/child/grandchild PIDs were absent from post-stop queries; the
+  timeout case observed manifests at 9.344 seconds and triggered at 15.047
+  seconds
+
+The full raw transport log is outside the candidate at
+`C:\Users\shawn\.codex\visualizations\2026\09\13\01a09a2c-5bc2-7111-89e6-574235e7cbf9\D2A_W2_TRANSPORT_ATTEMPT_20260913.md`;
+the companion report above is the immutable in-lane summary used for review.
 
 ## Controlled process-tree evidence
 
@@ -190,11 +232,9 @@ allowlist; this is controlled-process evidence, not a real Codex W2 result.
 
 ## Acceptance boundary
 
-This checkpoint is not `D2A_TECHNICAL_PASS`: the required real Codex target
-source write, normalized result, cancel, timeout, child/grandchild cleanup,
-version/auth/provenance, and real-target negative cases are not all evidenced.
-Full Core/Web/build/START verification passed as recorded above. Final
-`D2A_TECHNICAL_PASS` remains unavailable until the real-target gate is rerun with
-an approved transport and all required real evidence exists, then a fresh
-independent read-only reviewer reports no P0/P1 finding. The first reviewer had
-P1 findings; it is not reused as the final acceptance reviewer.
+This checkpoint is not yet `D2A_TECHNICAL_PASS`: the required real-target
+evidence now exists, but a fresh independent read-only reviewer must still
+review this exact immutable candidate and report no P0/P1 finding. Full
+Core/Web/build/START verification is rerun after the transport fix and recorded
+with the candidate result. The first reviewer had P1 findings; it is not reused
+as the final acceptance reviewer.

@@ -172,14 +172,19 @@ class CodexExecRuntimeAdapter:
 
     @staticmethod
     def _base_arguments() -> tuple[str, ...]:
-        return (
+        arguments = [
             "exec",
             "--ephemeral",
             "--ignore-user-config",
-            "--sandbox",
-            "workspace-write",
-            "--json",
-        )
+        ]
+        if os.name == "nt":
+            # --ignore-user-config intentionally removes the desktop's Windows
+            # sandbox setup.  Pin the approved elevated Windows sandbox mode
+            # explicitly while retaining Codex's workspace-write policy; this
+            # is not the dangerous bypass mode and remains in the envelope.
+            arguments.extend(["-c", 'windows.sandbox="elevated"'])
+        arguments.extend(["--sandbox", "workspace-write", "--json"])
+        return tuple(arguments)
 
     @staticmethod
     def _fingerprint(value: object) -> str:
