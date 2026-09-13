@@ -21,11 +21,19 @@
 - Approved process-only pairing Web tests (`npm test`): 3 files and 89 tests passed; exit `0`.
 - Production-token sentinel build (`npm run build` with a synthetic Vite token): typecheck/build passed and `rg` found no sentinel in `dist`; exit `0`.
 - Core affected regression (`test_d0_product_start.py`, `test_g14_runtime_reconciliation.py`, `test_health.py`, `test_api.py`): 58 passed, 35 warnings; exit `0`.
+- Post-pairing-review Core affected regression first rerun: `5 passed, 53 errors`; exit `1`. Every error was pytest setup failing to read the default `%TEMP%\pytest-of-shawn`; no product assertion failed.
+- The same Core command with a unique repo-external writable `--basetemp`: `58 passed, 35 warnings in 5.43s`; exit `0`.
 - PowerShell parser checked `start.ps1`, `start_core.ps1`, and `start_web.ps1`: exit `0`.
 - Direct Core/Web starts with no pairing credential: each child exited `1` with the bounded pairing-not-configured error.
 - Fresh START browser journey: process/schema/Core/API-auth/Web-client displayed `ready`; runtime displayed `unknown`; client displayed `authenticated_api_verified`.
 - First port-collision cleanup probe found an owned Vite listener left behind; that exact owned PID was stopped and the launcher received one bounded repair.
-- Final port-collision probe: launcher exit `1`, pre-existing 8765 owner preserved, owned 5173 listener removed; verification exit `0`.
-- Final positive START shutdown: Ctrl+C followed by no listener on 8765 or 5173; exit `0`.
+- Independent pairing review of candidate `a8f275dcc52b12b9ff098c4cadcb8609815c3613` returned `NEED_FIX`: Vite lacked strict-port failure, cleanup could match unrelated new listeners, and the handoff understated frontend scope.
+- Repair replaced listener scanning with a private kill-on-close Windows Job Object and enabled Vite `--strictPort`; the handoff scope statement was corrected.
+- Final 8765 collision probe: launcher exit `1`, pre-existing 8765 owner remained HTTP `200`, and no 5173 listener remained; verification exit `0`.
+- Final 5173 collision probe: launcher exit `1`, pre-existing 5173 owner remained HTTP `200`, and no 8765 listener remained; verification exit `0`.
+- Post-repair Web tests: 3 files and 89 tests passed; exit `0`.
+- Post-repair production-token sentinel build: typecheck/build passed and sentinel was absent from `dist`; exit `0`.
+- Final positive START browser journey again displayed process/schema/Core/API-auth/Web-client `ready`, runtime `unknown`, and `authenticated_api_verified`; Core/Web returned `200` and an anonymous protected request returned `403`.
+- Final owned-process shutdown probe terminated one exact START-owned Core process to exercise supervision; the launcher exited `1`, closed its Job Object, and left no listener on 8765 or 5173; verification exit `0`.
 
 All pytest temporary files and live-probe databases were outside the repository. `node_modules` and `dist` remained ignored test/build outputs. No existing migration was modified and no new migration was necessary.

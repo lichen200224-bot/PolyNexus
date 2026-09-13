@@ -18,20 +18,102 @@ $previousViteToken = [Environment]::GetEnvironmentVariable(
 )
 $coreProcess = $null
 $webProcess = $null
-$launchStartedAt = Get-Date
 
-function Get-StartListenerProcessIds {
-  $ids = @()
-  foreach ($line in (& netstat.exe -ano -p TCP)) {
-    $fields = @($line -split '\s+' | Where-Object { $_ })
-    if ($fields.Count -lt 5 -or $fields[3] -ne "LISTENING") { continue }
-    if ($fields[1] -notmatch '^127\.0\.0\.1:(5173|8765)$') { continue }
-    $ids += [int]$fields[4]
+if (-not ("PolyNexus.NativeJob" -as [type])) {
+  Add-Type -TypeDefinition @"
+using System;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+
+namespace PolyNexus {
+  public sealed class NativeJob : IDisposable {
+    private IntPtr handle;
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct BasicLimitInformation {
+      public long PerProcessUserTimeLimit;
+      public long PerJobUserTimeLimit;
+      public uint LimitFlags;
+      public UIntPtr MinimumWorkingSetSize;
+      public UIntPtr MaximumWorkingSetSize;
+      public uint ActiveProcessLimit;
+      public UIntPtr Affinity;
+      public uint PriorityClass;
+      public uint SchedulingClass;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct IoCounters {
+      public ulong ReadOperationCount;
+      public ulong WriteOperationCount;
+      public ulong OtherOperationCount;
+      public ulong ReadTransferCount;
+      public ulong WriteTransferCount;
+      public ulong OtherTransferCount;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct ExtendedLimitInformation {
+      public BasicLimitInformation BasicLimitInformation;
+      public IoCounters IoInfo;
+      public UIntPtr ProcessMemoryLimit;
+      public UIntPtr JobMemoryLimit;
+      public UIntPtr PeakProcessMemoryUsed;
+      public UIntPtr PeakJobMemoryUsed;
+    }
+
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
+    private static extern IntPtr CreateJobObject(IntPtr attributes, string name);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern bool SetInformationJobObject(
+      IntPtr job,
+      int informationClass,
+      ref ExtendedLimitInformation information,
+      uint informationLength
+    );
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern bool AssignProcessToJobObject(IntPtr job, IntPtr process);
+
+    [DllImport("kernel32.dll")]
+    private static extern bool CloseHandle(IntPtr handle);
+
+    public NativeJob() {
+      handle = CreateJobObject(IntPtr.Zero, null);
+      if (handle == IntPtr.Zero) throw new Win32Exception();
+      var information = new ExtendedLimitInformation();
+      information.BasicLimitInformation.LimitFlags = 0x00002000;
+      if (!SetInformationJobObject(
+        handle,
+        9,
+        ref information,
+        (uint)Marshal.SizeOf(typeof(ExtendedLimitInformation)))) {
+        int error = Marshal.GetLastWin32Error();
+        CloseHandle(handle);
+        handle = IntPtr.Zero;
+        throw new Win32Exception(error);
+      }
+    }
+
+    public void Add(Process process) {
+      if (!AssignProcessToJobObject(handle, process.Handle)) {
+        throw new Win32Exception(Marshal.GetLastWin32Error());
+      }
+    }
+
+    public void Dispose() {
+      if (handle == IntPtr.Zero) return;
+      CloseHandle(handle);
+      handle = IntPtr.Zero;
+    }
   }
-  return @($ids | Sort-Object -Unique)
+}
+"@
 }
 
-$preexistingListenerProcessIds = @(Get-StartListenerProcessIds)
+$ownedJob = [PolyNexus.NativeJob]::new()
 
 function Restore-ProcessEnvironment {
   param([string]$Name, $PreviousValue)
@@ -39,26 +121,6 @@ function Restore-ProcessEnvironment {
     Remove-Item "Env:$Name" -ErrorAction SilentlyContinue
   } else {
     [Environment]::SetEnvironmentVariable($Name, $PreviousValue, "Process")
-  }
-}
-
-function Stop-OwnedProcessTree {
-  param([System.Diagnostics.Process]$Process)
-  if ($null -eq $Process) { return }
-  $Process.Refresh()
-  if (-not $Process.HasExited) {
-    & taskkill.exe /PID $($Process.Id) /T /F 1>$null 2>$null
-  }
-}
-
-function Stop-NewStartListeners {
-  foreach ($processId in @(Get-StartListenerProcessIds)) {
-    if ($processId -in $preexistingListenerProcessIds) { continue }
-    $listenerProcess = Get-Process -Id $processId -ErrorAction SilentlyContinue
-    if ($null -eq $listenerProcess) { continue }
-    if ($listenerProcess.StartTime -lt $launchStartedAt.AddSeconds(-2)) { continue }
-    if ($listenerProcess.ProcessName -notin @("node", "python", "python3")) { continue }
-    Stop-Process -Id $processId -Force -ErrorAction SilentlyContinue
   }
 }
 
@@ -75,6 +137,7 @@ try {
     -WorkingDirectory $repoRoot `
     -WindowStyle Hidden `
     -PassThru
+  $ownedJob.Add($coreProcess)
 
   Remove-Item Env:LOOPBACK_TOKEN -ErrorAction SilentlyContinue
   $env:VITE_POLYNEXUS_LOOPBACK_TOKEN = $token
@@ -84,6 +147,7 @@ try {
     -WorkingDirectory $repoRoot `
     -WindowStyle Hidden `
     -PassThru
+  $ownedJob.Add($webProcess)
 
   Restore-ProcessEnvironment "LOOPBACK_TOKEN" $previousLoopbackToken
   Restore-ProcessEnvironment "VITE_POLYNEXUS_LOOPBACK_TOKEN" $previousViteToken
@@ -107,10 +171,7 @@ try {
 } finally {
   Restore-ProcessEnvironment "LOOPBACK_TOKEN" $previousLoopbackToken
   Restore-ProcessEnvironment "VITE_POLYNEXUS_LOOPBACK_TOKEN" $previousViteToken
-  Stop-OwnedProcessTree $webProcess
-  Stop-OwnedProcessTree $coreProcess
-  Start-Sleep -Milliseconds 250
-  Stop-NewStartListeners
+  $ownedJob.Dispose()
   [Array]::Clear($tokenBytes, 0, $tokenBytes.Length)
   $token = $null
 }

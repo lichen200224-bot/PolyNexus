@@ -13,8 +13,8 @@ Implemented only bounded D0:
 - The approved process-only START launcher generates a 256-bit token, passes only `LOOPBACK_TOKEN` to Core and only `VITE_POLYNEXUS_LOOPBACK_TOKEN` to Vite, never prints it, and clears its own process variables after child launch.
 - The development-only Web config retains the token in a closure and sends it only as `X-Loopback-Token`. Startup UI marks Web/client ready only after both layered health and a protected API request succeed. Missing/wrong credentials remain not ready.
 - Production builds ignore the development token path; a synthetic sentinel build verified the value was absent from all `dist` bytes.
-- START owns and cleans its child process trees. Its collision fallback snapshots pre-existing 127.0.0.1:5173/8765 listeners and stops only new Python/Node listeners created after START, preserving the pre-existing port owner.
-- Alembic remains the only schema authority. No migration, dependency, frontend, extension, workflow, schema-contract, Frozen, security, Human, or Assurance file changed.
+- START assigns the Core and Web process handles it creates to a private kill-on-close Windows Job Object; closing that owned handle cleans only job members and their descendants. Both services bind strict fixed loopback ports, so collisions fail closed while preserving the pre-existing port owner.
+- Alembic remains the only schema authority. No migration, dependency, extension, workflow, schema-contract, Frozen, security, Human, or Assurance file changed. Frontend changes are limited to the Human-approved process-only pairing exception.
 
 Review focus:
 

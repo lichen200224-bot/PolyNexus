@@ -8,7 +8,7 @@ $repoRoot = Split-Path -Parent $PSScriptRoot
 Remove-Item Env:LOOPBACK_TOKEN -ErrorAction SilentlyContinue
 Push-Location (Join-Path $repoRoot "apps\web")
 try {
-  npm run dev
+  npm run dev -- --strictPort
   if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
   }
