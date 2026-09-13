@@ -1,0 +1,23 @@
+{
+  "revision": "0004",
+  "down_revision": "0003",
+  "migration_sha256": "91fbb4217c0790d8054ac5ca431a5a9a567d31cbae05f1ab4625df80a4258c31",
+  "status": "IMPLEMENTED_TARGETED_TESTED_PENDING_INDEPENDENT_ACCEPTANCE",
+  "existing_migrations_changed": false,
+  "new_revision_count": 1,
+  "legacy_labels": "NULL generation => LEGACY_UNBOUND_UNVERIFIED; no inferred trust",
+  "pre_mutation_audits": [
+    "foreign_key_check",
+    "duplicate Context project/version",
+    "dangling/cross-project Task Context",
+    "Run Task/Context references",
+    "Artifact Task/Run references",
+    "Evidence/Finding Run/Task scope",
+    "Context Artifact refs valid unique same-project"
+  ],
+  "restore_evidence": "migration-final2:111passed; D1A_MIGRATION_STEP_FACTS all27 interrupted mutations restored exact backup SHA, legacy rows/IDs/refs/event order/content hash; historical0003 ordering/downgrade assertions retained",
+  "legacy_current_orm": "Only current-ORM consumer test upgrades head explicitly; historical0003 tests remain historical",
+  "downgrade": "0004 rejects lossy downgrade; use verified backup restore",
+  "production_database": "NOT_ACCESSED; explicit synthetic fixtures only",
+  "remaining": "Final independent schema/legacy acceptance audit remains pending; no production migration performed."
+}

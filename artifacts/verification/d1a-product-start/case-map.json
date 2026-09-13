@@ -1,0 +1,78 @@
+{
+  "status": "INCOMPLETE_ACCEPTANCE",
+  "no_case_is_full_pass": true,
+  "cases": [
+    {
+      "id": "D1A-01",
+      "status": "PARTIAL_PENDING_ACCEPTANCE",
+      "implemented_or_observed": "Project classification/archive and Task entry; durable Run/history bounded cursor continuation, same cursor after app restart, no-param compatibility",
+      "remaining": "All archived-project write boundaries and final browser entry journeys require final acceptance audit."
+    },
+    {
+      "id": "D1A-02",
+      "status": "PARTIAL_PENDING_ACCEPTANCE",
+      "implemented_or_observed": "Immutable versioned Context/Artifact; Core blob upload/download/hash/size/retention and closure; classification UI and artifact upload",
+      "remaining": "prior_decision_refs/memory_refs remain fail-closed rejected as unavailable. Full authorized reference-consumer and browser download/retention matrix not established."
+    },
+    {
+      "id": "D1A-03",
+      "status": "PARTIAL_PENDING_ACCEPTANCE",
+      "implemented_or_observed": "Explicit server-captured immutable input refs; Begin/Retry CAS and idempotent command replay; selected Git baseline/dirty capture",
+      "remaining": "All concurrent public Begin/Retry and malformed-reference permutations not independently established."
+    },
+    {
+      "id": "D1A-04",
+      "status": "PARTIAL_PENDING_ACCEPTANCE",
+      "implemented_or_observed": "Explicit generation required for new Run create/start; durable Start/Cancel receipts; Council child generation/lineage; replay and unknown-handle negatives",
+      "remaining": "Full public process launch-count and competing command race matrix remains incomplete."
+    },
+    {
+      "id": "D1A-05",
+      "status": "PARTIAL_PENDING_ACCEPTANCE",
+      "implemented_or_observed": "Real Windows Job root and descendant retained handles: g1 verified cleanup, Retry g2, late Abort(g1) leaves g2 alive/unchanged; final exact Job cleanup",
+      "remaining": "The real Job test directly uses repository/registry, not the complete public adapter/REST lifecycle. All terminal/interrupt combinations not covered."
+    },
+    {
+      "id": "D1A-06",
+      "status": "PARTIAL_PENDING_ACCEPTANCE",
+      "implemented_or_observed": "Exact scope/fence and immutable writer lineage; registry loss and foreign/stale cancel reject; unknown ownership blocks close/dispatch",
+      "remaining": "Complete restart reconciliation, natural completion Cancel invariance, partial-setup recovery and human ownership actions remain unverified."
+    },
+    {
+      "id": "D1A-07",
+      "status": "PARTIAL_PENDING_ACCEPTANCE",
+      "implemented_or_observed": "Synthetic Git capture/materialization preserves original HEAD/index/status/bytes; no-optional-locks readonly Git; explicit selected dirty paths",
+      "remaining": "Complete reparse/TOCTOU/mode/case-collision and concurrent same-repository task matrix and browser selection remain unverified."
+    },
+    {
+      "id": "D1A-08",
+      "status": "PARTIAL_PENDING_ACCEPTANCE",
+      "implemented_or_observed": "Actual CurrentUser DPAPI encrypted SecretRef store; scoped immediate dispatch resolution/zeroing; literal/encoded canary redaction; persisted DB/blob no-canary; live Project/Task highest classification",
+      "remaining": "All routes/tools/side-effect policy audit and missing-secret/error/export/browser matrix remain incomplete. No live provider configured."
+    },
+    {
+      "id": "D1A-09",
+      "status": "PARTIAL_PENDING_ACCEPTANCE",
+      "implemented_or_observed": "Explicit generation/Context/Artifact controls; keyboard focus test; exact selection, stale response guard, aborted/closed/unknown monotonicity; durable cursor polling/reconnect; Web targeted/full/build evidence",
+      "remaining": "Final browser and production build on final fingerprint are Controller work. Complete keyboard/focus, offline/poll terminal and command UI journey matrix not established."
+    },
+    {
+      "id": "D1A-10",
+      "status": "PARTIAL_PENDING_ACCEPTANCE",
+      "implemented_or_observed": "One linear0004; all27 additive mutation interruption/restores; old Run/Artifact/context refs/event order/content hash preserved; dangling/duplicate pre-mutation reject; legacy unbound/unverified labels",
+      "remaining": "Final independent schema/legacy acceptance audit remains pending; no production migration performed."
+    },
+    {
+      "id": "D1A-11",
+      "status": "PARTIAL_PENDING_ACCEPTANCE",
+      "implemented_or_observed": "Final complete Core suite passed; earlier full Web92 and cursor Web90 passed; actual Vite build exit0; unchanged START missing-token/collision/supervision evidence external",
+      "remaining": "Controller final Web/build/START/browser/sentinel and immutable candidate binding pending. Build wrapper had post-save cp950 print error, actual Vite exit0 preserved."
+    },
+    {
+      "id": "D1A-12",
+      "status": "PARTIAL_PENDING_ACCEPTANCE",
+      "implemented_or_observed": "Legacy nullable generation readable/unverified; new execution exact-bound; original WorkflowIdentityError/task_id oracle restored and passed; D0 API-created Run survives app restart",
+      "remaining": "No Human/Assurance authority, MCF adoption or acceptance granted. Full cross-boundary final acceptance remains pending."
+    }
+  ]
+}
