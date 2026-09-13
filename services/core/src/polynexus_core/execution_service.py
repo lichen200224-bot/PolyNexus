@@ -634,8 +634,6 @@ class ExecutionService:
         record,workspace_id=self._generations.prepare_workspace(run)
         from dataclasses import replace
         from polynexus_core.storage.content import ContentStore
-        from polynexus_core.domain.enums import AuthOwnership
-        from polynexus_core.runtime.external_contracts import create_projected_staging
         import os
         import hashlib
         import json
@@ -656,25 +654,7 @@ class ExecutionService:
             output_paths=tuple(record['source'].get('output_paths', selected_paths))
             facts['allowed_input_paths']=_json.dumps(selected_paths, separators=(',', ':'))
             facts['allowed_output_paths']=_json.dumps(output_paths, separators=(',', ':'))
-            try:
-                runtime_managed = (
-                    supervisor._adapter.capabilities().auth_ownership
-                    is AuthOwnership.RUNTIME_MANAGED
-                )
-            except Exception:
-                runtime_managed = False
-            if runtime_managed:
-                staging_id = "staging_" + hashlib.sha256(
-                    f"{run.id}:{workspace_id}".encode("utf-8")
-                ).hexdigest()[:24]
-                projected = create_projected_staging(
-                    source_root=managed_workspace,
-                    staging_root=Path(os.environ['POLYNEXUS_WORK_ROOT']) / staging_id,
-                    allowed_inputs=selected_paths,
-                    allowed_outputs=output_paths,
-                )
-                facts['projected_staging']=str(projected)
-                facts['workspace_scope_mode']='PROJECTED_STAGING'
+            facts['workspace_scope_mode']='PROJECTED_STAGING'
         rendered=replace(context,instructions=(*context.instructions,store.read(record['requirements']['hash'],record['requirements']['size']).decode('utf-8'),store.read(record['validation']['hash'],record['validation']['size']).decode('utf-8')),project_facts=facts)
         supervisor._adapter=CleanupObservation(supervisor._adapter)
         operation=asyncio.current_task();active_operations.register(ref,run.id,operation)
@@ -682,6 +662,9 @@ class ExecutionService:
             return await self._execute_with_cancellation_persistence(supervisor,run,task,rendered,workflow)
         finally:
             stopped=await self._owned_processes.cleanup_adapter(ref,run.id,claim['fence'],supervisor._adapter,run.runtime_ref)
+            no_effect=getattr(supervisor._adapter,'no_effect_failure_verified',lambda:False)()
+            if run.runtime_ref is None and no_effect:
+                stopped=True
             active_operations.unregister(ref,run.id,operation)
             self._run_repo.update(run);self._session.flush()
             self._generations._fact(ref,'CleanupObserved',details={'run_id':run.id,'fence':claim['fence'],'verified':stopped})

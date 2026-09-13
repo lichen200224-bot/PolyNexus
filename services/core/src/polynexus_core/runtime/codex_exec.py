@@ -40,6 +40,7 @@ from polynexus_core.runtime.external_contracts import (
     EgressDisposition,
     ExecutionEnvelope,
     ExternalContractError,
+    create_projected_staging,
     executable_digest,
     make_envelope,
 )
@@ -153,6 +154,7 @@ class CodexExecRuntimeAdapter:
         self._task_id: str | None = None
         self._project_id: str | None = None
         self._version: str | None = None
+        self._prelaunch_no_effect = False
 
     def bind_run_identity(self, *, run_id: str, task_id: str) -> None:
         """Private supervisor seam; called before workflow dispatch."""
@@ -295,11 +297,13 @@ class CodexExecRuntimeAdapter:
     async def create_run(self, context: ContextPackage) -> str:
         if self._run_id is None or self._task_id is None:
             raise ExternalContractError("binding_identity_missing")
+        self._prelaunch_no_effect = False
         version = self._probe()
         facts = dict(context.project_facts)
         workspace_value = facts.get("projected_staging")
-        if not isinstance(workspace_value, str) or not workspace_value:
-            raise ExternalContractError("projected_staging_required")
+        scope_mode = facts.get("workspace_scope_mode", "PROJECTED_STAGING")
+        if scope_mode != "PROJECTED_STAGING":
+            raise ExternalContractError("workspace_scope_mode_invalid")
         input_value = facts.get("allowed_input_paths", "[]")
         output_value = facts.get("allowed_output_paths", input_value)
         try:
@@ -314,6 +318,30 @@ class CodexExecRuntimeAdapter:
         if not isinstance(policy_digest, str) or not _SHA256.fullmatch(policy_digest):
             raise ExternalContractError("policy_preflight_missing")
         preflight = self._configuration_preflight(version)
+        if not isinstance(workspace_value, str) or not workspace_value:
+            managed_value = facts.get("managed_workspace")
+            if not isinstance(managed_value, str) or not managed_value:
+                raise ExternalContractError("projected_staging_required")
+            managed = Path(managed_value)
+            staging_id = "staging_" + hashlib.sha256(
+                f"{self._run_id}:{self._task_id}".encode("utf-8")
+            ).hexdigest()[:24]
+            try:
+                workspace_value = str(
+                    create_projected_staging(
+                        source_root=managed,
+                        staging_root=managed.parent / staging_id,
+                        allowed_inputs=allowed_inputs,
+                        allowed_outputs=allowed_outputs,
+                    )
+                )
+            except Exception:
+                # No runtime reference has been published and no child can
+                # have launched; expose this narrow proof to the owner so a
+                # staging preflight failure is terminal without claiming a
+                # generic adapter create failure is harmless.
+                self._prelaunch_no_effect = True
+                raise
         arguments = tuple(preflight["arguments"])
         config_sources = tuple(preflight["config_sources"])
         enabled_plugins = tuple(preflight["enabled_plugin_set"])
@@ -542,6 +570,11 @@ class CodexExecRuntimeAdapter:
         if target not in {RunState.CANCELLED, RunState.TIMED_OUT}:
             raise ExternalContractError("cleanup_target_invalid")
         self._get(runtime_ref).cleanup_target = target
+
+    def no_effect_failure_verified(self) -> bool:
+        """Return the narrow pre-launch projection proof for the owner."""
+
+        return self._prelaunch_no_effect
 
     def _content_store(self) -> ContentStore:
         root = self._content_root

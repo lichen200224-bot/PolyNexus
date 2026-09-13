@@ -223,7 +223,10 @@ def create_projected_staging(
         raise ExternalContractError("projected_staging_invalid")
     staging.mkdir()
     try:
-        for relative in tuple(sorted(set(inputs) | set(outputs))):
+        # Inputs are readable projection material.  Outputs are an independent
+        # write allowlist: an existing output is not copied unless it is also
+        # explicitly allowlisted as input.
+        for relative in inputs:
             source_path = _safe_relative(source, relative)
             if not source_path.exists():
                 continue
@@ -244,6 +247,19 @@ def create_projected_staging(
             destination.parent.mkdir(parents=True, exist_ok=True)
             with destination.open("xb") as stream:
                 stream.write(content)
+        # Keep output-only paths observable by Git without exposing their
+        # source bytes.  The executor sees a Core-created empty placeholder;
+        # it must replace it to produce an importable diff.
+        for relative in outputs:
+            if relative in inputs:
+                continue
+            source_path = _safe_relative(source, relative)
+            if source_path.exists() and not stat.S_ISREG(source_path.stat().st_mode):
+                raise ExternalContractError("projected_output_not_regular")
+            destination = staging / relative
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            with destination.open("xb"):
+                pass
         _projection_git(staging, "init", "--quiet")
         _projection_git(staging, "add", "--all")
         _projection_git(staging, "commit", "--quiet", "--allow-empty", "-m", "Core projected baseline")

@@ -293,6 +293,9 @@ def test_codex_adapter_separates_empty_inputs_from_approved_outputs(tmp_path: Pa
 
     async def execute():
         context = _context(repo, paths=(), output_paths=("bug.py",))
+        output_path = Path(context.project_facts["projected_staging"]) / "bug.py"
+        assert output_path.exists()
+        assert output_path.read_bytes() == b""
         ref = await adapter.create_run(context)
         await adapter.submit(ref, task)
         result = await adapter.result(ref)
@@ -340,6 +343,48 @@ def test_projected_staging_rejects_nested_reparse_path(tmp_path: Path) -> None:
             allowed_inputs=("nested/linked/bug.py",),
             allowed_outputs=("nested/linked/bug.py",),
         )
+
+
+def test_projected_staging_failure_is_terminal_before_external_effect(tmp_path: Path) -> None:
+    _repo_root, content = _repo(tmp_path)
+    adapter = CodexExecRuntimeAdapter(
+        executable=Path(sys.executable),
+        content_root=content,
+        version_probe=lambda _path: "codex-cli-0.0.0",
+        job_factory=_FakeJob,
+    )
+    task = _task()
+    context = ContextPackage(
+        project_id=task.project_id,
+        version=1,
+        instructions=("Fix the synthetic bug.",),
+        project_facts={
+            "managed_workspace": str(tmp_path / "missing-managed-workspace"),
+            "workspace_scope_mode": "PROJECTED_STAGING",
+            "allowed_input_paths": json.dumps(("bug.py",)),
+            "allowed_output_paths": json.dumps(("bug.py",)),
+            "runtime_policy_evidence_sha256": hashlib.sha256(
+                b"synthetic-policy-allow"
+            ).hexdigest(),
+        },
+    )
+    from polynexus_core.workflows.models import WorkflowDefinition, WorkflowStep
+
+    workflow = WorkflowDefinition(
+        id=task.workflow_id,
+        version=task.workflow_version,
+        steps=(WorkflowStep(id="step", type="TOOL"),),
+    )
+    run = Run(
+        task_id=task.id,
+        workflow_id=workflow.id,
+        workflow_version=workflow.version,
+        context_package_id=context.id,
+    )
+    with pytest.raises(RuntimeError):
+        asyncio.run(RunSupervisor(adapter).execute_run(run, task, context, workflow))
+    assert run.state is RunState.FAILED
+    assert run.runtime_ref is None
 
 
 def test_controlled_job_observes_output_and_excludes_unallowlisted_environment(
