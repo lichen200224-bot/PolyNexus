@@ -43,6 +43,13 @@ class DestinationTrust(StrEnum):
     UNTRUSTED_EXTERNAL = "UNTRUSTED_EXTERNAL"
 
 
+class ToolTrust(StrEnum):
+    """Trust derived from the Core-owned runtime registry at dispatch."""
+
+    TRUSTED_REGISTERED = "TRUSTED_REGISTERED"
+    UNTRUSTED = "UNTRUSTED"
+
+
 class PolicyDecision(StrEnum):
     ALLOW = "ALLOW"
     APPROVAL_REQUIRED = "APPROVAL_REQUIRED"
@@ -144,6 +151,7 @@ class EgressPolicyDecision:
     classification: DataClassification
     execution_mode: ExecutionMode
     destination_trust: DestinationTrust
+    tool_trust: ToolTrust
     decision: PolicyDecision
     route: str
     reason: str
@@ -161,6 +169,7 @@ class EgressPolicyDecision:
             "classification": self.classification.value,
             "execution_mode": self.execution_mode.value,
             "destination_trust": self.destination_trust.value,
+            "tool_trust": self.tool_trust.value,
             "decision": self.decision.value,
             "route": self.route,
             "reason": self.reason,
@@ -173,6 +182,7 @@ class EgressPolicyDecision:
         *,
         task_id: str,
         run_id: str,
+        generation_revision: int,
         actor_id: str,
     ) -> Evidence:
         """Create durable audit evidence without copying endpoint/secret data."""
@@ -186,12 +196,20 @@ class EgressPolicyDecision:
                 or _SENSITIVE_ID_MARKER.search(value)
             ):
                 raise RuntimeBindingError("Egress policy evidence identity is invalid")
+        if (
+            isinstance(generation_revision, bool)
+            or not isinstance(generation_revision, int)
+            or generation_revision < 1
+        ):
+            raise RuntimeBindingError("Egress policy evidence generation is invalid")
 
         status = {
             PolicyDecision.ALLOW: EvidenceStatus.PASS,
-            PolicyDecision.APPROVAL_REQUIRED: EvidenceStatus.HUMAN_DECISION,
+            PolicyDecision.APPROVAL_REQUIRED: EvidenceStatus.NEED_ACTION,
             PolicyDecision.DENY: EvidenceStatus.FAIL,
         }[self.decision]
+        metadata = {key: str(value) for key, value in self.as_dict().items()}
+        metadata["generation_revision"] = str(generation_revision)
         return Evidence(
             task_id=task_id,
             run_id=run_id,
@@ -199,7 +217,7 @@ class EgressPolicyDecision:
             source="runtime.routing_policy",
             type=EvidenceType.RUNTIME_EVIDENCE,
             status=status,
-            metadata={key: str(value) for key, value in self.as_dict().items()},
+            metadata=metadata,
         )
 
 
@@ -245,13 +263,25 @@ def validate_destination_trust(value: object) -> DestinationTrust:
     raise RuntimeBindingError("Runtime destination trust is unsupported")
 
 
+def validate_tool_trust(value: object) -> ToolTrust:
+    if isinstance(value, ToolTrust):
+        return value
+    if isinstance(value, str):
+        try:
+            return ToolTrust(value.upper())
+        except ValueError:
+            pass
+    raise RuntimeBindingError("Runtime tool trust is unsupported")
+
+
 def evaluate_egress_policy(
     *,
     classifications: Iterable[object],
     execution_mode: object,
     destination_trust: object,
+    tool_trust: object,
     local_available: bool,
-    side_effect: bool = False,
+    side_effect: bool,
 ) -> EgressPolicyDecision:
     """Apply D05 without downgrade or silent cloud fallback.
 
@@ -268,17 +298,23 @@ def evaluate_egress_policy(
         raise RuntimeBindingError("Data classification aggregation failed") from None
     mode = validate_execution_mode(execution_mode)
     trust = validate_destination_trust(destination_trust)
+    selected_tool_trust = validate_tool_trust(tool_trust)
     if not isinstance(local_available, bool) or not isinstance(side_effect, bool):
         raise RuntimeBindingError("Egress policy input is invalid")
 
+    if selected_tool_trust is ToolTrust.UNTRUSTED:
+        return EgressPolicyDecision(
+            effective, mode, trust, selected_tool_trust, PolicyDecision.DENY,
+            MANUAL_ROUTE, "untrusted_tool_denied", local_available, side_effect,
+        )
     if trust is DestinationTrust.LOOPBACK and not local_available:
         return EgressPolicyDecision(
-            effective, mode, trust, PolicyDecision.DENY, MANUAL_ROUTE,
+            effective, mode, trust, selected_tool_trust, PolicyDecision.DENY, MANUAL_ROUTE,
             "loopback_unavailable", local_available, side_effect,
         )
     if trust is DestinationTrust.LOOPBACK:
         return EgressPolicyDecision(
-            effective, mode, trust, PolicyDecision.ALLOW, LOCAL_ROUTE,
+            effective, mode, trust, selected_tool_trust, PolicyDecision.ALLOW, LOCAL_ROUTE,
             "loopback_allowed", local_available, side_effect,
         )
 
@@ -312,7 +348,8 @@ def evaluate_egress_policy(
         route = EXTERNAL_ROUTE
 
     return EgressPolicyDecision(
-        effective, mode, trust, decision, route, reason, local_available, side_effect,
+        effective, mode, trust, selected_tool_trust, decision, route, reason,
+        local_available, side_effect,
     )
 
 

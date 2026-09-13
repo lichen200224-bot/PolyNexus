@@ -151,30 +151,41 @@ class ExecutionService:
             # that flushed that identity in a larger transaction.
             profile = self._registry._resolve_selected_profile()
             self._generations.validate_run(run.task_id,run.generation_revision,run.context_package_id)
-            self._check_policy(run,profile)
-            claim=self._generations.claim_run(run)
-            if not claim["new_claim"]:raise ClaimConflictError("Generation was already claimed")
-            if not self._run_repo.claim_for_execution(run.id):
-                raise ClaimConflictError(
-                    f"Run {run.id} is not in CREATED state (current: {run.state.value})"
-                )
+            policy_decision, policy_evidence = self._check_policy(run, profile)
+            self._evidence_repo.add(policy_evidence)
+            from polynexus_core.runtime.routing_policy import PolicyDecision
+            if policy_decision.decision is not PolicyDecision.ALLOW:
+                # A denial is itself a durable policy outcome.  Council child
+                # preparation passes commit=False, but its isolated session is
+                # scoped to this CREATED identity and audit, so persist both
+                # atomically before returning the fixed fail-closed error.
+                self._session.commit()
+            else:
+                claim=self._generations.claim_run(run)
+                if not claim["new_claim"]:raise ClaimConflictError("Generation was already claimed")
+                if not self._run_repo.claim_for_execution(run.id):
+                    raise ClaimConflictError(
+                        f"Run {run.id} is not in CREATED state (current: {run.state.value})"
+                    )
 
-            claim_event = RunEvent(
-                run_id=run.id,
-                from_state=RunState.CREATED,
-                to_state=RunState.STARTING,
-            )
-            self._run_repo.append_event(claim_event)
-            self._binding_repo.insert_once(
-                self._registry.bind(
-                    profile.runtime_profile_ref,
+                claim_event = RunEvent(
                     run_id=run.id,
-                    resolved_at=claim_event.occurred_at,
+                    from_state=RunState.CREATED,
+                    to_state=RunState.STARTING,
                 )
-            )
+                self._run_repo.append_event(claim_event)
+                self._binding_repo.insert_once(
+                    self._registry.bind(
+                        profile.runtime_profile_ref,
+                        run_id=run.id,
+                        resolved_at=claim_event.occurred_at,
+                    )
+                )
         except Exception:
             self._session.rollback()
             raise
+        if policy_decision.decision is not PolicyDecision.ALLOW:
+            raise GenerationConflict("predispatch_policy_denied")
         if commit:
             self._session.commit()
 
@@ -240,7 +251,11 @@ class ExecutionService:
             gate_ev = persist_gate_report(gate_report, self._evidence_repo)
             gate_ev = sanitize_evidence(gate_ev)
             self._evidence_repo.update(gate_ev)
-            all_evidence = list(execution.evidence) + [gate_ev]
+            all_evidence = self._compose_success_evidence(
+                self._policy_audit_for_run(run.id),
+                execution.evidence,
+                (gate_ev,),
+            )
             new_result = RunResult(
                 run_id=execution.result.run_id,
                 status=execution.result.status,
@@ -318,8 +333,13 @@ class ExecutionService:
             context_package_id=context.id,
             generation_revision=generation_revision,
         )
-        self._check_policy(run,profile)
         self._run_repo.add(run)
+        policy_decision, policy_evidence = self._check_policy(run, profile)
+        self._evidence_repo.add(policy_evidence)
+        from polynexus_core.runtime.routing_policy import PolicyDecision
+        if policy_decision.decision is not PolicyDecision.ALLOW:
+            self._session.commit()
+            raise GenerationConflict("predispatch_policy_denied")
         self._generations.claim_run(run)
         # Claim the freshly created Run identity (CREATED -> STARTING) inside
         # the same binding-first transaction.
@@ -377,7 +397,11 @@ class ExecutionService:
             gate_ev = sanitize_evidence(gate_ev)
             self._evidence_repo.update(gate_ev)
             gate_evidence = [gate_ev]
-            all_evidence = list(execution.evidence) + gate_evidence
+            all_evidence = self._compose_success_evidence(
+                policy_evidence,
+                execution.evidence,
+                gate_evidence,
+            )
             new_result = RunResult(
                 run_id=execution.result.run_id,
                 status=execution.result.status,
@@ -470,7 +494,14 @@ class ExecutionService:
         from polynexus_core.domain.enums import RunState
         if run.state is not RunState.CREATED:raise ClaimConflictError("Run is not in CREATED state")
         self._generations.validate_run(run.task_id,run.generation_revision,run.context_package_id)
-        self._check_policy(run,profile)
+        policy_decision, policy_evidence = self._check_policy(run, profile)
+        self._evidence_repo.add(policy_evidence)
+        from polynexus_core.runtime.routing_policy import PolicyDecision
+        if policy_decision.decision is not PolicyDecision.ALLOW:
+            # The API's start-command receipt is already staged in this Session.
+            # Commit it with the audit while leaving the Run unclaimed/CREATED.
+            self._session.commit()
+            raise GenerationConflict("predispatch_policy_denied")
         generation_claim=self._generations.claim_run(run)
         if not generation_claim["new_claim"]:raise ClaimConflictError("Generation was already claimed")
         claimed = self._run_repo.claim_for_execution(run_id)
@@ -553,7 +584,11 @@ class ExecutionService:
             self._evidence_repo.update(gate_ev)
             # Rebuild RunResult to include gate evidence in evidence_ids.
             gate_evidence = [gate_ev]
-            all_evidence = list(execution.evidence) + gate_evidence
+            all_evidence = self._compose_success_evidence(
+                policy_evidence,
+                execution.evidence,
+                gate_evidence,
+            )
             execution = RunExecution(
                 run=execution.run,
                 result=RunResult(
@@ -636,17 +671,84 @@ class ExecutionService:
                 raise
             raise
 
-    def _check_policy(self,run,profile):
-        from polynexus_core.runtime.routing_policy import evaluate_egress_policy,DestinationTrust,PolicyDecision
-        from polynexus_core.domain.enums import TransportKind
+    def _check_policy(self, run, profile):
+        """Return the sanitized pre-dispatch decision and durable Evidence value."""
+
+        from polynexus_core.runtime.routing_policy import (
+            DestinationTrust,
+            ToolTrust,
+            evaluate_egress_policy,
+        )
+        from polynexus_core.domain.enums import ExecutionTarget, TransportKind
         import json
         ref=WorkGenerationRef(run.task_id,run.generation_revision)
         record=self._generations.verify_inputs(run.task_id,json.loads(self._generations.get(ref)['inputs']))
-        destination=DestinationTrust.LOOPBACK if profile.transport_kind is TransportKind.LOCAL else DestinationTrust.UNTRUSTED_EXTERNAL
+        destination = (
+            DestinationTrust.LOOPBACK
+            if profile.transport_kind is TransportKind.LOCAL
+            and profile.execution_target is ExecutionTarget.LOCAL
+            else DestinationTrust.UNTRUSTED_EXTERNAL
+        )
+        tool_trust = (
+            ToolTrust.TRUSTED_REGISTERED
+            if self._registry.is_registered_dispatch_tool(profile)
+            else ToolTrust.UNTRUSTED
+        )
         from polynexus_core.persistence.repository import SqlProjectRepository
         task=self._task_repo.get(run.task_id);project=SqlProjectRepository(self._session).get(task.project_id)
-        decision=evaluate_egress_policy(classifications=[record['classification'],task.classification,project.classification],execution_mode=record.get('execution_mode','STANDARD'),destination_trust=destination,local_available=destination is DestinationTrust.LOOPBACK,side_effect=False)
-        if decision.decision is not PolicyDecision.ALLOW:raise GenerationConflict('predispatch_policy_denied')
+        decision=evaluate_egress_policy(
+            classifications=[record['classification'],task.classification,project.classification],
+            execution_mode=record.get('execution_mode','STANDARD'),
+            destination_trust=destination,
+            tool_trust=tool_trust,
+            local_available=destination is DestinationTrust.LOOPBACK,
+            side_effect=True,
+        )
+        evidence=decision.as_evidence(
+            task_id=run.task_id,
+            run_id=run.id,
+            generation_revision=run.generation_revision,
+            actor_id="core-policy",
+        )
+        return decision, evidence
+
+    def _policy_audit_for_run(self, run_id: str) -> Evidence:
+        """Load the single durable pre-dispatch policy audit for a claimed Run."""
+
+        audits = tuple(
+            sanitize_evidence(evidence)
+            for evidence in self._evidence_repo.list_by_run(run_id)
+            if evidence.source == "runtime.routing_policy"
+        )
+        if len(audits) != 1:
+            raise ContractViolationError(
+                f"Run {run_id} must have exactly one runtime.routing_policy audit"
+            )
+        return audits[0]
+
+    @staticmethod
+    def _compose_success_evidence(
+        policy_evidence: Evidence,
+        runtime_evidence: Sequence[Evidence],
+        gate_evidence: Sequence[Evidence],
+    ) -> tuple[Evidence, ...]:
+        """Return policy, runtime, and gate evidence once in deterministic order."""
+
+        composed: list[Evidence] = []
+        seen_ids: set[str] = set()
+        for evidence in (policy_evidence, *runtime_evidence, *gate_evidence):
+            safe_evidence = sanitize_evidence(evidence)
+            if safe_evidence.id in seen_ids:
+                continue
+            seen_ids.add(safe_evidence.id)
+            composed.append(safe_evidence)
+        if sum(
+            evidence.source == "runtime.routing_policy" for evidence in composed
+        ) != 1:
+            raise ContractViolationError(
+                "Successful execution must contain exactly one runtime.routing_policy audit"
+            )
+        return tuple(composed)
 
     @staticmethod
     def _sanitize_execution(execution: RunExecution) -> RunExecution:
@@ -690,7 +792,6 @@ class ExecutionService:
 
         stored=self._run_repo.get(run_id)
         self._generations.validate_run(stored.task_id,stored.generation_revision,stored.context_package_id)
-        self._check_policy(stored,profile)
         try:
             return self._registry.create_adapter(profile)
         except Exception:

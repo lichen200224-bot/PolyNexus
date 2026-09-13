@@ -2,8 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ApiClientConfig, Generation } from '../api'
 import { workRequest, taskGenerationPath, ApiError } from '../api'
 
-interface Props { config: ApiClientConfig; taskId: string; contextId: string; onSelected: (generation: Generation | null) => void }
-export function GenerationControls({config, taskId, contextId, onSelected}: Props) {
+interface Props { archived?: boolean; config: ApiClientConfig; taskId: string; contextId: string; onSelected: (generation: Generation | null) => void }
+export function GenerationControls({config, taskId, contextId, onSelected, archived=false}: Props) {
   const [items,setItems]=useState<Generation[]>([]), [revision,setRevision]=useState<number|null>(null)
   const [chosen,setChosen]=useState<number|null>(null), [busy,setBusy]=useState(false), [error,setError]=useState('')
   const [requirements,setRequirements]=useState(''), [validation,setValidation]=useState(''), [repository,setRepository]=useState('')
@@ -39,7 +39,7 @@ export function GenerationControls({config, taskId, contextId, onSelected}: Prop
   },[load,revision])
   const act=async (action:()=>Promise<void>)=>{setBusy(true);setError('');try{await action()}catch(e){setError(e instanceof ApiError&&e.status===409?'Work changed or is not safely available. Reload and review the selected generation.':'Unable to complete this action. Check the connection and inputs.')}finally{setBusy(false)}}
   const generation=items.find(g=>g.revision===chosen)
-  const canBegin=revision!==null&&prepared!==null&&!busy&&!error&&(!items.some(g=>!g.closed||g.ownership_unknown))
+  const canBegin=!archived&&revision!==null&&prepared!==null&&!busy&&!error&&(!items.some(g=>!g.closed||g.ownership_unknown))
   return <section ref={section} className="generation-controls" aria-label="Work generations">
     <h3>Work generations</h3>
     <button type="button" onClick={()=>void load()} disabled={busy}>Load generations</button>
@@ -50,7 +50,7 @@ export function GenerationControls({config, taskId, contextId, onSelected}: Prop
         Generation {g.revision} · {g.ownership_unknown?'Ownership unknown':g.closed?'Closed':g.aborted?'Abort requested':'Open'} · control {g.control_revision}
       </label>)}
     </fieldset>
-    <fieldset disabled={busy}><legend>Prepare a new generation</legend>
+    <fieldset disabled={busy||archived}><legend>Prepare a new generation</legend>
       <p>Selected ContextPackage ID: {contextId||'Choose or create a context below.'}</p>
       <label>Requirements<textarea value={requirements} onChange={e=>setRequirements(e.target.value)} required/></label>
       <label>Validation criteria<textarea value={validation} onChange={e=>setValidation(e.target.value)} required/></label>

@@ -18,6 +18,12 @@ class GenerationRepository:
     def __init__(self, session):
         self.session = session
 
+    def reserve_task_write(self, task_id):
+        from polynexus_core.persistence.repository import SqlProjectRepository
+        project_id=self.session.execute(text('SELECT project_id FROM tasks WHERE id=:t'),{'t':task_id}).scalar_one_or_none()
+        if project_id is None:raise GenerationConflict('task_not_found')
+        if not SqlProjectRepository(self.session).reserve_write(project_id):raise GenerationConflict('project_archived')
+
     def prepare(self, *, task_id, context_package_id, requirements, validation, repository=None, baseline=None, selected=(), execution_mode='STANDARD', secret_ref=None):
         from dataclasses import asdict
         from polynexus_core.persistence.repository import SqlTaskRepository,SqlContextPackageRepository,SqlProjectRepository,SqlArtifactRepository
@@ -25,6 +31,7 @@ class GenerationRepository:
         from polynexus_core.workspace.managed import ManagedInputs,canonical,snapshot
         import os
         from pathlib import Path
+        self.reserve_task_write(task_id)
         task=SqlTaskRepository(self.session).get(task_id);context=SqlContextPackageRepository(self.session).get(context_package_id)
         if task is None or context is None or context.project_id!=task.project_id:raise GenerationConflict('input_context_scope_mismatch')
         from polynexus_core.runtime.routing_policy import validate_execution_mode
@@ -33,7 +40,7 @@ class GenerationRepository:
         store=ContentStore(Path(os.environ['POLYNEXUS_CONTENT_ROOT']))
         artifacts=SqlArtifactRepository(self.session)
         artifact_records=[]
-        for reference in context.artifact_refs:
+        for reference in dict.fromkeys((*context.artifact_refs,*context.prior_decision_refs,*context.memory_refs)):
             artifact=artifacts.get(reference)
             if artifact is None or artifact.project_id!=task.project_id:raise GenerationConflict('input_artifact_scope_mismatch')
             store.read_artifact(artifact)
@@ -54,7 +61,6 @@ class GenerationRepository:
             source={'baseline':snapshot([]),'input':snapshot([]),'repository':None,'baseline_commit':None,'selected':[]}
         project=SqlProjectRepository(self.session).get(task.project_id)
         if project.archived:raise GenerationConflict('project_archived')
-        if context.prior_decision_refs or context.memory_refs:raise GenerationConflict('context_reference_authority_unavailable')
         if not set(context.source_refs) <= {e['path'] for e in source['input']['entries']}:raise GenerationConflict('context_source_not_captured')
         from polynexus_core.runtime.routing_policy import highest_classification
         classification=highest_classification(*[project.classification,task.classification,context.classification,*[a['classification'] for a in artifact_records]]).value
@@ -128,6 +134,11 @@ class GenerationRepository:
         digest,replay=self._replay(principal,command_id,payload)
         if replay is not None:
             return replay
+        self.reserve_task_write(task_id)
+        # Another request may have committed the same command while this one
+        # waited for the project write reservation. Replay the durable receipt.
+        digest,replay=self._replay(principal,command_id,payload)
+        if replay is not None:return replay
         required={"context_package_id","requirements_ref","validation_ref","baseline_ref","input_ref"}
         if set(inputs)!=required or any(not isinstance(v,str) or not v.strip() for v in inputs.values()):
             raise GenerationConflict("generation_inputs_incomplete")
@@ -155,6 +166,7 @@ class GenerationRepository:
         return self._receipt(principal,command_id,digest,{"task_id":task_id,"generation_revision":updated,"command_id":command_id,"control_revision":0})
 
     def claim(self, ref, *, run_id, lineage, expected_control):
+        self.reserve_task_write(ref.task_id)
         row=self.get(ref)
         self.verify_inputs(ref.task_id,json.loads(row['inputs']))
         if row['aborted'] or row['closed'] or row['ownership_unknown']:
@@ -183,6 +195,7 @@ class GenerationRepository:
         return {"fence":fence,"new_claim":True}
 
     def claim_run(self,run):
+        self.reserve_task_write(run.task_id)
         ref=self.validate_run(run.task_id,run.generation_revision,run.context_package_id)
         if run.generation_parent_run_id:
             parent=self.session.execute(text('SELECT task_id,generation_revision,state FROM runs WHERE id=:id'),{'id':run.generation_parent_run_id}).mappings().one_or_none()
@@ -235,6 +248,7 @@ class GenerationRepository:
         payload={'kind':'create_run','task':task_id,'revision':revision,'context':context_package_id,'control':expected_control}
         digest,replay=self._replay(principal,command_id,payload)
         if replay is not None:return SqlRunRepository(self.session).get(replay['run_id'])
+        self.reserve_task_write(task_id)
         ref=self.validate_run(task_id,revision,context_package_id)
         row=self.get(ref)
         if row['control_revision']!=expected_control:raise GenerationConflict('generation_control_conflict')
@@ -307,6 +321,7 @@ class GenerationRepository:
         digest,replay=self._replay(principal,command_id,payload)
         if replay is not None:return replay
         if not record:return None
+        self.reserve_task_write(run.task_id)
         ref=self.validate_run(run.task_id,revision,run.context_package_id)
         if self.get(ref)['control_revision']!=expected_control:raise GenerationConflict('generation_control_conflict')
         # The caller's existing binding/claim transaction commits this receipt.

@@ -591,6 +591,96 @@ def test_child_binding_failure_rolls_back_unbound_run(council_session, monkeypat
     assert SqlRuntimeBindingSnapshotRepository(session).get_by_run(run.id) is None
 
 
+def test_council_child_policy_denial_commit_false_is_durable(
+    council_session,
+) -> None:
+    """A denied Council child keeps only its CREATED identity and policy audit."""
+    from dataclasses import replace
+
+    from polynexus_core.domain.enums import TransportKind
+    from polynexus_core.domain.generation import GenerationConflict, WorkGenerationRef
+    from polynexus_core.persistence.generation import GenerationRepository
+
+    session, db_path = council_session
+    task, context = _seed(session)
+    workflow = CouncilOrchestrator(session)._load_workflow(task)
+    factory_calls: list[str] = []
+    method_calls: list[str] = []
+
+    class ForbiddenAdapter(ReferenceRuntimeAdapter):
+        async def create_run(self, runtime_context):
+            method_calls.append("create_run")
+            return await super().create_run(runtime_context)
+
+    def factory():
+        factory_calls.append("factory")
+        return ForbiddenAdapter()
+
+    profile = replace(
+        build_reference_profile(),
+        transport_kind=TransportKind.OFFICIAL_API,
+        runtime_profile_ref="reference.external",
+    )
+    registry = RuntimeRegistry()
+    registry.register(profile, factory)
+    registry._resolve_selected_profile = lambda: profile
+
+    run = Run(
+        task_id=task.id,
+        workflow_id=task.workflow_id,
+        workflow_version=task.workflow_version,
+        context_package_id=context.id,
+        generation_revision=1,
+    )
+    SqlRunRepository(session).add(run)
+    session.flush()
+
+    with pytest.raises(GenerationConflict, match="^predispatch_policy_denied$"):
+        ExecutionService(session, registry=registry).prepare_claimed_run(
+            run, task, context, workflow, commit=False
+        )
+
+    reopened_engine = create_engine(
+        f"sqlite:///{db_path}",
+        connect_args={"check_same_thread": False},
+        future=True,
+    )
+    ReopenedSession = sessionmaker(
+        bind=reopened_engine, expire_on_commit=False, future=True
+    )
+    try:
+        with ReopenedSession() as reopened:
+            stored = SqlRunRepository(reopened).get(run.id)
+            assert stored is not None
+            assert stored.state is RunState.CREATED
+            assert stored.runtime_ref is None
+            assert SqlRuntimeBindingSnapshotRepository(reopened).get_by_run(run.id) is None
+            observation = GenerationRepository(reopened).observe(
+                WorkGenerationRef(task.id, 1)
+            )
+            assert observation["writer"] is None
+            audits = [
+                evidence
+                for evidence in SqlEvidenceRepository(reopened).list_by_run(run.id)
+                if evidence.source == "runtime.routing_policy"
+            ]
+            assert len(audits) == 1
+            assert audits[0].status.value == "FAIL"
+            assert audits[0].metadata["decision"] == "DENY"
+            assert audits[0].metadata["route"] == "MANUAL"
+            assert audits[0].metadata["tool_trust"] == "TRUSTED_REGISTERED"
+            assert audits[0].metadata["side_effect"] == "True"
+            assert all(
+                fragment not in str(audits[0].metadata)
+                for fragment in _FORBIDDEN_SECRET_FRAGMENTS
+            )
+    finally:
+        reopened_engine.dispose()
+
+    assert factory_calls == []
+    assert method_calls == []
+
+
 def test_profile_resolution_failure_rolls_back_flushed_run(
     council_session, monkeypatch
 ) -> None:
@@ -1497,7 +1587,7 @@ def _assert_truthful_boundary_failure(
             assert p.id in completed_ids
 
     # Each child Run: reloadable, consistent state/terminal event, terminal once,
-    # no raw secret, no fabricated evidence.
+    # no raw secret, and only the required routing-policy audit evidence.
     for p in plan.participants:
         assert p.analysis_run_id is not None
         child = SqlRunRepository(session).get(p.analysis_run_id)
@@ -1518,9 +1608,10 @@ def _assert_truthful_boundary_failure(
         for ev in child.events:
             assert _SECRET not in (ev.reason or "")
 
-        # No fabricated Evidence on a failed child Run.
+        # Failed child Runs persist exactly one routing-policy audit and no other evidence.
         run_evidence = SqlEvidenceRepository(session).list_by_run(p.analysis_run_id)
-        assert len(run_evidence) == 0, "failed run must not persist fabricated evidence"
+        assert len(run_evidence) == 1
+        assert run_evidence[0].source == "runtime.routing_policy"
 
     # Synthesis remains truthful: failed result (no consensus) when no completed
     # analysis, otherwise a truthful partial synthesis.
@@ -1626,8 +1717,10 @@ def test_status_error_not_persisted_in_result(state, council_session, tmp_path) 
         assert child is not None
         # run.result must be None: no raw RuntimeResult.summary / dangling refs.
         assert child.result is None
-        # No fabricated Evidence/Finding/Artifact persisted for the failed Run.
-        assert len(SqlEvidenceRepository(session).list_by_run(p.analysis_run_id)) == 0
+        # Only the required routing-policy audit is persisted for the failed Run.
+        evidence = SqlEvidenceRepository(session).list_by_run(p.analysis_run_id)
+        assert len(evidence) == 1
+        assert evidence[0].source == "runtime.routing_policy"
         # No raw secret in any event reason.
         for ev in child.events:
             assert _SECRET not in (ev.reason or "")
@@ -1650,7 +1743,9 @@ def test_status_error_not_persisted_in_result(state, council_session, tmp_path) 
             assert c2.result is None
             for ev in c2.events:
                 assert _SECRET not in (ev.reason or "")
-            assert len(SqlEvidenceRepository(session2).list_by_run(p.analysis_run_id)) == 0
+            evidence = SqlEvidenceRepository(session2).list_by_run(p.analysis_run_id)
+            assert len(evidence) == 1
+            assert evidence[0].source == "runtime.routing_policy"
     finally:
         session2.close()
         engine2.dispose()

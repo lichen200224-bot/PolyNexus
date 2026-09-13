@@ -474,7 +474,33 @@ class TestWP09RuntimeFailure:
             try:
                 evidence = SqlEvidenceRepository(session).list_by_task(tid)
                 run_evidence = [e for e in evidence if e.run_id == run_id]
-                assert len(run_evidence) == 0, "No fabricated Evidence on failure"
+                policy_audits = [
+                    e for e in run_evidence if e.source == "runtime.routing_policy"
+                ]
+                assert len(policy_audits) == 1
+                assert policy_audits[0].status.value == "PASS"
+                assert policy_audits[0].metadata["decision"] == "ALLOW"
+                assert policy_audits[0].metadata["route"] == "LOCAL"
+                assert policy_audits[0].metadata["tool_trust"] == "TRUSTED_REGISTERED"
+                assert _SECRET_MARKER not in str(policy_audits[0].metadata)
+                assert not [
+                    e
+                    for e in run_evidence
+                    if e.source != "runtime.routing_policy"
+                ], "No fabricated non-policy Evidence on failure"
+
+                from polynexus_core.persistence.repository import (
+                    SqlArtifactRepository,
+                    SqlFindingRepository,
+                )
+                assert not [
+                    f for f in SqlFindingRepository(session).list_by_task(tid)
+                    if f.run_id == run_id
+                ], "No fabricated Finding on failure"
+                assert not [
+                    a for a in SqlArtifactRepository(session).list_by_project(pid)
+                    if a.run_id == run_id
+                ], "No fabricated Artifact on failure"
             finally:
                 session.close()
         finally:
@@ -626,7 +652,20 @@ class TestWP09NoFabricatedOutput:
             try:
                 evidence = SqlEvidenceRepository(session).list_by_task(tid)
                 run_evidence = [e for e in evidence if e.run_id == run_id]
-                assert len(run_evidence) == 0, "No fabricated Evidence on pre-result failure"
+                policy_audits = [
+                    e for e in run_evidence if e.source == "runtime.routing_policy"
+                ]
+                assert len(policy_audits) == 1
+                assert policy_audits[0].status.value == "PASS"
+                assert policy_audits[0].metadata["decision"] == "ALLOW"
+                assert policy_audits[0].metadata["route"] == "LOCAL"
+                assert policy_audits[0].metadata["tool_trust"] == "TRUSTED_REGISTERED"
+                assert _SECRET_MARKER not in str(policy_audits[0].metadata)
+                assert not [
+                    e
+                    for e in run_evidence
+                    if e.source != "runtime.routing_policy"
+                ], "No fabricated non-policy Evidence on pre-result failure"
 
                 from polynexus_core.persistence.repository import SqlFindingRepository, SqlArtifactRepository
                 findings = SqlFindingRepository(session).list_by_task(tid)

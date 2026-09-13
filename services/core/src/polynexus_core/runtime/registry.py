@@ -252,6 +252,18 @@ class RuntimeRegistry:
             raise RuntimeBindingError(_UNKNOWN_PROFILE_REASON)
         return profile
 
+    def is_registered_dispatch_tool(self, profile: object) -> bool:
+        """Return trust only for an exact profile and registered factory pair."""
+
+        try:
+            if not isinstance(profile, RuntimeProfile):
+                return False
+            registered_profile = self._profiles.get(profile.runtime_profile_ref)
+            factory = self._factories.get(profile.adapter_id)
+            return registered_profile == profile and callable(factory)
+        except Exception:
+            return False
+
     def _resolve_selected_profile(
         self,
         *,
@@ -274,11 +286,12 @@ class RuntimeRegistry:
         required_capabilities: Iterable[str] = (),
     ) -> RuntimeAdapter:
         """Create the adapter for a resolved profile; unregistered fails closed."""
-        factory = self._factories.get(profile.adapter_id)
-        if factory is None:
+        if not self.is_registered_dispatch_tool(profile):
             raise RuntimeBindingError(
                 "No adapter factory registered for the resolved profile"
             )
+        factory = self._factories.get(profile.adapter_id)
+        assert factory is not None
         adapter = factory()
         _validate_adapter_compatibility(profile, adapter, required_capabilities)
         return adapter

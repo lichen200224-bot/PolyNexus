@@ -76,6 +76,7 @@ export function App() {
             </div>
           </section>
           <TaskList
+            archived={state.project.archived}
             config={config}
             projectId={state.project.id}
             onSelectTask={(t) => setState({ view: 'run-prep', project: state.project, task: t })}
@@ -93,6 +94,7 @@ export function App() {
             </div>
           </section>
           <RunPreparation
+            archived={state.project.archived}
             config={config}
             task={state.task}
             onBack={() => setState({ view: 'tasks', project: state.project })}
@@ -110,6 +112,7 @@ export function App() {
             </div>
           </section>
           <RunDetail
+            archived={state.project.archived}
             config={config}
             runId={state.runId}
             onBack={() => setState({ view: 'run-prep', project: state.project, task: state.task })}

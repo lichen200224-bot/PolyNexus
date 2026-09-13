@@ -1,3 +1,5 @@
+import { TaskList } from './TaskList'
+import { RunPreparation } from './RunPreparation'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createRoot, type Root } from 'react-dom/client'
 import { GenerationControls } from './GenerationControls'
@@ -65,4 +67,26 @@ describe('explicit generation workflow',()=>{
   expect(selected).toHaveBeenLastCalledWith({...generation,closed:1})
   expect(button('Abort selected generation').disabled).toBe(true)
   expect(calls).toHaveLength(2)
+ })
+
+ it('keeps all three archived task entries readable and blocks new work without blocking Abort',async()=>{
+  const tasks=['DISCUSS','REVIEW','VALIDATE'].map((mode,n)=>({id:'t'+n,project_id:'p',title:mode,mode,workflow_id:'review-minimal',workflow_version:1,context_package_id:'cp-fixed',created_at:'2026-01-01T00:00:00Z'}))
+  const calls:Array<{url:string;method:string}>=[]
+  globalThis.fetch=vi.fn(async(input,init)=>{const url=String(input);calls.push({url,method:init?.method??'GET'});return new Response(JSON.stringify(url.endsWith('/tasks')?{tasks}:url.includes('/generations')?{task_revision:1,generations:[generation]}:{runs:[]}))}) as typeof fetch
+  host=document.createElement('div');document.body.append(host);root=createRoot(host)
+  const config={baseUrl:'/api/v1',getAuthHeaders:()=>({})};const select=vi.fn()
+  root.render(<TaskList config={config} projectId="p" archived onSelectTask={select} onBack={()=>{}}/>);await flush()
+  expect(button('New task').disabled).toBe(true)
+  const entries=host.querySelectorAll<HTMLButtonElement>('.task-item-btn');expect(entries).toHaveLength(3)
+  entries.forEach(entry=>entry.click());expect(select.mock.calls.map(call=>call[0].mode)).toEqual(['DISCUSS','REVIEW','VALIDATE'])
+  root.render(<RunPreparation config={config} task={tasks[1]} archived onBack={()=>{}} onOpenDetail={()=>{}}/>);await flush()
+  expect(button('Create Run').disabled).toBe(true)
+  expect(button('+ Create new ContextPackage').disabled).toBe(true)
+  expect((host.querySelector('input[type="file"]') as HTMLInputElement).disabled).toBe(true)
+  expect(button('Prepare inputs').closest('fieldset')!.disabled).toBe(true)
+  button('Load generations').click();await flush();(host.querySelector('input[name="generation"]') as HTMLInputElement).click();await flush()
+  expect(button('Abort selected generation').disabled).toBe(false)
+  expect(button('Begin work').disabled).toBe(true)
+  expect(button('Create Run').disabled).toBe(true)
+  expect(calls.every(call=>call.method==='GET')).toBe(true)
  })

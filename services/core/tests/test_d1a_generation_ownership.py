@@ -243,3 +243,235 @@ def test_durable_public_cursors_survive_restart_and_reject_foreign(generation_db
         from polynexus_core.api.schemas import encode_cursor
         unknown=encode_cursor(['task-generations:'+t.id,'not-a-durable-event'])
         assert restarted.get(generation_path,params={'cursor':unknown},headers=headers).status_code==422
+
+
+def test_public_begin_reopen_concurrent_retry_and_invalid_authority(generation_db,monkeypatch):
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Barrier
+    from fastapi.testclient import TestClient
+    from polynexus_core.app import create_app
+    import polynexus_core.api.dependencies as dependencies
+    s,task,prepared=generation_db
+    monkeypatch.setenv('POLYNEXUS_DATABASE_URL',str(s.bind.url))
+    monkeypatch.setattr(dependencies,'_LOOPBACK_TOKEN','public-concurrency')
+    headers={'X-Loopback-Token':'public-concurrency'};path=f'/api/v1/tasks/{task.id}/generations'
+    def concurrent(client,bodies):
+        barrier=Barrier(2)
+        def post(body):barrier.wait(timeout=10);return client.post(path,json=body,headers=headers)
+        with ThreadPoolExecutor(max_workers=2) as pool:return list(pool.map(post,bodies))
+    with TestClient(create_app(),client=('127.0.0.1',50110)) as client:
+        foreign_project=client.post('/api/v1/projects',json={'name':'foreign refs'},headers=headers).json()['id']
+        foreign_context=client.post(f'/api/v1/projects/{foreign_project}/context-packages',json={'version':1},headers=headers).json()['id']
+        foreign_task=client.post(f'/api/v1/projects/{foreign_project}/tasks',json={'title':'foreign','workflow_id':'review-minimal','workflow_version':1,'context_package_id':foreign_context},headers=headers).json()['id']
+        foreign_inputs=client.post(f'/api/v1/tasks/{foreign_task}/inputs',json={'context_package_id':foreign_context,'requirements':'foreign','validation':'foreign'},headers=headers).json()
+        base={'command_id':'base','expected_revision':0,'inputs':prepared}
+        malformed=[{},dict(prepared,input_ref='sha256:'+'0'*64),dict(prepared,extra_ref='invented'),foreign_inputs]
+        for n,inputs in enumerate(malformed):
+            response=client.post(path,json=dict(base,command_id='invalid-'+str(n),inputs=inputs),headers=headers)
+            assert response.status_code==409,response.text
+        for field,value in [('principal','Human'),('human_decision','ACCEPTED'),('assurance','PASS')]:
+            response=client.post(path,json=dict(base,**{field:value}),headers=headers);assert response.status_code==422,response.text
+        assert client.get(path,headers=headers).json()['generations']==[]
+        responses=concurrent(client,[dict(base,command_id='begin-a'),dict(base,command_id='begin-b')])
+        assert sorted(r.status_code for r in responses)==[201,409],[r.text for r in responses]
+        receipt=next(r.json() for r in responses if r.status_code==201)
+        replay_body=dict(base,command_id=receipt['command_id'])
+        assert len(client.get(path,headers=headers).json()['generations'])==1
+    with TestClient(create_app(),client=('127.0.0.1',50111)) as reopened:
+        replay=reopened.post(path,json=replay_body,headers=headers);assert replay.status_code==201 and replay.json()==receipt
+        conflict=reopened.post(path,json=dict(replay_body,expected_revision=1),headers=headers);assert conflict.status_code==409 and conflict.json()['detail']=='command_payload_conflict'
+        abort=reopened.post(path+'/1/abort',json={'command_id':'close-one','expected_control':0},headers=headers)
+        assert abort.status_code==200 and abort.json()['work_aborted']
+        retry={'command_id':'same-retry','expected_revision':1,'predecessor':1,'inputs':prepared}
+        responses=concurrent(reopened,[retry,retry])
+        assert [r.status_code for r in responses]==[201,201],[r.text for r in responses]
+        assert responses[0].json()==responses[1].json() and responses[0].json()['generation_revision']==2
+        assert [g['revision'] for g in reopened.get(path,headers=headers).json()['generations']]==[1,2]
+        late=reopened.post(path,json=dict(retry,command_id='late-competitor'),headers=headers);assert late.status_code==409
+        assert reopened.post(path+'/2/abort',json={'command_id':'close-two','expected_control':0},headers=headers).json()['work_aborted']
+        bad_predecessor=reopened.post(path,json=dict(retry,command_id='wrong-predecessor',expected_revision=2),headers=headers);assert bad_predecessor.status_code==409
+    with Session(s.bind) as fresh:
+        assert fresh.execute(text('SELECT count(*) FROM work_generations WHERE task_id=:t'),{'t':task.id}).scalar_one()==2
+        assert set(fresh.execute(text('SELECT DISTINCT principal FROM generation_commands')).scalars())=={'loopback-controller'}
+        assert fresh.execute(text('SELECT count(*) FROM runs')).scalar_one()==0
+
+
+def test_public_legacy_query_new_mutation_and_frozen_authority(generation_db,monkeypatch):
+    from fastapi.testclient import TestClient
+    from polynexus_core.app import create_app
+    from polynexus_core.domain.enums import RunState,WorkMode,ExecutionTarget
+    import polynexus_core.api.dependencies as dependencies
+    s,task,prepared=generation_db
+    monkeypatch.setenv('POLYNEXUS_DATABASE_URL',str(s.bind.url));monkeypatch.setattr(dependencies,'_LOOPBACK_TOKEN','legacy-matrix')
+    headers={'X-Loopback-Token':'legacy-matrix'}
+    legacy=[]
+    for terminal in (False,True):
+        run=Run(task_id=task.id,workflow_id=task.workflow_id,workflow_version=1,context_package_id=prepared['context_package_id'])
+        if terminal:
+            for state in (RunState.STARTING,RunState.RUNNING,RunState.COMPLETED):run.transition(state)
+        SqlRunRepository(s).add(run);s.flush();legacy.append(run)
+    s.commit()
+    with TestClient(create_app(),client=('127.0.0.1',50112)) as client:
+        for run in legacy:
+            before=client.get(f'/api/v1/runs/{run.id}',headers=headers);assert before.status_code==200
+            assert before.json()['generation_binding_status']=='LEGACY_UNBOUND_UNVERIFIED' and before.json()['generation_revision'] is None
+            executed=client.post(f'/api/v1/runs/{run.id}/execute',headers=headers)
+            assert executed.status_code==(200 if run.state is RunState.COMPLETED else 409)
+            assert client.get(f'/api/v1/runs/{run.id}',headers=headers).json()==before.json()
+        count=len(client.get(f'/api/v1/tasks/{task.id}/runs',headers=headers).json()['runs'])
+        missing=client.post(f'/api/v1/tasks/{task.id}/runs',json={'context_package_id':prepared['context_package_id']},headers=headers)
+        assert missing.status_code==422
+        assert len(client.get(f'/api/v1/tasks/{task.id}/runs',headers=headers).json()['runs'])==count
+        for endpoint in ('human-decisions','assurance','accept'):
+            response=client.post(f'/api/v1/tasks/{task.id}/{endpoint}',json={'decision':'ACCEPTED'},headers=headers);assert response.status_code in (404,405)
+        assert client.get(f'/api/v1/tasks/{task.id}/generations',headers=headers).json()['generations']==[]
+    assert [x.value for x in RunState]==['CREATED','STARTING','RUNNING','CANCEL_REQUESTED','COMPLETED','FAILED','TIMED_OUT','CANCELLED','ORPHANED']
+    assert [x.value for x in WorkMode]==['DISCUSS','REVIEW','VALIDATE']
+    assert [x.value for x in ExecutionTarget]==['LOCAL']
+def test_public_rest_execution_controls_real_job_and_terminal_cancel_is_inert(generation_db,tmp_path,monkeypatch):
+    import json,os,subprocess,time
+    from pathlib import Path
+    from fastapi.testclient import TestClient
+    from polynexus_core.app import create_app
+    import polynexus_core.api.dependencies as dependencies
+    import polynexus_core.execution_service as execution_service_module
+    from polynexus_core.domain.enums import AuthOwnership,ExecutionTarget,RunState,TransportKind,UsageVisibility
+    from polynexus_core.domain.runtime_binding import RuntimeProfile
+    from polynexus_core.persistence.generation import GenerationRepository
+    from polynexus_core.runtime.contracts import RuntimeCapabilities,RuntimeResult,RuntimeStatus
+    from polynexus_core.runtime.registry import RuntimeRegistry
+    from polynexus_core.workspace.ownership import ControlledJob
+
+    assert os.name=='nt'
+    s,task,prepared=generation_db
+    source_root=tmp_path/'sources';source_root.mkdir()
+    work_root=tmp_path/'work'
+    monkeypatch.setenv('POLYNEXUS_SOURCE_ROOT',str(source_root))
+    monkeypatch.setenv('POLYNEXUS_WORK_ROOT',str(work_root))
+    repo=source_root/'clean';repo.mkdir()
+    def git(*args):
+        result=subprocess.run(['git','--no-optional-locks','-c','safe.directory='+repo.as_posix(),'-C',str(repo),*args],capture_output=True,timeout=30)
+        assert result.returncode==0,result.stderr
+        return result.stdout
+    git('init');git('config','user.name','Synthetic');git('config','user.email','synthetic@example.invalid')
+    (repo/'tracked.txt').write_bytes(b'clean source')
+    git('add','.');git('commit','-m','clean baseline')
+    baseline=git('rev-parse','HEAD').decode().strip()
+    prepared=GenerationRepository(s).prepare(task_id=task.id,context_package_id=prepared['context_package_id'],requirements='real controlled job',validation='cleanup and ownership',repository='clean',baseline=baseline,selected=[])
+    s.commit()
+
+    instances=[]
+    class RealJobAdapter:
+        def __init__(self):
+            self.runs={}
+            self.submit_calls=0
+            self.cleanup_calls=0
+        def capabilities(self):
+            return RuntimeCapabilities(cancel=True,artifacts=True,timeout_cleanup_verified=True,auth_ownership=AuthOwnership.NONE)
+        async def health(self): return True
+        async def readiness(self): return True
+        async def create_run(self,context):
+            del context
+            number=len(self.runs)+1
+            runtime_ref=f'controlled:{number}'
+            ready=tmp_path/f'owned-{number}.json'
+            child_code='import time;time.sleep(90)'
+            launcher=("import json,subprocess,sys,time;from pathlib import Path;"
+                      f"child=subprocess.Popen([sys.executable,'-c',{child_code!r}]);"
+                      "Path(sys.argv[1]).write_text(json.dumps({'pid':child.pid}));time.sleep(90)")
+            job=ControlledJob([sys.executable,'-B','-c',launcher,str(ready)],tmp_path)
+            deadline=time.monotonic()+10
+            while not ready.exists():
+                if time.monotonic()>=deadline:
+                    job.stop();job.dispose()
+                    raise AssertionError('owned descendant readiness timeout')
+                time.sleep(.02)
+            job.retain_descendant(json.loads(ready.read_text())['pid'])
+            self.runs[runtime_ref]={'job':job,'state':RunState.CREATED,'facts':None,'cleaned':False}
+            return runtime_ref
+        async def submit(self,runtime_ref,task):
+            del task
+            record=self.runs[runtime_ref]
+            assert record['state'] is RunState.CREATED
+            record['state']=RunState.RUNNING
+            self.submit_calls+=1
+        async def status(self,runtime_ref):
+            return RuntimeStatus(state=self.runs[runtime_ref]['state'])
+        async def result(self,runtime_ref):
+            record=self.runs[runtime_ref]
+            assert record['state'] is RunState.RUNNING
+            record['state']=RunState.COMPLETED
+            return RuntimeResult(summary='controlled job completed')
+        async def cancel(self,runtime_ref):
+            record=self.runs[runtime_ref]
+            if record['state'] in {RunState.CREATED,RunState.STARTING,RunState.RUNNING}:
+                record['job'].stop();record['state']=RunState.CANCELLED
+        async def resume(self,runtime_ref,checkpoint=None):
+            del runtime_ref,checkpoint
+            raise NotImplementedError
+        async def artifacts(self,runtime_ref):
+            self.runs[runtime_ref]
+            return ()
+        async def cleanup(self,runtime_ref):
+            record=self.runs[runtime_ref]
+            self.cleanup_calls+=1
+            record['job'].stop(timeout=10)
+            record['facts']=record['job'].facts()
+            record['job'].dispose()
+            record['cleaned']=True
+            return True
+        def version_info(self): return 'controlled-job/1'
+
+    profile=RuntimeProfile(provider_id='polynexus',transport_kind=TransportKind.LOCAL,runtime_id='controlled',adapter_id='builtin.controlled',execution_target=ExecutionTarget.LOCAL,runtime_profile_ref='controlled.local',profile_revision=1,auth_ownership=AuthOwnership.NONE,usage_visibility=UsageVisibility.UNAVAILABLE)
+    registry=RuntimeRegistry()
+    def factory():
+        adapter=RealJobAdapter();instances.append(adapter);return adapter
+    registry.register(profile,factory)
+    monkeypatch.setattr(execution_service_module,'build_default_registry',lambda:registry)
+    monkeypatch.setenv('POLYNEXUS_RUNTIME_PROFILE_REF','controlled.local')
+    monkeypatch.setenv('POLYNEXUS_DATABASE_URL',str(s.bind.url))
+    monkeypatch.setattr(dependencies,'_LOOPBACK_TOKEN','real-job-test')
+    headers={'X-Loopback-Token':'real-job-test'}
+    try:
+        with TestClient(create_app(),client=('127.0.0.1',50113)) as client:
+            generations_path=f'/api/v1/tasks/{task.id}/generations'
+            begun=client.post(generations_path,json={'command_id':'real-begin','expected_revision':0,'inputs':prepared},headers=headers)
+            assert begun.status_code==201,begun.text
+            revision=begun.json()['generation_revision']
+            created=client.post(f'/api/v1/tasks/{task.id}/runs',json={'command_id':'real-run','generation_revision':revision,'context_package_id':prepared['context_package_id'],'expected_control_revision':0},headers=headers)
+            assert created.status_code==201,created.text
+            run_id=created.json()['id']
+            started=client.post(f'/api/v1/runs/{run_id}/execute',json={'command_id':'real-start','generation_revision':revision,'expected_control_revision':0},headers=headers)
+            assert started.status_code==202,started.text
+            run=client.get(f'/api/v1/runs/{run_id}',headers=headers)
+            assert run.status_code==200 and run.json()['state']=='COMPLETED',run.text
+            observed=client.get(generations_path,headers=headers).json()['generations'][0]
+            assert observed['closed'] and observed['writer']['released']
+            assert observed['workspace']['git_observation']['state']=='CLEAN'
+            assert observed['workspace']['ownership']['state']=='RELEASED'
+            assert observed['workspace']['recoverability']['state']=='RECONSTRUCTABLE'
+            fence=observed['writer']['fence'];control=observed['control_revision']
+            stale=client.post(f'/api/v1/runs/{run_id}/cancel',json={'command_id':'stale-cancel','generation_revision':revision,'expected_control_revision':control,'expected_fence':fence+1},headers=headers)
+            assert stale.status_code==409 and stale.json()['detail']=='ownership_fence_conflict',stale.text
+            after_stale=client.get(generations_path,headers=headers).json()['generations'][0]
+            assert after_stale['control_revision']==control
+            assert not any(event['kind']=='RunCancelRequested' for event in after_stale['events'])
+            natural=client.post(f'/api/v1/runs/{run_id}/cancel',json={'command_id':'natural-cancel','generation_revision':revision,'expected_control_revision':control,'expected_fence':fence},headers=headers)
+            assert natural.status_code==200,natural.text
+            assert natural.json()['cancel_requested'] is False and natural.json()['control_revision']==control
+            after=client.get(generations_path,headers=headers).json()['generations'][0]
+            assert after['control_revision']==control
+            assert not any(event['kind']=='RunCancelRequested' for event in after['events'])
+            assert client.get(f'/api/v1/runs/{run_id}',headers=headers).json()['state']=='COMPLETED'
+        assert len(instances)==1
+        adapter=instances[0]
+        assert adapter.submit_calls==1 and adapter.cleanup_calls==1
+        record=next(iter(adapter.runs.values()))
+        assert record['cleaned'] and len(record['facts'])==2
+        assert all(fact['stopped'] and fact['ended_filetime']>0 for fact in record['facts'])
+    finally:
+        for adapter in instances:
+            for record in adapter.runs.values():
+                if not record['cleaned']:
+                    record['job'].stop(timeout=10)
+                    record['job'].dispose()

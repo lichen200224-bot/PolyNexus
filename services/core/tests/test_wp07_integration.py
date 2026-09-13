@@ -278,7 +278,12 @@ class TestWP07ExecutionPersistence:
             assert ev.type in {EvidenceType.RUNTIME_EVIDENCE, EvidenceType.DOCUMENT_EVIDENCE}
             if ev.type is EvidenceType.RUNTIME_EVIDENCE:
                 assert ev.status is EvidenceStatus.PASS
-                assert ev.actor_id == "system:run-supervisor"
+                if ev.source == "runtime.routing_policy":
+                    assert ev.actor_id == "core-policy"
+                elif ev.source == "runtime-adapter":
+                    assert ev.actor_id == "system:run-supervisor"
+                else:
+                    assert False, f"Unexpected RUNTIME_EVIDENCE source: {ev.source!r}"
 
         # Reload and verify no findings (reference runtime produces none)
         reloaded_findings = SqlFindingRepository(session2).list_by_task(task.id)

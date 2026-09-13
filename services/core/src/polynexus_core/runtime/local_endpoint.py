@@ -31,6 +31,7 @@ from polynexus_core.runtime.routing_policy import (
     LocalRouteDecision,
     LocalRouteEvidence,
     PolicyDecision,
+    ToolTrust,
     evaluate_egress_policy,
     evaluate_local_route,
     validate_loopback_endpoint,
@@ -102,6 +103,8 @@ class LocalModelEndpointAdapter:
             execution_mode=ExecutionMode.LOCAL_ONLY,
             destination_trust=DestinationTrust.LOOPBACK,
             local_available=True,
+            tool_trust=ToolTrust.TRUSTED_REGISTERED,
+            side_effect=True,
         )
         if self._egress_policy.route != "LOCAL":
             raise RuntimeBindingError("Local endpoint egress policy rejected")

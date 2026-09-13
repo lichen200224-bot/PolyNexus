@@ -34,6 +34,7 @@ from polynexus_core.execution_service import ExecutionService
 from polynexus_core.runtime.redaction import redact_text
 from polynexus_core.persistence.repository import (
     SqlContextPackageRepository,
+    SqlEvidenceRepository,
     SqlRunRepository,
     SqlTaskRepository,
 )
@@ -195,6 +196,20 @@ _TERMINAL_STATES = {
 _ACTIVE_STATES = {RunState.STARTING, RunState.RUNNING}
 
 
+def _has_non_allow_policy_audit(db: DbSession, run: Run) -> bool:
+    """Match a durable non-ALLOW audit to this exact Run/generation."""
+
+    if run.generation_revision is None:
+        return False
+    generation = str(run.generation_revision)
+    return any(
+        evidence.source == "runtime.routing_policy"
+        and evidence.metadata.get("generation_revision") == generation
+        and evidence.metadata.get("decision") in {"APPROVAL_REQUIRED", "DENY"}
+        for evidence in SqlEvidenceRepository(db).list_by_run(run.id)
+    )
+
+
 @router.post(
     "/runs/{run_id}/execute",
     response_model=RunResponse,
@@ -230,6 +245,8 @@ async def execute_run(
         except GenerationConflict as error:
             db.rollback();raise HTTPException(409,str(error)) from None
         if replay is not None:
+            if run.state is RunState.CREATED and _has_non_allow_policy_audit(db, run):
+                raise HTTPException(409, "predispatch_policy_denied")
             return JSONResponse(status_code=200 if run.state in _TERMINAL_STATES else 202,content=_run_to_response(run).model_dump(mode='json'))
 
     # Lifecycle guard — CANCEL_REQUESTED

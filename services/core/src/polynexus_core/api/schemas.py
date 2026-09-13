@@ -150,8 +150,8 @@ class ContextPackageCreate(BaseModel):
     constraints: tuple[str, ...] = Field(default=(), description="Constraints")
     project_facts: dict[str, str] = Field(default_factory=dict, description="Project facts")
     artifact_refs: tuple[str, ...] = Field(default=(), description="Artifact references")
-    prior_decision_refs: tuple[str, ...] = Field(default=(), description="Prior decision references")
-    memory_refs: tuple[str, ...] = Field(default=(), description="Memory references")
+    prior_decision_refs: tuple[str, ...] = Field(default=(), description="Same-project Core Artifact IDs imported as prior-decision content; not Human authorization or acceptance")
+    memory_refs: tuple[str, ...] = Field(default=(), description="Same-project Core Artifact IDs imported as memory content; not trusted or accepted memory")
     source_refs: tuple[str, ...] = Field(default=(), description="Source references")
 
 

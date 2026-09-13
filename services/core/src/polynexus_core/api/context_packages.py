@@ -58,8 +58,11 @@ def create_context_package(
             detail=f"Project {project_id} not found",
         )
 
+    if not project_repo.reserve_write(project_id):
+        raise HTTPException(409,"project_archived")
+
     # Artifact identity is Core-owned; raw source locators remain descriptive only.
-    for reference in body.artifact_refs:
+    for reference in dict.fromkeys((*body.artifact_refs,*body.prior_decision_refs,*body.memory_refs)):
         artifact = SqlArtifactRepository(db).get(reference)
         if artifact is None or artifact.project_id != project_id:
             raise HTTPException(422, "context_artifact_scope_mismatch")
@@ -67,8 +70,7 @@ def create_context_package(
             content_store().read_artifact(artifact)
         except ContentError as error:
             raise HTTPException(422, str(error)) from None
-    if body.prior_decision_refs or body.memory_refs:
-        raise HTTPException(422, "context_reference_authority_unavailable")
+    # Imported references carry content only, never Human decisions or trusted memory.
     if any(cp.version == body.version for cp in SqlContextPackageRepository(db).list_by_project(project_id)):
         raise HTTPException(409, "context_version_conflict")
 

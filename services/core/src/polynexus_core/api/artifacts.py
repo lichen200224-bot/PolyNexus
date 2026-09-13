@@ -30,7 +30,7 @@ class ArtifactUpload(BaseModel):
 def upload_artifact(project_id:str,body:ArtifactUpload,_auth:AuthLoopback,db:DbSession):
     project=SqlProjectRepository(db).get(project_id)
     if project is None:raise HTTPException(404,"project_not_found")
-    if project.archived:raise HTTPException(409,"project_archived")
+    if not SqlProjectRepository(db).reserve_write(project_id):raise HTTPException(409,"project_archived")
     try:
         data=base64.b64decode(body.content_base64,validate=True)
         digest,size=content_store().put(data)

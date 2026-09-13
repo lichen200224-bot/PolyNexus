@@ -54,6 +54,9 @@ def create_task(
             detail=f"Project {project_id} not found",
         )
 
+    if not project_repo.reserve_write(project_id):
+        raise HTTPException(409,"project_archived")
+
     # Validate context_package_id if provided
     if body.context_package_id:
         cp_repo = SqlContextPackageRepository(db)

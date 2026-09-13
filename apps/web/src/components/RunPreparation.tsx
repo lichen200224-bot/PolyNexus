@@ -7,6 +7,7 @@ import { listRuns, createRun, createContextPackage, AuthError, ApiError } from '
 import { StatusMessage } from './StatusMessage'
 
 interface RunPreparationProps {
+  archived?: boolean
   config: ApiClientConfig
   task: Task
   onBack: () => void
@@ -39,7 +40,7 @@ function parseProjectFacts(raw: string): Record<string, string> | string {
   return facts
 }
 
-export function RunPreparation({ config, task, onBack, onOpenDetail }: RunPreparationProps) {
+export function RunPreparation({ config, task, onBack, onOpenDetail, archived=false }: RunPreparationProps) {
   const [generation,setGeneration]=useState<Generation|null>(null)
   const runCommand=useRef(new Map<string,string>())
   const [cpClassification,setCpClassification]=useState('INTERNAL')
@@ -85,6 +86,7 @@ export function RunPreparation({ config, task, onBack, onOpenDetail }: RunPrepar
 
   const handleCreateRun = async (e: React.FormEvent) => {
     e.preventDefault()
+    if(archived)return
     if(!generation||generation.closed||generation.aborted||generation.ownership_unknown||generation.inputs.context_package_id!==contextPackageId.trim()){setError("Choose an open, verified generation before creating a Run.");return}
     setSubmitting(true)
     setError(null)
@@ -122,6 +124,7 @@ export function RunPreparation({ config, task, onBack, onOpenDetail }: RunPrepar
 
   const handleCreateCp = async (e: React.FormEvent) => {
     e.preventDefault()
+    if(archived)return
     setCpError(null)
     setCpSuccess(null)
     setCpValidationError(null)
@@ -173,8 +176,8 @@ export function RunPreparation({ config, task, onBack, onOpenDetail }: RunPrepar
   }
 
   const isVersionValid = parseVersion(cpVersion) !== null
-  const canCreateRun = contextPackageId.trim().length > 0 && !submitting && !!generation && !generation.closed && !generation.aborted && !generation.ownership_unknown && generation.inputs.context_package_id===contextPackageId.trim()
-  const canCreateCp = !cpSubmitting && isVersionValid
+  const canCreateRun = !archived && contextPackageId.trim().length > 0 && !submitting && !!generation && !generation.closed && !generation.aborted && !generation.ownership_unknown && generation.inputs.context_package_id===contextPackageId.trim()
+  const canCreateCp = !archived && !cpSubmitting && isVersionValid
 
   return (
     <section aria-labelledby="run-prep-heading">
@@ -183,6 +186,7 @@ export function RunPreparation({ config, task, onBack, onOpenDetail }: RunPrepar
         <button type="button" onClick={onBack} className="back-link">Back to tasks</button>
       </div>
 
+      {archived&&<p role="status">Archived project: new work is disabled; recorded history and safe cancellation remain available.</p>}
       <div className="task-info">
         <p><strong>Task:</strong> {task.title}</p>
         <p><strong>Mode:</strong> {task.mode}</p>
@@ -196,12 +200,13 @@ export function RunPreparation({ config, task, onBack, onOpenDetail }: RunPrepar
           className="back-link"
           onClick={() => setShowCpForm(!showCpForm)}
           aria-expanded={showCpForm}
+          disabled={archived}
           aria-controls="cp-authoring-form"
         >
           {showCpForm ? '- Hide ContextPackage authoring' : '+ Create new ContextPackage'}
         </button>
 
-        {showCpForm && (
+        {showCpForm && !archived && (
           <form
             id="cp-authoring-form"
             className="create-form"
@@ -295,7 +300,7 @@ export function RunPreparation({ config, task, onBack, onOpenDetail }: RunPrepar
             </div>
 
             <div className="form-field">
-              <label htmlFor="cp-prior-decision-refs">Prior Decision References</label>
+              <label htmlFor="cp-prior-decision-refs">Prior Decision References</label><p className="field-hint">Imported Core Artifact IDs from this project. Content only; not Human authorization or acceptance.</p>
               <textarea
                 id="cp-prior-decision-refs"
                 value={cpPriorDecisionRefs}
@@ -307,7 +312,7 @@ export function RunPreparation({ config, task, onBack, onOpenDetail }: RunPrepar
             </div>
 
             <div className="form-field">
-              <label htmlFor="cp-memory-refs">Memory References</label>
+              <label htmlFor="cp-memory-refs">Memory References</label><p className="field-hint">Imported Core Artifact IDs from this project. Content only; not trusted or accepted memory.</p>
               <textarea
                 id="cp-memory-refs"
                 value={cpMemoryRefs}
@@ -364,8 +369,8 @@ export function RunPreparation({ config, task, onBack, onOpenDetail }: RunPrepar
         </div>
       </form>
 
-      <GenerationControls config={config} taskId={task.id} contextId={contextPackageId.trim()} onSelected={g=>{setGeneration(g);if(g)setContextPackageId(g.inputs.context_package_id)}}/>
-      <ContextArtifacts config={config} projectId={task.project_id} onSelect={id=>{setContextPackageId(id);setGeneration(null)}} onArtifact={id=>{setCpArtifactRefs(old=>[...new Set([...parseMultiline(old),id])].join('\n'));setShowCpForm(true)}}/>
+      <GenerationControls archived={archived} config={config} taskId={task.id} contextId={contextPackageId.trim()} onSelected={g=>{setGeneration(g);if(g)setContextPackageId(g.inputs.context_package_id)}}/>
+      <ContextArtifacts archived={archived} config={config} projectId={task.project_id} onSelect={id=>{setContextPackageId(id);setGeneration(null)}} onArtifact={id=>{setCpArtifactRefs(old=>[...new Set([...parseMultiline(old),id])].join('\n'));setShowCpForm(true)}}/>
 
       <div className="runs-section">
         <h3>Runs</h3>

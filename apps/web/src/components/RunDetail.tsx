@@ -6,6 +6,7 @@ import { getRun, getRunResult, getRunFindings, getRunEvidence, getRunArtifacts, 
 import { StatusMessage } from './StatusMessage'
 
 interface RunDetailProps {
+  archived?: boolean
   config: ApiClientConfig
   runId: string
   onBack: () => void
@@ -42,7 +43,7 @@ function stateMessage(state: string): { kind: 'human-required' | 'terminal'; tit
   return null
 }
 
-export function RunDetail({ config, runId, onBack }: RunDetailProps) {
+export function RunDetail({ config, runId, onBack, archived=false }: RunDetailProps) {
   const [commandError,setCommandError]=useState(''),[commandBusy,setCommandBusy]=useState(false)
   const commandBodies=useRef(new Map<string,Record<string,unknown>>())
   const [run, setRun] = useState<Run | null>(null)
@@ -83,6 +84,7 @@ export function RunDetail({ config, runId, onBack }: RunDetailProps) {
 
   useEffect(() => { load() }, [load])
   const send=async(kind:'execute'|'cancel')=>{
+    if(kind==='execute'&&archived)return
     if(!run?.generation_revision)return
     setCommandBusy(true);setCommandError('')
     try {
@@ -124,7 +126,7 @@ export function RunDetail({ config, runId, onBack }: RunDetailProps) {
             <p><strong>State:</strong> {run.state}</p>
             <p>Generation: {run.generation_revision??'Legacy unbound / unverified'}</p>
             <button type="button" disabled={commandBusy} onClick={()=>void load()}>Refresh recorded state</button>
-            <button type="button" disabled={commandBusy||!run.generation_revision||run.state!=='CREATED'} onClick={()=>void send('execute')}>Start this Run</button>
+            <button type="button" disabled={commandBusy||!run.generation_revision||run.state!=='CREATED'||archived} onClick={()=>void send('execute')}>Start this Run</button>
             <button type="button" disabled={commandBusy||!run.generation_revision||!['CREATED','STARTING','RUNNING'].includes(run.state)} onClick={()=>void send('cancel')}>Cancel this Run</button>
             {commandError&&<p role="alert">{commandError}</p>}
 

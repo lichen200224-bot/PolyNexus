@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime, timezone
 from typing import Sequence
 
-from sqlalchemy import update as sa_update
+from sqlalchemy import text, update as sa_update
 from sqlalchemy.orm import Session
 
 from polynexus_core.domain.enums import (
@@ -550,6 +550,10 @@ class SqlProjectRepository(ProjectRepository):
         rows = self._s.query(ProjectRow).all()
         return [_row_to_project(r) for r in rows]
 
+    def reserve_write(self, project_id: str) -> bool:
+        """Serialize new work against archive in the caller's transaction."""
+        return self._s.execute(text("UPDATE projects SET archived=archived WHERE id=:id AND archived=0"),{"id":project_id}).rowcount == 1
+
     def archive(self, project_id: str) -> Project | None:
         row = self._s.get(ProjectRow, project_id)
         if row is None:
@@ -688,7 +692,7 @@ class SqlRunRepository(RunRepository):
         This is a one-winner mechanism — two sessions calling simultaneously will
         produce at most one successful claim.
         """
-        from sqlalchemy import update as sa_update
+        from sqlalchemy import text, update as sa_update
 
         stmt = (
             sa_update(RunRow)

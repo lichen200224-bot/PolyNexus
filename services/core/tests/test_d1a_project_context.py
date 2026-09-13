@@ -96,7 +96,11 @@ def content_api(tmp_path,monkeypatch):
     def sessions():
         with factory() as s:yield s
     app=FastAPI();app.dependency_overrides[get_session]=sessions;app.dependency_overrides[require_loopback]=lambda:None
-    for router in (artifacts,contexts,projects):app.include_router(router,prefix='/api/v1')
+    from polynexus_core.api.tasks import router as tasks
+    from polynexus_core.api.generations import router as generations
+    from polynexus_core.api.runs import router as runs
+    from polynexus_core.api.run_outputs import router as outputs
+    for router in (artifacts,contexts,projects,tasks,generations,runs,outputs):app.include_router(router,prefix='/api/v1')
     monkeypatch.setenv('POLYNEXUS_CONTENT_ROOT',str(tmp_path/'content'))
     with TestClient(app) as client:yield client,factory,tmp_path/'content'
     engine.dispose()
@@ -135,3 +139,63 @@ def test_context_artifact_closure_versions_and_retention(content_api):
     assert client.get(f"/api/v1/artifacts/{artifact['id']}/content").content==payload
     (root/artifact['sha256']).write_bytes(b'tampered')
     assert client.get(f"/api/v1/artifacts/{artifact['id']}/content").status_code==409
+
+
+def test_archive_rejects_new_work_but_preserves_reads_and_closure(content_api):
+    import base64
+    client,factory,root=content_api
+    project=client.post('/api/v1/projects',json={'name':'archive boundary'}).json()['id']
+    artifact=client.post(f'/api/v1/projects/{project}/artifacts',json={'content_base64':base64.b64encode(b'retained').decode()}).json()
+    cp=client.post(f'/api/v1/projects/{project}/context-packages',json={'version':1,'artifact_refs':[artifact['id']]}).json()['id']
+    task_body={'title':'retained','workflow_id':'review-minimal','workflow_version':1,'context_package_id':cp}
+    task=client.post(f'/api/v1/projects/{project}/tasks',json=task_body).json()['id']
+    input_body={'context_package_id':cp,'requirements':'before archive','validation':'retain closure'}
+    prepared=client.post(f'/api/v1/tasks/{task}/inputs',json=input_body).json()
+    begin={'command_id':'archive-begin','expected_revision':0,'inputs':prepared}
+    receipt=client.post(f'/api/v1/tasks/{task}/generations',json=begin);assert receipt.status_code==201,receipt.text
+    run_body={'command_id':'archive-run','generation_revision':1,'expected_control_revision':0,'context_package_id':cp}
+    run=client.post(f'/api/v1/tasks/{task}/runs',json=run_body).json()['id']
+    before={p.name:p.read_bytes() for p in root.iterdir()}
+    assert client.post(f'/api/v1/projects/{project}/archive').status_code==200
+    writes=[(f'/api/v1/projects/{project}/tasks',task_body),(f'/api/v1/projects/{project}/context-packages',{'version':2}),(f'/api/v1/projects/{project}/artifacts',{'content_base64':base64.b64encode(b'forbidden').decode()}),(f'/api/v1/tasks/{task}/inputs',dict(input_body,requirements='forbidden')),(f'/api/v1/tasks/{task}/generations',dict(begin,command_id='new-begin')),(f'/api/v1/tasks/{task}/runs',dict(run_body,command_id='new-run')),(f'/api/v1/runs/{run}/execute',{'command_id':'new-start','generation_revision':1,'expected_control_revision':0})]
+    for path,body in writes:
+        response=client.post(path,json=body);assert response.status_code==409,(path,response.text)
+    assert {p.name:p.read_bytes() for p in root.iterdir()}==before
+    assert client.post(f'/api/v1/tasks/{task}/generations',json=begin).json()==receipt.json()
+    for path in (f'/api/v1/projects/{project}/tasks',f'/api/v1/projects/{project}/context-packages',f'/api/v1/projects/{project}/artifacts',f'/api/v1/tasks/{task}/runs',f'/api/v1/runs/{run}',f'/api/v1/runs/{run}/history',f'/api/v1/tasks/{task}/generations'):
+        assert client.get(path).status_code==200,path
+    assert client.get(f"/api/v1/artifacts/{artifact['id']}/content").content==b'retained'
+    cancelled=client.post(f'/api/v1/runs/{run}/cancel',json={'command_id':'archive-cancel','generation_revision':1,'expected_control_revision':0,'expected_fence':0});assert cancelled.status_code==200,cancelled.text
+    aborted=client.post(f'/api/v1/tasks/{task}/generations/1/abort',json={'command_id':'archive-abort','expected_control':1});assert aborted.status_code==200,aborted.text
+    assert aborted.json()['work_aborted']
+
+
+@pytest.mark.parametrize('field',['prior_decision_refs','memory_refs'])
+def test_imported_reference_authority_is_content_only(content_api,field):
+    import base64,json
+    from polynexus_core.persistence.generation import GenerationRepository
+    from sqlalchemy.exc import IntegrityError
+    client,factory,root=content_api
+    project=client.post('/api/v1/projects',json={'name':'imported'}).json()['id']
+    foreign=client.post('/api/v1/projects',json={'name':'foreign'}).json()['id']
+    artifact=client.post(f'/api/v1/projects/{project}/artifacts',json={'content_base64':base64.b64encode(b'imported claim; not authorization').decode(),'classification':'RESTRICTED'}).json()
+    body={'version':1,field:[artifact['id']]}
+    assert client.post(f'/api/v1/projects/{foreign}/context-packages',json=body).status_code==422
+    assert client.post(f'/api/v1/projects/{project}/context-packages',json={'version':1,field:['missing']}).status_code==422
+    response=client.post(f'/api/v1/projects/{project}/context-packages',json=body);assert response.status_code==201,response.text
+    cp=response.json();assert cp[field]==[artifact['id']]
+    assert not {'human_decision','accepted','assurance','trusted'} & set(cp)
+    task=client.post(f'/api/v1/projects/{project}/tasks',json={'title':'import','workflow_id':'review-minimal','workflow_version':1,'context_package_id':cp['id']}).json()['id']
+    prepared=client.post(f'/api/v1/tasks/{task}/inputs',json={'context_package_id':cp['id'],'requirements':'read imported content','validation':'never elevate authority'})
+    assert prepared.status_code==201,prepared.text
+    with factory() as s:
+        record=GenerationRepository(s).verify_inputs(task,prepared.json())
+        assert record['classification']=='RESTRICTED' and [a['id'] for a in record['artifacts']]==[artifact['id']]
+        assert record['context'][field]==[artifact['id']]
+        with pytest.raises(IntegrityError,match='retained'):s.execute(text('DELETE FROM artifacts WHERE id=:id'),{'id':artifact['id']})
+        s.rollback()
+    assert client.delete(f"/api/v1/artifacts/{artifact['id']}").status_code==409
+    (root/artifact['sha256']).write_bytes(b'tampered')
+    assert client.post(f'/api/v1/projects/{project}/context-packages',json=dict(body,version=2)).status_code==422
+    begin=client.post(f'/api/v1/tasks/{task}/generations',json={'command_id':'tampered-import','expected_revision':0,'inputs':prepared.json()})
+    assert begin.status_code==409,begin.text

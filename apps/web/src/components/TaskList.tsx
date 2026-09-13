@@ -5,6 +5,7 @@ import { CreateTaskForm } from './CreateTaskForm'
 import { StatusMessage } from './StatusMessage'
 
 interface TaskListProps {
+  archived?: boolean
   config: ApiClientConfig
   projectId: string
   onSelectTask: (task: Task) => void
@@ -17,7 +18,7 @@ const MODE_LABELS: Record<string, string> = {
   VALIDATE: 'Validate',
 }
 
-export function TaskList({ config, projectId, onSelectTask, onBack }: TaskListProps) {
+export function TaskList({ config, projectId, onSelectTask, onBack, archived=false }: TaskListProps) {
   const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -62,16 +63,17 @@ export function TaskList({ config, projectId, onSelectTask, onBack }: TaskListPr
 
   return (
     <section aria-labelledby="task-list-heading">
+      {archived&&<p role="status">Archived project: existing tasks and history remain available.</p>}
       <div className="section-header">
         <h2 id="task-list-heading">Tasks</h2>
         <div className="section-actions">
-          <button type="button" onClick={() => setShowCreate(!showCreate)}>
+          <button type="button" disabled={archived} onClick={() => setShowCreate(!showCreate)}>
             {showCreate ? 'Cancel' : 'New task'}
           </button>
           <button type="button" onClick={onBack} className="back-link">Back</button>
         </div>
       </div>
-      {showCreate && (
+      {showCreate && !archived && (
         <CreateTaskForm
           config={config}
           projectId={projectId}

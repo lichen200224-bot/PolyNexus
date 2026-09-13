@@ -39,6 +39,7 @@ from polynexus_core.runtime.routing_policy import (
     EgressPolicyDecision,
     ExecutionMode,
     PolicyDecision,
+    ToolTrust,
     evaluate_local_route,
     evaluate_egress_policy,
     highest_classification,
@@ -305,7 +306,9 @@ def test_classification_routing_and_egress_policy_fail_closed() -> None:
         classifications=(DataClassification.PUBLIC, DataClassification.RESTRICTED),
         execution_mode=ExecutionMode.LOCAL_ONLY,
         destination_trust=DestinationTrust.LOOPBACK,
+        tool_trust=ToolTrust.TRUSTED_REGISTERED,
         local_available=True,
+        side_effect=True,
     )
     assert local.decision is PolicyDecision.ALLOW
     assert local.route == "LOCAL"
@@ -314,7 +317,9 @@ def test_classification_routing_and_egress_policy_fail_closed() -> None:
         classifications=(DataClassification.PUBLIC,),
         execution_mode=ExecutionMode.LOCAL_ONLY,
         destination_trust=DestinationTrust.LOOPBACK,
+        tool_trust=ToolTrust.TRUSTED_REGISTERED,
         local_available=False,
+        side_effect=True,
     )
     assert unavailable_local.decision is PolicyDecision.DENY
     assert unavailable_local.route == "MANUAL"
@@ -323,16 +328,31 @@ def test_classification_routing_and_egress_policy_fail_closed() -> None:
         classifications=(DataClassification.PUBLIC,),
         execution_mode="STANDARD",
         destination_trust="TRUSTED_EXTERNAL",
+        tool_trust="TRUSTED_REGISTERED",
         local_available=False,
+        side_effect=False,
     )
     assert standard.decision is PolicyDecision.ALLOW
     assert standard.route == "EXTERNAL"
+
+    untrusted_tool = evaluate_egress_policy(
+        classifications=(DataClassification.PUBLIC,),
+        execution_mode=ExecutionMode.STANDARD,
+        destination_trust=DestinationTrust.LOOPBACK,
+        tool_trust=ToolTrust.UNTRUSTED,
+        local_available=True,
+        side_effect=True,
+    )
+    assert untrusted_tool.decision is PolicyDecision.DENY
+    assert untrusted_tool.reason == "untrusted_tool_denied"
 
     preferred_without_local = evaluate_egress_policy(
         classifications=(DataClassification.INTERNAL,),
         execution_mode=ExecutionMode.LOCAL_PREFERRED,
         destination_trust=DestinationTrust.TRUSTED_EXTERNAL,
+        tool_trust=ToolTrust.TRUSTED_REGISTERED,
         local_available=False,
+        side_effect=False,
     )
     assert preferred_without_local.decision is PolicyDecision.APPROVAL_REQUIRED
     assert preferred_without_local.route == "MANUAL"
@@ -341,11 +361,16 @@ def test_classification_routing_and_egress_policy_fail_closed() -> None:
         classifications=(DataClassification.CONFIDENTIAL,),
         execution_mode=ExecutionMode.LOCAL_ONLY,
         destination_trust=DestinationTrust.TRUSTED_EXTERNAL,
+        tool_trust=ToolTrust.TRUSTED_REGISTERED,
         local_available=True,
+        side_effect=True,
     )
     assert denied.decision is PolicyDecision.DENY
     assert denied.route == "MANUAL"
-    evidence = denied.as_evidence(task_id="task_test", run_id="run_test", actor_id="policy")
+    evidence = denied.as_evidence(
+        task_id="task_test", run_id="run_test", generation_revision=1,
+        actor_id="policy",
+    )
     assert evidence.status.value == "FAIL"
     assert evidence.metadata["decision"] == "DENY"
     assert "127.0.0.1" not in json.dumps(evidence.metadata)
@@ -356,15 +381,23 @@ def test_egress_policy_evidence_rejects_unbounded_or_secret_like_identity():
         classifications=[DataClassification.INTERNAL],
         execution_mode=ExecutionMode.LOCAL_ONLY,
         destination_trust=DestinationTrust.LOOPBACK,
+        tool_trust=ToolTrust.TRUSTED_REGISTERED,
         local_available=True,
+        side_effect=True,
     )
     for field in ("task_id", "run_id", "actor_id"):
-        values = {"task_id": "task_safe", "run_id": "run_safe", "actor_id": "actor_safe"}
+        values = {
+            "task_id": "task_safe", "run_id": "run_safe",
+            "generation_revision": 1, "actor_id": "actor_safe",
+        }
         values[field] = "secret_token_value"
         with pytest.raises(RuntimeBindingError, match="identity"):
             decision.as_evidence(**values)
     with pytest.raises(RuntimeBindingError, match="identity"):
-        decision.as_evidence(task_id="task_safe", run_id="run_safe", actor_id="A" * 129)
+        decision.as_evidence(
+            task_id="task_safe", run_id="run_safe", generation_revision=1,
+            actor_id="A" * 129,
+        )
 
 
 def test_local_endpoint_timeout_is_terminal_and_cleanup_remains_unverified() -> None:
@@ -416,6 +449,7 @@ def test_local_endpoint_denied_policy_is_terminal_and_safe() -> None:
             classification=DataClassification.RESTRICTED,
             execution_mode=ExecutionMode.LOCAL_ONLY,
             destination_trust=DestinationTrust.LOOPBACK,
+            tool_trust=ToolTrust.TRUSTED_REGISTERED,
             decision=PolicyDecision.DENY,
             route="MANUAL",
             reason="fixture_denied",
