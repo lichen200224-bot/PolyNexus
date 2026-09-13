@@ -120,12 +120,18 @@ class ControlledJob:
     Only exact retained handles can establish stop. No ambient process scan or
     PID-only takeover is supported. The caller supplies a bounded local runner.
     """
-    def __init__(self, argv, cwd):
-        import os,ctypes,subprocess
+    def __init__(self, argv, cwd, *, environment=None):
+        import hashlib, os,ctypes,subprocess,threading
         from pathlib import Path
         if os.name!='nt' or not Path(cwd).is_absolute():raise GenerationConflict('owned_job_unavailable')
         self.c=ctypes;self.handles=[];self.handle=None;self.root=None
         self._closed=False;self._cached_facts=[]
+        self.argv=tuple(str(value) for value in argv);self.cwd=str(Path(cwd))
+        self._environment=dict(environment or self._safe_environment(os.environ))
+        self._stdout_read=None;self._stderr_read=None;self._stdout=b'';self._stderr=b''
+        self._termination_signal='none'
+        self._stdout_thread=None;self._stderr_thread=None;self._output_error=False
+        self._hashlib=hashlib;self._os=os
         c=ctypes;U=c.c_uint32;P=c.c_void_p;Z=c.c_size_t;Q=c.c_uint64
         class Basic(c.Structure):
             _fields_=[('process_time',c.c_int64),('job_time',c.c_int64),('flags',U),('min_ws',Z),('max_ws',Z),('active_limit',U),('affinity',Z),('priority',U),('scheduling',U)]
@@ -143,6 +149,7 @@ class ControlledJob:
           'CreateJobObjectW':([P,c.c_wchar_p],P),
           'SetInformationJobObject':([P,c.c_int,P,U],c.c_int),
           'CreateProcessW':([c.c_wchar_p,c.c_wchar_p,P,P,c.c_int,U,P,c.c_wchar_p,P,P],c.c_int),
+          'CreatePipe':([P,P,P,U],c.c_int),'SetHandleInformation':([P,U,U],c.c_int),
           'AssignProcessToJobObject':([P,P],c.c_int),'ResumeThread':([P],U),
           'TerminateProcess':([P,U],c.c_int),'TerminateJobObject':([P,U],c.c_int),
           'WaitForSingleObject':([P,U],U),'CloseHandle':([P],c.c_int),
@@ -156,20 +163,52 @@ class ControlledJob:
         limits=Extended();limits.basic.flags=0x2000
         if not k.SetInformationJobObject(self.handle,9,c.byref(limits),c.sizeof(limits)):
             k.CloseHandle(self.handle);self.handle=None;raise GenerationConflict('owned_job_limits_failed')
-        startup=Startup();startup.cb=c.sizeof(startup);process=Process()
+        class SecurityAttributes(c.Structure):
+            _fields_=[('length',U),('descriptor',P),('inherit',c.c_int)]
+        security=SecurityAttributes(c.sizeof(SecurityAttributes),None,1)
+        stdout_read=P();stdout_write=P();stderr_read=P();stderr_write=P()
+        if not k.CreatePipe(c.byref(stdout_read),c.byref(stdout_write),c.byref(security),0):
+            k.CloseHandle(self.handle);self.handle=None;raise GenerationConflict('owned_stdout_pipe_failed')
+        if not k.CreatePipe(c.byref(stderr_read),c.byref(stderr_write),c.byref(security),0):
+            k.CloseHandle(stdout_read);k.CloseHandle(stdout_write);k.CloseHandle(self.handle);self.handle=None
+            raise GenerationConflict('owned_stderr_pipe_failed')
+        if not k.SetHandleInformation(stdout_read,1,0) or not k.SetHandleInformation(stderr_read,1,0):
+            k.CloseHandle(stdout_read);k.CloseHandle(stdout_write);k.CloseHandle(stderr_read);k.CloseHandle(stderr_write);k.CloseHandle(self.handle);self.handle=None
+            raise GenerationConflict('owned_pipe_inherit_failed')
+        self._stdout_read=int(stdout_read.value or 0);self._stderr_read=int(stderr_read.value or 0)
+        startup=Startup();startup.cb=c.sizeof(startup);startup.flags=0x100;startup.stdout=stdout_write;startup.stderr=stderr_write;process=Process()
+        environment_block=''.join(f'{key}={value}\0' for key,value in sorted(self._environment.items(),key=lambda item:item[0].upper()))+'\0'
+        environment_buffer=c.create_unicode_buffer(environment_block)
         try:
             command=c.create_unicode_buffer(subprocess.list2cmdline([str(x) for x in argv]))
-            if not k.CreateProcessW(str(argv[0]),command,None,None,False,0x08000004,None,str(cwd),c.byref(startup),c.byref(process)):
+            if not k.CreateProcessW(str(argv[0]),command,None,None,True,0x08000404,c.cast(environment_buffer,P),str(cwd),c.byref(startup),c.byref(process)):
                 raise GenerationConflict('owned_process_create_failed')
             try:
                 if not k.AssignProcessToJobObject(self.handle,process.process):raise GenerationConflict('owned_job_assignment_failed')
                 if k.ResumeThread(process.thread)==0xffffffff:raise GenerationConflict('owned_process_resume_failed')
                 self.root=(process.pid,process.process);self.handles.append(self.root)
+                self._stdout_thread=threading.Thread(target=self._drain_pipe,args=('_stdout_read','_stdout'),daemon=True)
+                self._stderr_thread=threading.Thread(target=self._drain_pipe,args=('_stderr_read','_stderr'),daemon=True)
+                self._stdout_thread.start();self._stderr_thread.start()
             except BaseException:
                 k.TerminateProcess(process.process,1);k.WaitForSingleObject(process.process,5000);k.CloseHandle(process.process);raise
-            finally:k.CloseHandle(process.thread)
+            finally:
+                k.CloseHandle(process.thread)
+                if stdout_write.value:
+                    k.CloseHandle(stdout_write);stdout_write.value=None
+                if stderr_write.value:
+                    k.CloseHandle(stderr_write);stderr_write.value=None
         except BaseException:
+            if stdout_write.value:k.CloseHandle(stdout_write)
+            if stderr_write.value:k.CloseHandle(stderr_write)
+            if self._stdout_read:k.CloseHandle(self._stdout_read);self._stdout_read=None
+            if self._stderr_read:k.CloseHandle(self._stderr_read);self._stderr_read=None
             k.CloseHandle(self.handle);self.handle=None;raise
+
+    @staticmethod
+    def _safe_environment(source):
+        names={'COMSPEC','PATHEXT','PATH','SYSTEMDRIVE','SYSTEMROOT','TEMP','TMP','WINDIR'}
+        return {name:value for name,value in source.items() if name in names}
 
     def retain_descendant(self,pid):
         # PID is only a lookup hint from the owned runner. Exact job membership
@@ -189,12 +228,17 @@ class ControlledJob:
         c=self.c;created=c.c_uint64();ended=c.c_uint64();kernel=c.c_uint64();user=c.c_uint64();code=c.c_uint32()
         if not self.k.GetProcessTimes(entry[1],c.byref(created),c.byref(ended),c.byref(kernel),c.byref(user)) or not self.k.GetExitCodeProcess(entry[1],c.byref(code)):
             raise GenerationConflict('owned_process_observation_failed')
-        return {'pid':entry[0],'retained_handle':int(entry[1]),'created_filetime':created.value,'ended_filetime':ended.value,'exit_code':code.value,'stopped':self.k.WaitForSingleObject(entry[1],0)==0}
+        return {'pid':entry[0],'retained_handle':int(entry[1]),'created_filetime':created.value,'ended_filetime':ended.value,'exit_code':code.value,'stopped':self.k.WaitForSingleObject(entry[1],0)==0,'argv':self.argv,'cwd':self.cwd,'signal':self._termination_signal}
 
     def facts(self):
         if self._closed:
             return list(self._cached_facts)
         self._cached_facts=[self._facts(entry) for entry in self.handles]
+        if self._cached_facts and all(bool(item['stopped']) for item in self._cached_facts):
+            stdout,stderr=self.output()
+            for item in self._cached_facts:
+                item['stdout_bytes']=len(stdout);item['stderr_bytes']=len(stderr)
+                item['stdout_sha256']=self._hashlib.sha256(stdout).hexdigest();item['stderr_sha256']=self._hashlib.sha256(stderr).hexdigest()
         return list(self._cached_facts)
 
     def stopped(self):
@@ -205,7 +249,9 @@ class ControlledJob:
 
     def stop(self,timeout=10):
         import time
-        if not self.stopped() and not self.k.TerminateJobObject(self.handle,1):raise GenerationConflict('owned_job_stop_failed')
+        if not self.stopped():
+            self._termination_signal='job_terminate'
+            if not self.k.TerminateJobObject(self.handle,1):raise GenerationConflict('owned_job_stop_failed')
         deadline=time.monotonic()+min(timeout,60)
         while not self.stopped():
             if time.monotonic()>=deadline:raise GenerationConflict('owned_job_stop_unverified')
@@ -220,3 +266,30 @@ class ControlledJob:
             for _,handle in self.handles:self.k.CloseHandle(handle)
             self.k.CloseHandle(self.handle);self.handle=None
         self._closed=True
+
+    def output(self):
+        if self._stdout_thread is None and self._stderr_thread is None:
+            return self._stdout,self._stderr
+        for thread in (self._stdout_thread,self._stderr_thread):
+            if thread is not None:thread.join(timeout=10)
+        if any(thread is not None and thread.is_alive() for thread in (self._stdout_thread,self._stderr_thread)) or self._output_error:
+            raise GenerationConflict('owned_output_observation_failed')
+        return self._stdout,self._stderr
+
+    def _drain_pipe(self,handle_field,value_field):
+        handle=getattr(self,handle_field)
+        setattr(self,handle_field,None)
+        if not handle:return
+        try:
+            import msvcrt
+            fd=msvcrt.open_osfhandle(handle,self._os.O_RDONLY|self._os.O_BINARY)
+            data=[];remaining=4*1024*1024
+            while True:
+                chunk=self._os.read(fd,65536)
+                if not chunk:break
+                if remaining>0:
+                    kept=chunk[:remaining];data.append(kept);remaining-=len(kept)
+            self._os.close(fd)
+            setattr(self,value_field,b''.join(data))
+        except (OSError,ValueError):
+            self._output_error=True

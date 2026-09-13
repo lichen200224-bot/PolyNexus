@@ -634,19 +634,41 @@ class ExecutionService:
         record,workspace_id=self._generations.prepare_workspace(run)
         from dataclasses import replace
         from polynexus_core.storage.content import ContentStore
+        from polynexus_core.domain.enums import AuthOwnership
+        from polynexus_core.runtime.external_contracts import create_projected_staging
         import os
+        import hashlib
         store=ContentStore(Path(os.environ["POLYNEXUS_CONTENT_ROOT"]))
         facts=dict(context.project_facts)
         if record['source']['repository']:
             managed_workspace = Path(os.environ['POLYNEXUS_WORK_ROOT']) / workspace_id
             facts['managed_workspace']=str(managed_workspace)
             # The target receives an explicit, per-generation allowlist.  The
-            # materialized worktree may contain the complete baseline, but an
-            # external executor may only write paths selected at capture time.
+            # internal managed worktree may contain the complete baseline, but
+            # an external runtime receives only a Core-created projection.
             import json as _json
             selected_paths=tuple(record['source'].get('selected', ()))
             facts['allowed_input_paths']=_json.dumps(selected_paths, separators=(',', ':'))
             facts['allowed_output_paths']=_json.dumps(selected_paths, separators=(',', ':'))
+            try:
+                runtime_managed = (
+                    supervisor._adapter.capabilities().auth_ownership
+                    is AuthOwnership.RUNTIME_MANAGED
+                )
+            except Exception:
+                runtime_managed = False
+            if runtime_managed:
+                staging_id = "staging_" + hashlib.sha256(
+                    f"{run.id}:{workspace_id}".encode("utf-8")
+                ).hexdigest()[:24]
+                projected = create_projected_staging(
+                    source_root=managed_workspace,
+                    staging_root=Path(os.environ['POLYNEXUS_WORK_ROOT']) / staging_id,
+                    allowed_inputs=selected_paths,
+                    allowed_outputs=selected_paths,
+                )
+                facts['projected_staging']=str(projected)
+                facts['workspace_scope_mode']='PROJECTED_STAGING'
         rendered=replace(context,instructions=(*context.instructions,store.read(record['requirements']['hash'],record['requirements']['size']).decode('utf-8'),store.read(record['validation']['hash'],record['validation']['size']).decode('utf-8')),project_facts=facts)
         supervisor._adapter=CleanupObservation(supervisor._adapter)
         operation=asyncio.current_task();active_operations.register(ref,run.id,operation)
@@ -688,15 +710,20 @@ class ExecutionService:
             ToolTrust,
             evaluate_egress_policy,
         )
-        from polynexus_core.domain.enums import ExecutionTarget, TransportKind
+        from polynexus_core.domain.enums import AuthOwnership, ExecutionTarget, TransportKind
         import json
         ref=WorkGenerationRef(run.task_id,run.generation_revision)
         record=self._generations.verify_inputs(run.task_id,json.loads(self._generations.get(ref)['inputs']))
+        provider_model_egress = profile.auth_ownership is AuthOwnership.RUNTIME_MANAGED
         destination = (
-            DestinationTrust.LOOPBACK
-            if profile.transport_kind is TransportKind.LOCAL
-            and profile.execution_target is ExecutionTarget.LOCAL
-            else DestinationTrust.UNTRUSTED_EXTERNAL
+            DestinationTrust.TRUSTED_EXTERNAL
+            if provider_model_egress
+            else (
+                DestinationTrust.LOOPBACK
+                if profile.transport_kind is TransportKind.LOCAL
+                and profile.execution_target is ExecutionTarget.LOCAL
+                else DestinationTrust.UNTRUSTED_EXTERNAL
+            )
         )
         tool_trust = (
             ToolTrust.TRUSTED_REGISTERED
@@ -798,11 +825,20 @@ class ExecutionService:
         path retains its sanitized FAILED mapping.
         """
         from polynexus_core.domain.enums import RunState
+        from polynexus_core.domain.enums import AuthOwnership
 
         stored=self._run_repo.get(run_id)
         self._generations.validate_run(stored.task_id,stored.generation_revision,stored.context_package_id)
         try:
-            return self._registry.create_adapter(profile)
+            required_capabilities = (
+                ("timeout_cleanup_verified",)
+                if profile.auth_ownership is AuthOwnership.RUNTIME_MANAGED
+                else ()
+            )
+            return self._registry.create_adapter(
+                profile,
+                required_capabilities=required_capabilities,
+            )
         except Exception:
             stored = self._run_repo.get(run_id)
             assert stored is not None

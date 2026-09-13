@@ -9,8 +9,10 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
+import os
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 import pytest
@@ -24,11 +26,13 @@ from polynexus_core.runtime.external_contracts import (
     EgressDisposition,
     ExecutionEnvelope,
     ExternalContractError,
+    create_projected_staging,
     make_envelope,
 )
 from polynexus_core.storage.content import ContentStore
 from polynexus_core.runtime.registry import build_default_registry
 from polynexus_core.runtime.supervisor import RunSupervisor
+from polynexus_core.workspace.ownership import ControlledJob
 
 
 class _FakeJob:
@@ -102,15 +106,27 @@ def _adapter(
     )
 
 
-def _context(repo: Path, *, paths: tuple[str, ...] = ("bug.py",)) -> ContextPackage:
+def _context(
+    repo: Path,
+    *,
+    paths: tuple[str, ...] = ("bug.py",),
+    output_paths: tuple[str, ...] | None = None,
+) -> ContextPackage:
+    outputs = output_paths or paths
+    staging = create_projected_staging(
+        source_root=repo,
+        staging_root=repo.parent / "projected-staging",
+        allowed_inputs=paths,
+        allowed_outputs=outputs,
+    )
     return ContextPackage(
         project_id="project_1",
         version=1,
         instructions=("Fix the failing synthetic test.",),
         project_facts={
-            "managed_workspace": str(repo),
+            "projected_staging": str(staging),
             "allowed_input_paths": json.dumps(paths),
-            "allowed_output_paths": json.dumps(paths),
+            "allowed_output_paths": json.dumps(outputs),
         },
     )
 
@@ -145,6 +161,8 @@ def test_envelope_is_immutable_and_scoped_to_allowlisted_paths(tmp_path: Path) -
         },
     )
     assert len(envelope.envelope_sha256) == 64
+    with pytest.raises(TypeError):
+        envelope.egress[EgressChannel.PROVIDER_MODEL] = EgressDisposition.DENY  # type: ignore[index]
     with pytest.raises(AttributeError):
         envelope.allowed_outputs = ("other.py",)  # type: ignore[misc]
     with pytest.raises(ExternalContractError, match="relative_path"):
@@ -242,7 +260,7 @@ def test_output_mutation_between_quiescence_reads_is_rejected(tmp_path: Path, mo
         calls += 1
         current = original(record)
         if calls == 1:
-            (repo / "bug.py").write_text("def answer():\n    return 43\n", encoding="utf-8")
+            (record.envelope.staging_root / "bug.py").write_text("def answer():\n    return 43\n", encoding="utf-8")
         return current
 
     monkeypatch.setattr(adapter, "_git_diff", changing)
@@ -254,6 +272,46 @@ def test_output_mutation_between_quiescence_reads_is_rejected(tmp_path: Path, mo
             await adapter.result(ref)
 
     asyncio.run(execute())
+
+
+def test_codex_adapter_separates_empty_inputs_from_approved_outputs(tmp_path: Path) -> None:
+    repo, content = _repo(tmp_path)
+    adapter = _adapter(repo, content)
+    task = _task()
+    adapter.bind_run_identity(run_id="run_5", task_id=task.id)
+
+    async def execute():
+        context = _context(repo, paths=(), output_paths=("bug.py",))
+        ref = await adapter.create_run(context)
+        await adapter.submit(ref, task)
+        result = await adapter.result(ref)
+        assert result.artifacts
+
+    asyncio.run(execute())
+
+
+def test_controlled_job_observes_output_and_excludes_unallowlisted_environment(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("POLYNEXUS_TEST_SECRET", "must-not-cross-child-boundary")
+    script = (
+        "import os,sys;"
+        "print('stdout-observed');"
+        "print('stderr-observed', file=sys.stderr);"
+        "print('secret-present' if 'POLYNEXUS_TEST_SECRET' in os.environ else 'secret-absent')"
+    )
+    job = ControlledJob([sys.executable, "-B", "-c", script], tmp_path)
+    deadline = time.monotonic() + 10
+    while not job.stopped():
+        assert time.monotonic() < deadline
+        time.sleep(0.01)
+    facts = job.facts()
+    stdout, stderr = job.output()
+    job.dispose()
+    assert facts and facts[0]["stopped"] is True
+    assert b"stdout-observed" in stdout
+    assert b"stderr-observed" in stderr
+    assert b"secret-absent" in stdout
 
 
 def test_supervisor_timeout_sets_target_terminal_state_and_verifies_cleanup(

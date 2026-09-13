@@ -13,10 +13,12 @@ import json
 import os
 import re
 import stat
+import subprocess
 from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
 from typing import Mapping
+from types import MappingProxyType
 
 
 class ExternalContractError(ValueError):
@@ -131,6 +133,98 @@ def _file_digest(root: Path, paths: tuple[str, ...]) -> str:
     return hashlib.sha256(_canonical(observations)).hexdigest()
 
 
+def _projection_git(staging_root: Path, *arguments: str) -> None:
+    """Run the bounded Core-owned Git setup for a projected staging root."""
+
+    safe_names = {
+        "GIT_CONFIG_GLOBAL": os.devnull,
+        "GIT_CONFIG_NOSYSTEM": "1",
+        "GIT_TERMINAL_PROMPT": "0",
+        "PATH": os.environ.get("PATH", ""),
+    }
+    for name in ("COMSPEC", "PATHEXT", "SYSTEMROOT", "TEMP", "TMP", "WINDIR"):
+        if name in os.environ:
+            safe_names[name] = os.environ[name]
+    result = subprocess.run(
+        [
+            "git",
+            "-c",
+            "user.name=PolyNexus projected staging",
+            "-c",
+            "user.email=runtime@invalid",
+            *arguments,
+        ],
+        cwd=staging_root,
+        env=safe_names,
+        capture_output=True,
+        check=False,
+        timeout=30,
+    )
+    if result.returncode != 0:
+        raise ExternalContractError("projected_staging_git_failed")
+
+
+def create_projected_staging(
+    *,
+    source_root: Path,
+    staging_root: Path,
+    allowed_inputs: tuple[str, ...],
+    allowed_outputs: tuple[str, ...],
+) -> Path:
+    """Create a new per-Run PROJECTED_STAGING Git workspace.
+
+    Only the explicitly selected input files are copied.  The projection gets
+    its own empty Git history so an external process cannot address the source
+    repository, its parent, or an unselected baseline path.  The source tree is
+    never modified.
+    """
+
+    source = _absolute_plain_directory(source_root, "source_root")
+    inputs = tuple(sorted({relative_path(item) for item in allowed_inputs}))
+    outputs = tuple(sorted({relative_path(item) for item in allowed_outputs}))
+    if not outputs:
+        raise ExternalContractError("output_allowlist_empty")
+    if not isinstance(staging_root, Path) or not staging_root.is_absolute():
+        raise ExternalContractError("projected_staging_invalid")
+    staging = staging_root.resolve(strict=False)
+    if staging.exists():
+        raise ExternalContractError("projected_staging_already_exists")
+    parent = _absolute_plain_directory(staging.parent, "projected_staging_parent")
+    if staging == source or not staging.is_relative_to(parent):
+        raise ExternalContractError("projected_staging_invalid")
+    staging.mkdir()
+    try:
+        for relative in tuple(sorted(set(inputs) | set(outputs))):
+            source_path = source / relative
+            if not source_path.exists():
+                continue
+            _plain(source_path)
+            before = source_path.stat()
+            if not stat.S_ISREG(before.st_mode):
+                raise ExternalContractError("projected_input_not_regular")
+            content = source_path.read_bytes()
+            after = source_path.stat()
+            if (before.st_dev, before.st_ino, before.st_size, before.st_mtime_ns) != (
+                after.st_dev,
+                after.st_ino,
+                after.st_size,
+                after.st_mtime_ns,
+            ):
+                raise ExternalContractError("projected_input_changed")
+            destination = staging / relative
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            with destination.open("xb") as stream:
+                stream.write(content)
+        _projection_git(staging, "init", "--quiet")
+        _projection_git(staging, "add", "--all")
+        _projection_git(staging, "commit", "--quiet", "--allow-empty", "-m", "Core projected baseline")
+    except Exception:
+        # Keep the exact partial staging for bounded recovery diagnostics.  It
+        # is a new Core-owned path and is never confused with source state.
+        raise
+    return staging
+
+
 def executable_digest(path: Path) -> str:
     """Read only the executable bytes needed for provenance; no config/secret."""
 
@@ -172,6 +266,13 @@ class ExecutionEnvelope:
     config_sources: tuple[str, ...]
     egress: Mapping[EgressChannel, EgressDisposition]
     input_manifest_sha256: str
+    workspace_scope_mode: str = "PROJECTED_STAGING"
+    effective_runtime_configuration_fingerprint: str = ""
+    permission_policy_fingerprint: str = ""
+    enabled_plugin_set: tuple[str, ...] = ("NONE",)
+    enabled_mcp_set: tuple[str, ...] = ("NONE",)
+    remote_skill_catalog_state: str = "NONE"
+    input_quiescence_manifest_sha256: str = ""
     envelope_sha256: str = ""
 
     def __post_init__(self) -> None:
@@ -185,8 +286,8 @@ class ExecutionEnvelope:
         staging = _absolute_plain_directory(self.staging_root, "staging_root")
         inputs = tuple(sorted({relative_path(item) for item in self.allowed_inputs}))
         outputs = tuple(sorted({relative_path(item) for item in self.allowed_outputs}))
-        if not set(inputs).issubset(set(outputs)):
-            raise ExternalContractError("input_allowlist_not_output_scoped")
+        if not outputs:
+            raise ExternalContractError("output_allowlist_empty")
         executable = self.executable_path.resolve(strict=False)
         digest = self.executable_sha256
         if not isinstance(digest, str) or not _SHA256.fullmatch(digest):
@@ -197,6 +298,16 @@ class ExecutionEnvelope:
             raise ExternalContractError("input_manifest_invalid")
         arguments = _argument_tuple(self.arguments)
         sources = tuple(sorted(_identifier(value, "config_source") for value in self.config_sources))
+        if self.workspace_scope_mode != "PROJECTED_STAGING":
+            raise ExternalContractError("workspace_scope_mode_invalid")
+        plugins = tuple(sorted(str(value) for value in self.enabled_plugin_set))
+        mcps = tuple(sorted(str(value) for value in self.enabled_mcp_set))
+        if not plugins or not mcps or any(not value for value in (*plugins, *mcps)):
+            raise ExternalContractError("runtime_configuration_set_invalid")
+        if self.remote_skill_catalog_state != "NONE" and not _SHA256.fullmatch(
+            self.remote_skill_catalog_state
+        ):
+            raise ExternalContractError("runtime_skill_catalog_invalid")
         egress = dict(self.egress)
         if set(egress) != set(EgressChannel):
             raise ExternalContractError("egress_channels_incomplete")
@@ -204,13 +315,50 @@ class ExecutionEnvelope:
             raise ExternalContractError("egress_policy_invalid")
         if not executable.is_absolute():
             raise ExternalContractError("executable_path_invalid")
+        config_fingerprint = self.effective_runtime_configuration_fingerprint or hashlib.sha256(
+            _canonical(
+                {
+                    "arguments": arguments,
+                    "config_sources": sources,
+                    "enabled_mcp_set": mcps,
+                    "enabled_plugin_set": plugins,
+                    "remote_skill_catalog_state": self.remote_skill_catalog_state,
+                    "workspace_scope_mode": self.workspace_scope_mode,
+                }
+            )
+        ).hexdigest()
+        permission_fingerprint = self.permission_policy_fingerprint or hashlib.sha256(
+            _canonical(
+                {
+                    "allowed_inputs": inputs,
+                    "allowed_outputs": outputs,
+                    "egress": {key.value: value.value for key, value in egress.items()},
+                }
+            )
+        ).hexdigest()
+        for field, value in (
+            ("effective_runtime_configuration_fingerprint", config_fingerprint),
+            ("permission_policy_fingerprint", permission_fingerprint),
+        ):
+            if not _SHA256.fullmatch(value):
+                raise ExternalContractError(f"{field}_invalid")
+        quiescence_manifest = self.input_quiescence_manifest_sha256 or _file_digest(
+            staging, tuple(path for path in inputs if path not in outputs)
+        )
+        if not _SHA256.fullmatch(quiescence_manifest):
+            raise ExternalContractError("input_quiescence_manifest_invalid")
         object.__setattr__(self, "staging_root", staging)
         object.__setattr__(self, "allowed_inputs", inputs)
         object.__setattr__(self, "allowed_outputs", outputs)
         object.__setattr__(self, "executable_path", executable)
         object.__setattr__(self, "arguments", arguments)
         object.__setattr__(self, "config_sources", sources)
-        object.__setattr__(self, "egress", egress)
+        object.__setattr__(self, "egress", MappingProxyType(egress))
+        object.__setattr__(self, "enabled_plugin_set", plugins)
+        object.__setattr__(self, "enabled_mcp_set", mcps)
+        object.__setattr__(self, "effective_runtime_configuration_fingerprint", config_fingerprint)
+        object.__setattr__(self, "permission_policy_fingerprint", permission_fingerprint)
+        object.__setattr__(self, "input_quiescence_manifest_sha256", quiescence_manifest)
         expected = self._fingerprint_payload()
         fingerprint = hashlib.sha256(_canonical(expected)).hexdigest()
         if self.envelope_sha256 and self.envelope_sha256 != fingerprint:
@@ -231,7 +379,14 @@ class ExecutionEnvelope:
             "arguments": self.arguments,
             "config_sources": self.config_sources,
             "egress": {key.value: value.value for key, value in self.egress.items()},
+            "workspace_scope_mode": self.workspace_scope_mode,
+            "effective_runtime_configuration_fingerprint": self.effective_runtime_configuration_fingerprint,
+            "permission_policy_fingerprint": self.permission_policy_fingerprint,
+            "enabled_plugin_set": self.enabled_plugin_set,
+            "enabled_mcp_set": self.enabled_mcp_set,
+            "remote_skill_catalog_state": self.remote_skill_catalog_state,
             "input_manifest_sha256": self.input_manifest_sha256,
+            "input_quiescence_manifest_sha256": self.input_quiescence_manifest_sha256,
         }
 
     def verify_staging(self) -> None:
@@ -240,8 +395,13 @@ class ExecutionEnvelope:
         current = _absolute_plain_directory(self.staging_root, "staging_root")
         if current != self.staging_root:
             raise ExternalContractError("staging_identity_changed")
+        if self.workspace_scope_mode != "PROJECTED_STAGING" or not (self.staging_root / ".git").exists():
+            raise ExternalContractError("projected_staging_required")
         if executable_digest(self.executable_path) != self.executable_sha256:
             raise ExternalContractError("executable_identity_changed")
+        expected = hashlib.sha256(_canonical(self._fingerprint_payload())).hexdigest()
+        if expected != self.envelope_sha256:
+            raise ExternalContractError("envelope_identity_changed")
 
     def current_input_manifest(self) -> str:
         self.verify_staging()
@@ -250,7 +410,11 @@ class ExecutionEnvelope:
     def assert_quiescent_input(self) -> None:
         """Reject a changed input observation rather than importing stale output."""
 
-        if self.current_input_manifest() != self.input_manifest_sha256:
+        current = _file_digest(
+            self.staging_root,
+            tuple(path for path in self.allowed_inputs if path not in self.allowed_outputs),
+        )
+        if current != self.input_quiescence_manifest_sha256:
             raise ExternalContractError("input_manifest_changed")
 
 

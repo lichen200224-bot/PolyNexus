@@ -311,7 +311,13 @@ class RuntimeRegistry:
         factory = self._factories.get(profile.adapter_id)
         assert factory is not None
         adapter = factory()
-        _validate_adapter_compatibility(profile, adapter, required_capabilities)
+        required = tuple(required_capabilities)
+        if (
+            profile.auth_ownership is AuthOwnership.RUNTIME_MANAGED
+            and "timeout_cleanup_verified" not in required
+        ):
+            required = (*required, "timeout_cleanup_verified")
+        _validate_adapter_compatibility(profile, adapter, required)
         return adapter
 
     def _create_adapter_for_observation(self, profile: RuntimeProfile) -> RuntimeAdapter:

@@ -9,6 +9,7 @@ and an allowlisted Git diff is observed and copied into Core-owned storage.
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import json
 import os
 import re
@@ -107,6 +108,12 @@ class _CodexRun:
     cleanup_verified: bool = False
     result: RuntimeResult | None = None
     artifacts: tuple[Artifact, ...] = ()
+    argv: tuple[str, ...] = ()
+    cwd: str = ""
+    process_facts: tuple[dict[str, object], ...] = ()
+    stdout: bytes = b""
+    stderr: bytes = b""
+    prompt_sha256: str = ""
 
 
 class CodexExecRuntimeAdapter:
@@ -117,13 +124,13 @@ class CodexExecRuntimeAdapter:
         *,
         executable: Path | None = None,
         content_root: Path | None = None,
-        job_factory: Callable[[list[str], Path], object] = ControlledJob,
+        job_factory: Callable[[list[str], Path], object] | None = None,
         version_probe: Callable[[Path], str] = probe_codex_version,
     ) -> None:
         self._executable = (executable or resolve_codex_executable()).resolve(strict=True)
         self._version_probe = version_probe
         self._content_root = content_root
-        self._job_factory = job_factory
+        self._job_factory = job_factory or self._managed_job_factory
         self._runs: dict[str, _CodexRun] = {}
         self._run_id: str | None = None
         self._task_id: str | None = None
@@ -173,9 +180,9 @@ class CodexExecRuntimeAdapter:
             raise ExternalContractError("binding_identity_missing")
         version = self._probe()
         facts = dict(context.project_facts)
-        workspace_value = facts.get("managed_workspace")
+        workspace_value = facts.get("projected_staging")
         if not isinstance(workspace_value, str) or not workspace_value:
-            raise ExternalContractError("managed_workspace_required")
+            raise ExternalContractError("projected_staging_required")
         input_value = facts.get("allowed_input_paths", "[]")
         output_value = facts.get("allowed_output_paths", input_value)
         try:
@@ -183,8 +190,8 @@ class CodexExecRuntimeAdapter:
             allowed_outputs = tuple(json.loads(output_value))
         except (TypeError, ValueError, json.JSONDecodeError) as exc:
             raise ExternalContractError("allowlist_invalid") from exc
-        if not allowed_inputs or not allowed_outputs:
-            raise ExternalContractError("allowlist_empty")
+        if not allowed_outputs:
+            raise ExternalContractError("output_allowlist_empty")
         project_id = context.project_id
         envelope = make_envelope(
             run_id=self._run_id,
@@ -225,6 +232,7 @@ class CodexExecRuntimeAdapter:
         if task.id != record.task_id or task.project_id != record.project_id:
             raise ExternalContractError("codex_task_scope_invalid")
         record.envelope.verify_staging()
+        record.envelope.assert_quiescent_input()
         prompt = self._prompt(record, task)
         argv = [
             str(record.envelope.executable_path),
@@ -233,6 +241,9 @@ class CodexExecRuntimeAdapter:
             str(record.envelope.staging_root),
             prompt,
         ]
+        record.argv = tuple(argv)
+        record.cwd = str(record.envelope.staging_root)
+        record.prompt_sha256 = hashlib.sha256(prompt.encode("utf-8")).hexdigest()
         try:
             record.job = self._job_factory(argv, record.envelope.staging_root)
         except Exception as exc:
@@ -260,12 +271,14 @@ class CodexExecRuntimeAdapter:
             raise ExternalContractError("codex_result_unavailable")
         while not bool(record.job.stopped()):
             await asyncio.sleep(0.05)
+        self._observe_job(record)
         record.exit_code = self._exit_code(record)
         if record.exit_code != 0:
             record.state = RunState.FAILED
             raise ExternalContractError("codex_process_failed")
         try:
             record.envelope.verify_staging()
+            record.envelope.assert_quiescent_input()
             diff, source_after_manifest = self._stable_allowlisted_diff(record)
             if not diff:
                 raise ExternalContractError("allowlisted_source_change_missing")
@@ -292,10 +305,27 @@ class CodexExecRuntimeAdapter:
                 artifact_refs=(artifact.id,),
                 metadata={
                     "envelope_sha256": record.envelope.envelope_sha256,
+                    "workspace_scope_mode": record.envelope.workspace_scope_mode,
+                    "effective_runtime_configuration_fingerprint": record.envelope.effective_runtime_configuration_fingerprint,
+                    "permission_policy_fingerprint": record.envelope.permission_policy_fingerprint,
+                    "enabled_plugin_set": json.dumps(record.envelope.enabled_plugin_set, separators=(",", ":")),
+                    "enabled_mcp_set": json.dumps(record.envelope.enabled_mcp_set, separators=(",", ":")),
+                    "remote_skill_catalog_state": record.envelope.remote_skill_catalog_state,
                     "executable_sha256": record.envelope.executable_sha256,
                     "executable_version": record.envelope.executable_version,
                     "exit_code": str(record.exit_code),
-                    "cwd_scope": "managed-workspace",
+                    "argv_json": json.dumps(self._safe_argv(record), ensure_ascii=False, separators=(",", ":")),
+                    "cwd": record.cwd,
+                    "cwd_scope": record.envelope.workspace_scope_mode,
+                    "process_facts_json": json.dumps(self._safe_process_facts(record), sort_keys=True, separators=(",", ":")),
+                    "prompt_sha256": record.prompt_sha256,
+                    "stdout_sha256": hashlib.sha256(record.stdout).hexdigest(),
+                    "stderr_sha256": hashlib.sha256(record.stderr).hexdigest(),
+                    "stdout_bytes": str(len(record.stdout)),
+                    "stderr_bytes": str(len(record.stderr)),
+                    "signal": str(record.process_facts[0].get("signal", "unknown"))
+                    if record.process_facts else "unknown",
+                    "auth_ownership": AuthOwnership.RUNTIME_MANAGED.value,
                     "provider_model_egress": EgressDisposition.RUNTIME_MANAGED.value,
                     "agent_extension_egress": EgressDisposition.DENY.value,
                     "source_change": "allowlisted-diff-observed",
@@ -349,6 +379,7 @@ class CodexExecRuntimeAdapter:
             stopped = bool(record.job.stopped())
             if not stopped:
                 return False
+            self._observe_job(record)
             facts = tuple(record.job.facts())
             if not facts or not all(bool(item.get("stopped")) for item in facts):
                 return False
@@ -399,6 +430,7 @@ class CodexExecRuntimeAdapter:
 
     def _stable_allowlisted_diff(self, record: _CodexRun) -> tuple[bytes, str]:
         record.envelope.verify_staging()
+        record.envelope.assert_quiescent_input()
         first = self._git_diff(record)
         first_status = self._git_status_paths(record, allowlisted_only=False)
         if not first:
@@ -407,6 +439,7 @@ class CodexExecRuntimeAdapter:
             raise ExternalContractError("output_path_not_allowlisted")
         second = self._git_diff(record)
         second_status = self._git_status_paths(record, allowlisted_only=False)
+        record.envelope.assert_quiescent_input()
         if first != second or first_status != second_status:
             raise ExternalContractError("output_changed_during_import")
         if len(first) > _MAX_DIFF_BYTES:
@@ -482,12 +515,61 @@ class CodexExecRuntimeAdapter:
     @staticmethod
     def _exit_code(record: _CodexRun) -> int:
         try:
-            facts = tuple(record.job.facts()) if record.job is not None else ()
+            facts = record.process_facts or (tuple(record.job.facts()) if record.job is not None else ())
             if not facts:
                 raise ExternalContractError("codex_exit_observation_missing")
             return int(facts[0]["exit_code"])
         except (KeyError, TypeError, ValueError) as exc:
             raise ExternalContractError("codex_exit_observation_invalid") from exc
+
+    @staticmethod
+    def _observe_job(record: _CodexRun) -> None:
+        if record.job is None:
+            raise ExternalContractError("codex_process_observation_missing")
+        try:
+            record.process_facts = tuple(record.job.facts())
+            output = getattr(record.job, "output", None)
+            if callable(output):
+                stdout, stderr = output()
+                record.stdout = bytes(stdout)
+                record.stderr = bytes(stderr)
+        except Exception as exc:
+            raise ExternalContractError("codex_process_observation_invalid") from exc
+
+    @staticmethod
+    def _safe_argv(record: _CodexRun) -> tuple[str, ...]:
+        values = list(record.argv)
+        if values:
+            values[-1] = f"<prompt-sha256:{record.prompt_sha256}>"
+        return tuple(values)
+
+    @classmethod
+    def _safe_process_facts(cls, record: _CodexRun) -> tuple[dict[str, object], ...]:
+        safe: list[dict[str, object]] = []
+        for fact in record.process_facts:
+            item = dict(fact)
+            item["argv"] = cls._safe_argv(record)
+            safe.append(item)
+        return tuple(safe)
+
+    def _managed_job_factory(self, argv: list[str], cwd: Path) -> object:
+        return ControlledJob(argv, cwd, environment=self._executor_environment())
+
+    @staticmethod
+    def _executor_environment() -> dict[str, str]:
+        """Return the explicit non-secret environment given to the child."""
+
+        names = {
+            "COMSPEC",
+            "PATHEXT",
+            "PATH",
+            "SYSTEMDRIVE",
+            "SYSTEMROOT",
+            "TEMP",
+            "TMP",
+            "WINDIR",
+        }
+        return {name: value for name, value in os.environ.items() if name in names}
 
     def _get(self, runtime_ref: str) -> _CodexRun:
         try:
