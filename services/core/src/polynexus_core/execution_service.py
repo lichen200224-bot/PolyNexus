@@ -15,6 +15,9 @@ from pathlib import Path
 from typing import Sequence
 
 from sqlalchemy.orm import Session
+from polynexus_core.domain.generation import WorkGenerationRef,GenerationConflict
+from polynexus_core.persistence.generation import GenerationRepository
+from polynexus_core.workspace.ownership import OwnedProcessRegistry,active_operations,CleanupObservation
 
 from polynexus_core.errors import (
     ClaimConflictError,
@@ -87,6 +90,8 @@ class ExecutionService:
 
     def __init__(self, session: Session, registry: RuntimeRegistry | None = None) -> None:
         self._session = session
+        self._generations = GenerationRepository(session)
+        self._owned_processes = OwnedProcessRegistry()
         self._project_repo: ProjectRepository = SqlProjectRepository(session)
         self._task_repo: TaskRepository = SqlTaskRepository(session)
         self._cp_repo: ContextPackageRepository = SqlContextPackageRepository(session)
@@ -145,6 +150,10 @@ class ExecutionService:
             # the CREATED Run untouched. The rollback guard also covers callers
             # that flushed that identity in a larger transaction.
             profile = self._registry._resolve_selected_profile()
+            self._generations.validate_run(run.task_id,run.generation_revision,run.context_package_id)
+            self._check_policy(run,profile)
+            claim=self._generations.claim_run(run)
+            if not claim["new_claim"]:raise ClaimConflictError("Generation was already claimed")
             if not self._run_repo.claim_for_execution(run.id):
                 raise ClaimConflictError(
                     f"Run {run.id} is not in CREATED state (current: {run.state.value})"
@@ -212,7 +221,7 @@ class ExecutionService:
         )
         supervisor = RunSupervisor(adapter)
         execution = self._sanitize_execution(
-            await self._execute_with_cancellation_persistence(supervisor, run, task, context, workflow)
+            await self._execute_generation(supervisor, run, task, context, workflow)
         )
 
         self._run_repo.update(execution.run)
@@ -253,7 +262,7 @@ class ExecutionService:
         self._session.commit()
         return self._sanitize_execution(execution)
 
-    async def execute_task(self, task_id: str) -> RunExecution:
+    async def execute_task(self, task_id: str, *, generation_revision: int | None = None) -> RunExecution:
         """Execute a task through RunSupervisor and persist all results.
 
         Binding-first transaction boundary (PRE-WP14-B):
@@ -291,6 +300,8 @@ class ExecutionService:
         # 2. Load WorkflowDefinition from builtin YAML
         workflow = self._load_workflow(task.workflow_id, task.workflow_version)
 
+        self._generations.validate_run(task.id,generation_revision,context.id)
+
         # 2b. Resolve the RuntimeProfile via the Registry — fail closed before
         # any Run identity or adapter work happens.
         profile = self._registry._resolve_selected_profile()
@@ -305,8 +316,11 @@ class ExecutionService:
             workflow_id=workflow.id,
             workflow_version=workflow.version,
             context_package_id=context.id,
+            generation_revision=generation_revision,
         )
+        self._check_policy(run,profile)
         self._run_repo.add(run)
+        self._generations.claim_run(run)
         # Claim the freshly created Run identity (CREATED -> STARTING) inside
         # the same binding-first transaction.
         if not self._run_repo.claim_for_execution(run.id):
@@ -339,7 +353,7 @@ class ExecutionService:
         assert stored_run is not None
 
         execution = self._sanitize_execution(
-            await self._execute_with_cancellation_persistence(supervisor, stored_run, task, context, workflow)
+            await self._execute_generation(supervisor, stored_run, task, context, workflow)
         )
 
         # 5. Persist runtime outputs. The Run identity was already persisted
@@ -453,6 +467,12 @@ class ExecutionService:
         # runtime adapter is invoked. Any failure rolls back the whole
         # transaction — no claimed Run without a binding snapshot can exist,
         # and no adapter is started after a rollback.
+        from polynexus_core.domain.enums import RunState
+        if run.state is not RunState.CREATED:raise ClaimConflictError("Run is not in CREATED state")
+        self._generations.validate_run(run.task_id,run.generation_revision,run.context_package_id)
+        self._check_policy(run,profile)
+        generation_claim=self._generations.claim_run(run)
+        if not generation_claim["new_claim"]:raise ClaimConflictError("Generation was already claimed")
         claimed = self._run_repo.claim_for_execution(run_id)
         if not claimed:
             raise ClaimConflictError(
@@ -497,7 +517,7 @@ class ExecutionService:
         # and returns RunExecution with result=None on failure.
         # Programmer/domain validation errors (ValueError) propagate to caller.
         execution = self._sanitize_execution(
-            await self._execute_with_cancellation_persistence(supervisor, run, task, context, workflow)
+            await self._execute_generation(supervisor, run, task, context, workflow)
         )
 
         # --- Phase 4: Persist runtime outputs ---
@@ -558,6 +578,48 @@ class ExecutionService:
 
         return self._sanitize_execution(execution)
 
+    async def _execute_generation(self,supervisor,run,task,context,workflow):
+        from polynexus_core.security.secret_refs import secret_dispatch_scope,SecretStoreError
+        import json
+        ref=WorkGenerationRef(run.task_id,run.generation_revision)
+        record=self._generations.verify_inputs(run.task_id,json.loads(self._generations.get(ref)['inputs']))
+        try:
+            with secret_dispatch_scope(record.get('secret_ref')):
+                return self._sanitize_execution(await self._execute_generation_owned(supervisor,run,task,context,workflow))
+        except SecretStoreError:
+            self._generations.mark_unknown(run,'secret_reference_unavailable');self._session.commit()
+            raise GenerationConflict('secret_reference_unavailable') from None
+
+    async def _execute_generation_owned(
+        self, supervisor: RunSupervisor, run: Run, task: Task,
+        context: ContextPackage, workflow: WorkflowDefinition,
+    ) -> RunExecution:
+        ref=self._generations.validate_run(run.task_id,run.generation_revision,run.context_package_id)
+        claim=self._generations.bound_claim(run)
+        record,workspace_id=self._generations.prepare_workspace(run)
+        from dataclasses import replace
+        from polynexus_core.storage.content import ContentStore
+        import os
+        store=ContentStore(Path(os.environ["POLYNEXUS_CONTENT_ROOT"]))
+        facts=dict(context.project_facts)
+        if record['source']['repository']:facts['managed_workspace']=str(Path(os.environ['POLYNEXUS_WORK_ROOT'])/workspace_id)
+        rendered=replace(context,instructions=(*context.instructions,store.read(record['requirements']['hash'],record['requirements']['size']).decode('utf-8'),store.read(record['validation']['hash'],record['validation']['size']).decode('utf-8')),project_facts=facts)
+        supervisor._adapter=CleanupObservation(supervisor._adapter)
+        operation=asyncio.current_task();active_operations.register(ref,run.id,operation)
+        try:
+            return await self._execute_with_cancellation_persistence(supervisor,run,task,rendered,workflow)
+        finally:
+            stopped=await self._owned_processes.cleanup_adapter(ref,run.id,claim['fence'],supervisor._adapter,run.runtime_ref)
+            active_operations.unregister(ref,run.id,operation)
+            self._run_repo.update(run);self._session.flush()
+            self._generations._fact(ref,'CleanupObserved',details={'run_id':run.id,'fence':claim['fence'],'verified':stopped})
+            if not stopped:
+                self._generations.mark_unknown(run,'cleanup_unconfirmed')
+            elif run.generation_parent_run_id is None:
+                try:self._generations.close(ref,run_id=run.id,fence=claim['fence'],owned_processes=self._owned_processes)
+                except GenerationConflict:self._generations.mark_unknown(run,'writer_stop_unverified')
+            self._session.commit()
+
     async def _execute_with_cancellation_persistence(
         self, supervisor: RunSupervisor, run: Run, task: Task,
         context: ContextPackage, workflow: WorkflowDefinition,
@@ -565,7 +627,6 @@ class ExecutionService:
         try:
             return await supervisor.execute_claimed_run(run, task, context, workflow)
         except asyncio.CancelledError:
-            # Persist only the Supervisor-owned Run and events, never outputs.
             try:
                 sanitize_run(run)
                 self._run_repo.update(run)
@@ -574,6 +635,18 @@ class ExecutionService:
                 self._session.rollback()
                 raise
             raise
+
+    def _check_policy(self,run,profile):
+        from polynexus_core.runtime.routing_policy import evaluate_egress_policy,DestinationTrust,PolicyDecision
+        from polynexus_core.domain.enums import TransportKind
+        import json
+        ref=WorkGenerationRef(run.task_id,run.generation_revision)
+        record=self._generations.verify_inputs(run.task_id,json.loads(self._generations.get(ref)['inputs']))
+        destination=DestinationTrust.LOOPBACK if profile.transport_kind is TransportKind.LOCAL else DestinationTrust.UNTRUSTED_EXTERNAL
+        from polynexus_core.persistence.repository import SqlProjectRepository
+        task=self._task_repo.get(run.task_id);project=SqlProjectRepository(self._session).get(task.project_id)
+        decision=evaluate_egress_policy(classifications=[record['classification'],task.classification,project.classification],execution_mode=record.get('execution_mode','STANDARD'),destination_trust=destination,local_available=destination is DestinationTrust.LOOPBACK,side_effect=False)
+        if decision.decision is not PolicyDecision.ALLOW:raise GenerationConflict('predispatch_policy_denied')
 
     @staticmethod
     def _sanitize_execution(execution: RunExecution) -> RunExecution:
@@ -615,6 +688,9 @@ class ExecutionService:
         """
         from polynexus_core.domain.enums import RunState
 
+        stored=self._run_repo.get(run_id)
+        self._generations.validate_run(stored.task_id,stored.generation_revision,stored.context_package_id)
+        self._check_policy(stored,profile)
         try:
             return self._registry.create_adapter(profile)
         except Exception:

@@ -111,6 +111,7 @@ def _seed_legacy_history(db_path: Path) -> None:
                 "'[]', '{}', '2026-09-01 00:00:04.000000')"
             )
         )
+        connection.exec_driver_sql("INSERT INTO context_packages(id,project_id,version,created_at) VALUES('cp-wp23','proj-wp23',1,'2026-01-01')")
     engine.dispose()
 
 
@@ -127,7 +128,7 @@ def test_backup_restore_round_trip_preserves_legacy_history(tmp_path: Path) -> N
     assert receipt.size_bytes > 0
     assert len(receipt.sha256) == 64
 
-    _upgrade(db_path, "head")
+    _upgrade(db_path, "0003")
     assert _version(db_path) == "0003"
     assert _history(db_path) == before
 
@@ -140,7 +141,7 @@ def test_backup_restore_round_trip_preserves_legacy_history(tmp_path: Path) -> N
     assert _version(db_path) == "0001"
     assert _history(db_path) == before
 
-    _upgrade(db_path, "head")
+    _upgrade(db_path, "0003")
     assert _version(db_path) == "0003"
     assert _history(db_path) == before
     engine = create_engine(f"sqlite:///{db_path}", future=True)

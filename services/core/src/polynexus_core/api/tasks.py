@@ -31,6 +31,7 @@ def _task_to_response(t: Task) -> TaskResponse:
         mode=t.mode.value,
         context_package_id=t.context_package_id,
         created_at=t.created_at,
+        classification=t.classification,
     )
 
 
@@ -81,6 +82,7 @@ def create_task(
 
     task = Task(
         project_id=project_id,
+        classification=body.classification,
         title=body.title,
         workflow_id=body.workflow_id,
         workflow_version=body.workflow_version,

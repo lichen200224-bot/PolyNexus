@@ -14,6 +14,7 @@ import asyncio
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+from d1a_fixtures import d1a_content_environment,prepare_generation,migrate_fixture_engine
 import pytest
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
@@ -69,7 +70,7 @@ def db_engine(tmp_path: Path):
         connect_args={"check_same_thread": False},
         future=True,
     )
-    Base.metadata.create_all(engine)
+    migrate_fixture_engine(engine)
     yield engine
     engine.dispose()
 
@@ -94,7 +95,7 @@ def _seed_run(session: Session, state: RunState = RunState.CREATED) -> Run:
     run_repo = SqlRunRepository(session)
 
     project = Project(name="WP14B")
-    cp = ContextPackage(project_id=project.id, version=1, source_refs=("fixture:wp14b",))
+    cp = ContextPackage(project_id=project.id, version=1, instructions=("fixture:wp14b",))
     task = Task(
         project_id=project.id,
         title="runtime binding task",
@@ -112,6 +113,7 @@ def _seed_run(session: Session, state: RunState = RunState.CREATED) -> Run:
     project_repo.add(project)
     cp_repo.add(cp)
     task_repo.add(task)
+    run.generation_revision=prepare_generation(session,task.id)
     run_repo.add(run)
     session.commit()
     return run
@@ -708,7 +710,7 @@ def test_execute_task_creates_snapshot(db_session) -> None:
     run = _seed_run(db_session)
     service = _make_service(db_session)
 
-    execution = asyncio.run(service.execute_task(run.task_id))
+    execution = asyncio.run(service.execute_task(run.task_id, generation_revision=1))
 
     binding_repo = SqlRuntimeBindingSnapshotRepository(db_session)
     snapshot = binding_repo.get_by_run(execution.run.id)
@@ -736,6 +738,7 @@ def test_execute_existing_run_lifecycle_unchanged(db_session) -> None:
 # ---------------------------------------------------------------------------
 
 _LEGACY_SEED_STATEMENTS = [
+    "INSERT INTO context_packages(id,project_id,version,created_at) VALUES('cp-none','proj-legacy',1,'2026-01-01')",
     "INSERT INTO projects (id, name, description, created_at) "
     "VALUES ('proj-legacy', 'Legacy', NULL, '2026-08-20 10:00:00.000000')",
     "INSERT INTO tasks (id, project_id, title, workflow_id, workflow_version, mode, "
@@ -786,7 +789,7 @@ def migration_db(tmp_path: Path):
         f"sqlite:///{db_path}", connect_args={"check_same_thread": False}, future=True
     )
     with raw.begin() as conn:
-        for statement in _LEGACY_SEED_STATEMENTS:
+        for statement in [*_LEGACY_SEED_STATEMENTS[1:2], _LEGACY_SEED_STATEMENTS[0], *_LEGACY_SEED_STATEMENTS[2:]]:
             conn.execute(text(statement))
     raw.dispose()
 
@@ -831,7 +834,7 @@ def test_migration_downgrade_preserves_history_and_reupgrade_identical(migration
     from alembic import command as alembic_cmd
 
     db_path, config = migration_db
-    alembic_cmd.upgrade(config, "head")
+    alembic_cmd.upgrade(config, "0003")
 
     engine = create_engine(
         f"sqlite:///{db_path}", connect_args={"check_same_thread": False}, future=True
@@ -872,7 +875,7 @@ def test_migration_downgrade_preserves_history_and_reupgrade_identical(migration
     engine2.dispose()
 
     # Re-upgrade produces identical legacy bindings.
-    alembic_cmd.upgrade(config, "head")
+    alembic_cmd.upgrade(config, "0003")
     engine3 = create_engine(
         f"sqlite:///{db_path}", connect_args={"check_same_thread": False}, future=True
     )
@@ -897,7 +900,8 @@ def test_migration_installs_run_delete_guard_and_fails_closed(migration_db) -> N
     downgrade removes it together with 0002 artifacts; re-upgrade restores
     both the legacy backfill and the guard trigger."""
     from alembic import command as alembic_cmd
-    from polynexus_core.persistence.models import RunRow
+    from sqlalchemy import MetaData
+    from sqlalchemy.orm import registry, relationship
 
     def _sqlite_names(engine):
         rows = engine.connect().exec_driver_sql(
@@ -907,11 +911,23 @@ def test_migration_installs_run_delete_guard_and_fails_closed(migration_db) -> N
                 "trigger": {r[1] for r in rows if r[0] == "trigger"}}
 
     db_path, config = migration_db
-    alembic_cmd.upgrade(config, "head")
+    alembic_cmd.upgrade(config, "0003")
 
     engine = create_engine(
         f"sqlite:///{db_path}", connect_args={"check_same_thread": False}, future=True
     )
+    # This oracle deliberately targets historical 0003, before D1a columns.
+    historical = MetaData()
+    historical.reflect(bind=engine, only=["runs", "run_events"])
+    mapper = registry()
+    class RunRow:
+        pass
+    class EventRow:
+        pass
+    mapper.map_imperatively(RunRow, historical.tables["runs"], properties={
+        "events": relationship(EventRow, back_populates="run")})
+    mapper.map_imperatively(EventRow, historical.tables["run_events"], properties={
+        "run": relationship(RunRow, back_populates="events")})
     Session = sessionmaker(bind=engine, expire_on_commit=False, future=True)
     session = Session()
 
@@ -980,7 +996,7 @@ def test_migration_installs_run_delete_guard_and_fails_closed(migration_db) -> N
     engine_down.dispose()
 
     # Re-upgrade rebuilds the deterministic legacy backfill AND the guard.
-    alembic_cmd.upgrade(config, "head")
+    alembic_cmd.upgrade(config, "0003")
     engine_up = create_engine(
         f"sqlite:///{db_path}", connect_args={"check_same_thread": False}, future=True
     )
@@ -1020,7 +1036,7 @@ def test_migration_installs_run_delete_guard_and_fails_closed(migration_db) -> N
 def test_snapshot_surfaces_contain_no_credential_markers(db_session) -> None:
     run = _seed_run(db_session)
     service = _make_service(db_session)
-    execution = asyncio.run(service.execute_task(run.task_id))
+    execution = asyncio.run(service.execute_task(run.task_id, generation_revision=1))
 
     marker = SECRET_MARKER_PRE_WP14_B
     blob_parts = []
@@ -1163,7 +1179,7 @@ def test_adapter_first_observable_point_sees_committed_snapshot(db_engine, db_se
             )
 
     service = ExecutionService(db_session, registry=ProbeRegistry())
-    execution = asyncio.run(service.execute_task(run.task_id))
+    execution = asyncio.run(service.execute_task(run.task_id, generation_revision=1))
 
     assert execution.run.state is RunState.COMPLETED
     assert observed.get("snapshot") is True, (
@@ -1195,7 +1211,7 @@ def test_execute_task_binding_failure_no_adapter_no_partial_state(db_session) ->
     seeded = _seed_run(db_session)
     runs_before = len(SqlRunRepository(db_session).list_by_task(seeded.task_id))
     with pytest.raises(RuntimeBindingError, match="binding failed"):
-        asyncio.run(service.execute_task(seeded.task_id))
+        asyncio.run(service.execute_task(seeded.task_id, generation_revision=1))
 
     # Rolled back: no NEW Run rows persisted for the task.
     assert (
@@ -1274,7 +1290,7 @@ def test_execute_task_factory_failure_fails_closed(db_session) -> None:
     service = _make_service(db_session, registry=registry)
 
     with pytest.raises(RuntimeBindingError) as exc_info:
-        asyncio.run(service.execute_task(run.task_id))
+        asyncio.run(service.execute_task(run.task_id, generation_revision=1))
 
     assert registry.factory_calls == 1
 

@@ -17,6 +17,8 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, inspect as sa_inspect
 from sqlalchemy.orm import sessionmaker
 
+from d1a_fixtures import d1a_content_environment, prepared_run_body, start_body
+from polynexus_core.api.generations import router as generations_router
 from polynexus_core.api.dependencies import require_loopback
 from polynexus_core.persistence.database import get_session
 
@@ -82,6 +84,8 @@ def _create_test_app(db_url: str) -> tuple[FastAPI, sessionmaker]:
 
     app = FastAPI()
 
+
+    app.include_router(generations_router, prefix="/api/v1")
     def _override_get_session():
         session = TestSession()
         try:
@@ -147,9 +151,19 @@ def ctx(tmp_path: Path) -> _TestContext:
 class TestWP08ContextPackageCreate:
     """WP-08A: POST /api/v1/projects/{project_id}/context-packages"""
 
-    def test_create_context_package_201(self, ctx: _TestContext) -> None:
+    def test_create_context_package_201(self, ctx: _TestContext, tmp_path, monkeypatch) -> None:
         """201 successful create with stable response fields."""
         project_id = ctx.create_project()
+        # Preserve the original fixed reference assertion using a real Core blob.
+        from polynexus_core.domain.models import Artifact
+        from polynexus_core.domain.enums import ArtifactType
+        from polynexus_core.persistence.repository import SqlArtifactRepository
+        from polynexus_core.storage.content import ContentStore
+        monkeypatch.setenv("POLYNEXUS_CONTENT_ROOT", str(tmp_path / "content"))
+        digest,size=ContentStore(tmp_path / "content").put(b"synthetic context attachment")
+        with ctx.sf() as session:
+            SqlArtifactRepository(session).add(Artifact(id="art_001", project_id=project_id, artifact_type=ArtifactType.DOCUMENT, mime_type="text/plain", source_type="CORE_UPLOAD", storage_ref="core-blob:"+digest, sha256=digest, size=size))
+            session.commit()
         resp = ctx.client.post(
             f"/api/v1/projects/{project_id}/context-packages",
             json={
@@ -209,6 +223,8 @@ class TestWP08ContextPackageCreate:
 
         app = FastAPI()
 
+
+        app.include_router(generations_router, prefix="/api/v1")
         def _override_get_session():
             session = TestSession()
             try:
@@ -389,7 +405,7 @@ class TestWP08ContextPackageCreate:
         # Create run — must still work as before
         run_resp = ctx.client.post(
             f"/api/v1/tasks/{task_id}/runs",
-            json={"context_package_id": cp_id},
+            json=prepared_run_body(ctx.client, task_id, cp_id),
         )
         assert run_resp.status_code == 201
         assert run_resp.json()["state"] == "CREATED"

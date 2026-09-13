@@ -1,7 +1,7 @@
 """Run output query endpoints — read-only, run-scoped, via Repository boundary."""
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, Query, status
 
 from polynexus_core.api.dependencies import AuthLoopback, DbSession
 from polynexus_core.api.schemas import (
@@ -71,7 +71,8 @@ def _evidence_to_response(ev) -> EvidenceResponse:
 def _artifact_to_response(a) -> ArtifactResponse:
     a = sanitize_artifact(a)
     return ArtifactResponse(
-        id=a.id, project_id=a.project_id, task_id=a.task_id, run_id=a.run_id,
+        id=a.id,
+        classification=a.classification, project_id=a.project_id, task_id=a.task_id, run_id=a.run_id,
         artifact_type=a.artifact_type.value, mime_type=a.mime_type,
         source_type=a.source_type, storage_ref=a.storage_ref, sha256=a.sha256, size=a.size,
     )
@@ -147,11 +148,16 @@ def get_run_artifacts(run_id: str, _auth: AuthLoopback, db: DbSession) -> Artifa
 
 
 @router.get("/runs/{run_id}/history", response_model=HistoryWrapper)
-def get_run_history(run_id: str, _auth: AuthLoopback, db: DbSession) -> HistoryWrapper:
+def get_run_history(run_id: str, _auth: AuthLoopback, db: DbSession, limit: int | None = Query(default=None,ge=1,le=200), cursor: str | None = Query(default=None,max_length=2048)) -> HistoryWrapper:
     run, _ = _load_run_and_task(db, run_id)
     repo = SqlRunEventRepository(db)
     events = repo.list_by_run(run_id)
     for e in events:
         if e.run_id != run.id:
             raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=redact_text(f"Cross-owned event {e.id}"))
-    return HistoryWrapper(events=[_event_to_response(e) for e in events])
+    from polynexus_core.api.schemas import paginate
+    if limit is None and cursor is None:
+        from fastapi.responses import JSONResponse
+        return JSONResponse(content={"events":[_event_to_response(e).model_dump(mode="json") for e in events]})
+    page,next_cursor=paginate(events,"run-history:"+run_id,limit,cursor)
+    return HistoryWrapper(events=[_event_to_response(e) for e in page],next_cursor=next_cursor)

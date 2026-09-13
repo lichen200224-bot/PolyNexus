@@ -22,6 +22,8 @@ def _project_to_response(p: Project) -> ProjectResponse:
         name=p.name,
         description=p.description,
         created_at=p.created_at,
+        classification=p.classification,
+        archived=p.archived,
     )
 
 
@@ -36,7 +38,7 @@ def create_project(
     db: DbSession,
 ) -> ProjectResponse:
     repo = SqlProjectRepository(db)
-    project = Project(name=body.name, description=body.description)
+    project = Project(name=body.name, description=body.description, classification=body.classification)
     repo.add(project)
     db.commit()
     return _project_to_response(project)
@@ -65,4 +67,13 @@ def get_project(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Project {project_id} not found",
         )
+    return _project_to_response(project)
+
+
+@router.post("/projects/{project_id}/archive", response_model=ProjectResponse)
+def archive_project(project_id: str, _auth: AuthLoopback, db: DbSession) -> ProjectResponse:
+    project = SqlProjectRepository(db).archive(project_id)
+    if project is None:
+        raise HTTPException(status_code=404, detail="Project not found")
+    db.commit()
     return _project_to_response(project)

@@ -9,6 +9,7 @@ from __future__ import annotations
 import asyncio
 from pathlib import Path
 
+from d1a_fixtures import d1a_content_environment,prepare_generation,migrate_fixture_engine
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -46,7 +47,7 @@ def council_session(tmp_path: Path):
     db_path = tmp_path / "wp12.db"
     url = f"sqlite:///{db_path}"
     engine = create_engine(url, connect_args={"check_same_thread": False}, future=True)
-    Base.metadata.create_all(engine)
+    migrate_fixture_engine(engine)
     Session = sessionmaker(bind=engine, expire_on_commit=False, future=True)
     session = Session()
     yield session, db_path
@@ -69,6 +70,7 @@ def _seed(session) -> tuple[Task, ContextPackage]:
     )
     SqlTaskRepository(session).add(task)
     session.commit()
+    prepare_generation(session,task.id)
     return task, context
 
 
@@ -82,7 +84,7 @@ def _specs(ids_roles: list[tuple[str, str]], outcomes: dict[str, ParticipantOutc
 
 def _run(session, task, context, specs, **kwargs):
     orch = CouncilOrchestrator(session, **kwargs)
-    return asyncio.run(orch.run_council(task, context, specs))
+    return asyncio.run(orch.run_council(task, context, specs, generation_revision=1))
 
 
 class _ConcurrencyTracker:
@@ -166,7 +168,7 @@ class _ParentInterruptionAdapter(ReferenceRuntimeAdapter):
 
 
 class _FailingOnceAdapter(ReferenceRuntimeAdapter):
-    """Adapter that raises a secret-bearing error on its FIRST create_run only.
+    """Adapter that raises on FIRST submit after allocating a real reference handle.
 
     Used to prove runtime-failure isolation: exactly one participant fails with a
     sanitized outcome while the others continue, and no raw secret leaks.
@@ -176,11 +178,11 @@ class _FailingOnceAdapter(ReferenceRuntimeAdapter):
         super().__init__()
         self._calls = 0
 
-    async def create_run(self, context):
+    async def submit(self, runtime_ref, task):
         self._calls += 1
         if self._calls == 1:
             raise RuntimeError("SECRET_MARKER_CRITICAL_LEAK_xyz123")
-        return await super().create_run(context)
+        return await super().submit(runtime_ref, task)
 
 
 class _CountingAdapter(ReferenceRuntimeAdapter):
@@ -535,7 +537,7 @@ def test_council_factory_failure_after_binding_is_orphaned(
     orchestrator = CouncilOrchestrator(session, runtime_registry=registry)
 
     with pytest.raises(RuntimeBindingError, match="Runtime adapter construction failed"):
-        asyncio.run(orchestrator.run_council(task, context, specs))
+        asyncio.run(orchestrator.run_council(task, context, specs, generation_revision=1))
 
     runs = SqlRunRepository(session).list_by_task(task.id)
     parent = next(
@@ -567,7 +569,7 @@ def test_child_binding_failure_rolls_back_unbound_run(council_session, monkeypat
         workflow_id=task.workflow_id,
         workflow_version=task.workflow_version,
         context_package_id=context.id,
-    )
+     generation_revision=1)
     run_repo = SqlRunRepository(session)
     run_repo.add(run)
     session.flush()
@@ -600,7 +602,7 @@ def test_profile_resolution_failure_rolls_back_flushed_run(
         workflow_id=task.workflow_id,
         workflow_version=task.workflow_version,
         context_package_id=context.id,
-    )
+     generation_revision=1)
     run_repo = SqlRunRepository(session)
     run_repo.add(run)
     session.flush()
@@ -632,7 +634,7 @@ def test_council_profile_resolution_failure_leaves_no_parent_run(
         asyncio.run(
             orchestrator.run_council(
                 task, context, _specs([("p1", "analyst-a"), ("p2", "analyst-b")])
-            )
+            , generation_revision=1)
         )
 
     assert SqlRunRepository(session).list_by_task(task.id) == []
@@ -644,7 +646,7 @@ def test_council_stage_profile_resolution_failure_leaves_no_stage_run(
     session, _ = council_session
     task, context = _seed(session)
     orchestrator = CouncilOrchestrator(session)
-    parent = orchestrator._create_council_run(task, context)
+    parent = orchestrator._create_council_run(task, context, generation_revision=1)
     parent, _ = orchestrator._execution_service.prepare_claimed_run(
         parent, task, context, orchestrator._load_workflow(task)
     )
@@ -660,7 +662,7 @@ def test_council_stage_profile_resolution_failure_leaves_no_stage_run(
         workflow_id=task.workflow_id,
         workflow_version=task.workflow_version,
         context_package_id=context.id,
-    )
+     generation_revision=1)
 
     with pytest.raises(RuntimeError, match="profile resolution failed"):
         orchestrator._prepare_council_stage_run(stage, parent)
@@ -784,7 +786,7 @@ def test_existing_run_lifecycle_unaffected(council_session) -> None:
         workflow_id=task.workflow_id,
         workflow_version=task.workflow_version,
         context_package_id=context.id,
-    )
+     generation_revision=1)
     SqlRunRepository(session).add(run)
     session.commit()
 
@@ -846,7 +848,7 @@ def test_max_rounds_enforced(council_session) -> None:
     specs = _specs([("p1", "analyst-a"), ("p2", "analyst-b")])
     orch = CouncilOrchestrator(session, max_rounds=0)
     with pytest.raises(ValueError, match="round"):
-        asyncio.run(orch.run_council(task, context, specs, round=1))
+        asyncio.run(orch.run_council(task, context, specs, round=1, generation_revision=1))
 
 
 # ---------------------------------------------------------------------------
@@ -881,7 +883,7 @@ def test_analysis_runs_in_bounded_parallel(council_session) -> None:
     orch = CouncilOrchestrator(
         session, runtime_adapter=adapter, max_concurrency=max_concurrency
     )
-    plan = asyncio.run(orch.run_council(task, context, specs))
+    plan = asyncio.run(orch.run_council(task, context, specs, generation_revision=1))
 
     # Genuine overlap: at least two participant analyses were concurrently in flight.
     assert tracker.max >= 2, "expected concurrent analysis execution overlap"
@@ -935,7 +937,7 @@ def test_round_two_plan_persists_and_is_idempotent(council_session, tmp_path) ->
     specs = _specs([("p1", "analyst-a"), ("p2", "analyst-b")])
 
     plan = asyncio.run(
-        CouncilOrchestrator(session).run_council(task, context, specs, round=2)
+        CouncilOrchestrator(session).run_council(task, context, specs, round=2, generation_revision=1)
     )
     assert plan.round == 2
     assert all(p.round == 2 for p in plan.participants)
@@ -955,7 +957,7 @@ def test_round_two_plan_persists_and_is_idempotent(council_session, tmp_path) ->
     # Repeat run_council with identical inputs: same council, no new Runs.
     run_count_before = len(SqlRunRepository(session2).list_by_task(task.id))
     plan2 = asyncio.run(
-        CouncilOrchestrator(session2).run_council(task, context, specs, round=2)
+        CouncilOrchestrator(session2).run_council(task, context, specs, round=2, generation_revision=1)
     )
     run_count_after = len(SqlRunRepository(session2).list_by_task(task.id))
 
@@ -974,13 +976,13 @@ def test_different_specs_same_task_context_round_rejected(council_session) -> No
     session, _ = council_session
     task, context = _seed(session)
     specs_a = _specs([("p1", "analyst-a"), ("p2", "analyst-b")])
-    asyncio.run(CouncilOrchestrator(session).run_council(task, context, specs_a, round=1))
+    asyncio.run(CouncilOrchestrator(session).run_council(task, context, specs_a, round=1, generation_revision=1))
 
     # Conflicting request: same task/context/round, different participant specs.
     specs_b = _specs([("p1", "analyst-a"), ("p3", "analyst-c")])
     with pytest.raises(ValueError, match="different participant specs"):
         asyncio.run(
-            CouncilOrchestrator(session).run_council(task, context, specs_b, round=1)
+            CouncilOrchestrator(session).run_council(task, context, specs_b, round=1, generation_revision=1)
         )
 
 
@@ -997,7 +999,7 @@ def test_participant_timeout_isolated_and_reloadable(council_session) -> None:
     plan = asyncio.run(
         CouncilOrchestrator(session, runtime_adapter=adapter, timeout_seconds=0.1).run_council(
             task, context, specs
-        )
+        , generation_revision=1)
     )
     # Council timeout intent remains TIMED_OUT; ADR-014 Supervisor cancellation
     # now verifies Reference cleanup and durably records CANCELLED.
@@ -1042,7 +1044,7 @@ def test_outer_cancellation_fail_closed_parent_and_children(council_session) -> 
 
     async def cancel_after_binding() -> None:
         operation = asyncio.create_task(
-            orchestrator.run_council(task, context, specs)
+            orchestrator.run_council(task, context, specs, generation_revision=1)
         )
         await asyncio.wait_for(started.wait(), timeout=1.0)
         operation.cancel()
@@ -1102,7 +1104,7 @@ def test_outer_stage_timeout_fail_closed_parent(council_session, monkeypatch) ->
 
     monkeypatch.setattr(orchestrator, "_run_analysis_stage", raise_outer_timeout)
     with pytest.raises(asyncio.TimeoutError):
-        asyncio.run(orchestrator.run_council(task, context, specs))
+        asyncio.run(orchestrator.run_council(task, context, specs, generation_revision=1))
 
     runs = SqlRunRepository(session).list_by_task(task.id)
     council_runs = [
@@ -1136,7 +1138,7 @@ def test_parent_runtime_timeout_fails_closed_after_children_complete(council_ses
         asyncio.run(
             CouncilOrchestrator(
                 session, runtime_adapter=adapter, timeout_seconds=0.1
-            ).run_council(task, context, specs)
+            ).run_council(task, context, specs, generation_revision=1)
         )
 
     runs = SqlRunRepository(session).list_by_task(task.id)
@@ -1173,7 +1175,7 @@ def test_parent_runtime_cancellation_fails_closed_after_children_complete(
     )
 
     async def cancel_parent() -> None:
-        operation = asyncio.create_task(orchestrator.run_council(task, context, specs))
+        operation = asyncio.create_task(orchestrator.run_council(task, context, specs, generation_revision=1))
         await asyncio.wait_for(parent_started.wait(), timeout=1.0)
         operation.cancel()
         with pytest.raises(asyncio.CancelledError):
@@ -1208,7 +1210,7 @@ def test_parent_noncompleted_runtime_clears_consensus_and_reloads_truthfully(
     orchestrator = CouncilOrchestrator(session, runtime_adapter=adapter)
 
     with pytest.raises(RuntimeError, match="parent runtime did not complete"):
-        asyncio.run(orchestrator.run_council(task, context, specs))
+        asyncio.run(orchestrator.run_council(task, context, specs, generation_revision=1))
 
     runs = SqlRunRepository(session).list_by_task(task.id)
     parent = next(
@@ -1242,7 +1244,7 @@ def test_stage_setup_failure_reconciles_bound_stage_run_and_parent(
         orchestrator, "_prepare_council_stage_run", fail_after_binding
     )
     with pytest.raises(RuntimeError, match="unexpected stage setup failure"):
-        asyncio.run(orchestrator.run_council(task, context, specs))
+        asyncio.run(orchestrator.run_council(task, context, specs, generation_revision=1))
 
     runs = list(SqlRunRepository(session).list_by_task(task.id))
     parent = next(
@@ -1305,7 +1307,7 @@ def test_unexpected_child_setup_cancels_and_reconciles_siblings(
         ExecutionService, "prepare_claimed_run", fail_second_child_setup
     )
     with pytest.raises(RuntimeError, match="unexpected child setup failure"):
-        asyncio.run(orchestrator.run_council(task, context, specs))
+        asyncio.run(orchestrator.run_council(task, context, specs, generation_revision=1))
 
     assert started.is_set()
     runs = list(SqlRunRepository(session).list_by_task(task.id))
@@ -1359,7 +1361,7 @@ def test_participant_failure_sanitized_others_continue(council_session) -> None:
     # 3 participants: the first adapter call fails, the other two succeed.
     specs = _specs([("p1", "analyst-a"), ("p2", "analyst-b"), ("p3", "analyst-c")])
     plan = asyncio.run(
-        CouncilOrchestrator(session, runtime_adapter=adapter).run_council(task, context, specs)
+        CouncilOrchestrator(session, runtime_adapter=adapter).run_council(task, context, specs, generation_revision=1)
     )
     # Council completed (did not crash) with a truthful partial result.
     assert plan.synthesis_run_id is not None
@@ -1367,6 +1369,7 @@ def test_participant_failure_sanitized_others_continue(council_session) -> None:
     completed = [p for p in plan.participants if p.outcome is ParticipantOutcome.COMPLETED]
     assert len(failed) == 1
     assert len(completed) == 2
+    assert adapter._runs and all(record.cleaned for record in adapter._runs.values())
     # Sanitized reason persisted; raw secret marker never appears.
     secret = "SECRET_MARKER_CRITICAL_LEAK_xyz123"
     assert failed[0].reason == _REASON_PARTICIPANT_FAILED
@@ -1575,7 +1578,7 @@ def test_adapter_boundary_failure_truthful_and_reloadable(
 
     specs = _specs([("p1", "analyst-a"), ("p2", "analyst-b")])
     plan = asyncio.run(
-        CouncilOrchestrator(session, runtime_adapter=adapter).run_council(task, context, specs)
+        CouncilOrchestrator(session, runtime_adapter=adapter).run_council(task, context, specs, generation_revision=1)
     )
 
     _assert_truthful_boundary_failure(session, task, plan, terminal_state)
@@ -1613,7 +1616,7 @@ def test_status_error_not_persisted_in_result(state, council_session, tmp_path) 
     adapter = _StatusErrorAdapter(state)
     specs = _specs([("p1", "analyst-a"), ("p2", "analyst-b")])
     plan = asyncio.run(
-        CouncilOrchestrator(session, runtime_adapter=adapter).run_council(task, context, specs)
+        CouncilOrchestrator(session, runtime_adapter=adapter).run_council(task, context, specs, generation_revision=1)
     )
 
     for p in plan.participants:
@@ -1668,7 +1671,7 @@ def test_status_then_version_info_raises_keeps_terminal(
     adapter = _StatusThenVersionInfoRaisesAdapter(state)
     specs = _specs([("p1", "analyst-a"), ("p2", "analyst-b")])
     plan = asyncio.run(
-        CouncilOrchestrator(session, runtime_adapter=adapter).run_council(task, context, specs)
+        CouncilOrchestrator(session, runtime_adapter=adapter).run_council(task, context, specs, generation_revision=1)
     )
 
     expected_outcome = {
@@ -1752,7 +1755,7 @@ def test_post_runtime_exception_preserves_completed_participant(
     plan = asyncio.run(
         CouncilOrchestrator(session, timeout_seconds=30.0).run_council(
             task, context, specs
-        )
+        , generation_revision=1)
     )
 
     assert raised is True
@@ -1770,3 +1773,42 @@ def test_post_runtime_exception_preserves_completed_participant(
         item for item in reloaded.participants if item.id == participant.id
     )
     assert reloaded_participant.outcome is ParticipantOutcome.COMPLETED
+
+
+def test_create_failure_without_handle_preserves_unknown_ownership(council_session):
+    """A create exception is not proof that the adapter caused no side effects."""
+    from polynexus_core.domain.generation import GenerationConflict, WorkGenerationRef
+    from polynexus_core.persistence.generation import GenerationRepository
+
+    class CreateFailure(ReferenceRuntimeAdapter):
+        def __init__(self):
+            super().__init__()
+            self.create_calls = 0
+            self.cleanup_calls = 0
+
+        async def create_run(self, context):
+            self.create_calls += 1
+            raise RuntimeError("SECRET_MARKER_CREATE_UNKNOWN")
+
+        async def cleanup(self, runtime_ref):
+            self.cleanup_calls += 1
+            return await super().cleanup(runtime_ref)
+
+    session, _ = council_session
+    task, context = _seed(session)
+    adapter = CreateFailure()
+    specs = _specs([("p1", "analyst-a"), ("p2", "analyst-b")])
+    with pytest.raises(GenerationConflict, match="generation_not_startable"):
+        asyncio.run(CouncilOrchestrator(session, runtime_adapter=adapter).run_council(
+            task, context, specs, generation_revision=1))
+    repository = GenerationRepository(session)
+    observation = repository.observe(WorkGenerationRef(task.id, 1))
+    assert observation["ownership_unknown"] == 1
+    assert observation["closed"] == 0
+    assert observation["work_aborted"] is False
+    assert adapter.create_calls == 1
+    assert adapter.cleanup_calls == 0
+    with pytest.raises(GenerationConflict, match="generation_not_startable"):
+        repository.validate_run(task.id, 1, context.id)
+    for run in SqlRunRepository(session).list_by_task(task.id):
+        assert all("SECRET_MARKER_CREATE_UNKNOWN" not in (event.reason or "") for event in run.events)

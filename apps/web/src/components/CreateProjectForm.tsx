@@ -11,6 +11,7 @@ interface CreateProjectFormProps {
 export function CreateProjectForm({ config, onCreated, onCancel }: CreateProjectFormProps) {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
+  const [classification,setClassification]=useState('INTERNAL')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -20,6 +21,7 @@ export function CreateProjectForm({ config, onCreated, onCancel }: CreateProject
     setError(null)
     try {
       await createProject(config, {
+        classification,
         name: name.trim(),
         description: description.trim() || null,
       })
@@ -61,6 +63,7 @@ export function CreateProjectForm({ config, onCreated, onCancel }: CreateProject
           disabled={submitting}
         />
       </div>
+      <label>Classification<select value={classification} onChange={e=>setClassification(e.target.value)} disabled={submitting}>{["PUBLIC","INTERNAL","CONFIDENTIAL","RESTRICTED"].map(c=><option key={c}>{c}</option>)}</select></label>
       <div className="form-actions">
         <button type="submit" disabled={submitting || !name.trim()}>
           {submitting ? 'Creating...' : 'Create project'}

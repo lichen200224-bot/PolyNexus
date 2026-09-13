@@ -24,6 +24,7 @@ export function CreateTaskForm({ config, projectId, onCreated, onCancel }: Creat
   const [workflowId, setWorkflowId] = useState('review-minimal')
   const [workflowVersion, setWorkflowVersion] = useState(1)
   const [mode, setMode] = useState('REVIEW')
+  const [classification,setClassification]=useState('INTERNAL')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -33,6 +34,7 @@ export function CreateTaskForm({ config, projectId, onCreated, onCancel }: Creat
     setError(null)
     try {
       await createTask(config, projectId, {
+        classification,
         title: title.trim(),
         workflow_id: workflowId,
         workflow_version: workflowVersion,
@@ -105,6 +107,7 @@ export function CreateTaskForm({ config, projectId, onCreated, onCancel }: Creat
           ))}
         </select>
       </div>
+      <label>Classification<select value={classification} onChange={e=>setClassification(e.target.value)} disabled={submitting}>{["PUBLIC","INTERNAL","CONFIDENTIAL","RESTRICTED"].map(c=><option key={c}>{c}</option>)}</select></label>
       <div className="form-actions">
         <button type="submit" disabled={submitting || !title.trim()}>
           {submitting ? 'Creating...' : 'Create task'}

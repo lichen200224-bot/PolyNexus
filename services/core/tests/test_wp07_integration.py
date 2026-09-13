@@ -13,6 +13,7 @@ from __future__ import annotations
 import asyncio
 from pathlib import Path
 
+from d1a_fixtures import d1a_content_environment,prepare_generation,migrate_fixture_engine
 import pytest
 from alembic import command as alembic_cmd
 from alembic.config import Config
@@ -172,7 +173,7 @@ class TestWP07ExecutionPersistence:
 
         # --- Phase 3: Execute via ExecutionService ---
         service = ExecutionService(session1)
-        execution = asyncio.run(service.execute_task(task.id))
+        execution = asyncio.run(service.execute_task(task.id, generation_revision=prepare_generation(service._session,task.id)))
 
         # Verify in-memory execution result
         assert execution.run.state is RunState.COMPLETED
@@ -335,7 +336,7 @@ class TestWP07ExecutionPersistence:
 
         service = ExecutionService(session)
         with pytest.raises(ValueError, match="different projects"):
-            asyncio.run(service.execute_task(task.id))
+            asyncio.run(service.execute_task(task.id, generation_revision=1))
 
         session.close()
         engine.dispose()
@@ -376,7 +377,7 @@ class TestWP07ExecutionPersistence:
 
         service = ExecutionService(session)
         with pytest.raises(ValueError, match="Workflow definition not found"):
-            asyncio.run(service.execute_task(task.id))
+            asyncio.run(service.execute_task(task.id, generation_revision=1))
 
         session.close()
         engine.dispose()
@@ -411,7 +412,7 @@ class TestWP07ExecutionPersistence:
         session.commit()
 
         service = ExecutionService(session)
-        execution = asyncio.run(service.execute_task(task.id))
+        execution = asyncio.run(service.execute_task(task.id, generation_revision=prepare_generation(service._session,task.id)))
 
         run_id = execution.run.id
 
@@ -598,7 +599,7 @@ class TestWP07WorkflowPathSecurity:
 
         service = ExecutionService(session)
         with pytest.raises(ValueError, match="Invalid workflow_id format"):
-            asyncio.run(service.execute_task(task.id))
+            asyncio.run(service.execute_task(task.id, generation_revision=1))
 
         session.close()
         engine.dispose()
@@ -638,7 +639,7 @@ class TestWP07WorkflowPathSecurity:
 
         service = ExecutionService(session)
         with pytest.raises(ValueError, match="Invalid workflow_id format"):
-            asyncio.run(service.execute_task(task.id))
+            asyncio.run(service.execute_task(task.id, generation_revision=1))
 
         session.close()
         engine.dispose()
@@ -678,7 +679,7 @@ class TestWP07WorkflowPathSecurity:
 
         service = ExecutionService(session)
         with pytest.raises(ValueError, match="Invalid workflow_id format"):
-            asyncio.run(service.execute_task(task.id))
+            asyncio.run(service.execute_task(task.id, generation_revision=1))
 
         session.close()
         engine.dispose()
@@ -710,7 +711,7 @@ class TestWP07WorkflowPathSecurity:
         session.commit()
 
         service = ExecutionService(session)
-        execution = asyncio.run(service.execute_task(task.id))
+        execution = asyncio.run(service.execute_task(task.id, generation_revision=prepare_generation(service._session,task.id)))
         assert execution.run.state is RunState.COMPLETED
 
         session.close()
@@ -728,87 +729,49 @@ class TestWP07WorkflowPathSecurity:
         resolved = ExecutionService._check_workflow_path_containment("review-minimal")
         assert resolved.is_relative_to(_BUILTIN_WORKFLOWS_DIR.resolve())
 
-    def test_sibling_prefix_path_rejected_by_containment(self, tmp_path):
-        """A workflow_id that resolves to a sibling directory (shared string prefix) must be rejected.
+    @pytest.mark.parametrize("sibling_prefix", [True, False])
+    def test_real_link_escape_rejected_by_containment(self, tmp_path, monkeypatch, sibling_prefix):
+        """Real filesystem link escape through the production helper, in fixtures.
 
-        This exercises the production _check_workflow_path_containment helper to verify
-        it correctly rejects sibling-prefix paths that string startswith would miss.
-        Uses os.symlink to create a sibling-targeting junction; falls back to regex
-        rejection test if symlink is not supported.
+        Windows junctions exercise real reparse resolution without requiring
+        symlink privileges; POSIX uses a directory symlink. No fallback or skip.
         """
         import os
-
-        from polynexus_core.execution_service import ExecutionService
-
-        builtin_root = _BUILTIN_WORKFLOWS_DIR.resolve()
-        sibling = builtin_root.parent / (builtin_root.name + "_extra")
-        sibling.mkdir(exist_ok=True)
-        sibling_yaml = sibling / "review-minimal.yaml"
-        sibling_yaml.write_text("id: review-minimal\nversion: 1\nsteps:\n  - id: s\n    type: TOOL\n")
-
-        link = builtin_root / "review-minimal.yaml.link"
+        import subprocess
+        import json
+        import time
+        import polynexus_core.execution_service as module
+        builtin_root = tmp_path / "builtin"
+        builtin_root.mkdir()
+        outside = tmp_path / ("builtin_extra" if sibling_prefix else "outside")
+        outside.mkdir()
+        link = builtin_root / "review-minimal.yaml"
+        monkeypatch.setattr(module, "_BUILTIN_WORKFLOWS_DIR", builtin_root)
+        if os.name == "nt":
+            command = ["powershell", "-NoProfile", "-Command", "New-Item -ItemType Junction -Path $args[0] -Target $args[1] | Out-Null", str(link), str(outside)]
+            # Pass literal paths through environment, not PowerShell expressions.
+            env = os.environ.copy()
+            env.update(D1A_LINK=str(link), D1A_TARGET=str(outside))
+            command = ["powershell", "-NoProfile", "-Command", "New-Item -ItemType Junction -Path $env:D1A_LINK -Target $env:D1A_TARGET | Out-Null"]
+            child = subprocess.Popen(command, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            start = time.time()
+            try:
+                stdout, stderr = child.communicate(timeout=30)
+                assert child.returncode == 0, "synthetic junction creation failed"
+            finally:
+                if child.poll() is None:
+                    child.terminate(); child.wait(timeout=10)
+                (tmp_path / "junction-child.json").write_text(json.dumps({"pid": child.pid, "start": start, "end": time.time(), "exit": child.returncode, "stopped": child.poll() is not None}))
+        else:
+            os.symlink(outside, link, target_is_directory=True)
         try:
-            os.symlink(str(sibling_yaml), str(link))
-        except OSError:
-            # Symlink not supported — verify regex rejects sibling-path workflow IDs
+            assert link.resolve() == outside.resolve()
+            with pytest.raises(ValueError, match="traversal rejected"):
+                module.ExecutionService._check_workflow_path_containment("review-minimal")
             with pytest.raises(ValueError, match="Invalid workflow_id format"):
-                ExecutionService._check_workflow_path_containment("../review-minimal_extra/review-minimal")
-            sibling_yaml.unlink(missing_ok=True)
-            sibling.rmdir()
-            return
-
-        # Symlink created — rename real workflow, put symlink in its place
-        real = builtin_root / "review-minimal.yaml"
-        real_backup = builtin_root / "review-minimal.yaml.bak"
-        real.rename(real_backup)
-        link.rename(builtin_root / "review-minimal.yaml")
-
-        try:
-            with pytest.raises(ValueError, match="traversal rejected"):
-                ExecutionService._check_workflow_path_containment("review-minimal")
+                module.ExecutionService._check_workflow_path_containment("../builtin_extra/review-minimal")
         finally:
-            (builtin_root / "review-minimal.yaml").unlink(missing_ok=True)
-            real_backup.rename(real)
-            sibling_yaml.unlink(missing_ok=True)
-            sibling.rmdir()
-
-    def test_symlink_escape_rejected(self, tmp_path):
-        """Symlink inside builtin pointing outside must be rejected by production containment.
-
-        If symlink creation succeeds: replaces real workflow file with a symlink to an
-        outside file, calls _check_workflow_path_containment, and verifies it raises
-        ValueError with 'traversal rejected'.
-
-        If Windows denies symlink permission: pytest.skip with explicit reason.
-        The handoff must record this skip and its reason.
-        """
-        import os
-
-        from polynexus_core.execution_service import ExecutionService
-
-        builtin_root = _BUILTIN_WORKFLOWS_DIR.resolve()
-        outside_file = tmp_path / "escaped.yaml"
-        outside_file.write_text("id: escaped\nversion: 1\nsteps:\n  - id: s\n    type: TOOL\n")
-
-        symlink_target = builtin_root / "review-minimal.yaml"
-        real_file = builtin_root / "review-minimal.yaml.real"
-
-        try:
-            os.symlink(str(outside_file), str(symlink_target))
-        except OSError:
-            pytest.skip(
-                "Symlink creation denied by Windows policy — "
-                "cannot test real symlink escape via production containment helper. "
-                "Sibling-prefix and regex tests provide partial coverage."
-            )
-
-        # Symlink created — rename real file, verify production containment rejects
-        symlink_target.rename(real_file)  # move symlink out temporarily
-        os.symlink(str(outside_file), str(symlink_target))
-
-        try:
-            with pytest.raises(ValueError, match="traversal rejected"):
-                ExecutionService._check_workflow_path_containment("review-minimal")
-        finally:
-            symlink_target.unlink(missing_ok=True)
-            real_file.rename(builtin_root / "review-minimal.yaml")
+            if os.name == "nt":
+                link.rmdir()
+            else:
+                link.unlink()

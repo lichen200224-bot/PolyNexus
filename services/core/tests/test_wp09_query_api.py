@@ -12,6 +12,8 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from d1a_fixtures import d1a_content_environment, prepared_run_body, start_body
+from polynexus_core.api.generations import router as generations_router
 from polynexus_core.api.dependencies import require_loopback
 from polynexus_core.domain.enums import (
     ArtifactType, EvidenceStatus, EvidenceType, FindingSeverity, RunState,
@@ -49,6 +51,7 @@ def _create_test_app(db_url: str) -> tuple[FastAPI, sessionmaker]:
     engine = create_engine(db_url, connect_args={"check_same_thread": False}, future=True)
     TestSession = sessionmaker(bind=engine, expire_on_commit=False, future=True)
     app = FastAPI()
+    app.include_router(generations_router, prefix="/api/v1")
     def _override_get_session():
         s = TestSession()
         try:
@@ -80,7 +83,7 @@ class _Ctx:
         r = self.client.post(f"/api/v1/projects/{pid}/tasks", json={"title": title, "workflow_id": "review-minimal", "workflow_version": 1})
         assert r.status_code == 201; return r.json()["id"]
     def create_run(self, tid: str, cpid: str) -> str:
-        r = self.client.post(f"/api/v1/tasks/{tid}/runs", json={"context_package_id": cpid}); assert r.status_code == 201; return r.json()["id"]
+        r = self.client.post(f"/api/v1/tasks/{tid}/runs", json=prepared_run_body(self.client, tid, cpid)); assert r.status_code == 201; return r.json()["id"]
 
 
 @pytest.fixture()
@@ -118,6 +121,7 @@ def test_403_each_endpoint(tmp_path: Path, ep: str):
     from polynexus_core.api.runs import router as runs_router
     from polynexus_core.api.run_outputs import router as run_outputs_router
     app = FastAPI()
+    app.include_router(generations_router, prefix="/api/v1")
     def _override_get_session():
         s = TestSession()
         try: yield s; s.commit()
@@ -170,7 +174,7 @@ def _execute_with_injected_outputs(c: TestClient, sf, pid, tid, rid):
     ReferenceRuntimeAdapter.result = inj_result  # type: ignore
     ReferenceRuntimeAdapter.artifacts = inj_artifacts  # type: ignore
     try:
-        r = c.post(f"/api/v1/runs/{rid}/execute")
+        r = c.post(f"/api/v1/runs/{rid}/execute", json=start_body())
         assert r.status_code == 202
     finally:
         ReferenceRuntimeAdapter.result = orig_result  # type: ignore
@@ -192,7 +196,7 @@ def test_success_fidelity_and_reload(tmp_path: Path):
         cp = ContextPackage(project_id=pid, version=1); SqlContextPackageRepository(s).add(cp); s.commit(); cpid = cp.id
     finally: s.close()
     tid = c1.post(f"/api/v1/projects/{pid}/tasks", json={"title": "T", "workflow_id": "review-minimal", "workflow_version": 1}).json()["id"]
-    rid = c1.post(f"/api/v1/tasks/{tid}/runs", json={"context_package_id": cpid}).json()["id"]
+    rid = c1.post(f"/api/v1/tasks/{tid}/runs", json=prepared_run_body(c1, tid, cpid)).json()["id"]
     # injected evidence with distinct observed_at for ordering check + supervisor evidence will also be present
     from polynexus_core.runtime.contracts import RuntimeResult
     from polynexus_core.runtime.reference import ReferenceRuntimeAdapter
@@ -207,7 +211,7 @@ def test_success_fidelity_and_reload(tmp_path: Path):
     ReferenceRuntimeAdapter.result = inj_r  # type: ignore
     ReferenceRuntimeAdapter.artifacts = inj_a  # type: ignore
     try:
-        assert c1.post(f"/api/v1/runs/{rid}/execute").status_code == 202
+        assert c1.post(f"/api/v1/runs/{rid}/execute", json=start_body()).status_code == 202
     finally:
         ReferenceRuntimeAdapter.result = orig_r  # type: ignore
         ReferenceRuntimeAdapter.artifacts = orig_a  # type: ignore
@@ -282,7 +286,7 @@ def test_multiple_runs_no_leak(ctx: _Ctx):
     ReferenceRuntimeAdapter.result = inj_r  # type: ignore
     ReferenceRuntimeAdapter.artifacts = inj_a  # type: ignore
     try:
-        assert ctx.client.post(f"/api/v1/runs/{r1}/execute").status_code == 202
+        assert ctx.client.post(f"/api/v1/runs/{r1}/execute", json=start_body()).status_code == 202
     finally:
         ReferenceRuntimeAdapter.result = orig_r  # type: ignore
         ReferenceRuntimeAdapter.artifacts = orig_a  # type: ignore
@@ -307,7 +311,7 @@ def test_different_tasks_no_leak(ctx: _Ctx):
     async def inj_a(self_adapter, rr): return ()
     ReferenceRuntimeAdapter.result = inj_r  # type: ignore
     ReferenceRuntimeAdapter.artifacts = inj_a  # type: ignore
-    try: ctx.client.post(f"/api/v1/runs/{r1}/execute")
+    try: ctx.client.post(f"/api/v1/runs/{r1}/execute", json=start_body())
     finally:
         ReferenceRuntimeAdapter.result = orig_r  # type: ignore
         ReferenceRuntimeAdapter.artifacts = orig_a  # type: ignore
@@ -328,7 +332,7 @@ def test_different_projects_no_leak(ctx: _Ctx):
     async def inj_a(self_adapter, rr): return ()
     ReferenceRuntimeAdapter.result = inj_r  # type: ignore
     ReferenceRuntimeAdapter.artifacts = inj_a  # type: ignore
-    try: ctx.client.post(f"/api/v1/runs/{r1}/execute")
+    try: ctx.client.post(f"/api/v1/runs/{r1}/execute", json=start_body())
     finally:
         ReferenceRuntimeAdapter.result = orig_r  # type: ignore
         ReferenceRuntimeAdapter.artifacts = orig_a  # type: ignore
@@ -353,7 +357,7 @@ def test_missing_parent_task_422(ctx: _Ctx):
 def test_dangling_result_id_422(ctx: _Ctx):
     pid = ctx.create_project(); cpid = ctx.create_cp(pid); tid = ctx.create_task(pid); rid = ctx.create_run(tid, cpid)
     # execute to get COMPLETED with result
-    assert ctx.client.post(f"/api/v1/runs/{rid}/execute").status_code == 202
+    assert ctx.client.post(f"/api/v1/runs/{rid}/execute", json=start_body()).status_code == 202
     # corrupt result to reference non-existent finding
     from sqlalchemy import text
     s = ctx.sf()
@@ -432,7 +436,7 @@ def test_artifact_only_metadata(ctx: _Ctx):
     async def inj_a(self_adapter, rr): return ()
     ReferenceRuntimeAdapter.result = inj_r  # type: ignore
     ReferenceRuntimeAdapter.artifacts = inj_a  # type: ignore
-    try: ctx.client.post(f"/api/v1/runs/{rid}/execute")
+    try: ctx.client.post(f"/api/v1/runs/{rid}/execute", json=start_body())
     finally:
         ReferenceRuntimeAdapter.result = orig_r  # type: ignore
         ReferenceRuntimeAdapter.artifacts = orig_a  # type: ignore
@@ -452,7 +456,7 @@ def test_evidence_type_status_exact(ctx: _Ctx):
         SqlEvidenceRepository(s).add(ai_ev); s.commit()
     finally: s.close()
     # Also execute to get supervisor RUNTIME_EVIDENCE
-    assert ctx.client.post(f"/api/v1/runs/{rid}/execute").status_code == 202
+    assert ctx.client.post(f"/api/v1/runs/{rid}/execute", json=start_body()).status_code == 202
     evs = ctx.client.get(f"/api/v1/runs/{rid}/evidence").json()["evidence"]
     by_id = {e["id"]: e for e in evs}
     assert ai_ev.id in by_id

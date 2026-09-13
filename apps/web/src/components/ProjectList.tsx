@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import type { ApiClientConfig, Project } from '../api'
-import { listProjects, AuthError } from '../api'
+import { listProjects, workRequest, AuthError } from '../api'
 import { CreateProjectForm } from './CreateProjectForm'
 import { StatusMessage } from './StatusMessage'
 
@@ -98,6 +98,8 @@ export function ProjectList({ config, onSelectProject }: ProjectListProps) {
                 <span className="project-desc">{p.description}</span>
               )}
             </button>
+            <span>{p.classification??"INTERNAL"} · {p.archived?"Archived":"Active"}</span>
+            {!p.archived&&<button type="button" onClick={()=>{void workRequest(config,"POST",`/projects/${encodeURIComponent(p.id)}/archive`).then(load).catch(()=>setError("Unable to archive project. Try again."))}}>Archive {p.name}</button>}
           </li>
         ))}
       </ul>

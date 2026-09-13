@@ -3,6 +3,10 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException, status
+from sqlalchemy.exc import IntegrityError
+from polynexus_core.api.artifacts import content_store
+from polynexus_core.storage.content import ContentError
+from polynexus_core.persistence.repository import SqlArtifactRepository
 
 from polynexus_core.api.dependencies import AuthLoopback, DbSession
 from polynexus_core.api.schemas import (
@@ -31,6 +35,7 @@ def _cp_to_response(cp: ContextPackage) -> ContextPackageResponse:
         memory_refs=cp.memory_refs,
         source_refs=cp.source_refs,
         created_at=cp.created_at,
+        classification=cp.classification,
     )
 
 
@@ -53,9 +58,24 @@ def create_context_package(
             detail=f"Project {project_id} not found",
         )
 
+    # Artifact identity is Core-owned; raw source locators remain descriptive only.
+    for reference in body.artifact_refs:
+        artifact = SqlArtifactRepository(db).get(reference)
+        if artifact is None or artifact.project_id != project_id:
+            raise HTTPException(422, "context_artifact_scope_mismatch")
+        try:
+            content_store().read_artifact(artifact)
+        except ContentError as error:
+            raise HTTPException(422, str(error)) from None
+    if body.prior_decision_refs or body.memory_refs:
+        raise HTTPException(422, "context_reference_authority_unavailable")
+    if any(cp.version == body.version for cp in SqlContextPackageRepository(db).list_by_project(project_id)):
+        raise HTTPException(409, "context_version_conflict")
+
     # Create ContextPackage domain object (validates version >= 1 in __post_init__)
     cp = ContextPackage(
         project_id=project_id,
+        classification=body.classification,
         version=body.version,
         instructions=body.instructions,
         constraints=body.constraints,
@@ -68,7 +88,26 @@ def create_context_package(
 
     # Persist via repository boundary (no direct ORM operations)
     repo = SqlContextPackageRepository(db)
-    repo.add(cp)
-    db.commit()
+    try:
+        repo.add(cp)
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(409, "context_version_conflict") from None
 
+    return _cp_to_response(cp)
+
+
+@router.get("/projects/{project_id}/context-packages")
+def list_context_packages(project_id: str, _auth: AuthLoopback, db: DbSession):
+    if SqlProjectRepository(db).get(project_id) is None:
+        raise HTTPException(404, "project_not_found")
+    return {"context_packages": [_cp_to_response(cp) for cp in SqlContextPackageRepository(db).list_by_project(project_id)]}
+
+
+@router.get("/context-packages/{context_id}", response_model=ContextPackageResponse)
+def get_context_package(context_id: str, _auth: AuthLoopback, db: DbSession):
+    cp = SqlContextPackageRepository(db).get(context_id)
+    if cp is None:
+        raise HTTPException(404, "context_not_found")
     return _cp_to_response(cp)

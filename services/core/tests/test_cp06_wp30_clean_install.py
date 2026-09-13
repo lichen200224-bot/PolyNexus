@@ -84,6 +84,7 @@ def _seed_legacy_history(db_path: Path) -> None:
                 "VALUES ('evidence-wp30', 'task-wp30', 'run-wp30', 'system:wp30', 'wp30-test', 'RUNTIME_EVIDENCE', 'OBSERVED', '[]', '{}', '2026-09-01 00:00:04.000000')"
             )
         )
+        connection.exec_driver_sql("INSERT INTO context_packages(id,project_id,version,created_at) VALUES('cp-wp30','proj-wp30',1,'2026-01-01')")
     engine.dispose()
 
 
@@ -94,8 +95,10 @@ def test_backup_restore_downgrade_reupgrade_preserves_old_history(tmp_path: Path
     _seed_legacy_history(db_path)
     before = _history(db_path)
 
+    # Preserve the historical 0003 downgrade/reupgrade contract exactly.
+    # D1a head/restore is exercised separately in test_d1a_migration_restore.
     shutil.copy2(db_path, backup_path)
-    _upgrade(db_path, "head")
+    _upgrade(db_path, "0003")
     assert _version(db_path) == "0003"
     _assert_ordering_metadata(db_path, "run-wp30", "event-wp30")
     assert _history(db_path) == before
@@ -108,7 +111,7 @@ def test_backup_restore_downgrade_reupgrade_preserves_old_history(tmp_path: Path
     shutil.copy2(backup_path, db_path)
     assert _version(db_path) == "0001"
     assert _metadata_schema(db_path) == {"runs": {}, "run_events": {}}
-    _upgrade(db_path, "head")
+    _upgrade(db_path, "0003")
     assert _version(db_path) == "0003"
     _assert_ordering_metadata(db_path, "run-wp30", "event-wp30")
     assert _history(db_path) == before
@@ -168,12 +171,13 @@ def _assert_ordering_metadata(db_path: Path, run_id: str, event_id: str) -> None
         engine.dispose()
 
 
-def test_clean_head_ordering_defaults_and_required_sequence(tmp_path: Path) -> None:
+@pytest.mark.parametrize("revision, expected", [("0003", "0003"), ("head", "0004")])
+def test_clean_head_ordering_defaults_and_required_sequence(tmp_path: Path, revision, expected) -> None:
     from sqlalchemy.exc import IntegrityError
 
     db_path = tmp_path / "fresh-ordering.db"
-    _upgrade(db_path, "head")
-    assert _version(db_path) == "0003"
+    _upgrade(db_path, revision)
+    assert _version(db_path) == expected
     assert _metadata_schema(db_path) == {
         "runs": {"next_event_sequence": ("INTEGER", 1, "0")},
         "run_events": {"event_sequence": ("INTEGER", 1, None),

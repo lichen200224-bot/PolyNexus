@@ -51,6 +51,7 @@ def seed(engine):
              resolved_at,legacy_backfill,snapshot_schema_version,auth_ownership,usage_visibility)
             VALUES ('multi','polynexus','LOCAL','reference','builtin.reference','LOCAL',
                     '2026-09-12',1,1,'NONE','UNAVAILABLE')""")
+        c.exec_driver_sql("INSERT INTO context_packages(id,project_id,version,created_at) VALUES('cp','p',1,'2026-01-01')")
 
 
 def facts(engine):
@@ -99,13 +100,14 @@ def test_upgrade_downgrade_reupgrade_preserves_legacy_facts(tmp_path):
         engine.dispose()
 
 
-def test_fresh_head_and_no_event_counter(tmp_path):
+@pytest.mark.parametrize("revision, expected", [("0003", "0003"), ("head", "0004")])
+def test_fresh_head_and_no_event_counter(tmp_path, revision, expected):
     cfg = config(tmp_path / "fresh.db")
-    command.upgrade(cfg,"head")
+    command.upgrade(cfg,revision)
     engine=create_engine(f"sqlite:///{tmp_path / 'fresh.db'}")
     try:
         with engine.connect() as c:
-            assert c.exec_driver_sql("SELECT version_num FROM alembic_version").scalar_one() == "0003"
+            assert c.exec_driver_sql("SELECT version_num FROM alembic_version").scalar_one() == expected
             assert c.exec_driver_sql("SELECT COUNT(*) FROM run_events").scalar_one() == 0
         indexes=inspect(engine).get_unique_constraints('run_events')
         assert any(x['column_names']==['run_id','event_sequence'] for x in indexes)
@@ -119,7 +121,10 @@ def event(identity, run_id="multi"):
 
 
 def test_update_preserves_counter_and_new_append_continues(migrated):
-    engine,_=migrated
+    engine,cfg=migrated
+    command.upgrade(cfg,'head')
+    with engine.connect() as connection:
+        assert connection.exec_driver_sql('SELECT version_num FROM alembic_version').scalar_one()=='0004'
     with Session(engine) as s:
         repo=SqlRunRepository(s)
         repo.append_event(event("next"))

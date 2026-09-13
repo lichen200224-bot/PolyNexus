@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -13,6 +13,7 @@ from pydantic import BaseModel, Field, field_validator
 # ---------------------------------------------------------------------------
 
 class ProjectCreate(BaseModel):
+    classification: Literal["PUBLIC", "INTERNAL", "CONFIDENTIAL", "RESTRICTED"] = "INTERNAL"
     name: str = Field(..., min_length=1, description="Project name (non-empty)")
     description: str | None = Field(None, description="Optional project description")
 
@@ -25,6 +26,8 @@ class ProjectCreate(BaseModel):
 
 
 class ProjectResponse(BaseModel):
+    classification: str = "INTERNAL"
+    archived: bool = False
     id: str
     name: str
     description: str | None
@@ -40,6 +43,7 @@ class ProjectListResponse(BaseModel):
 # ---------------------------------------------------------------------------
 
 class TaskCreate(BaseModel):
+    classification: Literal["PUBLIC", "INTERNAL", "CONFIDENTIAL", "RESTRICTED"] = "INTERNAL"
     title: str = Field(..., min_length=1, description="Task title (non-empty)")
     workflow_id: str = Field(..., min_length=1, description="Workflow definition ID")
     workflow_version: int = Field(..., ge=1, description="Workflow version (>= 1)")
@@ -55,6 +59,7 @@ class TaskCreate(BaseModel):
 
 
 class TaskResponse(BaseModel):
+    classification: str = "INTERNAL"
     id: str
     project_id: str
     title: str
@@ -74,7 +79,22 @@ class TaskListResponse(BaseModel):
 # ---------------------------------------------------------------------------
 
 class RunCreate(BaseModel):
+    model_config = {"extra":"forbid"}
+    generation_revision: int = Field(ge=1)
+    expected_control_revision: int = Field(ge=0)
+    command_id: str = Field(min_length=1,max_length=128)
     context_package_id: str = Field(..., min_length=1, description="ContextPackage ID to associate with this run")
+
+
+class RunStart(BaseModel):
+    model_config={"extra":"forbid"}
+    generation_revision:int=Field(ge=1)
+    expected_control_revision:int=Field(ge=0)
+    command_id:str=Field(min_length=1,max_length=128)
+
+
+class RunCancel(RunStart):
+    expected_fence:int=Field(ge=0)
 
 
 class RunEventResponse(BaseModel):
@@ -96,6 +116,9 @@ class RunResultResponse(BaseModel):
 
 
 class RunResponse(BaseModel):
+    generation_binding_status: str = "LEGACY_UNBOUND_UNVERIFIED"
+    generation_revision: int | None = None
+    generation_parent_run_id: str | None = None
     id: str
     task_id: str
     workflow_id: str
@@ -112,6 +135,7 @@ class RunResponse(BaseModel):
 
 
 class RunListResponse(BaseModel):
+    next_cursor: str | None = None
     runs: list[RunResponse]
 
 
@@ -120,6 +144,7 @@ class RunListResponse(BaseModel):
 # ---------------------------------------------------------------------------
 
 class ContextPackageCreate(BaseModel):
+    classification: Literal["PUBLIC", "INTERNAL", "CONFIDENTIAL", "RESTRICTED"] = "INTERNAL"
     version: int = Field(..., ge=1, description="Version number (>= 1)")
     instructions: tuple[str, ...] = Field(default=(), description="Review instructions")
     constraints: tuple[str, ...] = Field(default=(), description="Constraints")
@@ -131,6 +156,7 @@ class ContextPackageCreate(BaseModel):
 
 
 class ContextPackageResponse(BaseModel):
+    classification: str = "INTERNAL"
     id: str
     project_id: str
     version: int
@@ -174,6 +200,7 @@ class EvidenceResponse(BaseModel):
 
 
 class ArtifactResponse(BaseModel):
+    classification: str = "INTERNAL"
     id: str
     project_id: str
     task_id: str | None
@@ -205,4 +232,38 @@ class ArtifactsWrapper(BaseModel):
 
 
 class HistoryWrapper(BaseModel):
+    next_cursor: str | None = None
     events: list[RunEventResponse]
+
+
+def encode_cursor(parts: list[str]) -> str:
+    import base64, json
+    return base64.urlsafe_b64encode(json.dumps(parts,separators=(',',':')).encode()).decode().rstrip('=')
+
+
+def decode_cursor(value: str, scope: str, length: int) -> list[str]:
+    import base64, json
+    from fastapi import HTTPException
+    try:
+        if len(value)>2048: raise ValueError()
+        parts=json.loads(base64.b64decode(value+'='*(-len(value)%4),altchars=b'-_',validate=True))
+        if not isinstance(parts,list) or len(parts)!=length or not all(isinstance(p,str) for p in parts) or parts[0]!=scope or encode_cursor(parts)!=value: raise ValueError()
+        return parts
+    except (ValueError,TypeError,UnicodeError):
+        raise HTTPException(422,'invalid_cursor') from None
+
+
+def paginate(items, scope: str, limit: int | None, cursor: str | None):
+    from fastapi import HTTPException
+    if limit is None and cursor is None: return items,None
+    size=limit or 100
+    ids=[item.id for item in items]
+    start=0;end=len(items)
+    if cursor is not None:
+        _,last,upper=decode_cursor(cursor,scope,3)
+        if last not in ids or upper not in ids: raise HTTPException(422,'invalid_cursor')
+        start=ids.index(last)+1;end=ids.index(upper)+1
+        if start>end: raise HTTPException(422,'invalid_cursor')
+    page=items[start:min(start+size,end)]
+    next_cursor=encode_cursor([scope,page[-1].id,ids[end-1]]) if page and start+len(page)<end else None
+    return page,next_cursor

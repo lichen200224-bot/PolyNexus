@@ -74,16 +74,17 @@ def _ensure_utc_naive(dt: datetime) -> datetime:
 # ---------------------------------------------------------------------------
 
 def _project_to_row(p: Project) -> ProjectRow:
-    return ProjectRow(id=p.id, name=p.name, description=p.description, created_at=_ensure_utc_naive(p.created_at))
+    return ProjectRow(id=p.id, name=p.name, description=p.description, created_at=_ensure_utc_naive(p.created_at), classification=p.classification, archived=p.archived)
 
 
 def _row_to_project(r: ProjectRow) -> Project:
-    return Project(id=r.id, name=r.name, description=r.description, created_at=r.created_at)
+    return Project(id=r.id, name=r.name, description=r.description, created_at=r.created_at, classification=r.classification, archived=r.archived)
 
 
 def _task_to_row(t: Task) -> TaskRow:
     return TaskRow(
         id=t.id,
+        classification=t.classification,
         project_id=t.project_id,
         title=t.title,
         workflow_id=t.workflow_id,
@@ -97,6 +98,7 @@ def _task_to_row(t: Task) -> TaskRow:
 def _row_to_task(r: TaskRow) -> Task:
     return Task(
         id=r.id,
+        classification=r.classification,
         project_id=r.project_id,
         title=r.title,
         workflow_id=r.workflow_id,
@@ -110,6 +112,7 @@ def _row_to_task(r: TaskRow) -> Task:
 def _cp_to_row(cp: ContextPackage) -> ContextPackageRow:
     return ContextPackageRow(
         id=cp.id,
+        classification=cp.classification,
         project_id=cp.project_id,
         version=cp.version,
         instructions=_serialize_tuple(cp.instructions),
@@ -126,6 +129,7 @@ def _cp_to_row(cp: ContextPackage) -> ContextPackageRow:
 def _row_to_cp(r: ContextPackageRow) -> ContextPackage:
     return ContextPackage(
         id=r.id,
+        classification=r.classification,
         project_id=r.project_id,
         version=r.version,
         instructions=_deserialize_tuple(r.instructions),
@@ -147,6 +151,8 @@ def _run_to_row(run: Run) -> RunRow:
     result_artifact_ids = _serialize_tuple(run.result.artifact_ids) if run.result else "[]"
     return RunRow(
         id=run.id,
+        generation_revision=run.generation_revision,
+        generation_parent_run_id=run.generation_parent_run_id,
         task_id=run.task_id,
         workflow_id=run.workflow_id,
         workflow_version=run.workflow_version,
@@ -178,6 +184,8 @@ def _row_to_run(r: RunRow) -> Run:
         )
     run = Run(
         id=r.id,
+        generation_revision=r.generation_revision,
+        generation_parent_run_id=r.generation_parent_run_id,
         task_id=r.task_id,
         workflow_id=r.workflow_id,
         workflow_version=r.workflow_version,
@@ -239,6 +247,7 @@ def _append_events(session: Session, events: Sequence[RunEvent]) -> None:
 def _artifact_to_row(a: Artifact) -> ArtifactRow:
     return ArtifactRow(
         id=a.id,
+        classification=a.classification,
         project_id=a.project_id,
         artifact_type=a.artifact_type.value,
         mime_type=a.mime_type,
@@ -254,6 +263,7 @@ def _artifact_to_row(a: Artifact) -> ArtifactRow:
 def _row_to_artifact(r: ArtifactRow) -> Artifact:
     return Artifact(
         id=r.id,
+        classification=r.classification,
         project_id=r.project_id,
         artifact_type=ArtifactType(r.artifact_type),
         mime_type=r.mime_type,
@@ -540,6 +550,14 @@ class SqlProjectRepository(ProjectRepository):
         rows = self._s.query(ProjectRow).all()
         return [_row_to_project(r) for r in rows]
 
+    def archive(self, project_id: str) -> Project | None:
+        row = self._s.get(ProjectRow, project_id)
+        if row is None:
+            return None
+        row.archived = True
+        self._s.flush()
+        return _row_to_project(row)
+
     def delete(self, project_id: str) -> bool:
         r = self._s.get(ProjectRow, project_id)
         if r is None:
@@ -565,6 +583,10 @@ class SqlTaskRepository(TaskRepository):
 
 
 class SqlContextPackageRepository(ContextPackageRepository):
+    def list_by_project(self, project_id):
+        rows = self._s.query(ContextPackageRow).filter_by(project_id=project_id).order_by(ContextPackageRow.version, ContextPackageRow.id).all()
+        return [_row_to_cp(row) for row in rows]
+
     def __init__(self, session: Session) -> None:
         self._s = session
 

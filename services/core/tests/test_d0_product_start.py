@@ -221,6 +221,8 @@ def test_authenticated_api_created_run_survives_real_app_restart(
     import polynexus_core.runtime.reconciliation as reconciliation_module
     from polynexus_core.runtime.registry import RuntimeRegistry
 
+    for key, leaf in (("POLYNEXUS_CONTENT_ROOT", "content"), ("POLYNEXUS_SOURCE_ROOT", "source"), ("POLYNEXUS_WORK_ROOT", "work")):
+        monkeypatch.setenv(key, str(tmp_path / leaf))
     db_path = tmp_path / "api-created-restart.db"
     _upgrade_to_head(db_path)
     monkeypatch.setenv("POLYNEXUS_DATABASE_URL", f"sqlite:///{db_path}")
@@ -260,9 +262,21 @@ def test_authenticated_api_created_run_survives_real_app_restart(
         )
         assert task.status_code == 201
         task_id = task.json()["id"]
+        prepared = client.post(
+            f"/api/v1/tasks/{task_id}/inputs",
+            json={"context_package_id": context_id, "requirements": "Create a durable Run", "validation": "Same Run survives application restart"},
+            headers=headers,
+        )
+        assert prepared.status_code == 201
+        begun = client.post(
+            f"/api/v1/tasks/{task_id}/generations",
+            json={"expected_revision": 0, "command_id": "restart-begin", "inputs": prepared.json()},
+            headers=headers,
+        )
+        assert begun.status_code == 201
         created = client.post(
             f"/api/v1/tasks/{task_id}/runs",
-            json={"context_package_id": context_id},
+            json={"context_package_id": context_id, "generation_revision": begun.json()["generation_revision"], "expected_control_revision": 0, "command_id": "restart-create"},
             headers=headers,
         )
         assert created.status_code == 201

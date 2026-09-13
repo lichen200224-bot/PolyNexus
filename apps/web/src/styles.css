@@ -420,3 +420,11 @@ select:focus-visible,
   .panel { align-items: flex-start; flex-direction: column; }
   .disclosure-card summary { align-items: flex-start; flex-direction: column; }
 }
+
+.generation-controls,.context-artifacts{margin-block:1.5rem;padding:1.25rem;border:1px solid #b9c6cd;border-radius:.75rem}
+.generation-controls fieldset{display:grid;gap:.75rem;margin-block:1rem;border:1px solid #b9c6cd;padding:1rem}
+.generation-controls label,.context-artifacts label{display:grid;gap:.35rem;margin-block:.5rem}
+.generation-controls label:has(input[type=radio]),.generation-controls label:has(input[type=checkbox]){display:flex;align-items:center}
+.generation-controls textarea{min-height:5rem}.generation-controls pre{white-space:pre-wrap;overflow-wrap:anywhere}
+.generation-controls button,.context-artifacts button{margin:.25rem}.generation-controls input,.generation-controls textarea,.generation-controls select,.context-artifacts select{max-width:100%;padding:.5rem}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #126da4;outline-offset:3px}

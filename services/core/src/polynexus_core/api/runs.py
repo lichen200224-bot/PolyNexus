@@ -7,7 +7,7 @@ lifecycle on an existing persisted Run.
 
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, Query, status
 
 from polynexus_core.api.dependencies import AuthLoopback, DbSession
 from polynexus_core.errors import (
@@ -18,11 +18,16 @@ from polynexus_core.errors import (
 )
 from polynexus_core.api.schemas import (
     RunCreate,
+    RunStart,
+    RunCancel,
     RunEventResponse,
     RunListResponse,
     RunResponse,
     RunResultResponse,
 )
+from polynexus_core.domain.generation import GenerationConflict
+from polynexus_core.storage.content import ContentError
+from polynexus_core.persistence.generation import GenerationRepository
 from polynexus_core.domain.enums import RunState
 from polynexus_core.domain.models import Run
 from polynexus_core.execution_service import ExecutionService
@@ -60,6 +65,9 @@ def _run_to_response(r: Run) -> RunResponse:
         )
     return RunResponse(
         id=r.id,
+        generation_binding_status="LEGACY_UNBOUND_UNVERIFIED" if r.generation_revision is None else "EXPLICIT_GENERATION",
+        generation_revision=r.generation_revision,
+        generation_parent_run_id=r.generation_parent_run_id,
         task_id=r.task_id,
         workflow_id=r.workflow_id,
         workflow_version=r.workflow_version,
@@ -109,16 +117,14 @@ def create_run(
             detail="ContextPackage does not belong to the same project as the task",
         )
 
-    # Create Run in CREATED state — no runtime execution
-    run = Run(
-        task_id=task_id,
-        workflow_id=task.workflow_id,
-        workflow_version=task.workflow_version,
-        context_package_id=body.context_package_id,
-    )
+    # Authentication identifies the local controller, never a body-provided Human.
+    try:
+        run=GenerationRepository(db).create_run(principal="loopback-controller",command_id=body.command_id,task_id=task_id,revision=body.generation_revision,context_package_id=body.context_package_id,expected_control=body.expected_control_revision)
+        db.commit()
+    except (GenerationConflict,ContentError) as error:
+        db.rollback()
+        raise HTTPException(409,str(error)) from None
     run_repo = SqlRunRepository(db)
-    run_repo.add(run)
-    db.commit()
 
     # Reload from DB to ensure persistence and event hydration
     run = run_repo.get(run.id)
@@ -134,6 +140,8 @@ def list_runs(
     task_id: str,
     _auth: AuthLoopback,
     db: DbSession,
+    limit: int | None = Query(default=None,ge=1,le=200),
+    cursor: str | None = Query(default=None,max_length=2048),
 ) -> RunListResponse:
     # Validate task exists
     task_repo = SqlTaskRepository(db)
@@ -145,7 +153,13 @@ def list_runs(
 
     run_repo = SqlRunRepository(db)
     runs = run_repo.list_by_task(task_id)
-    return RunListResponse(runs=[_run_to_response(r) for r in runs])
+    from polynexus_core.api.schemas import paginate
+    if limit is None and cursor is None:
+        from fastapi.responses import JSONResponse
+        return JSONResponse(content={"runs":[_run_to_response(r).model_dump(mode="json") for r in runs]})
+    runs=sorted(runs,key=lambda r:(r.created_at,r.id))
+    page,next_cursor=paginate(runs,"task_runs:"+task_id,limit,cursor)
+    return RunListResponse(runs=[_run_to_response(r) for r in page],next_cursor=next_cursor)
 
 
 @router.get("/runs/{run_id}", response_model=RunResponse)
@@ -189,6 +203,7 @@ async def execute_run(
     run_id: str,
     _auth: AuthLoopback,
     db: DbSession,
+    body: RunStart | None = None,
 ) -> RunResponse:
     """Execute an existing persisted Run through the full lifecycle.
 
@@ -207,6 +222,15 @@ async def execute_run(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Run {run_id} not found",
         )
+
+    # Bound command identity is checked even when replay now observes terminal state.
+    if body is not None and run.generation_revision is not None:
+        try:
+            replay=GenerationRepository(db).start_command(run,principal='loopback-controller',command_id=body.command_id,revision=body.generation_revision,expected_control=body.expected_control_revision)
+        except GenerationConflict as error:
+            db.rollback();raise HTTPException(409,str(error)) from None
+        if replay is not None:
+            return JSONResponse(status_code=200 if run.state in _TERMINAL_STATES else 202,content=_run_to_response(run).model_dump(mode='json'))
 
     # Lifecycle guard — CANCEL_REQUESTED
     if run.state is RunState.CANCEL_REQUESTED:
@@ -229,9 +253,28 @@ async def execute_run(
     # CREATED — execute the Run via CAS claim
     assert run.state is RunState.CREATED, f"Unexpected state: {run.state}"
 
+    # Preserve malformed legacy-reference diagnostics without granting launch.
+    stored_task=SqlTaskRepository(db).get(run.task_id)
+    stored_context=SqlContextPackageRepository(db).get(run.context_package_id)
+    if stored_task is None or stored_context is None:
+        raise HTTPException(422,'stored_resource_not_found')
+    if stored_task.project_id!=stored_context.project_id or run.workflow_id!=stored_task.workflow_id or run.workflow_version!=stored_task.workflow_version:
+        raise HTTPException(422,'stored_run_contract_mismatch')
+    if body is None or body.generation_revision!=run.generation_revision:
+        raise HTTPException(409,'exact_generation_required')
+    generations=GenerationRepository(db)
+    from polynexus_core.domain.generation import WorkGenerationRef
+    ref=WorkGenerationRef(run.task_id,body.generation_revision)
+    current=generations.get(ref)
+    if current['control_revision']!=body.expected_control_revision:
+        raise HTTPException(409,'generation_control_conflict')
     service = ExecutionService(db)
     try:
+        generations.start_command(run,principal='loopback-controller',command_id=body.command_id,revision=body.generation_revision,expected_control=body.expected_control_revision,record=True)
         execution = await service.execute_existing_run(run_id)
+    except (GenerationConflict,ContentError) as exc:
+        db.rollback()
+        raise HTTPException(409,str(exc)) from None
     except RunNotFoundError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -270,3 +313,23 @@ async def execute_run(
         status_code=status.HTTP_202_ACCEPTED,
         content=_run_to_response(run).model_dump(mode="json"),
     )
+
+
+@router.post('/runs/{run_id}/cancel')
+async def cancel_run(run_id:str,body:RunCancel,_auth:AuthLoopback,db:DbSession):
+    from polynexus_core.domain.generation import WorkGenerationRef
+    from polynexus_core.workspace.ownership import active_operations
+    run=SqlRunRepository(db).get(run_id)
+    if run is None:raise HTTPException(404,'run_not_found')
+    generations=GenerationRepository(db)
+    try:
+        result,is_new=generations.cancel_run(run,principal='loopback-controller',command_id=body.command_id,revision=body.generation_revision,expected_control=body.expected_control_revision,expected_fence=body.expected_fence)
+        db.commit()
+    except GenerationConflict as error:
+        db.rollback();raise HTTPException(409,str(error)) from None
+    if is_new and result['cancel_requested'] and run.state not in _TERMINAL_STATES:
+        ref=WorkGenerationRef(run.task_id,run.generation_revision)
+        if not active_operations.request_cancel_run(ref,run.id):
+            # Restart or an unregistered handle cannot establish cleanup proof.
+            generations.mark_unknown(run,'active_operation_handle_unavailable');db.commit()
+    return result

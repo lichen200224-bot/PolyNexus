@@ -6,6 +6,8 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
+from polynexus_core.api.generations import router as generations_router
+from polynexus_core.api.artifacts import router as artifacts_router
 from polynexus_core.api.health import router as health_router
 from polynexus_core.api.projects import router as projects_router
 from polynexus_core.api.tasks import router as tasks_router
@@ -75,6 +77,8 @@ def create_app() -> FastAPI:
         description="Local-first multi-AI collaboration and validation core.",
         lifespan=_lifespan,
     )
+    app.include_router(generations_router, prefix="/api/v1")
+    app.include_router(artifacts_router, prefix="/api/v1")
     app.include_router(health_router, prefix="/api/v1")
     app.include_router(projects_router, prefix="/api/v1")
     app.include_router(tasks_router, prefix="/api/v1")

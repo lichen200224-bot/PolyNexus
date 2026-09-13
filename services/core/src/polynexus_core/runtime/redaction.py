@@ -80,6 +80,8 @@ def redact_text(
         except Exception:
             text = fallback
 
+    from polynexus_core.security.secret_refs import redact_active_secret
+    text = redact_active_secret(text)
     text = _ASSIGNED_SECRET.sub(lambda match: f"{match.group(1)}={REDACTED}", text)
     text = _BEARER_SECRET.sub(f"Bearer {REDACTED}", text)
     text = _SENSITIVE_VALUE_PHRASE.sub(lambda match: f"{match.group(1)} {REDACTED}", text)

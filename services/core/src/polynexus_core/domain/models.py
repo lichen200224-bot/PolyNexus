@@ -33,8 +33,12 @@ class Project:
     id: str = field(default_factory=lambda: new_id("project"))
     description: str | None = None
     created_at: datetime = field(default_factory=utc_now)
+    classification: str = "INTERNAL"
+    archived: bool = False
 
     def __post_init__(self) -> None:
+        if self.classification not in {"PUBLIC", "INTERNAL", "CONFIDENTIAL", "RESTRICTED"}:
+            raise ValueError("Invalid data classification")
         if not self.name.strip():
             raise ValueError("Project name must not be empty")
 
@@ -50,7 +54,11 @@ class Task:
     context_package_id: str | None = None
     created_at: datetime = field(default_factory=utc_now)
 
+    classification: str = "INTERNAL"
+
     def __post_init__(self) -> None:
+        if self.classification not in {"PUBLIC", "INTERNAL", "CONFIDENTIAL", "RESTRICTED"}:
+            raise ValueError("Invalid data classification")
         if not self.title.strip():
             raise ValueError("Task title must not be empty")
         if self.workflow_version < 1:
@@ -71,7 +79,11 @@ class ContextPackage:
     id: str = field(default_factory=lambda: new_id("context"))
     created_at: datetime = field(default_factory=utc_now)
 
+    classification: str = "INTERNAL"
+
     def __post_init__(self) -> None:
+        if self.classification not in {"PUBLIC", "INTERNAL", "CONFIDENTIAL", "RESTRICTED"}:
+            raise ValueError("Invalid data classification")
         if self.version < 1:
             raise ValueError("ContextPackage version must be positive")
         object.__setattr__(self, "instructions", tuple(self.instructions))
@@ -96,7 +108,11 @@ class Artifact:
     run_id: str | None = None
     id: str = field(default_factory=lambda: new_id("artifact"))
 
+    classification: str = "INTERNAL"
+
     def __post_init__(self) -> None:
+        if self.classification not in {"PUBLIC", "INTERNAL", "CONFIDENTIAL", "RESTRICTED"}:
+            raise ValueError("Invalid data classification")
         if self.size < 0:
             raise ValueError("Artifact size must not be negative")
         if not self.sha256.strip():
@@ -174,6 +190,8 @@ class Run:
     updated_at: datetime = field(default_factory=utc_now)
     events: list[RunEvent] = field(default_factory=list)
     result: RunResult | None = None
+    generation_revision: int | None = None
+    generation_parent_run_id: str | None = None
 
     def __post_init__(self) -> None:
         if self.workflow_version < 1:

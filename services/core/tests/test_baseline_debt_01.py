@@ -4,6 +4,7 @@ from dataclasses import replace
 from datetime import datetime, timezone
 import asyncio
 
+from d1a_fixtures import d1a_content_environment,prepare_generation,migrate_fixture_engine
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
@@ -130,13 +131,15 @@ def test_service_cancellation_durable_after_reopen(tmp_path, monkeypatch, entry,
 
     path = tmp_path / 'cancel.db'
     engine = create_engine(f'sqlite:///{path}')
-    Base.metadata.create_all(engine)
+    migrate_fixture_engine(engine)
     task, context = _inputs()
+    context=replace(context,source_refs=(),instructions=(*context.instructions,"fixture:wp24"))
     with Session(engine) as s:
         SqlProjectRepository(s).add(Project(id=task.project_id, name='Cancellation'))
         s.flush()
         SqlContextPackageRepository(s).add(context)
         SqlTaskRepository(s).add(task)
+        prepare_generation(s,task.id)
         s.commit()
 
     async def scenario():
@@ -205,10 +208,10 @@ def test_service_cancellation_durable_after_reopen(tmp_path, monkeypatch, entry,
         with Session(engine) as s:
             service = ExecutionService(s, registry)
             if entry == 'task':
-                operation = service.execute_task(task.id)
+                operation = service.execute_task(task.id, generation_revision=1)
             else:
                 run = Run(task_id=task.id, workflow_id=WORKFLOW.id,
-                          workflow_version=WORKFLOW.version, context_package_id=context.id)
+                          workflow_version=WORKFLOW.version, context_package_id=context.id,generation_revision=1)
                 SqlRunRepository(s).add(run)
                 s.commit()
                 if entry == 'existing':
@@ -232,7 +235,7 @@ def test_service_cancellation_durable_after_reopen(tmp_path, monkeypatch, entry,
                 assert trace == [] and adapter.active
 
     try:
-        asyncio.run(scenario())
+        asyncio.run(asyncio.wait_for(scenario(),timeout=30))
     finally:
         engine.dispose()
     reopened = create_engine(f'sqlite:///{path}')

@@ -26,6 +26,8 @@ class Base(DeclarativeBase):
 
 class ProjectRow(Base):
     __tablename__ = "projects"
+    classification = Column(String(32), nullable=False, default="INTERNAL", server_default="INTERNAL")
+    archived = Column(Boolean, nullable=False, default=False, server_default="0")
 
     id = Column(String(64), primary_key=True)
     name = Column(String(256), nullable=False)
@@ -35,6 +37,7 @@ class ProjectRow(Base):
 
 class TaskRow(Base):
     __tablename__ = "tasks"
+    classification = Column(String(32), nullable=False, default="INTERNAL", server_default="INTERNAL")
 
     id = Column(String(64), primary_key=True)
     project_id = Column(String(64), ForeignKey("projects.id"), nullable=False)
@@ -50,6 +53,7 @@ class TaskRow(Base):
 
 class ContextPackageRow(Base):
     __tablename__ = "context_packages"
+    classification = Column(String(32), nullable=False, default="INTERNAL", server_default="INTERNAL")
 
     id = Column(String(64), primary_key=True)
     project_id = Column(String(64), ForeignKey("projects.id"), nullable=False)
@@ -68,6 +72,8 @@ class ContextPackageRow(Base):
 
 class RunRow(Base):
     __tablename__ = "runs"
+    generation_revision = Column(Integer, nullable=True)
+    generation_parent_run_id = Column(String(64), nullable=True)
 
     id = Column(String(64), primary_key=True)
     next_event_sequence = Column(Integer, nullable=False, default=0, server_default="0")
@@ -124,6 +130,7 @@ def _create_event_sequence_guard(target, connection, **kw) -> None:
 
 class ArtifactRow(Base):
     __tablename__ = "artifacts"
+    classification = Column(String(32), nullable=False, default="INTERNAL", server_default="INTERNAL")
 
     id = Column(String(64), primary_key=True)
     project_id = Column(String(64), ForeignKey("projects.id"), nullable=False)

@@ -156,6 +156,7 @@ class CouncilOrchestrator:
         context: ContextPackage,
         specs: Sequence[CouncilSpec],
         round: int = 1,
+        *, generation_revision: int | None = None,
     ) -> CouncilPlan:
         """Create the council Run and execute all stages (analysis -> cross-review -> synthesis).
 
@@ -191,11 +192,15 @@ class CouncilOrchestrator:
         # exists, reload and return it WITHOUT creating new Council/participant Runs.
         # A conflicting council (same task/context/round but different specs) is
         # deterministically rejected rather than silently returning the old plan.
-        existing = self._find_existing_council(task.id, context.id, round, specs)
+        from polynexus_core.domain.generation import WorkGenerationRef
+        from polynexus_core.workspace.ownership import active_operations
+        ref=WorkGenerationRef(task.id,generation_revision)
+        existing = self._find_existing_council(task.id, context.id, round, specs,generation_revision)
         if existing is not None:
             return existing
 
-        council_run = self._create_council_run(task, context)
+        self._execution_service._generations.validate_run(task.id,generation_revision,context.id)
+        council_run = self._create_council_run(task, context,generation_revision)
         plan = CouncilPlan(
             council_run_id=council_run.id,
             mode=task.mode.value,
@@ -212,6 +217,8 @@ class CouncilOrchestrator:
         council_run, council_profile = self._execution_service.prepare_claimed_run(
             council_run, task, context, self._load_workflow(task)
         )
+        self._execution_service._generations.prepare_workspace(council_run)
+        operation=asyncio.current_task();active_operations.register(ref,council_run.id,operation)
         bound_run_ids: set[str] = set()
 
         try:
@@ -226,6 +233,7 @@ class CouncilOrchestrator:
                 # Keep this call inside the fail-closed boundary so timeout,
                 # cancellation, setup, and factory errors cannot unwind while the
                 # bound parent remains STARTING/RUNNING.
+                active_operations.unregister(ref,council_run.id,operation)
                 parent_execution = await asyncio.wait_for(
                     self._execution_service.execute_claimed_run(
                         council_run,
@@ -244,16 +252,19 @@ class CouncilOrchestrator:
                     raise RuntimeError("Council parent runtime did not complete")
 
         except asyncio.TimeoutError:
+            active_operations.unregister(ref,council_run.id,operation)
             self._fail_closed_council_interruption(
                 council_run, plan, extra_run_ids=bound_run_ids
             )
             raise
         except asyncio.CancelledError:
+            active_operations.unregister(ref,council_run.id,operation)
             self._fail_closed_council_interruption(
                 council_run, plan, extra_run_ids=bound_run_ids
             )
             raise
         except Exception:
+            active_operations.unregister(ref,council_run.id,operation)
             # Any post-binding setup failure must fail closed.  Do not leave the
             # parent Council Run (or already-bound children) durably STARTING.
             self._fail_closed_council_interruption(
@@ -261,6 +272,7 @@ class CouncilOrchestrator:
             )
             raise
 
+        active_operations.unregister(ref,council_run.id,operation)
         if plan.partial or any(
             p.outcome not in (ParticipantOutcome.COMPLETED,) for p in plan.participants
         ):
@@ -536,6 +548,8 @@ class CouncilOrchestrator:
                     workflow_id=task.workflow_id,
                     workflow_version=task.workflow_version,
                     context_package_id=context.id,
+                    generation_revision=council_run.generation_revision,
+                    generation_parent_run_id=council_run.id,
                 )
                 session = session_factory()
                 binding_committed = False
@@ -751,6 +765,8 @@ class CouncilOrchestrator:
                     workflow_id=council_run.workflow_id,
                     workflow_version=council_run.workflow_version,
                     context_package_id=council_run.context_package_id,
+                    generation_revision=council_run.generation_revision,
+                    generation_parent_run_id=council_run.id,
                 )
                 review_run, profile = self._prepare_council_stage_run(
                     review_run, council_run, bound_run_ids
@@ -843,6 +859,8 @@ class CouncilOrchestrator:
             workflow_id=council_run.workflow_id,
             workflow_version=council_run.workflow_version,
             context_package_id=council_run.context_package_id,
+            generation_revision=council_run.generation_revision,
+            generation_parent_run_id=council_run.id,
         )
         synthesis_run, profile = self._prepare_council_stage_run(
             synthesis_run, council_run, bound_run_ids
@@ -976,6 +994,8 @@ class CouncilOrchestrator:
                 "Council ContextPackage not found while preparing a stage Run"
             )
         workflow = self._load_workflow(task)
+        if run.generation_revision!=council_run.generation_revision:raise ValueError("Council stage generation mismatch")
+        run.generation_parent_run_id=council_run.id
         self._run_repo.add(run)
         self._s.flush()
         if bound_run_ids is not None:
@@ -989,9 +1009,10 @@ class CouncilOrchestrator:
         )
         return prepared, profile
 
-    def _create_council_run(self, task: Task, context: ContextPackage) -> Run:
+    def _create_council_run(self, task: Task, context: ContextPackage,generation_revision:int) -> Run:
         run = Run(
             task_id=task.id,
+            generation_revision=generation_revision,
             workflow_id=task.workflow_id,
             workflow_version=task.workflow_version,
             context_package_id=context.id,
@@ -1001,7 +1022,7 @@ class CouncilOrchestrator:
         return run
 
     def _find_existing_council(
-        self, task_id: str, context_id: str, round: int, specs: Sequence[CouncilSpec]
+        self, task_id: str, context_id: str, round: int, specs: Sequence[CouncilSpec],generation_revision:int
     ) -> CouncilPlan | None:
         """Reload an existing council whose identity matches, or reject a conflict.
 
@@ -1016,7 +1037,7 @@ class CouncilOrchestrator:
         requested = sorted((s.id, s.role) for s in specs)
         runs = self._run_repo.list_by_task(task_id)
         for run in runs:
-            if run.context_package_id != context_id:
+            if run.context_package_id != context_id or run.generation_revision != generation_revision:
                 continue
             try:
                 plan = self._load_plan(run.id)

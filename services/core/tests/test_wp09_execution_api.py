@@ -27,6 +27,8 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from d1a_fixtures import d1a_content_environment, prepared_run_body, start_body
+from polynexus_core.api.generations import router as generations_router
 from polynexus_core.api.dependencies import require_loopback
 from polynexus_core.domain.enums import RunState, WorkMode
 from polynexus_core.domain.models import ContextPackage, Project, Task
@@ -104,6 +106,8 @@ def _create_test_app(db_url: str) -> tuple[FastAPI, sessionmaker]:
 
     app = FastAPI()
 
+
+    app.include_router(generations_router, prefix="/api/v1")
     def _override_get_session():
         session = TestSession()
         try:
@@ -174,7 +178,7 @@ class _TestContext:
     def create_run(self, task_id: str, context_package_id: str) -> str:
         resp = self.client.post(
             f"/api/v1/tasks/{task_id}/runs",
-            json={"context_package_id": context_package_id},
+            json=prepared_run_body(self.client, task_id, context_package_id),
         )
         assert resp.status_code == 201
         return resp.json()["id"]
@@ -205,7 +209,7 @@ class TestWP09FirstExecution:
         tid = ctx.create_task(pid, context_package_id=cp_id)
         run_id = ctx.create_run(tid, cp_id)
 
-        resp = c.post(f"/api/v1/runs/{run_id}/execute")
+        resp = c.post(f"/api/v1/runs/{run_id}/execute", json=start_body())
         assert resp.status_code == 202
         data = resp.json()
         assert data["id"] == run_id
@@ -218,7 +222,7 @@ class TestWP09FirstExecution:
         tid = ctx.create_task(pid, context_package_id=cp_id)
         run_id = ctx.create_run(tid, cp_id)
 
-        c.post(f"/api/v1/runs/{run_id}/execute")
+        c.post(f"/api/v1/runs/{run_id}/execute", json=start_body())
 
         resp = c.get(f"/api/v1/tasks/{tid}/runs")
         assert resp.status_code == 200
@@ -233,7 +237,7 @@ class TestWP09FirstExecution:
         tid = ctx.create_task(pid, context_package_id=cp_id)
         run_id = ctx.create_run(tid, cp_id)
 
-        c.post(f"/api/v1/runs/{run_id}/execute")
+        c.post(f"/api/v1/runs/{run_id}/execute", json=start_body())
 
         resp = c.get(f"/api/v1/runs/{run_id}")
         assert resp.status_code == 200
@@ -280,7 +284,7 @@ class TestWP09ClaimBeforeAdapter:
         ReferenceRuntimeAdapter.create_run = instrumented_create_run
 
         try:
-            resp = c.post(f"/api/v1/runs/{run_id}/execute")
+            resp = c.post(f"/api/v1/runs/{run_id}/execute", json=start_body())
             assert resp.status_code == 202
 
             # Verify the claim was visible during adapter.create_run
@@ -296,7 +300,7 @@ class TestWP09ClaimBeforeAdapter:
         tid = ctx.create_task(pid, context_package_id=cp_id)
         run_id = ctx.create_run(tid, cp_id)
 
-        c.post(f"/api/v1/runs/{run_id}/execute")
+        c.post(f"/api/v1/runs/{run_id}/execute", json=start_body())
 
         resp = c.get(f"/api/v1/runs/{run_id}")
         events = resp.json()["events"]
@@ -408,7 +412,7 @@ class TestWP09RuntimeFailure:
             json={"title": "T", "workflow_id": "review-minimal", "workflow_version": 1},
         ).json()["id"]
 
-        resp = c1.post(f"/api/v1/tasks/{tid}/runs", json={"context_package_id": cp_id})
+        resp = c1.post(f"/api/v1/tasks/{tid}/runs", json=prepared_run_body(c1, tid, cp_id))
         run_id = resp.json()["id"]
 
         # Inject failure at the specified adapter boundary
@@ -433,7 +437,7 @@ class TestWP09RuntimeFailure:
             setattr(ReferenceRuntimeAdapter, fail_point, failing_async)
 
         try:
-            resp = c1.post(f"/api/v1/runs/{run_id}/execute")
+            resp = c1.post(f"/api/v1/runs/{run_id}/execute", json=start_body())
             assert resp.status_code == 202
             data = resp.json()
 
@@ -508,7 +512,7 @@ class TestWP09Sanitization:
             json={"title": "T", "workflow_id": "review-minimal", "workflow_version": 1},
         ).json()["id"]
 
-        resp = c1.post(f"/api/v1/tasks/{tid}/runs", json={"context_package_id": cp_id})
+        resp = c1.post(f"/api/v1/tasks/{tid}/runs", json=prepared_run_body(c1, tid, cp_id))
         run_id = resp.json()["id"]
 
         # Inject failure with secret marker in exception message
@@ -521,7 +525,7 @@ class TestWP09Sanitization:
         ReferenceRuntimeAdapter.create_run = failing_create_run
 
         try:
-            resp = c1.post(f"/api/v1/runs/{run_id}/execute")
+            resp = c1.post(f"/api/v1/runs/{run_id}/execute", json=start_body())
             assert resp.status_code == 202
             response_text = resp.text
 
@@ -591,7 +595,7 @@ class TestWP09NoFabricatedOutput:
             json={"title": "T", "workflow_id": "review-minimal", "workflow_version": 1},
         ).json()["id"]
 
-        resp = c1.post(f"/api/v1/tasks/{tid}/runs", json={"context_package_id": cp_id})
+        resp = c1.post(f"/api/v1/tasks/{tid}/runs", json=prepared_run_body(c1, tid, cp_id))
         run_id = resp.json()["id"]
 
         # Inject failure at result call — runtime started but failed before producing result
@@ -604,7 +608,7 @@ class TestWP09NoFabricatedOutput:
         ReferenceRuntimeAdapter.result = failing_result
 
         try:
-            resp = c1.post(f"/api/v1/runs/{run_id}/execute")
+            resp = c1.post(f"/api/v1/runs/{run_id}/execute", json=start_body())
             assert resp.status_code == 202
 
             c1.close()
@@ -669,7 +673,7 @@ class TestWP09OutputPersistence:
             json={"title": "T", "workflow_id": "review-minimal", "workflow_version": 1},
         ).json()["id"]
 
-        resp = c1.post(f"/api/v1/tasks/{tid}/runs", json={"context_package_id": cp_id})
+        resp = c1.post(f"/api/v1/tasks/{tid}/runs", json=prepared_run_body(c1, tid, cp_id))
         run_id = resp.json()["id"]
 
         # Prepare real Finding/Evidence/Artifact that will be returned by adapter
@@ -711,7 +715,7 @@ class TestWP09OutputPersistence:
         ReferenceRuntimeAdapter.artifacts = injected_artifacts  # type: ignore[method-assign]
 
         try:
-            resp = c1.post(f"/api/v1/runs/{run_id}/execute")
+            resp = c1.post(f"/api/v1/runs/{run_id}/execute", json=start_body())
             assert resp.status_code == 202
             c1.close()
 
@@ -768,11 +772,11 @@ class TestWP09AdapterInvocationCount:
             tid = ctx.create_task(pid, context_package_id=cp_id)
             run_id = ctx.create_run(tid, cp_id)
 
-            resp1 = c.post(f"/api/v1/runs/{run_id}/execute")
+            resp1 = c.post(f"/api/v1/runs/{run_id}/execute", json=start_body())
             assert resp1.status_code == 202
             assert invocation_count == 1
 
-            resp2 = c.post(f"/api/v1/runs/{run_id}/execute")
+            resp2 = c.post(f"/api/v1/runs/{run_id}/execute", json=start_body())
             assert resp2.status_code == 200
             assert resp2.json()["state"] == "COMPLETED"
             assert invocation_count == 1, f"Adapter invoked {invocation_count} times, expected 1"
@@ -797,10 +801,10 @@ class TestWP09IdempotencyMatrix:
         tid = ctx.create_task(pid, context_package_id=cp_id)
         run_id = ctx.create_run(tid, cp_id)
 
-        resp1 = c.post(f"/api/v1/runs/{run_id}/execute")
+        resp1 = c.post(f"/api/v1/runs/{run_id}/execute", json=start_body())
         assert resp1.status_code == 202
 
-        resp2 = c.post(f"/api/v1/runs/{run_id}/execute")
+        resp2 = c.post(f"/api/v1/runs/{run_id}/execute", json=start_body())
         assert resp2.status_code == 200
         assert resp2.json()["state"] == "COMPLETED"
 
@@ -819,7 +823,7 @@ class TestWP09IdempotencyMatrix:
         finally:
             session.close()
 
-        resp = c.post(f"/api/v1/runs/{run_id}/execute")
+        resp = c.post(f"/api/v1/runs/{run_id}/execute", json=start_body())
         assert resp.status_code == 202
 
     def test_running_run_returns_202(self, ctx: _TestContext) -> None:
@@ -840,7 +844,7 @@ class TestWP09IdempotencyMatrix:
         finally:
             session.close()
 
-        resp = c.post(f"/api/v1/runs/{run_id}/execute")
+        resp = c.post(f"/api/v1/runs/{run_id}/execute", json=start_body())
         assert resp.status_code == 202
         assert resp.json()["state"] == "RUNNING"
 
@@ -863,7 +867,7 @@ class TestWP09IdempotencyMatrix:
         finally:
             session.close()
 
-        resp = c.post(f"/api/v1/runs/{run_id}/execute")
+        resp = c.post(f"/api/v1/runs/{run_id}/execute", json=start_body())
         assert resp.status_code == 200
         assert resp.json()["state"] == "FAILED"
 
@@ -886,7 +890,7 @@ class TestWP09IdempotencyMatrix:
         finally:
             session.close()
 
-        resp = c.post(f"/api/v1/runs/{run_id}/execute")
+        resp = c.post(f"/api/v1/runs/{run_id}/execute", json=start_body())
         assert resp.status_code == 200
         assert resp.json()["state"] == "TIMED_OUT"
 
@@ -910,7 +914,7 @@ class TestWP09IdempotencyMatrix:
         finally:
             session.close()
 
-        resp = c.post(f"/api/v1/runs/{run_id}/execute")
+        resp = c.post(f"/api/v1/runs/{run_id}/execute", json=start_body())
         assert resp.status_code == 200
         assert resp.json()["state"] == "CANCELLED"
 
@@ -934,7 +938,7 @@ class TestWP09IdempotencyMatrix:
         finally:
             session.close()
 
-        resp = c.post(f"/api/v1/runs/{run_id}/execute")
+        resp = c.post(f"/api/v1/runs/{run_id}/execute", json=start_body())
         assert resp.status_code == 200
         assert resp.json()["state"] == "ORPHANED"
 
@@ -957,7 +961,7 @@ class TestWP09IdempotencyMatrix:
         finally:
             session.close()
 
-        resp = c.post(f"/api/v1/runs/{run_id}/execute")
+        resp = c.post(f"/api/v1/runs/{run_id}/execute", json=start_body())
         assert resp.status_code == 409
 
 
@@ -967,7 +971,7 @@ class TestWP09IdempotencyMatrix:
 
 class TestWP09ValidationErrors:
     def test_execute_missing_run_returns_404(self, ctx: _TestContext) -> None:
-        resp = ctx.client.post("/api/v1/runs/nonexistent/execute")
+        resp = ctx.client.post("/api/v1/runs/nonexistent/execute", json=start_body())
         assert resp.status_code == 404
 
     def test_execute_auth_required(self, tmp_path: Path) -> None:
@@ -988,6 +992,8 @@ class TestWP09ValidationErrors:
 
         app = FastAPI()
 
+
+        app.include_router(generations_router, prefix="/api/v1")
         def _override_get_session():
             session = TestSession()
             try:
@@ -1006,7 +1012,7 @@ class TestWP09ValidationErrors:
         app.include_router(runs_router, prefix="/api/v1")
 
         client = TestClient(app, raise_server_exceptions=False)
-        resp = client.post("/api/v1/runs/any/execute")
+        resp = client.post("/api/v1/runs/any/execute", json=start_body())
         assert resp.status_code == 403
         engine.dispose()
 
@@ -1027,7 +1033,7 @@ class TestWP09ValidationErrors:
         finally:
             session.close()
 
-        resp = c.post(f"/api/v1/runs/{run_id}/execute")
+        resp = c.post(f"/api/v1/runs/{run_id}/execute", json=start_body())
         assert resp.status_code == 422
 
     def test_execute_workflow_mismatch_returns_422(self, ctx: _TestContext) -> None:
@@ -1046,7 +1052,7 @@ class TestWP09ValidationErrors:
         finally:
             session.close()
 
-        resp = c.post(f"/api/v1/runs/{run_id}/execute")
+        resp = c.post(f"/api/v1/runs/{run_id}/execute", json=start_body())
         assert resp.status_code == 422
 
     def test_stored_task_missing_returns_422(self, ctx: _TestContext) -> None:
@@ -1064,7 +1070,7 @@ class TestWP09ValidationErrors:
         finally:
             session.close()
 
-        resp = c.post(f"/api/v1/runs/{run_id}/execute")
+        resp = c.post(f"/api/v1/runs/{run_id}/execute", json=start_body())
         assert resp.status_code == 422
 
     def test_stored_context_package_missing_returns_422(self, ctx: _TestContext) -> None:
@@ -1082,7 +1088,7 @@ class TestWP09ValidationErrors:
         finally:
             session.close()
 
-        resp = c.post(f"/api/v1/runs/{run_id}/execute")
+        resp = c.post(f"/api/v1/runs/{run_id}/execute", json=start_body())
         assert resp.status_code == 422
 
 
@@ -1111,7 +1117,7 @@ class TestWP09RunCreateRegression:
         cp_id = ctx.create_context_package(pid)
         tid = ctx.create_task(pid, context_package_id=cp_id)
 
-        resp = c.post(f"/api/v1/tasks/{tid}/runs", json={"context_package_id": cp_id})
+        resp = c.post(f"/api/v1/tasks/{tid}/runs", json=prepared_run_body(c, tid, cp_id))
         assert resp.status_code == 201
         assert resp.json()["state"] == "CREATED"
         assert resp.json()["result"] is None
@@ -1123,8 +1129,8 @@ class TestWP09RunCreateRegression:
         cp_id = ctx.create_context_package(pid)
         tid = ctx.create_task(pid, context_package_id=cp_id)
 
-        c.post(f"/api/v1/tasks/{tid}/runs", json={"context_package_id": cp_id})
-        c.post(f"/api/v1/tasks/{tid}/runs", json={"context_package_id": cp_id})
+        c.post(f"/api/v1/tasks/{tid}/runs", json=prepared_run_body(c, tid, cp_id))
+        c.post(f"/api/v1/tasks/{tid}/runs", json=prepared_run_body(c, tid, cp_id))
 
         resp = c.get(f"/api/v1/tasks/{tid}/runs")
         assert resp.status_code == 200
@@ -1136,7 +1142,7 @@ class TestWP09RunCreateRegression:
         cp_id = ctx.create_context_package(pid)
         tid = ctx.create_task(pid, context_package_id=cp_id)
 
-        resp = c.post(f"/api/v1/tasks/{tid}/runs", json={"context_package_id": cp_id})
+        resp = c.post(f"/api/v1/tasks/{tid}/runs", json=prepared_run_body(c, tid, cp_id))
         run_id = resp.json()["id"]
 
         resp = c.get(f"/api/v1/runs/{run_id}")
@@ -1172,10 +1178,10 @@ class TestWP09ReloadFromNewSession:
             json={"title": "T", "workflow_id": "review-minimal", "workflow_version": 1},
         ).json()["id"]
 
-        resp = c1.post(f"/api/v1/tasks/{tid}/runs", json={"context_package_id": cp_id})
+        resp = c1.post(f"/api/v1/tasks/{tid}/runs", json=prepared_run_body(c1, tid, cp_id))
         run_id = resp.json()["id"]
 
-        resp = c1.post(f"/api/v1/runs/{run_id}/execute")
+        resp = c1.post(f"/api/v1/runs/{run_id}/execute", json=start_body())
         assert resp.status_code == 202
         c1.close()
 
@@ -1203,16 +1209,17 @@ class TestWP09ContextPackageAuthority:
         tid = ctx.create_task(pid, context_package_id=None)
 
         from polynexus_core.domain.models import Run
+        prepared = prepared_run_body(c,tid,cp_id)
         session = ctx.sf()
         try:
-            run = Run(task_id=tid, workflow_id="review-minimal", workflow_version=1, context_package_id=cp_id)
+            run = Run(task_id=tid, workflow_id="review-minimal", workflow_version=1, context_package_id=cp_id,generation_revision=prepared["generation_revision"])
             SqlRunRepository(session).add(run)
             session.commit()
             run_id = run.id
         finally:
             session.close()
 
-        resp = c.post(f"/api/v1/runs/{run_id}/execute")
+        resp = c.post(f"/api/v1/runs/{run_id}/execute", json=start_body())
         assert resp.status_code == 202
 
         resp = c.get(f"/api/v1/runs/{run_id}")
@@ -1241,3 +1248,50 @@ class TestWP09AlembicLifecycle:
         }
         assert expected.issubset(tables)
         engine.dispose()
+
+
+def test_d1a_start_receipt_replay_and_payload_conflict(ctx):
+    from sqlalchemy import text
+    project=ctx.create_project();cp=ctx.create_context_package(project)
+    task=ctx.create_task(project,context_package_id=cp);run=ctx.create_run(task,cp)
+    body={'generation_revision':1,'expected_control_revision':0,'command_id':'durable-start'}
+    first=ctx.client.post(f'/api/v1/runs/{run}/execute',json=body)
+    assert first.status_code==202
+    assert ctx.client.post(f'/api/v1/runs/{run}/execute',json=body).status_code==200
+    changed={**body,'expected_control_revision':99}
+    assert ctx.client.post(f'/api/v1/runs/{run}/execute',json=changed).status_code==409
+    with ctx.sf() as session:
+        assert session.execute(text("SELECT count(*) FROM generation_commands WHERE command_id='durable-start'")).scalar_one()==1
+        assert session.execute(text("SELECT count(*) FROM run_events WHERE run_id=:r AND to_state='STARTING'"),{'r':run}).scalar_one()==1
+        assert session.execute(text("SELECT count(*) FROM generation_events WHERE command_id='durable-start' AND kind='RunStartRequested'")).scalar_one()==1
+
+
+def test_d1a_cancel_created_exact_receipt_never_launches(ctx):
+    project=ctx.create_project();cp=ctx.create_context_package(project)
+    task=ctx.create_task(project,context_package_id=cp);run=ctx.create_run(task,cp)
+    body={'generation_revision':1,'expected_control_revision':0,'expected_fence':0,'command_id':'cancel-created'}
+    assert ctx.client.post(f'/api/v1/runs/{run}/cancel',json={**body,'expected_fence':8}).status_code==409
+    first=ctx.client.post(f'/api/v1/runs/{run}/cancel',json=body)
+    assert first.status_code==200 and first.json()['cancel_requested']
+    assert ctx.client.post(f'/api/v1/runs/{run}/cancel',json=body).json()==first.json()
+    assert ctx.client.get(f'/api/v1/runs/{run}').json()['state']=='CANCELLED'
+    assert ctx.client.post(f'/api/v1/runs/{run}/cancel',json={**body,'generation_revision':2}).status_code==409
+    assert ctx.client.post(f'/api/v1/runs/{run}/execute',json={'generation_revision':1,'expected_control_revision':1,'command_id':'start-cancelled'}).status_code==200
+    assert ctx.client.get(f'/api/v1/runs/{run}').json()['runtime_ref'] is None
+
+
+def test_d1a_cancel_lost_active_handle_is_unknown(ctx):
+    from sqlalchemy import text
+    project=ctx.create_project();cp=ctx.create_context_package(project)
+    task=ctx.create_task(project,context_package_id=cp);run=ctx.create_run(task,cp)
+    with ctx.sf() as session:
+        from polynexus_core.persistence.generation import GenerationRepository
+        repository=GenerationRepository(session);stored=SqlRunRepository(session).get(run)
+        claim=repository.claim_run(stored)
+        session.execute(text("UPDATE runs SET state='STARTING' WHERE id=:r"),{'r':run});session.commit()
+    body={'generation_revision':1,'expected_control_revision':1,'expected_fence':claim['fence'],'command_id':'lost-handle-cancel'}
+    result=ctx.client.post(f'/api/v1/runs/{run}/cancel',json=body)
+    assert result.status_code==200
+    generation=ctx.client.get(f'/api/v1/tasks/{task}/generations/1').json()
+    assert generation['ownership_unknown']==1 and generation['work_aborted'] is False
+    assert ctx.client.post(f'/api/v1/runs/{run}/cancel',json=body).json()==result.json()

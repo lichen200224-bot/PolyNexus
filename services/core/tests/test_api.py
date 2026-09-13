@@ -17,6 +17,8 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from d1a_fixtures import d1a_content_environment, prepared_run_body, start_body
+from polynexus_core.api.generations import router as generations_router
 from polynexus_core.api.dependencies import require_loopback
 from polynexus_core.persistence.database import get_session
 from polynexus_core.persistence.models import Base
@@ -82,6 +84,8 @@ def _create_test_app(db_url: str) -> tuple[FastAPI, sessionmaker]:
 
     app = FastAPI()
 
+
+    app.include_router(generations_router, prefix="/api/v1")
     def _override_get_session():
         session = TestSession()
         try:
@@ -180,6 +184,8 @@ class TestAuthBoundary:
 
         app = FastAPI()
 
+
+        app.include_router(generations_router, prefix="/api/v1")
         def _override_get_session():
             session = TestSession()
             try:
@@ -225,6 +231,8 @@ class TestAuthBoundary:
 
         app = FastAPI()
 
+
+        app.include_router(generations_router, prefix="/api/v1")
         def _override_get_session():
             session = TestSession()
             try:
@@ -468,7 +476,7 @@ class TestRunAPI:
         pid, tid = self._setup_project_and_task(c)
         cp_id = ctx.create_context_package(pid)
 
-        resp = c.post(f"/api/v1/tasks/{tid}/runs", json={"context_package_id": cp_id})
+        resp = c.post(f"/api/v1/tasks/{tid}/runs", json=prepared_run_body(c, tid, cp_id))
         assert resp.status_code == 201
         data = resp.json()
         assert data["state"] == "CREATED"
@@ -482,7 +490,7 @@ class TestRunAPI:
         pid, tid = self._setup_project_and_task(c)
         cp_id = ctx.create_context_package(pid)
 
-        resp = c.post(f"/api/v1/tasks/{tid}/runs", json={"context_package_id": cp_id})
+        resp = c.post(f"/api/v1/tasks/{tid}/runs", json=prepared_run_body(c, tid, cp_id))
         run_id = resp.json()["id"]
 
         resp = c.get(f"/api/v1/runs/{run_id}")
@@ -495,8 +503,8 @@ class TestRunAPI:
         pid, tid = self._setup_project_and_task(c)
         cp_id = ctx.create_context_package(pid)
 
-        c.post(f"/api/v1/tasks/{tid}/runs", json={"context_package_id": cp_id})
-        c.post(f"/api/v1/tasks/{tid}/runs", json={"context_package_id": cp_id})
+        c.post(f"/api/v1/tasks/{tid}/runs", json=prepared_run_body(c, tid, cp_id))
+        c.post(f"/api/v1/tasks/{tid}/runs", json=prepared_run_body(c, tid, cp_id))
 
         resp = c.get(f"/api/v1/tasks/{tid}/runs")
         assert resp.status_code == 200
@@ -513,14 +521,14 @@ class TestRunAPI:
     def test_create_run_nonexistent_task(self, ctx: _TestContext) -> None:
         resp = ctx.client.post(
             "/api/v1/tasks/nonexistent/runs",
-            json={"context_package_id": "cp_xxx"},
+            json={"context_package_id": "cp_xxx", "generation_revision":1, "expected_control_revision":0, "command_id":"negative-create"},
         )
         assert resp.status_code == 404
 
     def test_create_run_nonexistent_context_package(self, ctx: _TestContext) -> None:
         c = ctx.client
         _, tid = self._setup_project_and_task(c)
-        resp = c.post(f"/api/v1/tasks/{tid}/runs", json={"context_package_id": "cp_nonexistent"})
+        resp = c.post(f"/api/v1/tasks/{tid}/runs", json={"context_package_id": "cp_nonexistent", "generation_revision":1, "expected_control_revision":0, "command_id":"negative-create"})
         assert resp.status_code == 422
 
     def test_create_run_cross_project_context_package(self, ctx: _TestContext) -> None:
@@ -530,7 +538,7 @@ class TestRunAPI:
         pid2 = c.post("/api/v1/projects", json={"name": "Other"}).json()["id"]
         cp_id = ctx.create_context_package(pid2)
 
-        resp = c.post(f"/api/v1/tasks/{tid}/runs", json={"context_package_id": cp_id})
+        resp = c.post(f"/api/v1/tasks/{tid}/runs", json={"context_package_id": cp_id, "generation_revision":1, "expected_control_revision":0, "command_id":"negative-create"})
         assert resp.status_code == 422
 
     def test_run_no_forged_evidence(self, ctx: _TestContext) -> None:
@@ -539,7 +547,7 @@ class TestRunAPI:
         pid, tid = self._setup_project_and_task(c)
         cp_id = ctx.create_context_package(pid)
 
-        resp = c.post(f"/api/v1/tasks/{tid}/runs", json={"context_package_id": cp_id})
+        resp = c.post(f"/api/v1/tasks/{tid}/runs", json=prepared_run_body(c, tid, cp_id))
         data = resp.json()
         assert data["state"] == "CREATED"
         assert data["result"] is None
@@ -575,7 +583,7 @@ class TestRunAPI:
         cp_id = cp.id
         session.close()
 
-        resp = c1.post(f"/api/v1/tasks/{tid}/runs", json={"context_package_id": cp_id})
+        resp = c1.post(f"/api/v1/tasks/{tid}/runs", json=prepared_run_body(c1, tid, cp_id))
         run_id = resp.json()["id"]
         c1.close()
 

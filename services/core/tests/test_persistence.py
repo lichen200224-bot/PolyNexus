@@ -1079,8 +1079,8 @@ class TestAlembicLifecycle:
 
         config = Config(str(alembic_ini))
 
-        # --- Phase 1: upgrade head on empty db ---
-        alembic_cmd.upgrade(config, "head")
+        # --- Phase 1: upgrade historical 0003 on empty db ---
+        alembic_cmd.upgrade(config, "0003")
 
         engine = create_engine(
             f"sqlite:///{db_path}",

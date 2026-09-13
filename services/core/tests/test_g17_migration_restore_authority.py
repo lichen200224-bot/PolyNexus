@@ -68,7 +68,7 @@ def test_isolated_backup_restore_and_reupgrade_preserve_history(
     before = _history(db_path)
 
     shutil.copy2(db_path, backup_path)
-    _upgrade(db_path, "head")
+    _upgrade(db_path, "0003")
     assert _version(db_path) == "0003"
     _assert_ordering_metadata(db_path, "run-g17", "event-g17")
     assert _history(db_path) == before
@@ -81,7 +81,7 @@ def test_isolated_backup_restore_and_reupgrade_preserve_history(
     assert _metadata_schema(db_path) == {"runs": {}, "run_events": {}}
     assert _history(db_path) == before
 
-    _upgrade(db_path, "head")
+    _upgrade(db_path, "0003")
     assert _version(db_path) == "0003"
     _assert_ordering_metadata(db_path, "run-g17", "event-g17")
     assert _history(db_path) == before
@@ -144,6 +144,7 @@ def _seed_legacy_history(db_path: Path) -> None:
                 "'2026-09-01 00:00:04.000000')"
             )
         )
+        connection.exec_driver_sql("INSERT INTO context_packages(id,project_id,version,created_at) VALUES('cp-g17','proj-g17',1,'2026-01-01')")
     engine.dispose()
 
 

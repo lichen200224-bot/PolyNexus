@@ -14,6 +14,8 @@
 // ---------------------------------------------------------------------------
 
 export interface Project {
+  archived?: boolean
+  classification?: string
   id: string
   name: string
   description: string | null
@@ -21,6 +23,7 @@ export interface Project {
 }
 
 export interface Task {
+  classification?: string
   id: string
   project_id: string
   title: string
@@ -50,6 +53,8 @@ export interface RunResult {
 }
 
 export interface Run {
+  generation_revision?: number | null
+  generation_binding_status?: string
   id: string
   task_id: string
   workflow_id: string
@@ -79,11 +84,13 @@ export interface RunListResponse {
 }
 
 export interface ProjectCreateRequest {
+  classification?: string
   name: string
   description?: string | null
 }
 
 export interface TaskCreateRequest {
+  classification?: string
   title: string
   workflow_id: string
   workflow_version: number
@@ -92,6 +99,9 @@ export interface TaskCreateRequest {
 }
 
 export interface RunCreateRequest {
+  generation_revision: number
+  expected_control_revision: number
+  command_id: string
   context_package_id: string
 }
 
@@ -100,6 +110,7 @@ export interface RunCreateRequest {
 // ---------------------------------------------------------------------------
 
 export interface ContextPackage {
+  classification?: string
   id: string
   project_id: string
   version: number
@@ -114,6 +125,7 @@ export interface ContextPackage {
 }
 
 export interface ContextPackageCreateRequest {
+  classification?: string
   version: number
   instructions?: string[]
   constraints?: string[]
@@ -154,6 +166,7 @@ export interface Evidence {
 }
 
 export interface Artifact {
+  classification?: string
   id: string
   project_id: string
   task_id: string | null
@@ -454,3 +467,23 @@ export function getRunHistory(
     `/runs/${encodeURIComponent(runId)}/history`,
   )
 }
+
+
+export interface Generation {
+  task_id: string
+  generation_revision?: number
+  revision: number
+  control_revision: number
+  aborted: number | boolean
+  closed: number | boolean
+  ownership_unknown: number | boolean
+  work_aborted: boolean
+  inputs: Record<string, string>
+  writer: { run_id: string; fence: number; released: number | boolean } | null
+  workspace: { workspace_id: string; identity: unknown; git_observation: { state: string }; ownership: { state: string }; recoverability: { state: string; cleanup: string } } | null
+  events: Array<{event_id: string; kind: string; control_revision: number}>
+}
+export function workRequest<T>(config: ApiClientConfig, method: string, path: string, body?: unknown): Promise<T> {
+  return request<T>(config, method, path, body)
+}
+export const taskGenerationPath = (task: string) => `/tasks/${encodeURIComponent(task)}/generations`

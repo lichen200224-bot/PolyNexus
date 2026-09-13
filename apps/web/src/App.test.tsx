@@ -52,6 +52,23 @@ function click(el: Element | null) {
 }
 
 // ---------------------------------------------------------------------------
+
+// A prior explicit Begin is represented by a durable server fixture, never
+// synthesized by the product or inferred from ContextPackage ID.
+async function selectFixtureGeneration(el: HTMLDivElement) {
+  const contextId=(el.querySelector('#cp-id') as HTMLInputElement).value
+  const previous=globalThis.fetch
+  globalThis.fetch=vi.fn(async(input: RequestInfo | URL,init?:RequestInit)=>{
+    const url=String(input)
+    if((init?.method??'GET')==='GET'&&url.endsWith('/generations'))return new Response(JSON.stringify({task_revision:1,generations:[{task_id:'t_1',revision:1,control_revision:0,aborted:0,closed:0,ownership_unknown:0,inputs:{context_package_id:contextId,requirements_ref:'fixture:requirements',validation_ref:'fixture:validation',baseline_ref:'fixture:baseline',input_ref:'fixture:input'},writer:null,workspace:null,events:[]}]}),{status:200,headers:{'Content-Type':'application/json'}})
+    return previous(input,init)
+  }) as typeof fetch
+  ;(Array.from(el.querySelectorAll('button')).find(b=>b.textContent==='Load generations') as HTMLButtonElement).click()
+  await flush()
+  ;(el.querySelector('input[name="generation"][value="1"]') as HTMLInputElement).click()
+  await flush()
+}
+
 // API error classes
 // ---------------------------------------------------------------------------
 
@@ -622,6 +639,7 @@ describe('Run CREATED', () => {
     el.querySelector('#cp-id')!.dispatchEvent(new Event('input', { bubbles: true }))
     el.querySelector('#cp-id')!.dispatchEvent(new Event('change', { bubbles: true }))
     await flush()
+    await selectFixtureGeneration(el)
     el.querySelector('form')!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
     await flush()
     expect(el.querySelectorAll('[role="alert"]').length).toBeGreaterThan(0)
@@ -645,6 +663,7 @@ describe('Run CREATED', () => {
     el.querySelector('#cp-id')!.dispatchEvent(new Event('input', { bubbles: true }))
     el.querySelector('#cp-id')!.dispatchEvent(new Event('change', { bubbles: true }))
     await flush()
+    await selectFixtureGeneration(el)
     el.querySelector('form')!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
     await flush()
     expect(el.textContent).toContain('Authentication required')
@@ -668,6 +687,7 @@ describe('Run CREATED', () => {
     el.querySelector('#cp-id')!.dispatchEvent(new Event('input', { bubbles: true }))
     el.querySelector('#cp-id')!.dispatchEvent(new Event('change', { bubbles: true }))
     await flush()
+    await selectFixtureGeneration(el)
     el.querySelector('form')!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
     await flush()
     expect(el.textContent).toContain('Task not found')
@@ -1004,6 +1024,7 @@ describe('WP-08B: ContextPackage authoring', () => {
     expect(cpInput.value).toBe('context_returned')
 
     // Now submit Run form
+    await selectFixtureGeneration(el)
     el.querySelector('form[aria-label="Create run"]')!.dispatchEvent(
       new Event('submit', { bubbles: true, cancelable: true }),
     )
@@ -1410,6 +1431,7 @@ describe('WP-08B: ContextPackage authoring', () => {
     await flush()
 
     // Submit run creation
+    await selectFixtureGeneration(el)
     el.querySelector('form[aria-label="Create run"]')!.dispatchEvent(
       new Event('submit', { bubbles: true, cancelable: true }),
     )
@@ -1442,6 +1464,7 @@ describe('WP-08B: ContextPackage authoring', () => {
     el.querySelector('#cp-id')!.dispatchEvent(new Event('change', { bubbles: true }))
     await flush()
 
+    await selectFixtureGeneration(el)
     el.querySelector('form[aria-label="Create run"]')!.dispatchEvent(
       new Event('submit', { bubbles: true, cancelable: true }),
     )

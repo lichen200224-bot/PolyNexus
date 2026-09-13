@@ -15,6 +15,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from d1a_fixtures import d1a_content_environment,prepare_generation,migrate_fixture_engine
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -69,7 +70,7 @@ def gate_session(tmp_path: Path):
     db_path = tmp_path / "wp13.db"
     url = f"sqlite:///{db_path}"
     engine = create_engine(url, connect_args={"check_same_thread": False}, future=True)
-    Base.metadata.create_all(engine)
+    migrate_fixture_engine(engine)
     Session = sessionmaker(bind=engine, expire_on_commit=False, future=True)
     session = Session()
     yield session, db_path
@@ -92,16 +93,17 @@ def _seed(session):
     )
     SqlTaskRepository(session).add(task)
     session.commit()
+    prepare_generation(session,task.id)
     return task, context, project
 
 
-def _new_run(session, task, context) -> Run:
+def _new_run(session, task, context, *, generation_revision=None) -> Run:
     run = Run(
         task_id=task.id,
         workflow_id=task.workflow_id,
         workflow_version=task.workflow_version,
         context_package_id=context.id,
-    )
+     generation_revision=generation_revision)
     SqlRunRepository(session).add(run)
     session.commit()
     return run
@@ -526,7 +528,7 @@ def test_council_output_cannot_mutate_gate_verdict(gate_session) -> None:
     ]
     import asyncio
 
-    asyncio.run(CouncilOrchestrator(session).run_council(task, context, specs))
+    asyncio.run(CouncilOrchestrator(session).run_council(task, context, specs, generation_revision=1))
 
     after = evaluate_workflow_gates(workflow, task, gate_run, SqlEvidenceRepository(session))
     assert after.verdict is not GateOutcome.PASS
@@ -875,10 +877,16 @@ def test_task_workflow_version_mismatch_raises_identity_error(gate_session) -> N
 def test_run_task_id_mismatch_raises_identity_error(gate_session) -> None:
     session, _ = gate_session
     task, context, _ = _seed(session)
-    run = _new_run(session, task, context)
+    run = _new_run(session, task, context, generation_revision=1)
     run.task_id = "fake-task-id"
-    SqlRunRepository(session).update(run)
-    session.commit()
+    # A persisted bound identity cannot be rewritten. The gate still rejects
+    # the independently tampered in-memory value with its original error.
+    from sqlalchemy.exc import IntegrityError
+    with pytest.raises(IntegrityError, match="Run generation is immutable"):
+        SqlRunRepository(session).update(run)
+        session.commit()
+    session.rollback()
+    assert SqlRunRepository(session).get(run.id).task_id == task.id
     workflow = load_workflow_definition(_VERIFIED_GATE_WORKFLOW)
     with pytest.raises(WorkflowIdentityError, match="task_id"):
         evaluate_workflow_gates(workflow, task, run, SqlEvidenceRepository(session))
@@ -1257,7 +1265,7 @@ def test_execution_service_runs_gate_evaluation(gate_session) -> None:
     and persists the gate report as DOCUMENT_EVIDENCE on COMPLETED runs."""
     session, _ = gate_session
     task, context, project = _seed(session)
-    run = _new_run(session, task, context)
+    run = _new_run(session, task, context, generation_revision=1)
 
     import asyncio
     from polynexus_core.execution_service import ExecutionService
@@ -2583,7 +2591,7 @@ def test_unrelated_document_evidence_with_overlapping_metadata_does_not_block(
 
 def _seed_second_task(session, first_project):
     """Create a second independent task + context + run under the same project."""
-    context2 = ContextPackage(project_id=first_project.id, version=1)
+    context2 = ContextPackage(project_id=first_project.id, version=2)
     SqlContextPackageRepository(session).add(context2)
     task2 = Task(
         project_id=first_project.id,
@@ -2600,7 +2608,7 @@ def _seed_second_task(session, first_project):
         workflow_id=task2.workflow_id,
         workflow_version=task2.workflow_version,
         context_package_id=context2.id,
-    )
+     generation_revision=None)
     SqlRunRepository(session).add(run2)
     session.commit()
     return task2, context2, run2
@@ -2801,7 +2809,7 @@ def test_same_task_two_runs_each_persist_own_gate_report(gate_session) -> None:
         workflow_id=task.workflow_id,
         workflow_version=task.workflow_version,
         context_package_id=context.id,
-    )
+     generation_revision=None)
     SqlRunRepository(session).add(run2)
     session.commit()
 
@@ -2854,7 +2862,7 @@ def test_same_task_replay_run1_does_not_affect_run2(gate_session) -> None:
         workflow_id=task.workflow_id,
         workflow_version=task.workflow_version,
         context_package_id=context.id,
-    )
+     generation_revision=None)
     SqlRunRepository(session).add(run2)
     session.commit()
 
@@ -2986,7 +2994,7 @@ def test_combined_tamper_on_one_task_does_not_block_another(gate_session) -> Non
     run_a = _new_run(session, task_a, context_a)
 
     # Create Task B under same project.
-    context_b = ContextPackage(project_id=project.id, version=1)
+    context_b = ContextPackage(project_id=project.id, version=2)
     SqlContextPackageRepository(session).add(context_b)
     task_b = Task(
         project_id=project.id,
@@ -3003,7 +3011,7 @@ def test_combined_tamper_on_one_task_does_not_block_another(gate_session) -> Non
         workflow_id=task_b.workflow_id,
         workflow_version=task_b.workflow_version,
         context_package_id=context_b.id,
-    )
+     generation_revision=None)
     SqlRunRepository(session).add(run_b)
     session.commit()
 
@@ -3072,7 +3080,7 @@ def test_same_task_corrupted_run1_does_not_block_valid_run2(gate_session) -> Non
         workflow_id=task.workflow_id,
         workflow_version=task.workflow_version,
         context_package_id=context.id,
-    )
+     generation_revision=None)
     SqlRunRepository(session).add(run2)
     session.commit()
 

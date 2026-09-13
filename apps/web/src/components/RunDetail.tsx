@@ -1,4 +1,6 @@
-import { useEffect, useState, useCallback } from 'react'
+import { workRequest, taskGenerationPath } from '../api'
+import type { Generation } from '../api'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import type { ApiClientConfig, Run, RunResult, Finding, Evidence, Artifact, RunEvent } from '../api'
 import { getRun, getRunResult, getRunFindings, getRunEvidence, getRunArtifacts, getRunHistory, AuthError, ApiError, NotFoundError } from '../api'
 import { StatusMessage } from './StatusMessage'
@@ -41,6 +43,8 @@ function stateMessage(state: string): { kind: 'human-required' | 'terminal'; tit
 }
 
 export function RunDetail({ config, runId, onBack }: RunDetailProps) {
+  const [commandError,setCommandError]=useState(''),[commandBusy,setCommandBusy]=useState(false)
+  const commandBodies=useRef(new Map<string,Record<string,unknown>>())
   const [run, setRun] = useState<Run | null>(null)
   const [result, setResult] = useState<RunResult | null | undefined>(undefined)
   const [findings, setFindings] = useState<Finding[] | null>(null)
@@ -78,6 +82,20 @@ export function RunDetail({ config, runId, onBack }: RunDetailProps) {
   }, [config, runId])
 
   useEffect(() => { load() }, [load])
+  const send=async(kind:'execute'|'cancel')=>{
+    if(!run?.generation_revision)return
+    setCommandBusy(true);setCommandError('')
+    try {
+      const current=await workRequest<Generation>(config,'GET',`${taskGenerationPath(run.task_id)}/${run.generation_revision}`)
+      if(current.ownership_unknown)throw new Error('unknown ownership')
+      const key=kind+run.id
+      if(!commandBodies.current.has(key))commandBodies.current.set(key,{generation_revision:run.generation_revision,expected_control_revision:current.control_revision,command_id:crypto.randomUUID(),...(kind==='cancel'?{expected_fence:current.writer?.fence??0}:{})})
+      await workRequest(config,'POST',`/runs/${encodeURIComponent(run.id)}/${kind}`,commandBodies.current.get(key))
+      await load()
+    } catch {setCommandError('Unable to send command. Refresh the recorded state and check runtime readiness.')}
+    finally {setCommandBusy(false)}
+  }
+
 
   return (
     <section aria-labelledby="run-detail-heading">
@@ -104,6 +122,12 @@ export function RunDetail({ config, runId, onBack }: RunDetailProps) {
               <span className="section-count">{run.state}</span>
             </div>
             <p><strong>State:</strong> {run.state}</p>
+            <p>Generation: {run.generation_revision??'Legacy unbound / unverified'}</p>
+            <button type="button" disabled={commandBusy} onClick={()=>void load()}>Refresh recorded state</button>
+            <button type="button" disabled={commandBusy||!run.generation_revision||run.state!=='CREATED'} onClick={()=>void send('execute')}>Start this Run</button>
+            <button type="button" disabled={commandBusy||!run.generation_revision||!['CREATED','STARTING','RUNNING'].includes(run.state)} onClick={()=>void send('cancel')}>Cancel this Run</button>
+            {commandError&&<p role="alert">{commandError}</p>}
+
             <details className="detail-disclosure">
               <summary>Show run identity and execution metadata</summary>
               <p><strong>ID:</strong> {run.id}</p>

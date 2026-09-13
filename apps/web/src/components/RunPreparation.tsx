@@ -1,4 +1,7 @@
-import { useState, useEffect } from 'react'
+import { GenerationControls } from './GenerationControls'
+import { ContextArtifacts } from './ContextArtifacts'
+import type { Generation } from '../api'
+import { useState, useEffect, useRef } from 'react'
 import type { ApiClientConfig, Task, Run, ContextPackageCreateRequest } from '../api'
 import { listRuns, createRun, createContextPackage, AuthError, ApiError } from '../api'
 import { StatusMessage } from './StatusMessage'
@@ -37,6 +40,9 @@ function parseProjectFacts(raw: string): Record<string, string> | string {
 }
 
 export function RunPreparation({ config, task, onBack, onOpenDetail }: RunPreparationProps) {
+  const [generation,setGeneration]=useState<Generation|null>(null)
+  const runCommand=useRef(new Map<string,string>())
+  const [cpClassification,setCpClassification]=useState('INTERNAL')
   const [runs, setRuns] = useState<Run[]>([])
   const [loading, setLoading] = useState(true)
   const [contextPackageId, setContextPackageId] = useState('')
@@ -79,10 +85,14 @@ export function RunPreparation({ config, task, onBack, onOpenDetail }: RunPrepar
 
   const handleCreateRun = async (e: React.FormEvent) => {
     e.preventDefault()
+    if(!generation||generation.closed||generation.aborted||generation.ownership_unknown||generation.inputs.context_package_id!==contextPackageId.trim()){setError("Choose an open, verified generation before creating a Run.");return}
     setSubmitting(true)
     setError(null)
     try {
+      const key=String(generation.revision)+':'+generation.control_revision
+      if(!runCommand.current.has(key))runCommand.current.set(key,crypto.randomUUID())
       await createRun(config, task.id, {
+        generation_revision:generation.revision,expected_control_revision:generation.control_revision,command_id:runCommand.current.get(key)!,
         context_package_id: contextPackageId.trim(),
       })
       setContextPackageId('')
@@ -131,6 +141,7 @@ export function RunPreparation({ config, task, onBack, onOpenDetail }: RunPrepar
     }
 
     const body: ContextPackageCreateRequest = {
+      classification: cpClassification,
       version: versionNum,
       instructions: parseMultiline(cpInstructions),
       constraints: parseMultiline(cpConstraints),
@@ -162,7 +173,7 @@ export function RunPreparation({ config, task, onBack, onOpenDetail }: RunPrepar
   }
 
   const isVersionValid = parseVersion(cpVersion) !== null
-  const canCreateRun = contextPackageId.trim().length > 0 && !submitting
+  const canCreateRun = contextPackageId.trim().length > 0 && !submitting && !!generation && !generation.closed && !generation.aborted && !generation.ownership_unknown && generation.inputs.context_package_id===contextPackageId.trim()
   const canCreateCp = !cpSubmitting && isVersionValid
 
   return (
@@ -205,6 +216,7 @@ export function RunPreparation({ config, task, onBack, onOpenDetail }: RunPrepar
               </div>
             )}
 
+            <label>Context classification<select value={cpClassification} onChange={e=>setCpClassification(e.target.value)}>{["PUBLIC","INTERNAL","CONFIDENTIAL","RESTRICTED"].map(c=><option key={c}>{c}</option>)}</select></label>
             <div className="form-field">
               <label htmlFor="cp-version">Version *</label>
               <input
@@ -351,6 +363,9 @@ export function RunPreparation({ config, task, onBack, onOpenDetail }: RunPrepar
           </button>
         </div>
       </form>
+
+      <GenerationControls config={config} taskId={task.id} contextId={contextPackageId.trim()} onSelected={g=>{setGeneration(g);if(g)setContextPackageId(g.inputs.context_package_id)}}/>
+      <ContextArtifacts config={config} projectId={task.project_id} onSelect={id=>{setContextPackageId(id);setGeneration(null)}} onArtifact={id=>{setCpArtifactRefs(old=>[...new Set([...parseMultiline(old),id])].join('\n'));setShowCpForm(true)}}/>
 
       <div className="runs-section">
         <h3>Runs</h3>

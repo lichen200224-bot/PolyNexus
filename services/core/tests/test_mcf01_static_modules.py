@@ -6,6 +6,7 @@ import traceback
 from dataclasses import FrozenInstanceError, asdict, replace
 from datetime import datetime, timezone
 
+from d1a_fixtures import d1a_content_environment,prepare_generation,migrate_fixture_engine
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
@@ -259,11 +260,13 @@ def test_probe_failures_are_bounded_and_sanitized(mode, category):
 
 def seed(session):
     project = Project(name="MCF01")
-    context = ContextPackage(project_id=project.id, version=1, source_refs=("fixture:mcf01",))
+    context = ContextPackage(project_id=project.id, version=1, instructions=("fixture:mcf01",))
     task = Task(project_id=project.id, title="module proof", workflow_id="review-minimal", workflow_version=1, context_package_id=context.id)
     run = Run(task_id=task.id, workflow_id=task.workflow_id, workflow_version=1, context_package_id=context.id)
-    for repo, entity in ((SqlProjectRepository, project), (SqlContextPackageRepository, context), (SqlTaskRepository, task), (SqlRunRepository, run)):
+    for repo, entity in ((SqlProjectRepository, project), (SqlContextPackageRepository, context), (SqlTaskRepository, task)):
         repo(session).add(entity)
+    run.generation_revision=prepare_generation(session,task.id)
+    SqlRunRepository(session).add(run)
     session.commit()
     return run
 
@@ -271,7 +274,7 @@ def seed(session):
 @pytest.fixture
 def engine(tmp_path):
     value = create_engine(f"sqlite:///{tmp_path / 'mcf01.db'}")
-    Base.metadata.create_all(value)
+    migrate_fixture_engine(value)
     yield value
     value.dispose()
 
