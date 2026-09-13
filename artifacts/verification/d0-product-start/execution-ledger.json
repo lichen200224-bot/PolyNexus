@@ -18,7 +18,7 @@
   },
   "verification": {
     "targeted_final": {
-      "result": "23 passed, 1 warning in 2.31s",
+      "result": "25 passed, 1 warning in 2.61s",
       "exit_code": 0
     },
     "affected_regression": {
