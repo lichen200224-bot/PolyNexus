@@ -186,6 +186,28 @@ export interface HistoryWrapper {
   events: RunEvent[]
 }
 
+export interface HealthLayer {
+  status: 'ready' | 'not_ready' | 'unknown'
+  reason?: string
+}
+
+export interface HealthResponse {
+  status: string
+  service: string
+  version: string
+  baseline: string
+  readiness: 'partial' | 'not_ready'
+  layers: {
+    process: HealthLayer
+    schema: HealthLayer
+    database_integrity: HealthLayer
+    core: HealthLayer
+    api_auth: HealthLayer
+    web_client: HealthLayer
+    runtime: HealthLayer
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Error types
 // ---------------------------------------------------------------------------
@@ -226,6 +248,8 @@ export interface ApiClientConfig {
   baseUrl: string
   /** Inject auth headers; return {} when no auth source is available. */
   getAuthHeaders: AuthHeaderProvider
+  /** True only when START supplied the process-scoped browser credential. */
+  authConfigured?: boolean
 }
 
 async function request<T>(
@@ -262,6 +286,14 @@ async function request<T>(
   }
 
   return res.json() as Promise<T>
+}
+
+// ---------------------------------------------------------------------------
+// Startup health
+// ---------------------------------------------------------------------------
+
+export function getHealth(config: ApiClientConfig): Promise<HealthResponse> {
+  return request<HealthResponse>(config, 'GET', '/health')
 }
 
 // ---------------------------------------------------------------------------

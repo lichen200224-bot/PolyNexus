@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, afterEach } from 'vitest'
-import { App } from './App'
+import { App, createDefaultConfig } from './App'
 import { AuthError, ApiError, NotFoundError } from './api'
 
 // ---------------------------------------------------------------------------
@@ -81,6 +81,19 @@ describe('App', () => {
   afterEach(() => { globalThis.fetch = originalFetch })
 
   it('exports App', () => { expect(typeof App).toBe('function') })
+
+  it('maps the process-only development token to the auth header', async () => {
+    vi.stubEnv('VITE_POLYNEXUS_LOOPBACK_TOKEN', 'process-only-app-token')
+    try {
+      const config = createDefaultConfig()
+      expect(config.authConfigured).toBe(true)
+      expect(await config.getAuthHeaders()).toEqual({
+        'X-Loopback-Token': 'process-only-app-token',
+      })
+    } finally {
+      vi.unstubAllEnvs()
+    }
+  })
 
   it('renders header', async () => {
     mockJson({ projects: [] })

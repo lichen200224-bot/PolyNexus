@@ -4,6 +4,7 @@ import { ProjectList } from './components/ProjectList'
 import { TaskList } from './components/TaskList'
 import { RunPreparation } from './components/RunPreparation'
 import { RunDetail } from './components/RunDetail'
+import { StartupHealth } from './components/StartupHealth'
 
 const workModes = [
   ['Discuss', 'Independent analysis, cross review, synthesis'],
@@ -17,11 +18,19 @@ type ViewState =
   | { view: 'run-prep'; project: Project; task: Task }
   | { view: 'run-detail'; project: Project; task: Task; runId: string }
 
-function createDefaultConfig(): ApiClientConfig {
+export function createDefaultConfig(): ApiClientConfig {
   const base = import.meta.env.VITE_POLYNEXUS_API_BASE_URL || '/api/v1'
+  const configuredToken = import.meta.env.VITE_POLYNEXUS_LOOPBACK_TOKEN as string | undefined
+  const token = import.meta.env.DEV
+    ? configuredToken?.trim()
+    : undefined
   return {
     baseUrl: base.replace(/\/+$/, ''),
-    getAuthHeaders: () => ({}),
+    getAuthHeaders: (): Record<string, string> => {
+      if (!token) return {}
+      return { 'X-Loopback-Token': token }
+    },
+    authConfigured: Boolean(token),
   }
 }
 
@@ -39,6 +48,8 @@ export function App() {
           Select a project, then start with the purpose of the work—not the provider.
         </p>
       </header>
+
+      <StartupHealth config={config} />
 
       <div id="workspace-content" tabIndex={-1}>
       {state.view === 'projects' && (
