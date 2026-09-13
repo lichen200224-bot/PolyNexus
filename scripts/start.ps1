@@ -25,6 +25,7 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace PolyNexus {
   public sealed class NativeJob : IDisposable {
@@ -63,6 +64,36 @@ namespace PolyNexus {
       public UIntPtr PeakJobMemoryUsed;
     }
 
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    private struct StartupInformation {
+      public uint cb;
+      public string lpReserved;
+      public string lpDesktop;
+      public string lpTitle;
+      public uint dwX;
+      public uint dwY;
+      public uint dwXSize;
+      public uint dwYSize;
+      public uint dwXCountChars;
+      public uint dwYCountChars;
+      public uint dwFillAttribute;
+      public uint dwFlags;
+      public short wShowWindow;
+      public short cbReserved2;
+      public IntPtr lpReserved2;
+      public IntPtr hStdInput;
+      public IntPtr hStdOutput;
+      public IntPtr hStdError;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct ProcessInformation {
+      public IntPtr hProcess;
+      public IntPtr hThread;
+      public uint dwProcessId;
+      public uint dwThreadId;
+    }
+
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
     private static extern IntPtr CreateJobObject(IntPtr attributes, string name);
 
@@ -77,8 +108,39 @@ namespace PolyNexus {
     [DllImport("kernel32.dll", SetLastError = true)]
     private static extern bool AssignProcessToJobObject(IntPtr job, IntPtr process);
 
-    [DllImport("kernel32.dll")]
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    private static extern bool CreateProcess(
+      string applicationName,
+      StringBuilder commandLine,
+      IntPtr processAttributes,
+      IntPtr threadAttributes,
+      bool inheritHandles,
+      uint creationFlags,
+      IntPtr environment,
+      string currentDirectory,
+      ref StartupInformation startupInformation,
+      out ProcessInformation processInformation
+    );
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern uint ResumeThread(IntPtr thread);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern bool TerminateProcess(IntPtr process, uint exitCode);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern uint WaitForSingleObject(IntPtr handle, uint milliseconds);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
     private static extern bool CloseHandle(IntPtr handle);
+
+    private const uint CreateSuspended = 0x00000004;
+    private const uint CreateNoWindow = 0x08000000;
+    private const uint ResumeFailed = 0xffffffff;
+
+    private static string QuoteArgument(string value) {
+      return "\"" + value.Replace("\"", "\\\"") + "\"";
+    }
 
     public NativeJob() {
       handle = CreateJobObject(IntPtr.Zero, null);
@@ -97,9 +159,54 @@ namespace PolyNexus {
       }
     }
 
-    public void Add(Process process) {
-      if (!AssignProcessToJobObject(handle, process.Handle)) {
+    public Process StartSuspended(
+      string executable,
+      string[] arguments,
+      string workingDirectory
+    ) {
+      var commandLine = new StringBuilder(QuoteArgument(executable));
+      foreach (string argument in arguments) {
+        commandLine.Append(" ").Append(QuoteArgument(argument));
+      }
+
+      var startup = new StartupInformation();
+      startup.cb = (uint)Marshal.SizeOf(typeof(StartupInformation));
+      ProcessInformation process;
+      if (!CreateProcess(
+        executable,
+        commandLine,
+        IntPtr.Zero,
+        IntPtr.Zero,
+        false,
+        CreateSuspended | CreateNoWindow,
+        IntPtr.Zero,
+        workingDirectory,
+        ref startup,
+        out process)) {
         throw new Win32Exception(Marshal.GetLastWin32Error());
+      }
+
+      try {
+        if (!AssignProcessToJobObject(handle, process.hProcess)) {
+          int error = Marshal.GetLastWin32Error();
+          TerminateProcess(process.hProcess, 1);
+          WaitForSingleObject(process.hProcess, 5000);
+          throw new Win32Exception(error);
+        }
+
+        if (ResumeThread(process.hThread) == ResumeFailed) {
+          int error = Marshal.GetLastWin32Error();
+          TerminateProcess(process.hProcess, 1);
+          WaitForSingleObject(process.hProcess, 5000);
+          throw new Win32Exception(error);
+        }
+
+        var managedProcess = Process.GetProcessById((int)process.dwProcessId);
+        IntPtr managedHandle = managedProcess.Handle;
+        return managedProcess;
+      } finally {
+        CloseHandle(process.hThread);
+        CloseHandle(process.hProcess);
       }
     }
 
@@ -131,23 +238,19 @@ try {
   $webScript = Join-Path $PSScriptRoot "start_web.ps1"
   $commonArguments = @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File")
 
-  $coreProcess = Start-Process `
-    -FilePath $hostExecutable `
-    -ArgumentList ($commonArguments + "`"$coreScript`"") `
-    -WorkingDirectory $repoRoot `
-    -WindowStyle Hidden `
-    -PassThru
-  $ownedJob.Add($coreProcess)
+  $coreProcess = $ownedJob.StartSuspended(
+    $hostExecutable,
+    ($commonArguments + $coreScript),
+    $repoRoot
+  )
 
   Remove-Item Env:LOOPBACK_TOKEN -ErrorAction SilentlyContinue
   $env:VITE_POLYNEXUS_LOOPBACK_TOKEN = $token
-  $webProcess = Start-Process `
-    -FilePath $hostExecutable `
-    -ArgumentList ($commonArguments + "`"$webScript`"") `
-    -WorkingDirectory $repoRoot `
-    -WindowStyle Hidden `
-    -PassThru
-  $ownedJob.Add($webProcess)
+  $webProcess = $ownedJob.StartSuspended(
+    $hostExecutable,
+    ($commonArguments + $webScript),
+    $repoRoot
+  )
 
   Restore-ProcessEnvironment "LOOPBACK_TOKEN" $previousLoopbackToken
   Restore-ProcessEnvironment "VITE_POLYNEXUS_LOOPBACK_TOKEN" $previousViteToken

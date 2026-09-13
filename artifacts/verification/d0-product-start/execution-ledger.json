@@ -58,7 +58,7 @@
       "anonymous_protected_api": 403,
       "missing_token_scripts": "start_core and start_web each exited 1",
       "port_collision": "8765 and 5173 were each pre-occupied in separate probes; launcher exited 1, preserved each pre-existing owner, and removed the other START-owned listener",
-      "bounded_shutdown": "Core and Web run in a private kill-on-close Windows Job Object; an exact owned Core termination triggered supervision and left neither listener",
+      "bounded_shutdown": "Core and Web wrappers are created suspended, assigned to a private kill-on-close Windows Job Object, and only then resumed; an exact owned Core termination triggered supervision and left neither listener",
       "token_persistence": "no actual token written to Git, DB, log, URL, evidence, or production build artifact"
     }
   },
@@ -66,7 +66,8 @@
   "repair_passes": [
     "Test-only expectation corrected from tuple to ORM list after the first targeted run; no product root cause recurred.",
     "Independent review of candidate 894cdc407874099f7c29ffb1b9ea72da4b8073f8 found missing RunResult JSON reference auditing and missing authenticated API create/restart evidence; both were repaired in the same Core scope.",
-    "Independent pairing review of candidate a8f275dcc52b12b9ff098c4cadcb8609815c3613 found non-strict Web port fallback, over-broad listener cleanup, and a handoff scope contradiction; repairs enabled strictPort, replaced listener scanning with an owned Windows Job Object, and corrected the evidence."
+    "Independent pairing review of candidate a8f275dcc52b12b9ff098c4cadcb8609815c3613 found non-strict Web port fallback, over-broad listener cleanup, and a handoff scope contradiction; repairs enabled strictPort, replaced listener scanning with an owned Windows Job Object, and corrected the evidence.",
+    "Fresh rereview of candidate d548d6e9295c09e3c52725280042c5d578db8a50 found a post-create Job-assignment race and incomplete assignment-failure cleanup. Human authorized repair 03; wrappers are now created suspended, assigned by exact native handle, and resumed only after success, while assignment failure terminates only the exact suspended process."
   ],
   "independent_review": {
     "reviewed_candidate": "894cdc407874099f7c29ffb1b9ea72da4b8073f8",
@@ -77,6 +78,9 @@
     ],
     "pairing_reviewed_candidate": "a8f275dcc52b12b9ff098c4cadcb8609815c3613",
     "pairing_review_verdict": "NEED_FIX",
-    "approved_exception_status": "REPAIRED_PENDING_EXACT_CANDIDATE_REREVIEW"
+    "ownership_rereviewed_candidate": "d548d6e9295c09e3c52725280042c5d578db8a50",
+    "ownership_rereview_verdict": "NEED_FIX",
+    "ownership_repair_03_authorization": "APPROVED_BY_HUMAN",
+    "approved_exception_status": "REPAIR_03_IMPLEMENTED_PENDING_EXACT_CANDIDATE_REREVIEW"
   }
 }

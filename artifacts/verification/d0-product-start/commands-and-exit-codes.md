@@ -35,5 +35,15 @@
 - Post-repair production-token sentinel build: typecheck/build passed and sentinel was absent from `dist`; exit `0`.
 - Final positive START browser journey again displayed process/schema/Core/API-auth/Web-client `ready`, runtime `unknown`, and `authenticated_api_verified`; Core/Web returned `200` and an anonymous protected request returned `403`.
 - Final owned-process shutdown probe terminated one exact START-owned Core process to exercise supervision; the launcher exited `1`, closed its Job Object, and left no listener on 8765 or 5173; verification exit `0`.
+- Fresh rereview of exact candidate `d548d6e9295c09e3c52725280042c5d578db8a50` returned `NEED_FIX`: wrappers could execute between `Start-Process` and Job assignment, and assignment failure did not explicitly terminate the unassigned exact child.
+- Human authorized bounded `D0-PAIRING-OWNERSHIP-REPAIR-03`. START now uses Win32 `CREATE_SUSPENDED`, assigns the exact native process handle to its private Job Object, and resumes only after successful assignment. Assignment failure terminates and waits only on that exact still-suspended handle.
+- Repair-03 positive START: Core `200`, Web `200`, anonymous protected API `403`; fresh browser again displayed process/schema/Core/API-auth/Web-client `ready`, runtime `unknown`, and `authenticated_api_verified`.
+- Repair-03 supervision probe: terminating the exact owned Core caused launcher exit `1`; both 8765 and 5173 listeners were removed.
+- Repair-03 8765 collision: launcher exit `1`, pre-existing owner remained HTTP `200`, and no 5173 listener remained.
+- Repair-03 5173 collision: launcher exit `1`, pre-existing owner remained HTTP `200`, and no 8765 listener remained.
+- Repair-03 PowerShell parser: all three START scripts parsed; exit `0`. Direct Core/Web missing-token checks each failed closed; verification exit `0`.
+- Repair-03 Web tests: 3 files and 89 tests passed; exit `0`.
+- Repair-03 production-token sentinel build: typecheck/build passed and sentinel was absent from `dist`; exit `0`.
+- Repair-03 Core affected regression with unique repo-external `--basetemp`: `58 passed, 35 warnings in 6.09s`; exit `0`.
 
 All pytest temporary files and live-probe databases were outside the repository. `node_modules` and `dist` remained ignored test/build outputs. No existing migration was modified and no new migration was necessary.
