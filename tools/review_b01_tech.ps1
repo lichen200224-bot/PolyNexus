@@ -44,6 +44,8 @@ Assert-Review ($productSourceChanges.Count -eq 0) "no unapproved Core source mut
 $allowedPrefixes = @(
     "docs/delivery/checks/B01_TECHNICAL_READY_20260914.md",
     "docs/delivery/checks/B01_INDEPENDENT_REVIEW_20260914.md",
+    "apps/web/package.json",
+    "apps/web/package-lock.json",
     "services/core/tests/fixtures/b01_synthetic_repo/",
     "services/core/tests/test_b01_tech.py",
     "tools/run_b01_tech.ps1",

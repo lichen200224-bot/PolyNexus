@@ -31,6 +31,9 @@ Checks performed from receipts and working tree:
 - P0 offline verification/reconstruction is true and reconstructed source
   hashes equal the accepted-worktree hashes;
 - no `services/core/src` product source changed in this B01 patch;
+- the only Web product-file changes are the intended package-only Vitest
+  hardening (`4.1.10` → `4.1.11`), lockfile update, and verified integrity
+  correction for the unchanged `@jridgewell/sourcemap-codec@1.5.5` entry;
 - `git diff --check` passed;
 - no unexpected non-ignored worktree paths were found.
 

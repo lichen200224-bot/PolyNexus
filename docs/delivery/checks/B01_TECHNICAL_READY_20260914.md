@@ -101,6 +101,7 @@ All commands below use the isolated B01 cwd unless another cwd is stated.
 | `pwsh -NoLogo -NoProfile -NonInteractive -File tools/run_b01_tech.ps1 -ArtifactRoot <thread artifact root>` | repo root | `0` (`B01_TECHNICAL_READY`) |
 | `D:\AI學習教材\PolyNexus\.venv\Scripts\python.exe -B -m pytest --override-ini addopts= -q --disable-warnings --tb=short --basetemp C:\Users\shawn\AppData\Local\Temp\b01-tech-full-core-20260914 tests` | `services/core` | `0` (`914 passed, 1 skipped`) |
 | `npm ci` | `apps/web` | `0` (`90 packages`) |
+| `npm audit --audit-level=moderate` | `apps/web` | `0` (`0 vulnerabilities`; Vitest hardening applied) |
 | `npm test -- --run` | `apps/web` | `0` (`4 files, 94 tests`) |
 | `npm run build` | `apps/web` | `0` (Vite/TypeScript build) |
 | `node --test extensions/browser-companion/tests/test_websurface_drivers.mjs` | repo root | `0` (`10 passed`) |
@@ -108,6 +109,18 @@ All commands below use the isolated B01 cwd unless another cwd is stated.
 
 The runner's final fresh evidence includes its exact artifact root and all
 child command exits in `artifacts/verification/b01-tech-20260914/run.json`.
+
+## Dependency hardening follow-up
+
+The initial Web install reported one advisory affecting both direct `vitest`
+and transitive `@vitest/mocker` (`GHSA-82fw-gwwq-j7x9`, moderate). The
+package-only remediation pins `vitest` from `4.1.10` to `4.1.11` and updates
+the lockfile. During clean-install verification, the lockfile also corrected
+the registry integrity value for the unchanged `@jridgewell/sourcemap-codec`
+`1.5.5` entry; the prior value caused `EINTEGRITY`. It does not modify
+`services/core/src` or the B01 runtime evidence boundary. A clean `npm ci`,
+`npm audit --audit-level=moderate`, Web test run (`94 passed`), and production
+build all exited `0` after the update.
 
 Final real-executor synthetic cwd:
 `C:\Users\shawn\.codex\visualizations\2026\09\14\01a09fe7-12e2-7c61-aa3e-fcbc0543de45\b01-tech-evidence-20260914-final3\real-bug-fix\synthetic-repo`.
