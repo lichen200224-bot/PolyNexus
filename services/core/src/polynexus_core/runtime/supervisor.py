@@ -198,7 +198,14 @@ class RunSupervisor:
 
         binder = getattr(self._adapter, "bind_run_identity", None)
         if callable(binder):
-            binder(run_id=run.id, task_id=task.id)
+            if run.runtime_ref is None:
+                binder(run_id=run.id, task_id=task.id)
+            else:
+                binder(
+                    run_id=run.id,
+                    task_id=task.id,
+                    expected_runtime_ref=run.runtime_ref,
+                )
 
     @asynccontextmanager
     async def _runtime_slot(self):

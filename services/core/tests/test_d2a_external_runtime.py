@@ -78,6 +78,32 @@ class _MalformedResultJob(_FakeJob):
         return b"not-json\n", b""
 
 
+class _D1bResultJob(_FakeJob):
+    def output(self) -> tuple[bytes, bytes]:
+        return (
+            json.dumps(
+                {
+                    "type": "turn.completed",
+                    "d1b_checks": [
+                        {
+                            "check_id": "tests",
+                            "argv": ["pytest", "-q"],
+                            "cwd": str(self.cwd),
+                            "runner_exit": 0,
+                            "child_exit": 0,
+                            "output": "adapter-produced check result",
+                            "execution_id": "exec-adapter-d1b",
+                        }
+                    ],
+                },
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode()
+            + b"\n",
+            b"",
+        )
+
+
 def _git(cwd: Path, *args: str) -> None:
     result = subprocess.run(
         ["git", "-c", "user.name=d2a", "-c", "user.email=d2a@example.invalid", *args],
@@ -215,6 +241,60 @@ def test_codex_adapter_observes_real_allowlisted_diff_and_core_blob(tmp_path: Pa
     diff = ContentStore(content).read_artifact(artifact)
     assert b"return 42" in diff
     assert artifact.sha256 == hashlib.sha256(diff).hexdigest()
+
+
+def test_codex_adapter_keeps_explicit_terminal_checks_in_generic_core_result(tmp_path: Path) -> None:
+    repo, content = _repo(tmp_path)
+    context = _context(repo)
+    task = _task()
+    adapter = CodexExecRuntimeAdapter(
+        executable=Path(sys.executable),
+        content_root=content,
+        version_probe=lambda _path: "codex-cli-0.0.0",
+        job_factory=lambda argv, cwd: _D1bResultJob(argv, cwd),
+    )
+    adapter.bind_run_identity(run_id="run-d1b-adapter", task_id=task.id)
+
+    async def execute():
+        runtime_ref = await adapter.create_run(context)
+        await adapter.submit(runtime_ref, task)
+        result = await adapter.result(runtime_ref)
+        return result
+
+    result = asyncio.run(execute())
+    assert not any(item.metadata.get("d1b_observation_kind") for item in result.evidence)
+    normalized = json.loads(result.evidence[0].metadata["normalized_result_json"])
+    assert normalized["d1b_checks"][0]["check_id"] == "tests"
+    assert result.artifacts[0].artifact_type.value == "CODE_DIFF"
+
+
+def test_codex_adapter_supports_core_bound_cross_review_without_source_diff(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    repo, content = _repo(tmp_path)
+    task = _task()
+    monkeypatch.setenv("POLYNEXUS_CROSS_REVIEWER_REF", "reviewer:d1b-runtime")
+    adapter = CodexExecRuntimeAdapter(
+        executable=Path(sys.executable),
+        content_root=content,
+        version_probe=lambda _path: "codex-cli-0.0.0",
+        job_factory=lambda argv, cwd: _D1bResultJob(argv, cwd, changed_path=None),
+    )
+    adapter.bind_run_identity(
+        run_id="run-d1b-cross-runtime",
+        task_id=task.id,
+        expected_runtime_ref="cross-reviewer:reviewer:d1b-runtime",
+    )
+
+    async def execute():
+        runtime_ref = await adapter.create_run(_context(repo))
+        assert runtime_ref == "cross-reviewer:reviewer:d1b-runtime"
+        await adapter.submit(runtime_ref, task)
+        return await adapter.result(runtime_ref)
+
+    result = asyncio.run(execute())
+    assert result.artifacts[0].artifact_type.value == "TEST_RESULT"
+    assert result.evidence[0].metadata["source_change"] == "review-output-observed"
 
 
 def test_codex_adapter_rejects_non_allowlisted_change_and_resume(tmp_path: Path) -> None:

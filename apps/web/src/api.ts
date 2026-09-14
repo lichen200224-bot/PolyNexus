@@ -487,3 +487,186 @@ export function workRequest<T>(config: ApiClientConfig, method: string, path: st
   return request<T>(config, method, path, body)
 }
 export const taskGenerationPath = (task: string) => `/tasks/${encodeURIComponent(task)}/generations`
+
+// ---------------------------------------------------------------------------
+// D1b exact Candidate view / Human boundary
+// ---------------------------------------------------------------------------
+
+export interface CandidateView {
+  format: 'pn.candidate.view.v1'
+  candidate_id: string
+  candidate: Record<string, unknown>
+  changeset: Record<string, unknown>
+  baseline: Record<string, unknown>
+  result: Record<string, unknown>
+  diff: Array<Record<string, unknown>>
+  checks: Array<Record<string, unknown>>
+  evidence: Record<string, unknown> | null
+  evidence_set_id: string | null
+  missing_reasons: string[]
+  eligibility_revision: number
+  review_round: number
+  decision_revision: number
+  requirements: Record<string, unknown>
+  validation_contract: Array<Record<string, unknown>>
+  publication: Record<string, unknown> | null
+  requirements_snapshot_id: string
+  validation_contract_snapshot_id: string
+  verification: Record<string, unknown> | null
+  verification_id: string | null
+  assurance: Record<string, unknown> | null
+  disposition: { state: string; acceptance_id: string | null }
+  decision_history: Array<Record<string, unknown>>
+  policy_revision: number
+  view_digest: string
+}
+
+export interface DecisionChallenge {
+  challenge_id: string
+  candidate_id: string
+  action: 'Accept' | 'Reject' | 'Revoke' | 'Supersede'
+  replacement_acceptance_id: string | null
+  view_digest: string
+  nonce: string
+  expires_at: string
+}
+
+export type HumanEnrollmentCeremony = 'registration' | 'authentication' | 'revocation'
+
+export interface WebAuthnCredentialResponse {
+  clientDataJSON: string
+  attestationObject?: string | null
+  authenticatorData?: string | null
+  signature?: string | null
+  userHandle?: string | null
+}
+
+export interface WebAuthnCredential {
+  id: string
+  rawId: string
+  type: 'public-key'
+  response: WebAuthnCredentialResponse
+}
+
+export interface HumanEnrollmentChallenge {
+  challenge_id: string
+  challenge: string
+  ceremony: HumanEnrollmentCeremony
+  audience: string
+  origin: string
+  rp_id: string
+  principal_ref: string | null
+  user_id: string | null
+  allow_credentials: Array<{ id: string; type: 'public-key' }>
+  expires_at: string
+}
+
+export interface HumanPairing {
+  grant_id: string
+  principal_ref: string
+  status: string
+  expires_at: string
+  key_id?: string
+  auth_method?: string
+  enrollment_challenge_id?: string
+  pairing_token?: string
+}
+
+export interface HumanSession {
+  session_id: string
+  principal_ref: string
+  audience: string
+  status: string
+  expires_at: string
+}
+
+export interface DecisionReceipt {
+  action: string
+  acceptance_id: string | null
+  candidate_id: string
+  decision_id: string
+  disposition: string
+  idempotent: boolean
+  revision: number
+}
+
+export function createHumanPairing(
+  config: ApiClientConfig,
+  body:
+    | { challenge_id: string; credential: WebAuthnCredential; expires_at: string }
+    | { principal_ref: string; enrollment_proof: string; expires_at: string },
+): Promise<HumanPairing> {
+  return request<HumanPairing>(config, 'POST', '/human/pairings', body)
+}
+
+export function issueHumanEnrollmentChallenge(
+  config: ApiClientConfig,
+  body: {
+    ceremony: HumanEnrollmentCeremony
+    key_id?: string
+    session_id?: string
+    csrf_token?: string
+  },
+): Promise<HumanEnrollmentChallenge> {
+  return request<HumanEnrollmentChallenge>(config, 'POST', '/human/enrollment/challenges', body)
+}
+
+export function registerHumanCredential(
+  config: ApiClientConfig,
+  body: { challenge_id: string; credential: WebAuthnCredential },
+): Promise<{ key_id: string; principal_ref: string; status: string; algorithm: string; fingerprint: string; rp_id: string; origin: string }> {
+  return request<{ key_id: string; principal_ref: string; status: string; algorithm: string; fingerprint: string; rp_id: string; origin: string }>(config, 'POST', '/human/enrollment/credentials', body)
+}
+
+export function revokeHumanCredential(
+  config: ApiClientConfig,
+  body: { challenge_id: string; key_id: string; credential: WebAuthnCredential },
+): Promise<{ key_id: string; principal_ref: string; status: string; revoked_grants: boolean }> {
+  return request<{ key_id: string; principal_ref: string; status: string; revoked_grants: boolean }>(config, 'POST', '/human/enrollment/revoke', body)
+}
+
+export function createHumanSession(
+  config: ApiClientConfig,
+  body: { grant_id: string; pairing_token?: string; pairing_proof?: string; audience: string; csrf_token: string; expires_at?: string },
+): Promise<HumanSession> {
+  return request<HumanSession>(config, 'POST', '/human/sessions', body)
+}
+
+export function revokeHumanSession(
+  config: ApiClientConfig,
+  sessionId: string,
+  body: { csrf_token: string },
+): Promise<{ session_id: string; status: string }> {
+  return request<{ session_id: string; status: string }>(
+    config,
+    'POST',
+    `/human/sessions/${encodeURIComponent(sessionId)}/revoke`,
+    body,
+  )
+}
+
+export function getCandidateView(
+  config: ApiClientConfig,
+  candidateId: string,
+  policyRevision = 1,
+): Promise<CandidateView> {
+  return request<CandidateView>(
+    config,
+    'GET',
+    `/candidates/${encodeURIComponent(candidateId)}/view?policy_revision=${policyRevision}`,
+  )
+}
+
+export function issueDecisionChallenge(
+  config: ApiClientConfig,
+  body: { session_id: string; candidate_id: string; action: DecisionChallenge['action']; replacement_acceptance_id?: string | null; policy_revision?: number },
+): Promise<DecisionChallenge> {
+  return request<DecisionChallenge>(config, 'POST', '/human/decision-challenges', body)
+}
+
+export function submitHumanDecision(
+  config: ApiClientConfig,
+  body: Record<string, unknown>,
+): Promise<DecisionReceipt> {
+  return request<DecisionReceipt>(config, 'POST', '/human/decisions', body)
+}

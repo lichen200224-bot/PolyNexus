@@ -5,6 +5,8 @@ import { TaskList } from './components/TaskList'
 import { RunPreparation } from './components/RunPreparation'
 import { RunDetail } from './components/RunDetail'
 import { StartupHealth } from './components/StartupHealth'
+import { CandidateLookup } from './components/CandidateLookup'
+import { CandidateReview } from './components/CandidateReview'
 
 const workModes = [
   ['Discuss', 'Independent analysis, cross review, synthesis'],
@@ -17,6 +19,7 @@ type ViewState =
   | { view: 'tasks'; project: Project }
   | { view: 'run-prep'; project: Project; task: Task }
   | { view: 'run-detail'; project: Project; task: Task; runId: string }
+  | { view: 'candidate-review'; candidateId: string }
 
 export function createDefaultConfig(): ApiClientConfig {
   const base = import.meta.env.VITE_POLYNEXUS_API_BASE_URL || '/api/v1'
@@ -64,6 +67,7 @@ export function App() {
             config={config}
             onSelectProject={(p) => setState({ view: 'tasks', project: p })}
           />
+          <CandidateLookup onOpen={(candidateId) => setState({ view: 'candidate-review', candidateId })} />
         </>
       )}
 
@@ -118,6 +122,14 @@ export function App() {
             onBack={() => setState({ view: 'run-prep', project: state.project, task: state.task })}
           />
         </>
+      )}
+
+      {state.view === 'candidate-review' && (
+        <CandidateReview
+          config={config}
+          candidateId={state.candidateId}
+          onBack={() => setState({ view: 'projects' })}
+        />
       )}
       </div>
 

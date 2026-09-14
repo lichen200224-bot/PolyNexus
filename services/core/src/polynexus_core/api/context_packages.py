@@ -61,6 +61,11 @@ def create_context_package(
     if not project_repo.reserve_write(project_id):
         raise HTTPException(409,"project_archived")
 
+    # D1b execution plans are Core-issued only.  A caller-provided context
+    # fact must never be promoted into trusted verification instructions.
+    if "d1b_execution_plan_json" in body.project_facts:
+        raise HTTPException(422, "reserved_runtime_plan_fact")
+
     # Artifact identity is Core-owned; raw source locators remain descriptive only.
     for reference in dict.fromkeys((*body.artifact_refs,*body.prior_decision_refs,*body.memory_refs)):
         artifact = SqlArtifactRepository(db).get(reference)

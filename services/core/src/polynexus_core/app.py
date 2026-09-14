@@ -14,6 +14,7 @@ from polynexus_core.api.tasks import router as tasks_router
 from polynexus_core.api.runs import router as runs_router
 from polynexus_core.api.context_packages import router as context_packages_router
 from polynexus_core.api.run_outputs import router as run_outputs_router
+from polynexus_core.api.d1b import router as d1b_router
 
 
 @asynccontextmanager
@@ -85,6 +86,7 @@ def create_app() -> FastAPI:
     app.include_router(runs_router, prefix="/api/v1")
     app.include_router(context_packages_router, prefix="/api/v1")
     app.include_router(run_outputs_router, prefix="/api/v1")
+    app.include_router(d1b_router, prefix="/api/v1")
     return app
 
 

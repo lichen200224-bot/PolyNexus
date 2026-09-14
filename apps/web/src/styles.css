@@ -41,6 +41,38 @@ h1 { max-width: 780px; margin: 0; font-size: clamp(2rem, 5vw, 4.2rem); line-heig
 
 .panel h2 { margin: 0; }
 
+.candidate-lookup,
+.candidate-review {
+  margin-top: 24px;
+  padding: 24px;
+  background: #fff;
+  border: 1px solid #dbe1ea;
+  border-radius: 16px;
+}
+.candidate-lookup h2,
+.candidate-review h2 { margin: 0; overflow-wrap: anywhere; }
+.candidate-lookup-form label { display: block; margin-bottom: 6px; font-weight: 600; color: #52637f; }
+.candidate-lookup-controls { display: flex; gap: 10px; }
+.candidate-lookup-controls input { flex: 1; min-width: 0; padding: 10px 12px; border: 1px solid #dbe1ea; border-radius: 8px; font: inherit; }
+.candidate-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin: 24px 0; }
+.candidate-facts div { padding: 12px; background: #f4f6f9; border-radius: 8px; }
+.candidate-facts dt { color: #52637f; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; }
+.candidate-facts dd { margin: 5px 0 0; overflow-wrap: anywhere; }
+.candidate-actions { padding: 16px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; color: #1e3a8a; }
+.candidate-actions p { line-height: 1.5; }
+.human-protocol-form { margin-top: 14px; max-width: 620px; }
+.human-protocol-form .form-field { margin-bottom: 12px; }
+.human-protocol-form .form-field input,
+.human-protocol-form .form-field select,
+.human-protocol-form .form-field textarea { border-color: #bfdbfe; }
+.human-notice { margin: 12px 0 0; color: #166534; }
+.human-error { margin: 12px 0 0; color: #991b1b; }
+.candidate-review pre { overflow: auto; max-height: 360px; padding: 12px; background: #172033; color: #e5edf8; border-radius: 8px; }
+.review-warning { margin-top: 16px; padding: 14px 16px; background: #fff7ed; border: 1px solid #fed7aa; border-radius: 10px; color: #9a3412; }
+.review-warning ul { margin: 8px 0 0; padding-left: 20px; }
+.diff-entry { margin: 12px 0; }
+.diff-entry h3 { margin: 0 0 6px; font-size: 0.9rem; color: #52637f; }
+
 /* --- Buttons --- */
 
 button { border: 0; border-radius: 10px; padding: 10px 14px; background: #e8edf4; color: #667085; cursor: pointer; }

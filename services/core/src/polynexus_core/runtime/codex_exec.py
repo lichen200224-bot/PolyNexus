@@ -2,9 +2,11 @@
 
 This adapter is intentionally small and target-specific.  It does not become
 the Runtime resolver, does not read a credential store, and does not claim
-that a successful CLI exit is a source change.  A result is importable only
-after the controlled process has quiesced, the staged boundary is rechecked,
-and an allowlisted Git diff is observed and copied into Core-owned storage.
+that a successful CLI exit is a source change.  A normal result is importable
+only after the controlled process has quiesced, the staged boundary is
+rechecked, and an allowlisted Git diff is observed and copied into Core-owned
+storage.  A Core-prebound cross-review identity may instead import the bounded
+terminal review output without modifying source files.
 """
 from __future__ import annotations
 
@@ -132,6 +134,7 @@ class _CodexRun:
     stderr: bytes = b""
     prompt_sha256: str = ""
     normalized_result: dict[str, object] | None = None
+    allow_source_unchanged: bool = False
 
 
 class CodexExecRuntimeAdapter:
@@ -155,14 +158,31 @@ class CodexExecRuntimeAdapter:
         self._project_id: str | None = None
         self._version: str | None = None
         self._prelaunch_no_effect = False
+        self._expected_runtime_ref: str | None = None
 
-    def bind_run_identity(self, *, run_id: str, task_id: str) -> None:
+    def bind_run_identity(
+        self,
+        *,
+        run_id: str,
+        task_id: str,
+        expected_runtime_ref: str | None = None,
+    ) -> None:
         """Private supervisor seam; called before workflow dispatch."""
 
         if not run_id or not task_id:
             raise ExternalContractError("run_identity_invalid")
         if self._run_id is not None and (self._run_id, self._task_id) != (run_id, task_id):
             raise ExternalContractError("run_identity_rebind")
+        if expected_runtime_ref is not None:
+            if not isinstance(expected_runtime_ref, str) or not expected_runtime_ref.strip():
+                raise ExternalContractError("runtime_identity_invalid")
+            if expected_runtime_ref.startswith("cross-reviewer:"):
+                configured = os.environ.get("POLYNEXUS_CROSS_REVIEWER_REF", "")
+                if expected_runtime_ref != "cross-reviewer:" + configured:
+                    raise ExternalContractError("cross_reviewer_runtime_identity_invalid")
+            elif not expected_runtime_ref.startswith("codex-exec:"):
+                raise ExternalContractError("runtime_identity_invalid")
+            self._expected_runtime_ref = expected_runtime_ref
         self._run_id, self._task_id = run_id, task_id
 
     def _probe(self) -> str:
@@ -381,12 +401,13 @@ class CodexExecRuntimeAdapter:
             remote_skill_catalog_state=remote_skills,
             route_policy_evidence_sha256=policy_digest,
         )
-        runtime_ref = f"codex-exec:{uuid4().hex}"
+        runtime_ref = self._expected_runtime_ref or f"codex-exec:{uuid4().hex}"
         self._runs[runtime_ref] = _CodexRun(
             context=context,
             envelope=envelope,
             task_id=self._task_id,
             project_id=project_id,
+            allow_source_unchanged=runtime_ref.startswith("cross-reviewer:"),
         )
         return runtime_ref
 
@@ -447,18 +468,28 @@ class CodexExecRuntimeAdapter:
             preflight = self._assert_configuration_unchanged(record)
             record.envelope.verify_staging()
             record.envelope.assert_quiescent_input()
-            diff, source_after_manifest = self._stable_allowlisted_diff(record)
-            if not diff:
-                raise ExternalContractError("allowlisted_source_change_missing")
+            review_output = False
+            try:
+                diff, source_after_manifest = self._stable_allowlisted_diff(record)
+            except ExternalContractError as error:
+                if not record.allow_source_unchanged or str(error) != "allowlisted_source_change_missing":
+                    raise
+                record.envelope.verify_staging()
+                record.envelope.assert_quiescent_input()
+                diff = record.stdout
+                if not diff:
+                    raise ExternalContractError("review_output_missing") from None
+                source_after_manifest = record.envelope.current_input_manifest()
+                review_output = True
             store = self._content_store()
             digest, size = store.put(diff)
             artifact = Artifact(
                 project_id=record.project_id,
                 task_id=record.task_id,
                 run_id=self._run_id,
-                artifact_type=ArtifactType.CODE_DIFF,
-                mime_type="text/x-diff",
-                source_type="codex.exec",
+                artifact_type=ArtifactType.TEST_RESULT if review_output else ArtifactType.CODE_DIFF,
+                mime_type="application/json" if review_output else "text/x-diff",
+                source_type="codex.exec.cross-review" if review_output else "codex.exec",
                 storage_ref=f"core-blob:{digest}",
                 sha256=digest,
                 size=size,
@@ -503,7 +534,7 @@ class CodexExecRuntimeAdapter:
                     "auth_ownership": AuthOwnership.RUNTIME_MANAGED.value,
                     "provider_model_egress": EgressDisposition.RUNTIME_MANAGED.value,
                     "agent_extension_egress": EgressDisposition.DENY.value,
-                    "source_change": "allowlisted-diff-observed",
+                    "source_change": "review-output-observed" if review_output else "allowlisted-diff-observed",
                     "source_before_manifest_sha256": record.envelope.input_manifest_sha256,
                     "source_after_manifest_sha256": source_after_manifest,
                 },
@@ -511,7 +542,11 @@ class CodexExecRuntimeAdapter:
             record.artifacts = (artifact,)
             record.state = RunState.COMPLETED
             record.result = RuntimeResult(
-                summary="Codex executor produced an allowlisted source change",
+                summary=(
+                    "Codex executor produced a cross-review result"
+                    if review_output
+                    else "Codex executor produced an allowlisted source change"
+                ),
                 evidence=(evidence,),
                 artifacts=record.artifacts,
             )
@@ -605,6 +640,11 @@ class CodexExecRuntimeAdapter:
         instructions = "\n".join(str(value) for value in record.context.instructions)
         constraints = "\n".join(str(value) for value in record.context.constraints)
         paths = ", ".join(record.envelope.allowed_outputs)
+        action = (
+            "Do not modify source files; emit the required review result as the terminal JSON result."
+            if record.allow_source_unchanged
+            else "Make the source change and report a concise result."
+        )
         return (
             "Work only in this synthetic or Core-managed repository.\n"
             f"Task: {task.title}\n"
@@ -613,7 +653,7 @@ class CodexExecRuntimeAdapter:
             f"Only modify these allowlisted relative paths: {paths}.\n"
             "Do not access parent directories, credentials, secrets, network services, "
             "or files outside the staged workspace.\n"
-            "Make the source change and report a concise result."
+            + action
         )
 
     def _stable_allowlisted_diff(self, record: _CodexRun) -> tuple[bytes, str]:
@@ -761,6 +801,8 @@ class CodexExecRuntimeAdapter:
             "terminal_type": terminal_type,
             "terminal_sha256": cls._fingerprint(terminal),
         }
+        if "d1b_checks" in terminal:
+            normalized["d1b_checks"] = terminal["d1b_checks"]
         record.normalized_result = normalized
         return normalized
 
