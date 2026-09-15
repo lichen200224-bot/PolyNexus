@@ -1,0 +1,95 @@
+{
+  "run": {
+    "id": "run_6b915dbe6b7045e3b5072e5355e64628",
+    "task_id": "task_b5d228e79e6644d8a6661c199e651900",
+    "generation_revision": 1,
+    "state": "COMPLETED",
+    "result_artifact_ids": "[\"artifact_7042b2d2308a4aca954c33b539dee0d5\"]"
+  },
+  "generation": {
+    "task_id": "task_b5d228e79e6644d8a6661c199e651900",
+    "revision": 1,
+    "control_revision": 2,
+    "aborted": 0,
+    "closed": 1,
+    "ownership_unknown": 0
+  },
+  "binding": {
+    "run_id": "run_6b915dbe6b7045e3b5072e5355e64628",
+    "runtime_profile_ref": "opencode.acp.local",
+    "adapter_id": "builtin.opencode.acp"
+  },
+  "authorization": {
+    "authorization_id": "dispatch-auth_4e96567aedb84c7f875d81a8f48b2b0e",
+    "run_id": "run_6b915dbe6b7045e3b5072e5355e64628",
+    "state": "CONSUMED",
+    "issuer_class": "TEST_ONLY",
+    "policy_digest": "0172fb3a1748aab16726840e74bf126166854fffce5f3ebdcbd2e08932ff52c3",
+    "policy_evidence_id": "evidence_63f2640863284796ab4d4cd556e72962"
+  },
+  "authorization_events": [
+    {
+      "event_kind": "ISSUE",
+      "from_state": null,
+      "to_state": "ISSUED"
+    },
+    {
+      "event_kind": "CONSUME",
+      "from_state": "ISSUED",
+      "to_state": "CONSUMED"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "evidence_297b88b23a4142bebcb47516646a6410",
+      "run_id": "run_6b915dbe6b7045e3b5072e5355e64628",
+      "source": "runtime.opencode.acp",
+      "status": "OBSERVED"
+    },
+    {
+      "id": "evidence_63f2640863284796ab4d4cd556e72962",
+      "run_id": "run_6b915dbe6b7045e3b5072e5355e64628",
+      "source": "runtime.routing_policy",
+      "status": "NEED_ACTION"
+    },
+    {
+      "id": "evidence_81c8b2dd8dc5482680e182e80e7e5652",
+      "run_id": "run_6b915dbe6b7045e3b5072e5355e64628",
+      "source": "runtime-adapter",
+      "status": "PASS"
+    },
+    {
+      "id": "evidence_9b58397cf4104e00afdbb6f347b05bf3",
+      "run_id": "run_6b915dbe6b7045e3b5072e5355e64628",
+      "source": "workflow-gate-evaluation",
+      "status": "OBSERVED"
+    },
+    {
+      "id": "evidence_f99ad139270a4818825230f03cb0912a",
+      "run_id": "run_6b915dbe6b7045e3b5072e5355e64628",
+      "source": "runtime.dispatch_authorization",
+      "status": "OBSERVED"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact_7042b2d2308a4aca954c33b539dee0d5",
+      "run_id": "run_6b915dbe6b7045e3b5072e5355e64628",
+      "storage_ref": "core-blob:7749dc5c1111dfc60c7ec37c1133739e3e4f07f6c3202834b61354243f74869b",
+      "sha256": "7749dc5c1111dfc60c7ec37c1133739e3e4f07f6c3202834b61354243f74869b"
+    }
+  ],
+  "selected_source_files": {
+    "bug.py": {
+      "source_sha256": "a88461f8368a8e884152e5d38bc7a52315f9e311d6c094597c3ad15700bf3911",
+      "staging_sha256": "232ebf42bfe8ca6cb387145693368b0708b36fd6d25d10c5949a60afdb9ff473"
+    },
+    "test_bug.py": {
+      "source_sha256": "f8afc94387afa737f65fe8868b9f4e02af64f58b5f0bd9b0505747bfdbe3a576",
+      "staging_sha256": "f8afc94387afa737f65fe8868b9f4e02af64f58b5f0bd9b0505747bfdbe3a576"
+    }
+  },
+  "original_source_unchanged": true,
+  "test_input_unchanged": true,
+  "single_changed_path": true
+}

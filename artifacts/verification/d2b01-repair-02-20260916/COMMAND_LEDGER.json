@@ -1,0 +1,61 @@
+{
+  "task_id": "D2B-01-REPAIR-02",
+  "base_sha": "237d5fc6b8495c3a455e1d2ba5cca7b2351c3441",
+  "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\enhanced-product-continuation",
+  "exact_shell_record_ref": "EXECUTION_COMMAND_RECORDS.json",
+  "ordering": [
+    {
+      "order": 1,
+      "name": "frozen_a1_real_product_path",
+      "executed_source_sha": "4b1c2c57b78ad8e55833080400819c591133bf54",
+      "command": "D:\\AI學習教材\\PolyNexus\\.venv\\Scripts\\python.exe -B tools/run_d2b01_production.py --artifact-root <USER_HOME>\\AppData\\Local\\Temp\\d2b01-repair-02-production-raw-20260916-1 --executable <USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\d2b01-opencode-tool\\node_modules\\opencode-ai\\bin\\opencode.exe",
+      "actual_exit": 1,
+      "postcondition_passed": 1,
+      "postcondition_failed": 0,
+      "postcondition_skipped": 0,
+      "product_run_state": "COMPLETED",
+      "tool_failure": "RuntimeDispatchAuthorizationEventRow was subscripted in final oracle",
+      "raw_ref": "commit-a1-failed-run/production-run.json"
+    },
+    {
+      "order": 2,
+      "name": "frozen_a1_independent_readback",
+      "executed_source_sha": "4b1c2c57b78ad8e55833080400819c591133bf54",
+      "command": "D:\\AI學習教材\\PolyNexus\\.venv\\Scripts\\python.exe -B tools/readback_d2b01_production.py <USER_HOME>\\AppData\\Local\\Temp\\d2b01-repair-02-production-raw-20260916-1",
+      "actual_exit": 0,
+      "passed": "NOT_APPLICABLE",
+      "failed": "NOT_APPLICABLE",
+      "skipped": "NOT_APPLICABLE",
+      "raw_ref": "commit-a1-failed-run/production-readback.json"
+    },
+    {
+      "order": 3,
+      "name": "frozen_a2_real_product_path",
+      "executed_source_sha": "98e674570f357b4e8af23d9f203f993f42ce638e",
+      "command": "D:\\AI學習教材\\PolyNexus\\.venv\\Scripts\\python.exe -B tools/run_d2b01_production.py --artifact-root <USER_HOME>\\AppData\\Local\\Temp\\d2b01-repair-02-production-raw-20260916-2 --executable <USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\d2b01-opencode-tool\\node_modules\\opencode-ai\\bin\\opencode.exe",
+      "actual_exit": 0,
+      "postcondition_passed": 1,
+      "postcondition_failed": 0,
+      "postcondition_skipped": 0,
+      "product_run_state": "COMPLETED",
+      "raw_ref": "production-run.json"
+    },
+    {
+      "order": 4,
+      "name": "frozen_a2_independent_readback",
+      "executed_source_sha": "98e674570f357b4e8af23d9f203f993f42ce638e",
+      "command": "D:\\AI學習教材\\PolyNexus\\.venv\\Scripts\\python.exe -B tools/readback_d2b01_production.py <USER_HOME>\\AppData\\Local\\Temp\\d2b01-repair-02-production-raw-20260916-2",
+      "actual_exit": 0,
+      "passed": "NOT_APPLICABLE",
+      "failed": "NOT_APPLICABLE",
+      "skipped": "NOT_APPLICABLE",
+      "raw_ref": "production-readback.json"
+    }
+  ],
+  "tool_pycompile": {
+    "command": "<USER_HOME>\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe -m py_compile tools/run_d2b01_production.py",
+    "actual_exit": 0
+  },
+  "existing_core_suite": "Reviewed Candidate 237d5fc6b8495c3a455e1d2ba5cca7b2351c3441: 963 passed, 1 skipped. Product source/tests/migration unchanged in this repair; suite was not unnecessarily repeated.",
+  "existing_skip": "tests/test_d2a_external_runtime.py::test_projected_staging_rejects_nested_reparse_path — symlink creation unavailable in this Windows test environment"
+}

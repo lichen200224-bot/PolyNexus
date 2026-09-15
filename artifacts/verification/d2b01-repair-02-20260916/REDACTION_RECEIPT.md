@@ -1,0 +1,7 @@
+# Evidence redaction and provenance
+
+`PUBLISH.py` reads each isolated diagnostic file as bytes. It scans the original and sanitized bytes for secret-like values, then deterministically replaces only the personal home prefix with `<USER_HOME>` in direct, nested JSON-escaped (1, 2, 4 and 8 backslash) and slash-path forms. `EXECUTION_COMMAND_RECORDS.json` uses the same normalization on completed Codex app command/output metadata. No secret, token, cookie, credential, private key, Human WebAuthn assertion, or unnecessary personal data is published.
+
+Exit codes, Run/Task/Generation identities, authorization state and digest, policy disposition and Evidence status, timestamps, process facts, failure messages, source/runtime/Artifact hashes, postcondition counts, runtime results and acceptance meaning are unchanged. `SOURCE_PROVENANCE.json` is a separately labelled receipt derived from frozen preflight records and completed command exits. The A1 tool-oracle failure remains in `commit-a1-failed-run/` with actual exit 1; it is not relabelled as a successful diagnostic. The earlier reviewed Candidate evidence directory remains untouched as historical provenance.
+
+`MANIFEST.sha256` covers every file in this package except the manifest itself. Raw Windows CRLF outputs retain their bytes and are excluded from Git text diff by the package's `.gitattributes`; product/tool source still receives normal `git diff --check` validation.

@@ -1,0 +1,34 @@
+[
+  {
+    "kind": "real_product_path",
+    "artifact_attempt": 1,
+    "command": "\"<USER_HOME>\\\\.cache\\\\codex-runtimes\\\\codex-primary-runtime\\\\dependencies\\\\native\\\\powershell\\\\pwsh.exe\" -Command '$rawRoot=Join-Path $env:TEMP '\"'d2b01-repair-02-production-raw-20260916-1'; if(Test-Path -LiteralPath \"'$rawRoot){throw '\"'artifact root must be new'}; \"'$head=(git rev-parse HEAD).Trim(); $status=@(git status --porcelain); Write-Output \"HEAD=$head\"; Write-Output \"WORKTREE_CLEAN=$($status.Count -eq 0)\"; if($head -ne '\"'4b1c2c57b78ad8e55833080400819c591133bf54' -or \"'$status.Count -ne 0){throw '\"'frozen Commit A precondition failed'}; & 'D:\\\\AI學習教材\\\\PolyNexus\\\\.venv\\\\Scripts\\\\python.exe' -B tools/run_d2b01_production.py --artifact-root \"'$rawRoot --executable '\"'<USER_HOME>\\\\OneDrive\\\\文件\\\\PONYNEXUS\\\\d2b01-opencode-tool\\\\node_modules\\\\opencode-ai\\\\bin\\\\opencode.exe'; \"'$actual=$LASTEXITCODE; Write-Output \"ACTUAL_EXIT=$actual\"; exit $actual'",
+    "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\enhanced-product-continuation",
+    "actual_exit": 1,
+    "output": "HEAD=4b1c2c57b78ad8e55833080400819c591133bf54\r\nWORKTREE_CLEAN=True\r\nTraceback (most recent call last):\r\nPRODUCTION_PATH_OUTCOME=COMPLETED\r\nPRODUCTION_PATH_POLICY=APPROVAL_REQUIRED\r\nPRODUCTION_PATH_BINDING=opencode.acp.local\r\nPRODUCTION_PATH_AUTHORIZATION=CONSUMED\r\nPRODUCTION_PATH_POSTCONDITION_EXIT=0\r\n  File \"<USER_HOME>\\OneDrive\\���\\PONYNEXUS\\enhanced-product-continuation\\tools\\run_d2b01_production.py\", line 261, in <module>\r\n    raise SystemExit(main())\r\n                     ^^^^^^\r\n  File \"<USER_HOME>\\OneDrive\\���\\PONYNEXUS\\enhanced-product-continuation\\tools\\run_d2b01_production.py\", line 240, in main\r\n    and sum(item[\"event_kind\"] == \"CONSUME\" for item in RuntimeDispatchAuthorizationRepository(session).events(authorization.authorization_id)) == 1\r\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"<USER_HOME>\\OneDrive\\���\\PONYNEXUS\\enhanced-product-continuation\\tools\\run_d2b01_production.py\", line 240, in <genexpr>\r\n    and sum(item[\"event_kind\"] == \"CONSUME\" for item in RuntimeDispatchAuthorizationRepository(session).events(authorization.authorization_id)) == 1\r\n            ~~~~^^^^^^^^^^^^^^\r\nTypeError: 'RuntimeDispatchAuthorizationEventRow' object is not subscriptable\r\nACTUAL_EXIT=1\r\n"
+  },
+  {
+    "kind": "independent_readback",
+    "artifact_attempt": 1,
+    "command": "\"<USER_HOME>\\\\.cache\\\\codex-runtimes\\\\codex-primary-runtime\\\\dependencies\\\\native\\\\powershell\\\\pwsh.exe\" -Command '$rawRoot=Join-Path $env:TEMP '\"'d2b01-repair-02-production-raw-20260916-1'; & 'D:\\\\AI學習教材\\\\PolyNexus\\\\.venv\\\\Scripts\\\\python.exe' -B tools/readback_d2b01_production.py \"'$rawRoot; $actual=$LASTEXITCODE; Write-Output \"ACTUAL_EXIT=$actual\"; exit $actual'",
+    "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\enhanced-product-continuation",
+    "actual_exit": 0,
+    "output": "READBACK_RUN_STATE=COMPLETED\r\nREADBACK_GENERATION_CLOSED=1\r\nREADBACK_SINGLE_CHANGED_PATH=True\r\nREADBACK_AUTH_CONSUMED_ONCE=True\r\nACTUAL_EXIT=0\r\n"
+  },
+  {
+    "kind": "real_product_path",
+    "artifact_attempt": 2,
+    "command": "\"<USER_HOME>\\\\.cache\\\\codex-runtimes\\\\codex-primary-runtime\\\\dependencies\\\\native\\\\powershell\\\\pwsh.exe\" -Command '$rawRoot=Join-Path $env:TEMP '\"'d2b01-repair-02-production-raw-20260916-2'; if(Test-Path -LiteralPath \"'$rawRoot){throw '\"'artifact root must be new'}; \"'$head=(git rev-parse HEAD).Trim(); $status=@(git status --porcelain); Write-Output \"HEAD=$head\"; Write-Output \"WORKTREE_CLEAN=$($status.Count -eq 0)\"; if($head -ne '\"'98e674570f357b4e8af23d9f203f993f42ce638e' -or \"'$status.Count -ne 0){throw '\"'frozen source precondition failed'}; & 'D:\\\\AI學習教材\\\\PolyNexus\\\\.venv\\\\Scripts\\\\python.exe' -B tools/run_d2b01_production.py --artifact-root \"'$rawRoot --executable '\"'<USER_HOME>\\\\OneDrive\\\\文件\\\\PONYNEXUS\\\\d2b01-opencode-tool\\\\node_modules\\\\opencode-ai\\\\bin\\\\opencode.exe'; \"'$actual=$LASTEXITCODE; Write-Output \"ACTUAL_EXIT=$actual\"; exit $actual'",
+    "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\enhanced-product-continuation",
+    "actual_exit": 0,
+    "output": "HEAD=98e674570f357b4e8af23d9f203f993f42ce638e\r\nWORKTREE_CLEAN=True\r\nPRODUCTION_PATH_OUTCOME=COMPLETED\r\nPRODUCTION_PATH_POLICY=APPROVAL_REQUIRED\r\nPRODUCTION_PATH_BINDING=opencode.acp.local\r\nPRODUCTION_PATH_AUTHORIZATION=CONSUMED\r\nPRODUCTION_PATH_POSTCONDITION_EXIT=0\r\nACTUAL_EXIT=0\r\n"
+  },
+  {
+    "kind": "independent_readback",
+    "artifact_attempt": 2,
+    "command": "\"<USER_HOME>\\\\.cache\\\\codex-runtimes\\\\codex-primary-runtime\\\\dependencies\\\\native\\\\powershell\\\\pwsh.exe\" -Command '$rawRoot=Join-Path $env:TEMP '\"'d2b01-repair-02-production-raw-20260916-2'; & 'D:\\\\AI學習教材\\\\PolyNexus\\\\.venv\\\\Scripts\\\\python.exe' -B tools/readback_d2b01_production.py \"'$rawRoot; $actual=$LASTEXITCODE; Write-Output \"ACTUAL_EXIT=$actual\"; exit $actual'",
+    "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\enhanced-product-continuation",
+    "actual_exit": 0,
+    "output": "READBACK_RUN_STATE=COMPLETED\r\nREADBACK_GENERATION_CLOSED=1\r\nREADBACK_SINGLE_CHANGED_PATH=True\r\nREADBACK_AUTH_CONSUMED_ONCE=True\r\nACTUAL_EXIT=0\r\n"
+  }
+]

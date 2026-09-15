@@ -1,0 +1,11 @@
+{
+  "executed_source_sha": "98e674570f357b4e8af23d9f203f993f42ce638e",
+  "executed_tree_sha": "91ea9645c6f8c424127134df698da6aee38f0ca9",
+  "branch": "codex/enhanced-delivery-runtime-fleet",
+  "worktree_clean_before_run": true,
+  "runner_sha256": "4396054e0daee5a12051f2656c5d93f9fb9f08888b6e3c4683bfe86d60b85bda",
+  "readback_runner_sha256": "0bc14cf8b9e45d4e10c4120d20df9eee5eff717d45e3c053916d039d8e1cd038",
+  "opencode_executable_sha256": "0242a0dc705af67c90882b456a36b619883c1c786aad8fe071a1bc64e5d1d440",
+  "opencode_version": "1.18.31",
+  "raw_artifact_root": "<USER_HOME>\\AppData\\Local\\Temp\\d2b01-repair-02-production-raw-20260916-2"
+}

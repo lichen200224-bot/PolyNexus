@@ -1,0 +1,212 @@
+{
+  "selected_profile": "opencode.acp.local",
+  "project_id": "project_d6bc7462424a4d8b9c6644ca1585e8a3",
+  "task_id": "task_b5d228e79e6644d8a6661c199e651900",
+  "context_id": "context_7f0e3e18a90a45dd907e4d008b025dff",
+  "generation": {
+    "task_id": "task_b5d228e79e6644d8a6661c199e651900",
+    "generation_revision": 1,
+    "command_id": "begin",
+    "control_revision": 0
+  },
+  "run_id": "run_6b915dbe6b7045e3b5072e5355e64628",
+  "initial_outcome": "PREDISPATCH_POLICY_DENIED",
+  "initial_error": "predispatch_policy_denied",
+  "outcome": "COMPLETED",
+  "retry_error": "",
+  "binding": {
+    "run_id": "run_6b915dbe6b7045e3b5072e5355e64628",
+    "profile": "opencode.acp.local",
+    "adapter_id": "builtin.opencode.acp"
+  },
+  "initial_binding": null,
+  "authorization": {
+    "id": "dispatch-auth_4e96567aedb84c7f875d81a8f48b2b0e",
+    "issuer_class": "TEST_ONLY",
+    "policy_digest": "0172fb3a1748aab16726840e74bf126166854fffce5f3ebdcbd2e08932ff52c3",
+    "state": "CONSUMED",
+    "issued_at": "2026-09-15T22:20:59.342409+00:00",
+    "consumed_at": "2026-09-15T22:20:59.415075+00:00"
+  },
+  "authorization_events": [
+    {
+      "event_kind": "ISSUE",
+      "from_state": null,
+      "to_state": "ISSUED",
+      "occurred_at": "2026-09-15T22:20:59.342409"
+    },
+    {
+      "event_kind": "CONSUME",
+      "from_state": "ISSUED",
+      "to_state": "CONSUMED",
+      "occurred_at": "2026-09-15T22:20:59.415075"
+    }
+  ],
+  "launch_observations_before_effect": [
+    {
+      "run_state": "STARTING",
+      "binding": {
+        "run_id": "run_6b915dbe6b7045e3b5072e5355e64628",
+        "profile": "opencode.acp.local"
+      },
+      "authorization_state": "CONSUMED",
+      "routing_policy_decisions": [
+        "APPROVAL_REQUIRED"
+      ],
+      "dispatch_evidence_count": 1,
+      "argv": [
+        "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\d2b01-opencode-tool\\node_modules\\opencode-ai\\bin\\opencode.exe",
+        "--pure",
+        "acp"
+      ],
+      "cwd": "<USER_HOME>\\AppData\\Local\\Temp\\d2b01-repair-02-production-raw-20260916-2\\work-root\\staging_865e385e884cb4b6d64ea89e"
+    }
+  ],
+  "real_acp_process_count": 1,
+  "real_process_facts": [
+    {
+      "pid": 17748,
+      "retained_handle": 828,
+      "created_filetime": 134339844606317869,
+      "ended_filetime": 134339844789531519,
+      "exit_code": 0,
+      "stopped": true,
+      "argv": [
+        "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\d2b01-opencode-tool\\node_modules\\opencode-ai\\bin\\opencode.exe",
+        "--pure",
+        "acp"
+      ],
+      "cwd": "<USER_HOME>\\AppData\\Local\\Temp\\d2b01-repair-02-production-raw-20260916-2\\work-root\\staging_865e385e884cb4b6d64ea89e",
+      "signal": "none",
+      "stdout_bytes": 57338,
+      "stderr_bytes": 0,
+      "stdout_sha256": "d46531dce87b24dbd85ce1d51f53bfd353a0c792bd2edae3f82532e3cd00dbd2",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "postcondition_test": {
+    "argv": [
+      "D:\\AI學習教材\\PolyNexus\\.venv\\Scripts\\python.exe",
+      "-B",
+      "-m",
+      "pytest",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "test_bug.py"
+    ],
+    "cwd": "<USER_HOME>\\AppData\\Local\\Temp\\d2b01-repair-02-production-raw-20260916-2\\work-root\\staging_865e385e884cb4b6d64ea89e",
+    "exit": 0,
+    "stdout": ".                                                                        [100%]\r\n1 passed in 0.00s\r\n",
+    "stderr": ""
+  },
+  "persisted_artifacts": [
+    {
+      "id": "artifact_7042b2d2308a4aca954c33b539dee0d5",
+      "run_id": "run_6b915dbe6b7045e3b5072e5355e64628",
+      "storage_ref": "core-blob:7749dc5c1111dfc60c7ec37c1133739e3e4f07f6c3202834b61354243f74869b",
+      "sha256": "7749dc5c1111dfc60c7ec37c1133739e3e4f07f6c3202834b61354243f74869b",
+      "size": 170,
+      "content_sha256": "7749dc5c1111dfc60c7ec37c1133739e3e4f07f6c3202834b61354243f74869b"
+    }
+  ],
+  "persisted_runtime_evidence": [
+    {
+      "id": "evidence_63f2640863284796ab4d4cd556e72962",
+      "run_id": "run_6b915dbe6b7045e3b5072e5355e64628",
+      "source": "runtime.routing_policy",
+      "status": "NEED_ACTION",
+      "metadata": {
+        "classification": "PUBLIC",
+        "execution_mode": "STANDARD",
+        "destination_trust": "TRUSTED_EXTERNAL",
+        "tool_trust": "TRUSTED_REGISTERED",
+        "decision": "APPROVAL_REQUIRED",
+        "route": "MANUAL",
+        "reason": "sensitive_or_side_effect_requires_approval",
+        "local_available": "False",
+        "side_effect": "True",
+        "generation_revision": "1"
+      }
+    },
+    {
+      "id": "evidence_f99ad139270a4818825230f03cb0912a",
+      "run_id": "run_6b915dbe6b7045e3b5072e5355e64628",
+      "source": "runtime.dispatch_authorization",
+      "status": "OBSERVED",
+      "metadata": {
+        "authorization_id": "dispatch-auth_4e96567aedb84c7f875d81a8f48b2b0e",
+        "issuer_class": "TEST_ONLY",
+        "policy_digest": "0172fb3a1748aab16726840e74bf126166854fffce5f3ebdcbd2e08932ff52c3",
+        "policy_evidence_id": "evidence_63f2640863284796ab4d4cd556e72962",
+        "issued_at": "2026-09-15T22:20:59.342409+00:00",
+        "consumed_at": "2026-09-15T22:20:59.415075+00:00",
+        "effective_dispatch_outcome": "AUTHORIZED_FOR_EXACT_RUN",
+        "original_policy_decision": "APPROVAL_REQUIRED"
+      }
+    },
+    {
+      "id": "evidence_297b88b23a4142bebcb47516646a6410",
+      "run_id": "run_6b915dbe6b7045e3b5072e5355e64628",
+      "source": "runtime.opencode.acp",
+      "status": "OBSERVED",
+      "metadata": {
+        "envelope_sha256": "baf94c4f60c0221f86938a89d2fb21867112969e42f4b3c72d35daa7dedacb86",
+        "effective_runtime_configuration_fingerprint": "8868d5a3b67551bf94bf849fc2b46b9ee58ad7decef07f82ba57855a72ecf823",
+        "permission_policy_fingerprint": "a6b749cc97ad50b90f1c6de105694b1826a751971aab51ae0a00523b25b70890",
+        "route_policy_evidence_sha256": "33ee36474a279a0403167dac59ae858695cf70f9735a605d53e5f9e42fc22492",
+        "workspace_scope_mode": "PROJECTED_STAGING",
+        "enabled_plugin_set": "NONE",
+        "enabled_mcp_set": "NONE",
+        "remote_skill_catalog_state": "NONE",
+        "executable_sha256": "0242a0dc705af67c90882b456a36b619883c1c786aad8fe071a1bc64e5d1d440",
+        "executable_version": "opencode-1.18.31",
+        "cwd": "[PATH_REDACTED]",
+        "argv_json": "[\"--pure\", \"acp\"]",
+        "exit_code": "0",
+        "protocol_version": "1",
+        "session_id_sha256": "35cd7ff1bd6c916c85917cb4f624e26659a9dab13f3a169ee09e16d81d3289af",
+        "stop_reason": "end_turn",
+        "source_changed_paths_json": "[\"bug.py\"]",
+        "source_before_hashes_json": "{\"bug.py\": \"a88461f8368a8e884152e5d38bc7a52315f9e311d6c094597c3ad15700bf3911\"}",
+        "source_after_hashes_json": "{\"bug.py\": \"232ebf42bfe8ca6cb387145693368b0708b36fd6d25d10c5949a60afdb9ff473\"}",
+        "stdout_sha256": "d46531dce87b24dbd85ce1d51f53bfd353a0c792bd2edae3f82532e3cd00dbd2",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "auth_ownership": "RUNTIME_MANAGED",
+        "provider_model_egress": "RUNTIME_MANAGED",
+        "agent_extension_egress": "DENY"
+      }
+    }
+  ],
+  "routing_policy_evidence": [
+    {
+      "id": "evidence_63f2640863284796ab4d4cd556e72962",
+      "run_id": "run_6b915dbe6b7045e3b5072e5355e64628",
+      "status": "NEED_ACTION",
+      "metadata": {
+        "classification": "PUBLIC",
+        "execution_mode": "STANDARD",
+        "destination_trust": "TRUSTED_EXTERNAL",
+        "tool_trust": "TRUSTED_REGISTERED",
+        "decision": "APPROVAL_REQUIRED",
+        "route": "MANUAL",
+        "reason": "sensitive_or_side_effect_requires_approval",
+        "local_available": "False",
+        "side_effect": "True",
+        "generation_revision": "1"
+      }
+    }
+  ],
+  "all_evidence_sources": [
+    "runtime.routing_policy",
+    "runtime.dispatch_authorization",
+    "runtime.opencode.acp",
+    "runtime-adapter",
+    "workflow-gate-evaluation"
+  ],
+  "source_before_sha256": "a88461f8368a8e884152e5d38bc7a52315f9e311d6c094597c3ad15700bf3911",
+  "original_source_unchanged": true,
+  "baseline_commit": "c2267479f1af63f0e5fa6458920e400572716679",
+  "run_state": "COMPLETED",
+  "staging_after_sha256": "232ebf42bfe8ca6cb387145693368b0708b36fd6d25d10c5949a60afdb9ff473"
+}

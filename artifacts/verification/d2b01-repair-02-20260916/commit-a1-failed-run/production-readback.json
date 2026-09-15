@@ -1,0 +1,95 @@
+{
+  "run": {
+    "id": "run_3bf7fcdb257443e9bcb6a89090106fc7",
+    "task_id": "task_c2a17e01cf034c6f8063cc1be4a4fa64",
+    "generation_revision": 1,
+    "state": "COMPLETED",
+    "result_artifact_ids": "[\"artifact_e69bdaa2c7ab4f9c8b5e49c3fcc6f4ce\"]"
+  },
+  "generation": {
+    "task_id": "task_c2a17e01cf034c6f8063cc1be4a4fa64",
+    "revision": 1,
+    "control_revision": 2,
+    "aborted": 0,
+    "closed": 1,
+    "ownership_unknown": 0
+  },
+  "binding": {
+    "run_id": "run_3bf7fcdb257443e9bcb6a89090106fc7",
+    "runtime_profile_ref": "opencode.acp.local",
+    "adapter_id": "builtin.opencode.acp"
+  },
+  "authorization": {
+    "authorization_id": "dispatch-auth_8b2740074da5488ebb6441db6ca8e708",
+    "run_id": "run_3bf7fcdb257443e9bcb6a89090106fc7",
+    "state": "CONSUMED",
+    "issuer_class": "TEST_ONLY",
+    "policy_digest": "d2c21fc12116ecbb1ffe343c93cf704d2a7b697fd53f358f73e382b7b24da2f5",
+    "policy_evidence_id": "evidence_ae0230f4d3854202bec627e3a2c15467"
+  },
+  "authorization_events": [
+    {
+      "event_kind": "ISSUE",
+      "from_state": null,
+      "to_state": "ISSUED"
+    },
+    {
+      "event_kind": "CONSUME",
+      "from_state": "ISSUED",
+      "to_state": "CONSUMED"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "evidence_0f11498a398a4692b37cbd502b256d4d",
+      "run_id": "run_3bf7fcdb257443e9bcb6a89090106fc7",
+      "source": "runtime.dispatch_authorization",
+      "status": "OBSERVED"
+    },
+    {
+      "id": "evidence_2076131b19614c96a059f8f93169fe5d",
+      "run_id": "run_3bf7fcdb257443e9bcb6a89090106fc7",
+      "source": "runtime-adapter",
+      "status": "PASS"
+    },
+    {
+      "id": "evidence_4dde06522cc345d084d3fa0b8ac84312",
+      "run_id": "run_3bf7fcdb257443e9bcb6a89090106fc7",
+      "source": "runtime.opencode.acp",
+      "status": "OBSERVED"
+    },
+    {
+      "id": "evidence_a7bbf837fd6c4bbd8c23d9532569b819",
+      "run_id": "run_3bf7fcdb257443e9bcb6a89090106fc7",
+      "source": "workflow-gate-evaluation",
+      "status": "OBSERVED"
+    },
+    {
+      "id": "evidence_ae0230f4d3854202bec627e3a2c15467",
+      "run_id": "run_3bf7fcdb257443e9bcb6a89090106fc7",
+      "source": "runtime.routing_policy",
+      "status": "NEED_ACTION"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact_e69bdaa2c7ab4f9c8b5e49c3fcc6f4ce",
+      "run_id": "run_3bf7fcdb257443e9bcb6a89090106fc7",
+      "storage_ref": "core-blob:7749dc5c1111dfc60c7ec37c1133739e3e4f07f6c3202834b61354243f74869b",
+      "sha256": "7749dc5c1111dfc60c7ec37c1133739e3e4f07f6c3202834b61354243f74869b"
+    }
+  ],
+  "selected_source_files": {
+    "bug.py": {
+      "source_sha256": "a88461f8368a8e884152e5d38bc7a52315f9e311d6c094597c3ad15700bf3911",
+      "staging_sha256": "232ebf42bfe8ca6cb387145693368b0708b36fd6d25d10c5949a60afdb9ff473"
+    },
+    "test_bug.py": {
+      "source_sha256": "f8afc94387afa737f65fe8868b9f4e02af64f58b5f0bd9b0505747bfdbe3a576",
+      "staging_sha256": "f8afc94387afa737f65fe8868b9f4e02af64f58b5f0bd9b0505747bfdbe3a576"
+    }
+  },
+  "original_source_unchanged": true,
+  "test_input_unchanged": true,
+  "single_changed_path": true
+}
