@@ -1,54 +1,132 @@
 # 最終 UAT 與交付契約
 
-Status: UAT_PLAN / PRODUCT_VERIFICATION_NOT_RUN
-目標：AI先完成正常開發、技術測試、獨立審查與修復，再集中交Human檢核實際用途、操作及成果。以下是要交付的契約，不是宣稱目前已有安裝包或測試通過。
+Date: 2026-09-15 (Asia/Taipei)
+Status: `HUMAN_DIRECTION_APPROVED / UAT_PLAN / ENHANCED_PRODUCT_NOT_YET_READY`
+Product version: `UNCHANGED`
 
-## 1. AI交付前入口
+目標：Codex 先完成批准範圍內的開發、UT/contract/SIT/build/live target tests 與同範圍修復；ChatGPT 對每個 exact remote candidate 做獨立驗收。中間不逐 Goal 要 Human 批准。所有必要 Human-only 情境最後集中為 **一次整合 Human UAT / Final Acceptance session**。
 
-全部本次required功能有可定位implementation與exact candidate evidence；來源/設計/功能包/UT/Contract/SIT/UAT追溯成立。必要技術checks通過，沒有未解BLOCKER/MAJOR。Live能力只按實際版本與操作scope宣稱；未支援/未測如實列出，不能把required未完變成known limitation。
+## 1. AI 交付前入口
 
-AI測試Human協議只用隔離TEST_ONLY principal；實際Human acceptance和必要Web send保留Human操作。B01可先technical-ready供後續開發，真正Human-only條件在本UAT集中完成，未完成不得標B01或整體Human accepted。
+進入最終 Human UAT 前必須同時成立：
 
-## 2. 必交資產
+- `CURRENT_PRODUCT_STATE.md` 已對應最終 exact product candidate；
+- D2b Strategic Runtime Fleet 的 required target capabilities 已有真實 evidence，或 source-bound 允許的限制被明確標示；
+- D3 Council/Workflow/role routing 完成並有 cross-runtime evidence；
+- D4 Unified Work Control Plane / Runtime Fleet Doctor 可用；
+- T1/T2 required functional + failure/security SIT 通過；
+- required PN/FD/source clauses 有 implementation/test/evidence/review 對應；
+- 無未解 BLOCKER/MAJOR；
+- final candidate 已由 ChatGPT independent Product Acceptance Center 判定 `READY_FOR_HUMAN_UAT`；
+- known limitation 不能用來掩蓋 required 未完成項。
 
-- exact source/候選SHA及build/package hashes；可啟動套件或可重現建置安裝方式、依賴lock和支援環境。
-- 繁體中文使用手冊：安裝、啟動、首次連接/配對、三入口、repo/input/工作、結果/證據/接受、Web/Local、取消恢復、Doctor、備份還原。
-- 功能核銷：每PN/功能子項/原required條款，source、implementation、test command、current evidence、review、成熟度與限制。
-- 技術驗收報告與必要JUnit/log/screenshots索引；大檔不直接推public Git，保留批准位置及hash。
-- 最終人工操作表：步驟、輸入、預期結果、實際結果欄、問題位置、失敗回報方式；不要求Human逐份看UT log。
-- 安全與操作限制、已知問題、備份/還原/回退指引、P0 accepted-package verify/reconstruct方法。
+Human protocol automated tests 只能使用隔離 TEST_ONLY principal。實際 Final Acceptance、Windows Hello、人類使用體驗與其他 Human-only 決定由 Human 本人執行。
 
-## 3. Human操作情境
+## 2. Human 介入預算
 
-| UAT | 操作 | 必要結果 | 不可接受 |
+本 UAT 設計的目的之一是降低 Human 中途介入：
+
+| 類型 | 預期次數 | 規則 |
+|---|---:|---|
+| D2b/D3/D4/T1/T2 中間產品批准 | `0` | Codex -> ChatGPT review -> PASS 自動續行 |
+| 最終整合 Human UAT / Acceptance | `1` | 正常路徑唯一必要 Human acceptance session |
+| Provider 官方 login / Windows Hello 前置 | `0-1` conditional | 僅現有安全 auth 無法使用時 |
+| 架構/安全/scope exception | `0-1` conditional | 只有批准 invariants 無法滿足時 |
+| merge/tag/release/deploy | separate optional | Product Accept 不自動授權發布 |
+
+正常預期剩餘 Human 介入：**1 次**。有環境/架構例外時合理上限約 **2-3 次**。
+
+## 3. 必交資產
+
+- exact final source/candidate SHA、ancestry、build/package hashes；
+- `CURRENT_PRODUCT_STATE` final reconciliation；
+- Runtime Fleet capability/maturity/evidence matrix for Codex/OpenCode/Gemini CLI/Claude Code/Antigravity；
+- 繁中使用手冊：安裝、啟動、runtime readiness、Project/Task、Work Control、Council、Candidate/Evidence/Human、取消恢復、Doctor、備份還原；
+- 功能核銷：每 required PN/子項/source clause -> implementation -> test -> evidence -> review -> limitation；
+- T1/T2 Golden/failure scenario evidence index；
+- B01 technical + pending Human closure trace；
+- P0 accepted package verify/reconstruct 方法；
+- 最終人工操作表，只要求 Human 驗證真正需要使用者判斷/體驗/身份的項目，不要求閱讀全部 UT logs。
+
+## 4. Final Human UAT scenarios
+
+以下 HU-01–HU-12 形成**同一次集中 session**；必要時可分段休息，但不重新建立逐 Goal approval 模式。
+
+| UAT | Human 操作 | 必要結果 | 不可接受 |
 |---|---|---|---|
-| HU-01 | 依手冊在指定乾淨環境啟動/重開 | Core/UI/schema/runtime readiness分層清楚，歷史可讀 | 開發者手動改DB/隱藏global設定才會動 |
-| HU-02 | Create Project→Discuss，多角色分析 | 可定位原稿、交叉審查、共識/分歧/風險，partial failure明示 | 同一份回答假裝多AI |
-| HU-03 | 文件/程式Review及九範本代表操作 | Finding位置/severity/依據可理解，每範本技術覆蓋已核銷 | 模板只有名稱不可執行 |
-| HU-04 | 真實小bug：固定input→Run→diff→tests | 修改在managed/approved workspace，原Human dirty不變 | 只說改了，沒有source或測試 |
-| HU-05 | failure/Cancel/Retry與重開 | 舊輪/新輪分明，安全cleanup，late abort不誤停新輪 | unknown owner仍放行新writer |
-| HU-06 | Candidate verification及Human Accept/Open | exact view/required有效，接受後開啟對應source | tool fail仍Accept、改內容沿用舊PASS |
-| HU-07 | Reject/Revoke/Supersede/takeover | 前後接受歷史保留；Working Copy不冒immutable結果 | 覆寫歷史、Accept即改原repo或push |
-| HU-08 | Local-only及核准雲地混用 | 選定route與實際記錄一致、禁止的egress被拒 | 敏感資料靜默走cloud |
-| HU-09 | 三Web vendor確認send/capture/fallback | payload/target明確確認、正常與fallback可用 | AI未經必要確認自動send或讀取秘密 |
-| HU-10 | 模組/Runtime切換與Doctor | 既定支援範圍可用，不影響歷史；unsupported清楚 | 僅descriptor就標全部SUPPORTED |
-| HU-11 | Backup/Restore、P0 verify/reconstruct | 關鍵資料/source可重建，hash一致、secret不出包 | 缺source或依賴provider私有session |
-| HU-12 | N1/WS後續能力與日用UX | 本次已納入scope項如實交付，reconnect不丟durable事實 | 以B01已過为由省略完整目標 |
+| HU-01 | 依手冊 clean start / restart PolyNexus | Core/UI/schema/runtime readiness分層清楚；歷史可讀；舊 durable facts 未遺失 | 開發者手改DB/隱藏global設定才可啟動 |
+| HU-02 | 開 Project/Task，查看 Unified Work Control Plane | current stage/role/runtime/generation/run/blocker/next owner/next action 可理解且與 durable facts 一致 | UI 自己發明 success/next state |
+| HU-03 | 查看 Runtime Fleet / Doctor | Codex、OpenCode、Gemini CLI、Claude Code、Antigravity 的 installed/readiness/maturity/capability/limitation truthfully displayed | descriptor 就全部顯示 SUPPORTED/green |
+| HU-04 | 執行 Multi-Agent Golden coding flow | 至少觀察 Claude/Architect -> Codex/Implementer -> OpenCode/Reviewer 的真實接力；handoff/context 可追蹤 | 同一回答冒充多AI、無 real runtime evidence |
+| HU-05 | 執行 Gemini/Claude Council 或等價 cross-model review | 可看 individual analysis、cross-review、synthesis、partial failure | 缺 participant 輸出卻產生假共識 |
+| HU-06 | 執行 Antigravity secondary/adversarial verification 情境 | outer success 仍受 Core Evidence/postcondition 驗證；限制可理解 | vendor `SUCCESS`/exit0 直接變 PASS |
+| HU-07 | failure/Cancel/Retry/restart | g1/g2、Run、owner/fence、cleanup、late abort 狀態清楚；安全 retry | ownership unknown 還放行新 writer |
+| HU-08 | Candidate verification + exact Human decision | required evidence/eligibility 正確；Windows Hello/exact-view challenge；Accept 後對應 exact result | stale/missing evidence 可 Accept |
+| HU-09 | Reject/Revoke/Supersede/takeover representative path | append-only history與 Working Copy/immutable accepted result 區分清楚 | 覆寫歷史、Accept 自動修改 Human repo |
+| HU-10 | Local-only / approved cloud mixed routing representative path | runtime/egress/policy 與實際記錄一致；禁止 route fail closed | 敏感資料 silent cloud fallback |
+| HU-11 | B01 closure + P0 verify/reconstruct + Backup/Restore representative path | 真實 bug-fix/recovery 技術鏈對得上 final product；P0/source/hash 可重建；secret 不出包 | 依賴私有 provider session 才可重建 |
+| HU-12 | 日用 UX、九模板代表操作、Web/Local/source-required remainder | 必要 workflow/monitor/findings/assurance/metrics/操作性符合用途；known limitations 清楚 | 為 Demo 而省略 required source scope |
 
-各功能包的UAT cases細分到FEATURE_SCOPE_MATRIX與TEST_PLAN；Human可按風險抽查已由獨立AI實測的普通細節，但不可把必要真實Human-only確認抽查成未做即PASS。
+Human 不需在 HU-04～HU-06 每次重新批准 provider invocation；那些 runtime executions 應在 AI technical acceptance 階段已完成。Human UAT 的重點是最終產品可理解性、實際身份/decision 與 end-to-end 行為。
 
-## 4. 問題處置
+## 5. Strategic Runtime acceptance boundary
 
-UAT缺陷分功能不符、操作不可用、資料/安全、環境、需求變更。前四類在原scope內由AI修復、new candidate、affected與required regression、fresh review，再只重驗受影響Human情境；不讓Human重新批每個bug。
+五 Runtime 都必須進產品 Fleet，但不要求 capability 完全等價。
 
-需求變更若改已凍結規則、介面、安全/資料權限或驗收約定，要更新requirements/validation snapshot與impact；新Candidate不能冒舊接受。重大問題不得用『使用者可以先忍受』默認waive。Human明確接受的限定例外需記範圍與未達成熟度，不能抹掉工具failure。
+Human 應看到 truthful matrix：
 
-## 5. 最終狀態與發布
+- `VERIFIED`;
+- `SUPPORTED_NOT_CURRENTLY_VERIFIED`;
+- `UNSUPPORTED`;
+- `ENVIRONMENT_BLOCKED`;
+- `UNKNOWN`.
 
-AI輸出READY_FOR_HUMAN_UAT不是SIGNED/ACCEPTED/PRODUCTION_READY。Human接受exact delivered candidate與限制後才記對應接受。Product Accept不自動Git merge/push/tag/release/apply；release publication是獨立授權副作用。
+`ResumeMode.NONE`、不支援特定 tool/MCP/plugin 或環境登入阻擋都可以是合法限制，只要不違反 source-required scope。不能為了 Demo 把未驗 capability 顯示成 green。
 
-後續任何source/contract/dependency改動形成新候選和impact驗證；交付包hash必須對上被驗bytes。記錄當前disposition與歷史Human decision，不以日期或branch名推導成功。產品版本不因本文件或前置commit自行增加。
+## 6. B01 closure policy
 
-## 6. F001／F002 必做UAT延伸
+`codex/product-b01-tech@ca85d22c...` 的技術證據不得遺失；其 historical status `B01_TECHNICAL_READY / PENDING_FINAL_HUMAN_UAT` 保留。
 
-PN-078在HU-03逐值檢核三Mode／四Status及分軸顯示，在HU-06確認VERIFIED Status不把FAIL變成可接受。PN-038在HU-12檢核合法分歧/去重/UNKNOWN與0的區別，並確認metric無接受或override操作。具體步驟、預期與禁止效果見[ASSURANCE_CONTRACT §6–7](ASSURANCE_CONTRACT.md#uat)。不得以既有77項核銷取代新增PN-078；目前為規劃，Human UAT仍NOT_RUN。
+最終 HU-11 將 B01 Human-only requirement 與 full enhanced-product UAT 一起結案，而不是現在再開一個中途 Human Gate。若 G0 或後續 product lineage 對 B01 技術 evidence 做了影響修改，Codex 必須先重跑 affected/required evidence 並由 ChatGPT 重新驗收，再交 Human。
+
+## 7. UAT problem handling
+
+UAT defect categories:
+
+- functional mismatch;
+- unusable UX/operation;
+- data/security/trust issue;
+- environment issue;
+- actual new requirement/change request.
+
+前四類若仍在 approved scope：
+
+```text
+Human reports issue
+  -> Codex fixes
+  -> new exact candidate
+  -> required/affected tests
+  -> ChatGPT independent re-review
+  -> only affected Human scenario rerun
+```
+
+不要求 Human 重新批准修 bug 本身。
+
+只有第五類、frozen semantic change、new authority/security/egress/cost expansion 才走 change control。
+
+## 8. Final state and release
+
+AI may declare only:
+
+`READY_FOR_HUMAN_UAT`
+
+Human may then accept/reject the exact delivered candidate and documented limitations. Product Human Accept does not automatically authorize:
+
+- merge to another protected/default branch;
+- tag/release;
+- deployment;
+- production DB migration;
+- paid purchase;
+- broader external data egress.
+
+Those remain separate side effects requiring explicit authority when requested.
