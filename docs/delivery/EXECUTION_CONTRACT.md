@@ -129,6 +129,7 @@ D2B-02 Gemini CLI ACP
 D2B-03 Claude Code
 D2B-04 Antigravity
 D2B-05 Runtime Fleet Doctor
+D2B-06 FD-09 Local AI endpoints (PN-022/PN-023: LM Studio/Ollama/Generic compatible)
 D3 Multi-Agent Council/Workflow
 D4 Unified Work Control Plane
 D4-NEXT only source-required remainder
@@ -138,7 +139,7 @@ DELIVERY
 FINAL_HUMAN_UAT
 ```
 
-This sequence does not add PN or change frozen acceptance semantics. Units map to existing FD responsibilities.
+This sequence does not add PN or change frozen acceptance semantics. Units map to existing FD responsibilities. D2B-06 restores the source-required FD-09 / PN-022/PN-023 D2b responsibility to the approved automatic-continuation route before D3; it is separate from the five strategic vendor runtimes, not a new PN or vendor Fleet requirement. After G0 reconciles FD-05/FD-10 dependencies, each of LM Studio, Ollama and Generic compatible needs its own live target evidence for health, model discovery/selection, stream/result, capability and actual model identity, plus SIT-09 positive/negative routing. Adapter source, fixtures or another endpoint's PASS do not close a missing live target. As with every product unit, an exact Codex candidate and independent ChatGPT review gate continuation; this documentation contract alone does not start product writes.
 
 ## 8. Exception gates — when Human is required
 
