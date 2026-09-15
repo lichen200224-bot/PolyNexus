@@ -1,18 +1,26 @@
-# PolyNexus 單一前置接續入口
+# PolyNexus 單一目前接續入口
 
-Date: 2026-09-12
-Canonical repository: lichen200224-bot/PolyNexus
-Active preparation branch: planning/full-delivery-design-consolidation
-Task: PREP-FULL-DELIVERY-01
-Preparation Writer: ChatGPT
-Next required role: FRESH_INDEPENDENT_DESIGN_REVIEWER
-Product implementation: HOLD_PENDING_START_GATES
-Product version: UNCHANGED
+Date: 2026-09-15 (Asia/Taipei)
+Canonical repository: `lichen200224-bot/PolyNexus`
+Active documentation branch: `planning/enhanced-runtime-control-plane`
+Task: `ENHANCED-DELIVERY-REPLAN-01`
+State: `HUMAN_DIRECTION_APPROVED / DOCUMENTATION_CANDIDATE / FRESH_DOC_REVIEW_REQUIRED`
+Product version: `UNCHANGED`
 
-先讀 [START_HERE](delivery/START_HERE.md)、[SOURCE_LOCK](delivery/SOURCE_LOCK.json)、[FEATURE_WORK_PACKAGES](delivery/FEATURE_WORK_PACKAGES.md)；以remote實際exact SHA＋發布receipt接續，不把本頁寫成自證本commit已push。
+先讀：
 
-本分支整合初版產品保留基線、Track A正式/凍結文義、模組化/MCF設計、跨機治理及各功能開發契約。既有分支保留歷史，不再從其過期NEXT_GOAL自行派Writer。GitHub default branch目前仍保留原設定，不代表該舊default具有此新文件。
+1. `docs/delivery/START_HERE.md`
+2. `docs/delivery/CURRENT_PRODUCT_STATE.md`
+3. `docs/delivery/STRATEGIC_RUNTIME_FLEET.md`
+4. `docs/delivery/GOAL_PLAN.md`
+5. `docs/delivery/EXECUTION_CONTRACT.md`
 
-f0c0b986380dc21d103d4e856057cb8ac435a8f9是產品保留錨點；MCF-02 030890b30160f1063ac2cef1d36705a9ea70bddb是待獨立審查程式候選，未合併/未接受。原100/100僅bounded G24–G30，非完整產品完成。
+再依 assigned unit 讀 feature/source/frozen contracts。
 
-Human已授權本次文件/Git前置整併及由Codex接手後續正式開發方向。当前仅發布文件候選，不授權作者自驗收、live auth/send、production DB、force/history rewrite或release。達到設計/來源/實機/權限/資源Gate後依EXECUTION_CONTRACT接續，不逐功能重新詢問已定稿需求。
+目前規劃基準不是舊 `PREP-FULL-DELIVERY-01` 的 HOLD/NEXT_GOAL 文字。已知 remote product state 以 `CURRENT_PRODUCT_STATE.md` 記錄並需由每位 Reviewer/Controller 重新 read-back：D1B/current route `e9538f328...`、B01 technical `ca85d22c...`、old MCF-02 `030890b3...` = `REJECTED / NOT_ADOPTED`。
+
+Human 已批准後續收斂方向：Codex 全開發/測試，ChatGPT 獨立驗收 exact product candidate；PASS 後在批准 scope 內直接續下一 dependency-ready unit，不逐 Goal 問 Human。正常只保留一次 final integrated Human UAT / Acceptance；provider login 或 architecture/security exception 才條件式介入。
+
+New product writes 尚未由本文件自動啟動。本 docs candidate 必須先依 `docs/delivery/DESIGN_REVIEW.md` 做 fresh non-writer independent review。PASS 後第一產品動作為 G0 Current/B01 reconciliation，之後依 D2b Strategic Runtime Fleet -> D3 -> D4 -> T1/T2 -> DELIVERY -> FINAL_HUMAN_UAT。
+
+任何歷史分支/文件內舊 routing 只保留 provenance，不得覆蓋此 current entry；actual remote truth 和 current Human decision 優先。
