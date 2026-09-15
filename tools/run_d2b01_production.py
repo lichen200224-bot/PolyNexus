@@ -190,6 +190,11 @@ def main() -> int:
             stored_auth = RuntimeDispatchAuthorizationRepository(session).get(authorization.authorization_id) if authorization else None
             stored_run = SqlRunRepository(session).get(run.id) if run else None
             persisted_binding = SqlRuntimeBindingSnapshotRepository(session).get_by_run(run.id) if run else None
+            process_facts = jobs[0].facts() if len(jobs) == 1 else []
+            root_fact = process_facts[0] if len(process_facts) == 1 else None
+            with Session(engine) as independent:
+                all_evidence_sources = ([item.source for item in SqlEvidenceRepository(independent).list_by_run(run.id)]
+                                        if run else [])
             record = {
                 "selected_profile": selected.runtime_profile_ref,
                 "project_id": project.id, "task_id": task.id, "context_id": context.id,
@@ -207,12 +212,12 @@ def main() -> int:
                                          for e in RuntimeDispatchAuthorizationRepository(session).events(authorization.authorization_id)] if authorization else [],
                 "launch_observations_before_effect": launch_observations,
                 "real_acp_process_count": len(jobs),
-                "real_process_facts": jobs[0].facts() if jobs else [],
+                "real_process_facts": process_facts,
                 "postcondition_test": postcondition,
                 "persisted_artifacts": artifact_observations,
                 "persisted_runtime_evidence": runtime_observations,
                 "routing_policy_evidence": [{"id": item.id, "run_id": item.run_id, "status": item.status.value, "metadata": item.metadata} for item in audit],
-                "all_evidence_sources": [item.source for item in SqlEvidenceRepository(session).list_by_run(run.id)],
+                "all_evidence_sources": all_evidence_sources,
                 "source_before_sha256": before,
                 "original_source_unchanged": hashlib.sha256(bug.read_bytes()).hexdigest() == before,
                 "baseline_commit": baseline,
@@ -238,7 +243,10 @@ def main() -> int:
                 and observed.get("authorization_state") == "CONSUMED"
                 and observed.get("routing_policy_decisions") == ["APPROVAL_REQUIRED"]
                 and observed.get("dispatch_evidence_count") == 1
-                and len(jobs) == 1 and jobs[0].facts()["exit_code"] == 0 and jobs[0].facts()["stopped"]
+                and len(jobs) == 1 and root_fact is not None
+                and root_fact.get("exit_code") == 0
+                and root_fact.get("argv", [None])[0] == str(exe)
+                and all(fact.get("stopped") is True for fact in process_facts)
                 and postcondition and postcondition["exit"] == 0
                 and len(artifact_observations) == 1
                 and artifact_observations[0]["sha256"] == artifact_observations[0]["content_sha256"]
