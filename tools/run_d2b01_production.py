@@ -237,7 +237,7 @@ def main() -> int:
                 and selected.runtime_profile_ref == "opencode.acp.local"
                 and binding is None and persisted_binding is not None
                 and stored_auth and stored_auth.state.value == "CONSUMED"
-                and sum(item["event_kind"] == "CONSUME" for item in RuntimeDispatchAuthorizationRepository(session).events(authorization.authorization_id)) == 1
+                and sum(item.event_kind == "CONSUME" for item in RuntimeDispatchAuthorizationRepository(session).events(authorization.authorization_id)) == 1
                 and observed.get("run_state") == "STARTING"
                 and observed.get("binding", {}).get("run_id") == run.id
                 and observed.get("authorization_state") == "CONSUMED"
