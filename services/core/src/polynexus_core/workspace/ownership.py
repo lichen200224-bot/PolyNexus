@@ -120,8 +120,8 @@ class ControlledJob:
     Only exact retained handles can establish stop. No ambient process scan or
     PID-only takeover is supported. The caller supplies a bounded local runner.
     """
-    def __init__(self, argv, cwd, *, environment=None):
-        import hashlib, os,ctypes,subprocess,threading
+    def __init__(self, argv, cwd, *, environment=None, interactive=False):
+        import hashlib, os,ctypes,subprocess,threading,queue
         from pathlib import Path
         if os.name!='nt' or not Path(cwd).is_absolute():raise GenerationConflict('owned_job_unavailable')
         self.c=ctypes;self.handles=[];self.handle=None;self.root=None
@@ -131,6 +131,10 @@ class ControlledJob:
         self._stdout_read=None;self._stderr_read=None;self._stdout=b'';self._stderr=b''
         self._termination_signal='none'
         self._stdout_thread=None;self._stderr_thread=None;self._output_error=False
+        self._interactive=bool(interactive)
+        self._stdin_fd=None;self._stdin_lock=threading.Lock()
+        self._stdout_lines=queue.Queue() if interactive else None
+        self._output_truncated=False
         self._hashlib=hashlib;self._os=os
         c=ctypes;U=c.c_uint32;P=c.c_void_p;Z=c.c_size_t;Q=c.c_uint64
         class Basic(c.Structure):
@@ -175,8 +179,15 @@ class ControlledJob:
         if not k.SetHandleInformation(stdout_read,1,0) or not k.SetHandleInformation(stderr_read,1,0):
             k.CloseHandle(stdout_read);k.CloseHandle(stdout_write);k.CloseHandle(stderr_read);k.CloseHandle(stderr_write);k.CloseHandle(self.handle);self.handle=None
             raise GenerationConflict('owned_pipe_inherit_failed')
+        stdin_read=P();stdin_write=P()
+        if self._interactive:
+            if not k.CreatePipe(c.byref(stdin_read),c.byref(stdin_write),c.byref(security),0) or not k.SetHandleInformation(stdin_write,1,0):
+                k.CloseHandle(stdout_read);k.CloseHandle(stdout_write);k.CloseHandle(stderr_read);k.CloseHandle(stderr_write);k.CloseHandle(self.handle);self.handle=None
+                raise GenerationConflict('owned_stdin_pipe_failed')
         self._stdout_read=int(stdout_read.value or 0);self._stderr_read=int(stderr_read.value or 0)
-        startup=Startup();startup.cb=c.sizeof(startup);startup.flags=0x100;startup.stdout=stdout_write;startup.stderr=stderr_write;process=Process()
+        startup=Startup();startup.cb=c.sizeof(startup);startup.flags=0x100;startup.stdout=stdout_write;startup.stderr=stderr_write
+        if self._interactive:startup.stdin=stdin_read
+        process=Process()
         environment_block=''.join(f'{key}={value}\0' for key,value in sorted(self._environment.items(),key=lambda item:item[0].upper()))+'\0'
         environment_buffer=c.create_unicode_buffer(environment_block)
         try:
@@ -185,12 +196,18 @@ class ControlledJob:
                 raise GenerationConflict('owned_process_create_failed')
             try:
                 if not k.AssignProcessToJobObject(self.handle,process.process):raise GenerationConflict('owned_job_assignment_failed')
+                if self._interactive:
+                    k.CloseHandle(stdin_read);stdin_read.value=None
+                    import msvcrt
+                    self._stdin_fd=msvcrt.open_osfhandle(int(stdin_write.value),os.O_WRONLY|os.O_BINARY)
+                    stdin_write.value=None
                 if k.ResumeThread(process.thread)==0xffffffff:raise GenerationConflict('owned_process_resume_failed')
                 self.root=(process.pid,process.process);self.handles.append(self.root)
                 self._stdout_thread=threading.Thread(target=self._drain_pipe,args=('_stdout_read','_stdout'),daemon=True)
                 self._stderr_thread=threading.Thread(target=self._drain_pipe,args=('_stderr_read','_stderr'),daemon=True)
                 self._stdout_thread.start();self._stderr_thread.start()
             except BaseException:
+                self.close_stdin()
                 k.TerminateProcess(process.process,1);k.WaitForSingleObject(process.process,5000);k.CloseHandle(process.process);raise
             finally:
                 k.CloseHandle(process.thread)
@@ -201,6 +218,8 @@ class ControlledJob:
         except BaseException:
             if stdout_write.value:k.CloseHandle(stdout_write)
             if stderr_write.value:k.CloseHandle(stderr_write)
+            if stdin_read.value:k.CloseHandle(stdin_read)
+            if stdin_write.value:k.CloseHandle(stdin_write)
             if self._stdout_read:k.CloseHandle(self._stdout_read);self._stdout_read=None
             if self._stderr_read:k.CloseHandle(self._stderr_read);self._stderr_read=None
             k.CloseHandle(self.handle);self.handle=None;raise
@@ -260,6 +279,7 @@ class ControlledJob:
 
     def dispose(self):
         if self._closed:return
+        self.close_stdin()
         if self.handle:
             self.stop()
             self._cached_facts=self.facts()
@@ -276,6 +296,35 @@ class ControlledJob:
             raise GenerationConflict('owned_output_observation_failed')
         return self._stdout,self._stderr
 
+    def send_line(self,data):
+        """Send one bounded newline-delimited request to this owned child."""
+        if not self._interactive or self._stdin_fd is None or not isinstance(data,bytes) or len(data)>1024*1024 or not data.endswith(b'\n'):
+            raise GenerationConflict('owned_stdin_invalid')
+        with self._stdin_lock:
+            offset=0
+            while offset<len(data):
+                written=self._os.write(self._stdin_fd,data[offset:])
+                if written<=0:raise GenerationConflict('owned_stdin_write_failed')
+                offset+=written
+
+    def read_line(self,timeout):
+        """Receive a complete stdout line while the retained Job is live."""
+        if not self._interactive:
+            raise GenerationConflict('owned_stdout_not_interactive')
+        try:
+            line=self._stdout_lines.get(timeout=timeout)
+        except Exception as exc:
+            raise TimeoutError('owned_stdout_timeout') from exc
+        if line is None:raise GenerationConflict('owned_stdout_closed')
+        return line
+
+    def close_stdin(self):
+        if not self._interactive:return
+        with self._stdin_lock:
+            if self._stdin_fd is not None:
+                self._os.close(self._stdin_fd)
+                self._stdin_fd=None
+
     def _drain_pipe(self,handle_field,value_field):
         handle=getattr(self,handle_field)
         setattr(self,handle_field,None)
@@ -283,13 +332,25 @@ class ControlledJob:
         try:
             import msvcrt
             fd=msvcrt.open_osfhandle(handle,self._os.O_RDONLY|self._os.O_BINARY)
-            data=[];remaining=4*1024*1024
+            data=[];remaining=4*1024*1024;pending=b''
             while True:
                 chunk=self._os.read(fd,65536)
                 if not chunk:break
                 if remaining>0:
                     kept=chunk[:remaining];data.append(kept);remaining-=len(kept)
+                    if self._interactive and value_field=='_stdout':
+                        pending+=kept
+                        while b'\n' in pending:
+                            line,pending=pending.split(b'\n',1)
+                            self._stdout_lines.put(line+b'\n')
+                elif self._interactive and value_field=='_stdout':
+                    self._output_truncated=True
             self._os.close(fd)
             setattr(self,value_field,b''.join(data))
+            if self._interactive and value_field=='_stdout' and pending:
+                self._stdout_lines.put(pending)
         except (OSError,ValueError):
             self._output_error=True
+        finally:
+            if self._interactive and value_field=='_stdout':
+                self._stdout_lines.put(None)

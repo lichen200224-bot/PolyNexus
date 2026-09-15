@@ -1,0 +1,77 @@
+{
+  "task_id": "D2B-01",
+  "base_sha": "1fd856d3016ff0e155f97af3d5fd74ce2b368e6b",
+  "home_normalization": "C:\\Users\\shawn => <USER_HOME>",
+  "ordering": [
+    {
+      "order": 1,
+      "name": "real_target",
+      "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\enhanced-product-continuation",
+      "command": "D:\\AI學習教材\\PolyNexus\\.venv\\Scripts\\python.exe -B tools/run_d2b01_real.py --artifact-root <USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\d2b01-real-raw-20260915-1 --executable <USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\d2b01-opencode-tool\\node_modules\\opencode-ai\\bin\\opencode.exe",
+      "actual_exit": 0,
+      "result": "REAL_TARGET_STATUS=PASS; REAL_TARGET_CHILD_EXIT=0; REAL_TARGET_POSTCONDITION_EXIT=0; REAL_TARGET_CLEANUP=True",
+      "raw_refs": ["real-run.json", "acp.stdout.jsonl", "acp.stderr.log", "source-change.diff", "source-before/bug.py", "source-after/bug.py", "postcondition.stdout.log"]
+    },
+    {
+      "order": 2,
+      "name": "targeted_final",
+      "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\enhanced-product-continuation\\services\\core",
+      "command": "D:\\AI學習教材\\PolyNexus\\.venv\\Scripts\\python.exe -B -m pytest --override-ini addopts= -q --disable-warnings --tb=short --basetemp %TEMP%\\d2b01-pytest-targeted-20260915-final tests/test_d2b01_opencode_acp.py",
+      "actual_exit": 0,
+      "passed": 20,
+      "failed": 0,
+      "skipped": 0,
+      "raw_ref": "targeted.log"
+    },
+    {
+      "order": 3,
+      "name": "affected_regression",
+      "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\enhanced-product-continuation\\services\\core",
+      "command": "D:\\AI學習教材\\PolyNexus\\.venv\\Scripts\\python.exe -B -m pytest --override-ini addopts= -q --disable-warnings --tb=short --basetemp %TEMP%\\d2b01-pytest-affected-20260915 tests/test_d2a_external_runtime.py tests/test_d1a_generation_ownership.py tests/test_d1a_policy_secret.py tests/test_d1b_runtime_producer.py tests/test_g14_runtime_reconciliation.py tests/test_g16_runtime_selection_policy.py tests/test_runtime_skeleton.py tests/test_b01_tech.py",
+      "actual_exit": 0,
+      "passed": 83,
+      "failed": 0,
+      "skipped": 1,
+      "skip_case": "test_d2a_external_runtime.py::test_projected_staging_rejects_nested_reparse_path",
+      "skip_reason": "symlink creation is unavailable in this Windows test environment",
+      "raw_ref": "affected.log"
+    },
+    {
+      "order": 4,
+      "name": "full_core",
+      "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\enhanced-product-continuation\\services\\core",
+      "command": "D:\\AI學習教材\\PolyNexus\\.venv\\Scripts\\python.exe -B -m pytest --override-ini addopts= -q --disable-warnings --tb=short --basetemp %TEMP%\\d2b01-pytest-full-core-20260915 tests",
+      "actual_exit": 0,
+      "passed": 934,
+      "failed": 0,
+      "skipped": 1,
+      "skip_case": "test_d2a_external_runtime.py::test_projected_staging_rejects_nested_reparse_path",
+      "skip_reason": "symlink creation is unavailable in this Windows test environment",
+      "raw_ref": "full-core.log"
+    },
+    {
+      "order": 5,
+      "name": "real_idle_timeout_and_owned_stop",
+      "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\enhanced-product-continuation",
+      "command": "D:\\AI學習教材\\PolyNexus\\.venv\\Scripts\\python.exe -B tools/run_d2b01_controls.py --artifact-root <USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\d2b01-control-raw-20260915-1 --executable <USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\d2b01-opencode-tool\\node_modules\\opencode-ai\\bin\\opencode.exe",
+      "actual_exit": 0,
+      "child_actual_exit": 1,
+      "idle_read_timed_out": true,
+      "owned_stop_verified": true,
+      "raw_refs": ["idle-control.json", "idle.stdout.jsonl", "idle.stderr.log"]
+    },
+    {
+      "order": 6,
+      "name": "full_core_final_source",
+      "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\enhanced-product-continuation\\services\\core",
+      "command": "D:\\AI學習教材\\PolyNexus\\.venv\\Scripts\\python.exe -B -m pytest --override-ini addopts= -q --disable-warnings --tb=short --basetemp %TEMP%\\d2b01-pytest-full-core-final-20260915 tests",
+      "actual_exit": 0,
+      "passed": 934,
+      "failed": 0,
+      "skipped": 1,
+      "skip_case": "test_d2a_external_runtime.py::test_projected_staging_rejects_nested_reparse_path",
+      "skip_reason": "symlink creation is unavailable in this Windows test environment",
+      "raw_ref": "full-core-final.log"
+    }
+  ]
+}

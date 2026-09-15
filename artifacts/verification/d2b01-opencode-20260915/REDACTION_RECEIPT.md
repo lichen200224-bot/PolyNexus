@@ -1,0 +1,5 @@
+# D2B-01 evidence redaction receipt
+
+The raw files were copied by `SANITIZE.py`. It replaced the personal home prefix `C:\Users\shawn` with `<USER_HOME>` in direct Windows paths, JSON-escaped Windows paths and slash paths. The same normalization applies to command cwd and executable paths in `COMMAND_LEDGER.json`. No ACP messages, states, IDs, hashes, counts, exit codes, failure messages, source bytes, process stop facts or acceptance meanings were changed. Consequently `real-run.json` retains the SHA-256 of the **original local** ACP stdout while `MANIFEST.sha256` checks the published sanitized JSONL bytes separately.
+
+The source before/after copies, required oracle test and Git diff are unchanged byte-for-byte. Secret scan rejects secret-like API keys, bearer values, token/password/cookie/credential assignments, private-key headers and Human WebAuthn/passkey material before publication. The inputs used here produced zero matches, so no secret-value replacement was necessary. This receipt is a normalization record, not a receiver acceptance decision.

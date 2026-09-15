@@ -1,0 +1,8 @@
+diff --git a/bug.py b/bug.py
+index 1083d26..eca386f 100644
+--- a/bug.py
++++ b/bug.py
+@@ -1,2 +1,2 @@
+ def answer():
+-    return 41
++    return 42

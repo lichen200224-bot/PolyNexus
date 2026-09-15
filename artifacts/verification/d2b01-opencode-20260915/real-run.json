@@ -1,0 +1,112 @@
+{
+  "status": "PASS",
+  "error": "",
+  "executable": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\d2b01-opencode-tool\\node_modules\\opencode-ai\\bin\\opencode.exe",
+  "version": "opencode-acp/1.18.31",
+  "executable_sha256": "0242a0dc705af67c90882b456a36b619883c1c786aad8fe071a1bc64e5d1d440",
+  "source_cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\d2b01-real-raw-20260915-1\\synthetic-source",
+  "staging_cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\d2b01-real-raw-20260915-1\\staging_4a9577ae2ecdafecf040ab61",
+  "source_before_sha256": "bb90d2b315ed538549cd708303971dd03d30dd733928b845504fab3a42eeb914",
+  "staging_after_sha256": "aecc013c518523ca22b7e3780f87002f5cae13fabc369f2f59a1faf7058f8c76",
+  "original_source_unchanged": true,
+  "actual_changed_paths": {
+    "argv": [
+      "git",
+      "status",
+      "--porcelain=v1",
+      "--untracked-files=all"
+    ],
+    "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\d2b01-real-raw-20260915-1\\staging_4a9577ae2ecdafecf040ab61",
+    "exit": 0,
+    "stdout": " M bug.py\n",
+    "stderr": ""
+  },
+  "terminal": {
+    "protocolVersion": 1,
+    "sessionId": "ses_f5aa83773ffeoVfztzOebBlQof",
+    "stopReason": "end_turn"
+  },
+  "child_exit": 0,
+  "process_facts": [
+    {
+      "pid": 20244,
+      "retained_handle": 920,
+      "created_filetime": 134339539865141070,
+      "ended_filetime": 134339540147412089,
+      "exit_code": 0,
+      "stopped": true,
+      "argv": [
+        "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\d2b01-opencode-tool\\node_modules\\opencode-ai\\bin\\opencode.exe",
+        "--pure",
+        "acp"
+      ],
+      "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\d2b01-real-raw-20260915-1\\staging_4a9577ae2ecdafecf040ab61",
+      "signal": "none",
+      "stdout_bytes": 64719,
+      "stderr_bytes": 0,
+      "stdout_sha256": "9a4bd44790ef903cddb7944051b762c50e5e3674f238356dc620d0f3fadedf42",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "cleanup_verified": true,
+  "session_update_count": 51,
+  "baseline_test": {
+    "argv": [
+      "D:\\AI學習教材\\PolyNexus\\.venv\\Scripts\\python.exe",
+      "-B",
+      "-m",
+      "pytest",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "test_bug.py"
+    ],
+    "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\d2b01-real-raw-20260915-1\\synthetic-source",
+    "exit": 1,
+    "stdout": "F                                                                        [100%]\r\n================================== FAILURES ===================================\r\n____________________________ test_answer_is_fixed _____________________________\r\n\r\n    def test_answer_is_fixed():\r\n>       assert answer() == 42\r\nE       assert 41 == 42\r\nE        +  where 41 = answer()\r\n\r\ntest_bug.py:4: AssertionError\r\n=========================== short test summary info ===========================\r\nFAILED test_bug.py::test_answer_is_fixed - assert 41 == 42\r\n1 failed in 0.04s\r\n",
+    "stderr": ""
+  },
+  "postcondition_test": {
+    "argv": [
+      "D:\\AI學習教材\\PolyNexus\\.venv\\Scripts\\python.exe",
+      "-B",
+      "-m",
+      "pytest",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "test_bug.py"
+    ],
+    "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\d2b01-real-raw-20260915-1\\staging_4a9577ae2ecdafecf040ab61",
+    "exit": 0,
+    "stdout": ".                                                                        [100%]\r\n1 passed in 0.00s\r\n",
+    "stderr": ""
+  },
+  "artifact_sha256": "23548f4352285d4635ed180fb4c27f0d2cc14d606ae2d23bc46b612dd901f6ca",
+  "evidence_metadata": {
+    "envelope_sha256": "1a7cee150e8c5cf7662fa871656e45164bd44273e9d03aadf27de1430d416384",
+    "effective_runtime_configuration_fingerprint": "d06ee0b310048c6a5ea889dee7eb3fe4d7b0af8bf1f67dd10c5344f8192f0511",
+    "permission_policy_fingerprint": "15292af3fc0a7d272a8b399fb2c36e685ee74190cda19e36f9aaaf05b61258d9",
+    "route_policy_evidence_sha256": "5062fa00cea5576ea7baf9705adf0989a5bfeb334588fcaaeb9aa8fb54a837c7",
+    "workspace_scope_mode": "PROJECTED_STAGING",
+    "enabled_plugin_set": "NONE",
+    "enabled_mcp_set": "NONE",
+    "remote_skill_catalog_state": "NONE",
+    "executable_sha256": "0242a0dc705af67c90882b456a36b619883c1c786aad8fe071a1bc64e5d1d440",
+    "executable_version": "opencode-1.18.31",
+    "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\d2b01-real-raw-20260915-1\\staging_4a9577ae2ecdafecf040ab61",
+    "argv_json": "[\"--pure\", \"acp\"]",
+    "exit_code": "0",
+    "protocol_version": "1",
+    "session_id_sha256": "1ab04c607ec1fa9fa0f071229d3634bd21ea3a335f5d0c22bca3d2216db60b41",
+    "stop_reason": "end_turn",
+    "source_changed_paths_json": "[\"bug.py\"]",
+    "source_before_hashes_json": "{\"bug.py\": \"bb90d2b315ed538549cd708303971dd03d30dd733928b845504fab3a42eeb914\"}",
+    "source_after_hashes_json": "{\"bug.py\": \"aecc013c518523ca22b7e3780f87002f5cae13fabc369f2f59a1faf7058f8c76\"}",
+    "stdout_sha256": "9a4bd44790ef903cddb7944051b762c50e5e3674f238356dc620d0f3fadedf42",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "auth_ownership": "RUNTIME_MANAGED",
+    "provider_model_egress": "RUNTIME_MANAGED",
+    "agent_extension_egress": "DENY"
+  }
+}

@@ -26,6 +26,9 @@ from polynexus_core.runtime.codex_exec import (
     CODEX_PROFILE_REF,
     CodexExecRuntimeAdapter,
 )
+from polynexus_core.runtime.opencode_acp import (
+    OPENCODE_ADAPTER_ID, OPENCODE_PROFILE_REF, OpenCodeACPRuntimeAdapter,
+)
 from polynexus_core.runtime.reference import ReferenceRuntimeAdapter
 from polynexus_core.runtime.registry import (
     RuntimeRegistry,
@@ -43,6 +46,23 @@ def build_codex_profile() -> RuntimeProfile:
         adapter_id=CODEX_ADAPTER_ID,
         execution_target=ExecutionTarget.LOCAL,
         runtime_profile_ref=CODEX_PROFILE_REF,
+        profile_revision=1,
+        auth_ownership=AuthOwnership.RUNTIME_MANAGED,
+        secret_ref_id=None,
+        usage_visibility=UsageVisibility.UNAVAILABLE,
+    )
+
+
+def build_opencode_acp_profile() -> RuntimeProfile:
+    """Declare the opt-in installed OpenCode ACP target without fallback."""
+
+    return RuntimeProfile(
+        provider_id="opencode",
+        transport_kind=TransportKind.LOCAL,
+        runtime_id="opencode-acp",
+        adapter_id=OPENCODE_ADAPTER_ID,
+        execution_target=ExecutionTarget.LOCAL,
+        runtime_profile_ref=OPENCODE_PROFILE_REF,
         profile_revision=1,
         auth_ownership=AuthOwnership.RUNTIME_MANAGED,
         secret_ref_id=None,
@@ -86,6 +106,18 @@ def build_default_registry() -> RuntimeRegistry:
             conformance_scope=ConformanceScope.UNVERIFIED,
         ),
         ((build_codex_profile(), CodexExecRuntimeAdapter),),
+    )
+    bridge.register(
+        ModuleManifest(
+            module_id="module.opencode.acp",
+            module_type=ModuleType.RUNTIME,
+            module_version="1.0.0",
+            provider_id="opencode",
+            capabilities=("cancel", "artifacts", "auth_ownership"),
+            health=HealthBoundary.RUNTIME_PROBE,
+            conformance_scope=ConformanceScope.UNVERIFIED,
+        ),
+        ((build_opencode_acp_profile(), OpenCodeACPRuntimeAdapter),),
     )
     registry.static_module_registry = modules  # type: ignore[attr-defined]
     registry.static_module_bridge = bridge  # type: ignore[attr-defined]

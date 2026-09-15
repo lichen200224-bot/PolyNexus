@@ -1,0 +1,2 @@
+# Preserve published raw evidence bytes and terminal whitespace.
+* -text whitespace=-blank-at-eol,-blank-at-eof

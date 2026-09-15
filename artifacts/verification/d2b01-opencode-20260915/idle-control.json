@@ -1,0 +1,38 @@
+{
+  "executable": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\d2b01-opencode-tool\\node_modules\\opencode-ai\\bin\\opencode.exe",
+  "executable_sha256": "0242a0dc705af67c90882b456a36b619883c1c786aad8fe071a1bc64e5d1d440",
+  "argv": [
+    "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\d2b01-opencode-tool\\node_modules\\opencode-ai\\bin\\opencode.exe",
+    "--pure",
+    "acp"
+  ],
+  "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\d2b01-control-raw-20260915-1\\idle-staging",
+  "idle_read_timeout_seconds": 0.5,
+  "idle_read_timed_out": true,
+  "error": "",
+  "owned_stop_exit": 1,
+  "stopped": true,
+  "retained_process_facts": [
+    {
+      "pid": 13600,
+      "retained_handle": 612,
+      "created_filetime": 134339546388150598,
+      "ended_filetime": 134339546393327515,
+      "exit_code": 1,
+      "stopped": true,
+      "argv": [
+        "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\d2b01-opencode-tool\\node_modules\\opencode-ai\\bin\\opencode.exe",
+        "--pure",
+        "acp"
+      ],
+      "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\d2b01-control-raw-20260915-1\\idle-staging",
+      "signal": "job_terminate",
+      "stdout_bytes": 0,
+      "stderr_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}
