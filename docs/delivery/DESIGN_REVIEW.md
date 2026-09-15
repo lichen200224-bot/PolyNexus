@@ -1,52 +1,103 @@
-# 前置文件獨立設計審查契約
+# 加強版收斂文件 Fresh Independent Review 契約
 
-Status: REVIEW_SPECIFICATION / INDEPENDENT_REVIEW_NOT_RUN
-Writer: ChatGPT preparation context
-Review subject: exact published planning/full-delivery-design-consolidation commit
+Date: 2026-09-15 (Asia/Taipei)
+Task: `ENHANCED-DELIVERY-REPLAN-01`
+Status: `REVIEW_SPECIFICATION / INDEPENDENT_REVIEW_NOT_RUN`
+Writer: ChatGPT planning/documentation context
+Review subject: exact remote candidate on `planning/enhanced-runtime-control-plane`
+Product version: `UNCHANGED`
 
-## 1. 角色與輸入
+## 1. Reviewer role
 
-必須由未撰寫本patch的fresh AI context審查。先取得canonical remote實際SHA並比對publication receipt，再讀AGENTS、START_HERE、SOURCE_LOCK、GIT_RECONCILIATION、FEATURE_WORK_PACKAGES、FEATURE_SCOPE_MATRIX及相關原規格。f0c0b986是保留產品前身；後續文件commit以實際parent鏈為準。
+Reviewer 必須不是本文件 patch Writer。Review mode: `READ_ONLY / EXACT_SHA / REMOTE_TRUTH / SOURCE_TO_DELIVERY`。
 
-Reviewer只讀受審candidate，驗證資料放隔離位置；不得改產品/原refs/已接受契約、自造Human批准、用作者摘要取代source-to-design核對。作者自檢與結構validator PASS都不是獨立語意審查。
+Reviewer 不修改受審 candidate、不修改 product source、不替 Writer 修文件、不自造 Human 決議。若發現問題，輸出 finding 給 documentation Writer，修復形成新 SHA 再重驗。
 
-## 2. 必要審查項目
+## 2. Remote / ancestry checks
+
+Review 開始時必須重新取得 canonical remote：`lichen200224-bot/PolyNexus`。
+
+驗證：
+
+- review branch exact tip SHA;
+- branch base/ancestry from current D1B source `e9538f328f409e2cb7d6868a8b79cc33ba4bdd87`, unless remote truth proves an intentionally documented newer non-product-doc parent;
+- candidate changed paths are documentation/governance only; no product source/tests/migrations/dependencies are silently modified;
+- no force/history rewrite/default/protection/release side effect;
+- current refs used in `CURRENT_PRODUCT_STATE.md` still match remote or drift is explicitly reconciled.
+
+## 3. Mandatory semantic checks
 
 | ID | Required check |
 |---|---|
-| DR-01 | branch/commit/parent與source locks正確，產品目錄未暗改，原refs沒有被force/rewrite/delete |
-| DR-02 | 初版＋正式增量＋模組方向逐條繼承；每PN有唯一primary工作包、子功能、scope、限制、設計與測試，77行不是全原子覆蓋證明 |
-| DR-03 | ADR-MOD-013與ADR-ID-013唯一引用，Golden及原byte保留，舊routing不得活化 |
-| DR-04 | I-01–I-23逐一定位無矛盾，尤其generation/Run/Candidate/publication、same-lineage、Model B、canonical authority |
-| DR-05 | Candidate quiescence/freeze、exact verification與EvidenceSet、四軸requiredness/applicability/outcome/validity不混淆 |
-| DR-06 | Human-only principal/session/challenge、exact view、anti-replay/idempotency、CSRF/Origin、append-onlyhistory、D11-C fallback成立 |
-| DR-07 | S0在真實工作前、generation/workspace先於launch、binding-before-effect、取消/timeout/cleanup與crash recovery無重複副作用 |
-| DR-08 | MCF候選不冒accepted、staging/worktree責任一致、deny-all不當可改碼、live/config/權限設計有可行路徑 |
-| DR-09 | 3入口/九範本/Council/Web/Local/兩深度Runtime/UX/Doctor/維護保留；B01不縮成完整產品範圍 |
-| DR-10 | SQL/API/事件/併發/冪等/相容/遷移有實作契約，未知schema/API明示proposed，legacy不造可信資料 |
-| DR-11 | 每項required有positive/negative oracle；test plans分fixture/live/host，required skip不自動waive，Case名稱不等已存在test |
-| DR-12 | 操作/clean install/restore/P0source重建可落地；N1/WS保持階段與scope，不變成cloud sync |
-| DR-13 | execution contracts可減少人工micro-gates但不冒充產品Human；預算/targets/ownership具備有效start條件 |
-| DR-14 | 功能包依賴圖無循環；共享路徑單一寫入；integration順序和舊候選处置明確；source閉包/リンク/版本一致 |
+| ER-01 | `CURRENT_PRODUCT_STATE.md` separates accepted, technical-only, rejected and historical planning states without inflating any status |
+| ER-02 | D1B `e9538...`, B01 `ca85d22...`, rejected MCF `030890...`, governance/planning refs are correctly characterized against actual source/evidence |
+| ER-03 | new plan does not add/redefine PN/frozen product requirements; D2b/D3/D4/T1/T2 map to existing FD responsibilities |
+| ER-04 | Strategic Runtime Fleet includes Codex/OpenCode/Gemini CLI/Claude Code/Antigravity but does not claim equal capabilities or unsupported integration surfaces |
+| ER-05 | OpenCode/Gemini ACP reuse and Claude/Antigravity multi-transport strategy preserve Core lifecycle/policy/Evidence/Human authority |
+| ER-06 | rejected `030890...` MCF candidate cannot be merged/accepted by wording; useful ideas may only be re-derived on current lineage |
+| ER-07 | `TaskControlSnapshot` is a non-persistent projection and does not become a second execution/source-of-truth domain |
+| ER-08 | Council/Workflow plan reuses existing Council/Run/Context/Artifact/Evidence contracts; no duplicate AgentSession/AgentMessage/Handoff authority introduced |
+| ER-09 | Runtime capability/maturity model is truthful: `UNKNOWN/UNSUPPORTED/ENVIRONMENT_BLOCKED/ResumeMode.NONE` remain valid outcomes |
+| ER-10 | no silent runtime fallback or post-dispatch rebinding; actual Run binding remains immutable |
+| ER-11 | Codex sole Writer/Test Executor and ChatGPT independent Product Acceptance roles are unambiguous; Codex self-PASS cannot promote a candidate |
+| ER-12 | automatic continuation after ChatGPT PASS is bounded to already approved scope and does not authorize architecture/security/scope/release exceptions |
+| ER-13 | Human intervention target of one final UAT is compatible with Human-only trust/auth decisions; provider login/architecture exceptions remain explicit conditional gates |
+| ER-14 | final UAT covers Control Plane, five-runtime Fleet visibility, multi-agent Golden flows, failure/retry, Candidate/Human exact-view, B01 closure and restore/P0 without converting technical rehearsal into Human acceptance |
+| ER-15 | WebSocket/dynamic router/plugin marketplace and other deferred items are not silently required unless authoritative source already requires them |
+| ER-16 | START_HERE/AGENTS/docs37/GOAL_PLAN/EXECUTION_CONTRACT/CODEX_HANDOFF/RUNTIME/UX/UAT all route consistently to the new task/branch and do not reactivate stale PREP routing |
+| ER-17 | no product version bump, frozen Golden rewrite, acceptance-history rewrite or security weakening is introduced by documentation wording |
 
-## 3. Source closure與精確引用
+## 4. Existing source/frozen closure
 
-作者文件所有實際relative link要解析。引用原件保留原byte，因此其historical連結可能指舊proposal；不得宣稱全部連結閉包天然成立。逐項分類normative/historical/external。Normative缺原文/Golden/接受依據即設計阻擋，先找exact source補齊，不能從摘要推定。
+This replan is a delivery/routing delta, not a rewrite of `FEATURE_SCOPE_MATRIX`, frozen Track A, formal requirements or historical evidence. Reviewer must sample/trace the affected existing responsibilities:
 
-Source受審接受receipt的scope獨立記錄；不需要重做全部已接受歷史，但不能擴張該接受到新功能。本包版本仍Draft，沒有自動升版或正式freeze。
+- FD-06/07/08/19 for Runtime Fleet;
+- FD-15/16 for Council/Workflow;
+- FD-18 for Control Plane/UX;
+- FD-21/22 for SIT/Delivery/Governance;
+- FD-10/12/13/14 where policy/Evidence/Human semantics are referenced.
 
-## 4. 機械檢查
+If new wording changes a frozen semantic instead of changing execution order/presentation, that is a MAJOR/BLOCKER and requires repair/change control.
 
-有可執行Git的環境，對exact parent/candidate做diff --name-status、diff --check、protected path/tree comparison、remote SHA及clean checkout核對；不可只看Writer dirty working tree。解析SOURCE_LOCK/FEATURE_SCOPE_MATRIX，檢查PN唯一分配、所有功能子項有UT/SIT/UAT對應、DAG無循環、文件完整、來源blob相同。保留命令和actual exits。
+## 5. Mechanical checks
 
-原baseline/governance validators僅驗原有範圍；不能把其成功當本完整設計PASS。GitHub REST成功、local CLI exit、產品tests、Windows/live實驗分開記錄。無可用環境就標NOT_RUN/ENVIRONMENT_BLOCKED，不補造exit0。
+When environment permits, record actual commands/exits for:
 
-## 5. 結果與修復
+- remote branch/ref verification;
+- exact base..candidate name-status/stat;
+- `git diff --check`;
+- protected product-tree comparison;
+- internal relative-link existence for newly/modified entry documents;
+- grep/check for stale active routing phrases that now conflict with the new entry path.
 
-VERIFIED_PASS只在所有mandatory review項通過且无BLOCKER/MAJOR；NEED_FIX列可修缺陷；HOLD用於缺來源/授權/實機條件。Finding至少含id/severity、file/section、權威依據、影響PN/包、建議修復及可重驗oracle。
+Planning validators may be run, but their PASS is only structural evidence and cannot replace semantic review.
 
-修復交前置Writer產生新SHA；Reviewer按impact重新檢查。文件作者可修，不得把自己的修復評語貼為independent verdict。若問題不是既有範圍內修正而是改Frozen/安全/產品承諾，集中Human change-control。
+## 6. Verdict
 
-## 6. 輸出
+Allowed verdicts:
 
-reviewed documentation SHA/parent、source coverage、17+文件範圍的實際清單、PN/功能包/AT覆蓋、invariants、findings、命令/actual exits、not-run/限制、scope/ADR impact、VERDICT、是否滿足Codex啟動条件。最後只能推薦READY_FOR_CODEX_START_GATE，不以review報告直接啟動產品Writer或發布release。
+- `ENHANCED_REPLAN_FRESH_REVIEW_PASS` — no BLOCKER/MAJOR and the candidate is safe to use for the bounded G0/Codex start gate;
+- `NEED_FIX` — documentation defects are repairable within approved direction;
+- `HOLD / HUMAN_EXCEPTION_REQUIRED` — source conflict or an actual new architecture/security/scope decision is required.
+
+A PASS authorizes preparation of the product `G0` start receipt; it does **not** itself accept B01, start Codex product writes, release software or constitute final Human product acceptance.
+
+## 7. Required review output
+
+Include:
+
+```text
+TASK_ID
+ROLE
+REVIEWED_BRANCH
+REVIEWED_SHA
+BASE_SHA / ANCESTRY
+REMOTE_FACTS
+CHANGED_PATHS / PRODUCT_TREE_PRESERVATION
+ER-01..ER-17 RESULTS
+ACTUAL_COMMANDS_AND_EXITS
+FINDINGS
+NOT_RUN / ENVIRONMENT_LIMITS
+VERDICT
+G0_START_GATE_RECOMMENDATION
+```
