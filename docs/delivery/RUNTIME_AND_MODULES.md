@@ -1,49 +1,180 @@
 # Runtime、模組化與真實整合設計
 
-Status: DESIGN_DRAFT。原定Codex/OpenCode深度Runtime、Local endpoints與Web層都保留；MCF-02第一個external target及其限制不能被偷換成完整產品完成。
+Date: 2026-09-15 (Asia/Taipei)
+Status: `HUMAN_DIRECTION_APPROVED / DOCUMENTATION_CANDIDATE`
+Product version: `UNCHANGED`
 
-## 1. Reuse而非重造
+本文件保留既有 static module / runtime contracts，並把加強版的 Strategic Runtime Fleet 收斂到既有 FD-06/07/08/19。它不建立新的 Runtime authority，也不把 vendor 名稱或 descriptor 當成支援證據。
 
-Static ModuleManifest/ModuleRegistry→RuntimeModuleBridge→既有RuntimeProfile/RuntimeRegistry→Run-owned immutable RuntimeBindingSnapshot→RuntimeAdapter→RunSupervisor。Core不分散vendor if/else。Module只供metadata/factory/capability；不能自宣告VERIFIED/CERTIFIED或產生Human approval。
+## 1. Reuse 而非重造
 
-RUNTIME/TOOL/SURFACE/INTEGRATION名詞只有實作contract與evidence存在才可標support；descriptor vocabulary不是完整plugin功能。MEMORY、remote install、hot reload等仍依原future範圍，不藉此新建plugin平台。
+Static ModuleManifest/ModuleRegistry -> RuntimeModuleBridge -> RuntimeProfile/RuntimeRegistry -> Run-owned immutable RuntimeBinding -> RuntimeAdapter -> RunSupervisor。
 
-## 2. Target evidence profile
+Core 不分散 vendor if/else。Module 只供 metadata/factory/capability；不能自宣告 `VERIFIED/CERTIFIED`、不能建立 Human approval，也不能繞過 Generation/Run/Candidate/Evidence contracts。
 
-每target保存：provider/runtime/adapter identity與版本、executable/content digest、protocol/contract版本、auth ownership、實際config來源與resolved fingerprint、model identity可見性、capability宣告、conformance結果、host/browser、fixture/live、證據時間及scope。
+RUNTIME/TOOL/SURFACE/INTEGRATION 只有在實作 contract + evidence 存在時才可標支援。MEMORY、remote install、hot reload、marketplace 等仍屬 future scope，不能因 Runtime Fleet 擴張而偷渡成 Plugin Platform。
 
-Codex/OpenCode既有deterministic adapters保留，不以改名或maturity旗標升成live。聲稱深度支援需真實create/submit/cwd/change/status/result/error/cancel/timeout/cleanup/artifacts/version及可用resume範圍證據。NATIVE不支援可為NONE或有證據的MANAGED，但不能假resume。
+## 2. Current implementation facts
 
-Local LM Studio/Ollama/Generic compatible按Endpoint+Model宣告能力。Server接受同步HTTP後，本地停止等待不能證明遠端運算已取消；cleanup/cancel不確定如實報告。Web另走MV3/confirmed send/fallback，不當成official API或native Runtime捷徑。
+Current product line already contains a real external-runtime foundation:
 
-## 3. MCF-02候選整合
+- Core-owned external execution envelope;
+- per-Run `PROJECTED_STAGING`;
+- distinct input/output allowlists;
+- executable/config/policy fingerprints;
+- provider-model vs extension/tool egress separation;
+- RuntimeSupervisor deadline/cancel/cleanup path;
+- Core-owned Artifact import/provenance;
+- real Codex target evidence in the D2a/B01 lineage.
 
-`030890b3...`列待獨立審查，不由本次文件改寫為accepted。F001–F005包含Run-scoped staging/envelope、effective config、scoped Core policy、disabled permission callback、quiescence後Core-owned artifact import。實作/修復報告與測試數只是候選材料。
+Therefore D2b must add thin target integrations and shared transport machinery, not rebuild the Core runtime subsystem.
 
-開發群先比較候選對新generation/lineage/ownership/Candidate設計的影響。能重用且已通獨立檢核的部分引用exact SHA；不重做，亦不整條無條件merge。
+## 3. Old MCF-02 candidate disposition
 
-MCF proposal的PRIMARY為OpenCode ACP、BACKUP為Gemini CLI ACP；第一個slice不同时做兩個production targets。這不刪除完整初版的Codex深度目標。是否啟用backup或增target需要同一執行契約明列的target gate，不由名字推斷授權。
+`feature/mcf-02-opencode-acp-runtime@030890b30160f1063ac2cef1d36705a9ea70bddb` is **REJECTED / NOT_ADOPTED** for current product integration.
 
-## 4. Envelope / staging sequence
+The rejection is structural: it is not descended from the accepted/current D1a product line, its diff would remove accepted delivery/security/workspace contracts, and its ACP coverage is fixture/fake-target evidence rather than the required real-target proof.
 
-每Run建立新的staging與isolated config scope；只投影已批准context與files。不得默認使用Human project root、parent/global home、plugins/MCP/remote skills。用bound executable檢查版本與實際resolved config來源，與Core-approved期望/permissions/egress一致才可launch。
+Rules:
 
-含未知字段/來源、binary hash變化、scope替換、implicit provider/model或permissive expansion都not-ready；resolver raw輸出只在受控memory內解析，不進Evidence。環境未支持平台的managed sources則明確unsupported，不假等價。
+- do not merge/cherry-pick/copy the candidate wholesale;
+- do not treat its writer tests as live OpenCode support;
+- useful contract ideas may be re-derived independently against the current Core and current accepted lineage;
+- D2B-01 implements OpenCode ACP anew as a thin adapter over the current external contract.
 
-Binding在副作用前commit；envelope與actual Run/Task/Project/destination关联，不把profile級shared準備物重用到不同Run。Core policy允許其本身允許的route；APPROVAL_REQUIRED不能因附policy ref而變ALLOW，更不變Human-approved。
+## 4. Strategic Runtime Fleet
 
-## 5. 寫入能力與可用性Gate
+The enhanced version must visibly support the company-strategic fleet defined in `STRATEGIC_RUNTIME_FLEET.md`:
 
-deny-all fixture可證明拒絕邊界，不能證明真實bug fix可完成。要啟用必要工具/檔案修改，必須先確認runtime是否有受控file/process mediation、workspace scope、plugin/config閉包及可驗的permission決定。若需擴張原MCF信任/公開契約，先architecture/security change control；不得直接把全部permission設allow。
+| Runtime | Transport strategy | Enhanced-version target |
+|---|---|---|
+| Codex | current bounded CLI / structured result path | retain existing real reference runtime |
+| OpenCode | generic ACP adapter | real deep target |
+| Gemini CLI | reuse generic ACP adapter when current supported environment exposes ACP | real deep target with truthful environment constraints |
+| Claude Code | supported structured/headless execution, optional supported bridge | real deep target |
+| Antigravity | supported headless machine-readable stream | real controlled target |
 
-可行性試驗在專用synthetic repo與明列測試auth/egress範圍執行，不碰Human repo。須同時證明：允許scope內真改碼成功、scope外/未批准tool拒絕、cancel/timeout停止owned工作、輸出可由Core接收且不泄secret。永遠拒絕所有操作與放行所有操作都不是完成。
+The fleet is heterogeneous. Runtime support is per capability, not an all-or-nothing green badge.
 
-## 6. Artifact lifecycle與失敗
+## 5. Target evidence profile
 
-Supervisor證明owned工作quiescent後，Core對output檔案做containment、大小/內容hash、必要重讀與symlink/替換防護，建立自己的不可變copy，再寫metadata及Candidate snapshot。Staging不是長期artifact store，後續staging變動不影響已發布內容。
+Each target stores or exposes bounded evidence for:
 
-Raw runtime成功文字不是Verified evidence；合法Finding/Artifact/Evidence payload須經redaction與normalization。Malformed stream、unsupported request、stale session、mixed request/response ID、cleanup failure、process崩潰、partial output都fail closed，不能默默換target或重綁既有Run。
+- provider/runtime/adapter identity and observed version;
+- executable path/content identity or equivalent strong observation;
+- protocol/contract/transport identity;
+- auth ownership;
+- effective non-secret config/fingerprint;
+- model identity visibility when available;
+- capability declarations and conformance evidence;
+- host/environment and fixture/live markers;
+- observed cwd/workspace scope;
+- result/event normalization;
+- cancel/timeout/cleanup evidence for claimed capabilities;
+- Artifact/provenance refs;
+- evidence timestamp/scope/maturity.
 
-## 7. 模組替換驗收
+A descriptor, version probe or health check is not sufficient for `REAL_VERIFIED` maturity.
 
-在同一Core task/workflow contract下使用至少兩個已核准的runtime註冊，替換不需修改Core vendor branch，不改歷史binding/Run/Candidate身份。對duplicate ID、unknown version/capability、unavailable factory、policy拒絕、配置drift、module故障做負例。能力/maturity依每個target的實際evidence，不把一個target的PASS擴張到所有模組。
+## 6. Shared ACP transport
+
+D2B-01 creates one generic bounded ACP transport/integration seam. D2B-02 reuses it for Gemini CLI when supported.
+
+Shared ACP machinery may normalize:
+
+- process/session setup;
+- ACP request/response/event framing;
+- bounded input dispatch;
+- permission request projection into Core policy;
+- result/event normalization;
+- cancel/cleanup mapping where observed;
+- target-independent failure categories.
+
+Target-specific code remains responsible for executable discovery, version/config/auth quirks and capability truth. Generic ACP code must not silently pretend two agents have the same resume, permission, cancellation or model behavior.
+
+## 7. Claude / Antigravity non-ACP paths
+
+PolyNexus is a multi-transport Runtime Control Plane, not an ACP frontend.
+
+Claude Code may use a supported structured/headless execution surface or independently justified supported bridge. Antigravity should use its supported headless machine-readable path. Neither integration may rely on browser-cookie/session extraction, private IPC reverse engineering or unsupported API takeover.
+
+If Antigravity or another vendor reports outer success while required output/postconditions are absent, PolyNexus fails the operation. Vendor success text or process exit `0` never replaces Core postcondition/Evidence validation.
+
+## 8. Envelope / staging sequence
+
+Every external Run receives a new Core-created projected staging/config scope. Only approved context/files are projected. The Human project root, parent/global config home, arbitrary plugins/MCP/remote skills are not implicitly exposed.
+
+Before launch, validate the bound executable, actual resolved non-secret config, approved permissions/egress and runtime capability declaration. Drift or unknown expansion makes the target not ready.
+
+Binding occurs before external side effect. Envelope facts bind to the exact Run/Task/Project and cannot be reused as a mutable profile-level authorization.
+
+## 9. Permission / egress / auth
+
+Runtime-managed provider authentication may remain vendor-owned, but PolyNexus must not read/copy/replay raw credentials. API-key routes continue to use SecretRef when applicable.
+
+Separate:
+
+- provider-model egress needed for the selected runtime;
+- agent extension/tool/MCP/plugin egress.
+
+The second class remains deny-by-default unless a source-bound requirement and Core policy explicitly authorize it. `LOCAL_CHILD` does not imply local inference.
+
+## 10. Artifact lifecycle and failure
+
+After Supervisor-owned work becomes safely quiescent, Core validates output containment, expected postconditions, size/hash and replacement/symlink conditions before importing immutable content and provenance.
+
+Malformed streams, unsupported requests, stale handles, permission denial, cleanup failure, partial output, config drift, result mismatch or unexpected egress fail closed. No adapter may silently switch runtime or rebind an existing Run.
+
+## 11. Capability / maturity states
+
+Use truthful normalized states such as:
+
+- `VERIFIED`;
+- `SUPPORTED_NOT_CURRENTLY_VERIFIED`;
+- `UNSUPPORTED`;
+- `ENVIRONMENT_BLOCKED`;
+- `UNKNOWN`.
+
+Native resume may legitimately be `NONE`. Cancel capability is distinct from timeout-cleanup verification. Process cleanup is distinct from remote provider cancellation. One runtime's evidence never promotes another runtime.
+
+## 12. Runtime selection
+
+The enhanced version uses explicit or policy-bounded role/capability selection:
+
+```text
+Workflow role
+  -> normalized capability requirements
+  -> eligible configured runtime profiles
+  -> selected profile
+  -> immutable RuntimeBinding
+```
+
+Do not implement an autonomous cost/quality optimizer or silent runtime fallback as a completion requirement. Those remain future enhancements after enough real telemetry exists.
+
+## 13. Runtime Fleet Doctor
+
+D2B-05 / FD-19 exposes at least:
+
+```text
+runtime_id
+provider
+transport
+observed_version
+installed
+health
+readiness
+maturity
+verified_capabilities
+unsupported_capabilities
+environment_blockers
+auth_ownership
+egress_profile
+last_verified_at
+evidence_ref
+```
+
+The UI may present these facts compactly, but it must not turn `UNKNOWN`, `ENVIRONMENT_BLOCKED` or partial capability evidence into `SUPPORTED`/green success.
+
+## 14. Replaceability acceptance
+
+Under the same Core task/workflow contract, at least two approved Runtime profiles must be swappable without adding Core vendor branching or altering historical Run/Candidate identities. Golden SIT further demonstrates the broader five-runtime fleet across multiple scenarios; routine workflows are not required to invoke all five agents.
