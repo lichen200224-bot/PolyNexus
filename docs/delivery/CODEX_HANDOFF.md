@@ -73,6 +73,7 @@ D2B-02 Gemini CLI ACP
 D2B-03 Claude Code structured/headless
 D2B-04 Antigravity headless
 D2B-05 Runtime Fleet Doctor
+D2B-06 FD-09 / PN-022/PN-023 Local AI: real LM Studio, Ollama, Generic compatible endpoint evidence (FD-05/FD-10 deps; SIT-09)
 D3 Multi-Agent Council/Workflow
 D4 Unified Work Control Plane
 D4-NEXT source-required remainder only
@@ -83,6 +84,8 @@ READY_FOR_HUMAN_UAT
 ```
 
 Detailed target contracts are in `STRATEGIC_RUNTIME_FLEET.md` and `GOAL_PLAN.md`.
+
+D2B-06 is a separate required D2b unit. G0 first reconciles FD-05/FD-10 dependencies; no local adapter/fixture or another endpoint's result substitutes for each of the three live targets. Preserve truthful model identity, stream/result/capability and LOCAL_ONLY fail-closed behavior. Publish exact evidence for independent review before treating FD-09 complete.
 
 ## 5. Role contract
 

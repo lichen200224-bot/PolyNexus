@@ -12,6 +12,7 @@ Product version: `UNCHANGED`
 
 - `CURRENT_PRODUCT_STATE.md` 已對應最終 exact product candidate；
 - D2b Strategic Runtime Fleet 的 required target capabilities 已有真實 evidence，或 source-bound 允許的限制被明確標示；
+- D2B-06 FD-09 / PN-022/PN-023 的 LM Studio、Ollama、Generic compatible 三類 local endpoint 已各自有真實 health/model discovery/selection/stream/result/identity/capability evidence 與 SIT-09 positive/negative 結果；fixture 或單一 endpoint PASS 不算三個 live target 完成；
 - D3 Council/Workflow/role routing 完成並有 cross-runtime evidence；
 - D4 Unified Work Control Plane / Runtime Fleet Doctor 可用；
 - T1/T2 required functional + failure/security SIT 通過；
@@ -68,6 +69,8 @@ Human protocol automated tests 只能使用隔離 TEST_ONLY principal。實際 F
 | HU-12 | 日用 UX、九模板代表操作、Web/Local/source-required remainder | 必要 workflow/monitor/findings/assurance/metrics/操作性符合用途；known limitations 清楚 | 為 Demo 而省略 required source scope |
 
 Human 不需在 HU-04～HU-06 每次重新批准 provider invocation；那些 runtime executions 應在 AI technical acceptance 階段已完成。Human UAT 的重點是最終產品可理解性、實際身份/decision 與 end-to-end 行為。
+
+HU-10／HU-12 檢視 FD-09 / PN-022/PN-023 local endpoint 選擇、實際 model identity/capability 與 LOCAL_ONLY fail-closed 行為；三個 live target 的技術證據應已由 D2B-06/SIT-09 在 AI acceptance 階段逐一核對，不以 Human 的代表性操作代替。
 
 HU-08／HU-12 涉及的 PN-078 Assurance Mode/Status 與 PN-038 attributable human override metric，依 [ASSURANCE_CONTRACT.md](ASSURANCE_CONTRACT.md) 核對；Assurance Status、metric 均不得代替 verification PASS 或 Human acceptance。
 

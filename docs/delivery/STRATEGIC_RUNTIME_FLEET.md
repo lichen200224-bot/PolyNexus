@@ -146,6 +146,12 @@ evidence_ref
 
 A descriptor or health probe alone must never upgrade maturity to `REAL_VERIFIED`.
 
+### D2B-06 — FD-09 Local AI endpoints (PN-022/PN-023)
+
+This is a separate, still-required D2b work unit after the five strategic Runtime Fleet units; it does not replace or enlarge that five-runtime vendor list. Its declared dependencies are FD-05 lifecycle/binding and FD-10 policy/SecretRef. After G0 reconciles their actual state, Codex may execute the dependency-ready unit without claiming that the Fleet Doctor is an FD-09 technical prerequisite.
+
+LM Studio, Ollama and Generic compatible local endpoints each need real target-specific health, model discovery/selection, stream/result and actual model identity/capability evidence. Existing local adapter source or fixture tests do not prove the three live targets, and one endpoint's result cannot stand in for another. Unsupported structured output/cancel must be explicit; unknown model, timeout, malformed stream and LOCAL_ONLY routing failure must remain truthful and fail closed. Complete FD-09 positive/negative evidence and SIT-09 before D3/T1 completion or final delivery readiness; an exact candidate still requires independent review.
+
 ## 5. Capability truthfulness
 
 The fleet is intentionally heterogeneous. Example capability states are `VERIFIED`, `SUPPORTED_NOT_CURRENTLY_VERIFIED`, `UNSUPPORTED`, `ENVIRONMENT_BLOCKED`, `UNKNOWN`.

@@ -30,11 +30,12 @@ D0/D1a/D2a/D1b/B01 remain historical delivery milestones and evidence sources. N
 | D2B-03 | FD-06/07/08/19 | Claude Code real structured/headless runtime | Only if required official login/auth is unavailable |
 | D2B-04 | FD-06/07/08/19 | Antigravity real controlled headless runtime | Only if required official login/auth is unavailable |
 | D2B-05 | FD-19 | Runtime Fleet Doctor/capability/maturity matrix | None |
+| D2B-06 | FD-09 / PN-022/PN-023; deps FD-05/FD-10 | LM Studio, Ollama, Generic compatible local endpoints: real per-target health/discovery/selection/stream/result/model identity/capability evidence; SIT-09 positive/negative routing | Only if an actual required local target is environment-blocked |
 | D3 | FD-15/16 + FD-10.MIXED + FD-12 workflow gates | Council, role->runtime selection, structured handoff, nine templates, workflow/failure routing, Assurance integration | None in approved scope |
 | D4 | FD-18 + FD-19 + required FD-02/03/17/20.OPS deltas | Unified Work Control Plane, Runtime Fleet view, monitor, existing Candidate/Human/Evidence integration and required daily-use UX | None in approved scope |
 | D4-NEXT | FD-18.WS / FD-20.N1 only if source-required | Deliver only requirements that remain mandatory after reconciliation; WebSocket is not a blocker when bounded polling/reconnect satisfies scope | Exception only if requirement interpretation changes |
-| T1 | FD-21 functional SIT | Cross-runtime Golden scenarios with UI->Core->runtime->Evidence/Candidate chain | None |
-| T2 | FD-21 reliability/security SIT | Failure, permission, egress, secret, timeout, cleanup, drift and recovery evidence across strategic runtimes | None |
+| T1 | FD-21 functional SIT | Cross-runtime Golden scenarios with UI->Core->runtime->Evidence/Candidate chain, including FD-09/SIT-09 local endpoints | None |
+| T2 | FD-21 reliability/security SIT | Failure, permission, egress, secret, timeout, cleanup, drift and recovery evidence across strategic runtimes and FD-09 local routing | None |
 | DELIVERY | FD-21/22 | Exact completion reconciliation, operator docs, demo workflows, limitations, package/hash/evidence index | None |
 | FINAL_HUMAN_UAT | `UAT_AND_RELEASE.md` | One concentrated Human-only acceptance session, including pending B01 Human closure | **Required Human intervention** |
 | PROMOTION/RELEASE | separate side effect | merge/tag/release/deploy only if explicitly requested after acceptance | Separate Human authorization if desired |
@@ -51,11 +52,14 @@ OpenCode ACP
   -> Claude Code structured/headless
   -> Antigravity headless
   -> Fleet Doctor/Capability Matrix
+  -> D2B-06 FD-09 Local AI endpoints
 ```
 
 The order optimizes shared transport reuse and risk. It is not a ranking of business importance. Demo/runtime presentation may place Claude Code, Gemini or Antigravity more prominently.
 
 Every runtime needs real target evidence for its claimed capability scope. The enhanced version does not require equal capabilities or native resume across all vendors. `UNKNOWN`, `UNSUPPORTED`, `ENVIRONMENT_BLOCKED` and `ResumeMode.NONE` are valid truthful states.
+
+D2B-06 preserves the separate required FD-09 / PN-022/PN-023 Local AI scope; it is not a sixth strategic vendor runtime. After G0 and FD-05/FD-10 dependency reconciliation, execute it as a dependency-ready D2b unit before D3/T1. LM Studio, Ollama and Generic compatible each require their own live target evidence; existing adapter code, fixtures or another endpoint's PASS cannot close any missing target. Per-target health/model discovery and selection, stream/result, capability and actual model identity must be checked. Unsupported structured output/cancel is stated truthfully; timeout/malformed stream/unknown model and LOCAL_ONLY failure must not silently route to cloud. SIT-09 and independent exact-candidate review gate completion.
 
 ## 4. D3 — Multi-Agent collaboration without a second Agent framework
 

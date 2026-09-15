@@ -72,7 +72,7 @@ Do not introduce parallel `AgentSession`, `AgentMessage`, `AgentHandoff`, `Agent
 The remaining product-level gaps are intentionally narrowed to:
 
 1. `G0` — reconcile B01 technical candidate and current state before new product writes;
-2. `D2b` — Strategic Runtime Fleet: real OpenCode, Gemini CLI, Claude Code and Antigravity execution behind the existing Core contract, without requiring equal vendor capability;
+2. `D2b` — Strategic Runtime Fleet: real OpenCode, Gemini CLI, Claude Code and Antigravity execution behind the existing Core contract, without requiring equal vendor capability; separate FD-09 / PN-022/PN-023 Local AI work remains required for real LM Studio, Ollama and Generic compatible endpoints in D2B-06, with per-target evidence;
 3. `D3` — expose existing Council/workflow semantics as bounded multi-agent role routing and structured handoff;
 4. `D4` — Unified Work Control Plane / Runtime Fleet Doctor using a non-persistent aggregated read model, not a second execution engine;
 5. `T1/T2` — cross-runtime functional and failure/security SIT;
@@ -102,6 +102,7 @@ After that review passes, product execution proceeds without per-goal Human micr
 ```text
 G0 Current/B01 reconciliation
   -> D2b Strategic Runtime Fleet
+  -> D2B-06 FD-09 Local AI endpoints (LM Studio/Ollama/Generic compatible)
   -> D3 Multi-Agent Council / Workflow
   -> D4 Unified Work Control Plane
   -> D4-NEXT only source-required remainder

@@ -55,6 +55,7 @@ D1B evidence records bounded technical + isolated Human product acceptance. B01 
 This replan changes delivery order and completion emphasis, not frozen product identity:
 
 - D2b becomes **Strategic Runtime Fleet**: OpenCode, Gemini CLI, Claude Code, Antigravity on top of existing Codex/reference runtime;
+- D2b also retains separate **FD-09 / PN-022/PN-023 Local AI** scope: real LM Studio, Ollama and Generic compatible local endpoint evidence in D2B-06; the five strategic vendor runtimes do not close it;
 - D3 completes **Council / role->runtime / structured handoff / workflow/templates** without a new Agent framework;
 - D4 completes **Unified Work Control Plane + Runtime Fleet Doctor** as a thin read-model/UX layer;
 - T1/T2 prove functional cross-runtime Golden scenarios and failure/security truthfulness;
@@ -87,6 +88,7 @@ G0 Current/B01 reconciliation
   -> D2B-03 Claude Code
   -> D2B-04 Antigravity
   -> D2B-05 Runtime Fleet Doctor
+  -> D2B-06 FD-09 Local AI endpoints (LM Studio/Ollama/Generic compatible)
   -> D3 Multi-Agent Council/Workflow
   -> D4 Unified Work Control Plane
   -> D4-NEXT only source-required remainder
