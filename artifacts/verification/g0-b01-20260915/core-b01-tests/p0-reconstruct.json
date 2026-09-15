@@ -1,0 +1,33 @@
+{
+  "acceptance_id": "acceptance_13f19b97e73dfbd39d454e0216d12b2c",
+  "accepted_source_sha256": {
+    "app.py": "7b9a72466d3960eb2aacccfc848939453490db0678bd4725def3f789b891c919",
+    "new.txt": "11507a0e2f5e69d5dfa40a62a1bd7b6ee57e6bcd85c67c9b8431b36fff21c437"
+  },
+  "accepted_worktree": "<USER_HOME>\\.codex\\visualizations\\2026\\09\\14\\01a09fe7-12e2-7c61-aa3e-fcbc0543de45\\b01-tech-evidence-20260914-final3\\pytest-basetemp\\test_b01_p0_accept_open_verify0\\accepted-managed-worktree",
+  "candidate_id": "sha256:b7f8954db28f25612b87917be1aaad49a07b1e03abd2ae0a12c14d92751610db",
+  "case": "B01-P0-RECONSTRUCT",
+  "child_exit_evidence": [],
+  "offline_verification": {
+    "acceptance_id": "acceptance_13f19b97e73dfbd39d454e0216d12b2c",
+    "candidate_id": "sha256:b7f8954db28f25612b87917be1aaad49a07b1e03abd2ae0a12c14d92751610db",
+    "changeset_id": "sha256:0c9c48538c128fdaeeb509ebba21723ad0b1a6b9498650c98328d7a9451efc4b",
+    "manifest_digest": "sha256:c5a7e010a7c76466c650d83d3b3aac6ac1c7dc029b4fc054b778041f4152fbb0",
+    "source_paths": [
+      "app.py",
+      "new.txt"
+    ],
+    "verified": true
+  },
+  "original_accepted_bytes_unchanged": true,
+  "package": "<USER_HOME>\\.codex\\visualizations\\2026\\09\\14\\01a09fe7-12e2-7c61-aa3e-fcbc0543de45\\b01-tech-evidence-20260914-final3\\pytest-basetemp\\test_b01_p0_accept_open_verify0\\portable-b01.p0.zip",
+  "principal": "TEST_ONLY:test-only:b01-human",
+  "provider_private_session_required": false,
+  "reconstructed_source_sha256": {
+    "app.py": "7b9a72466d3960eb2aacccfc848939453490db0678bd4725def3f789b891c919",
+    "new.txt": "11507a0e2f5e69d5dfa40a62a1bd7b6ee57e6bcd85c67c9b8431b36fff21c437"
+  },
+  "runner_exit": "recorded by pytest wrapper",
+  "pytest_runner_exit": 0,
+  "pytest_runner_cwd": "<USER_HOME>\\.codex\\visualizations\\2026\\09\\14\\01a09fe7-12e2-7c61-aa3e-fcbc0543de45\\b01-tech-worktree\\services\\core"
+}

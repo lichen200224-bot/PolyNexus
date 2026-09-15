@@ -1,0 +1,6 @@
+B01_INDEPENDENT_REVIEW PASS
+candidate=e9538f328f409e2cb7d6868a8b79cc33ba4bdd87
+real_executor_exit=0
+core_b01_tests_exit=0
+product_source_changes=0
+unexpected_worktree_paths=0

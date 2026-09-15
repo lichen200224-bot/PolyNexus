@@ -1,0 +1,13 @@
+
+> polynexus-web@0.1.0 test
+> vitest run --run
+
+
+ RUN  v4.1.11 <USER_HOME>/OneDrive/文件/PONYNEXUS/g0-b01-review-ca85d22/apps/web
+
+
+ Test Files  4 passed (4)
+      Tests  94 passed (94)
+   Start at  20:49:11
+   Duration  33.09s (transform 600ms, setup 0ms, import 930ms, tests 22.78s, environment 48.43s)
+

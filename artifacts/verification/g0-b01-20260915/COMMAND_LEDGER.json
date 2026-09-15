@@ -1,0 +1,167 @@
+{
+  "schema": "G0-B01 exact command ledger; command strings preserve original recorded shell invocation except personal home normalization",
+  "historical_p0_zip_direct_byte_check": "NOT_VERIFIED",
+  "skipped_case": "services/core/tests/test_d2a_external_runtime.py::test_projected_staging_rejects_nested_reparse_path",
+  "skip_reason": "pytest.skip(\"symlink creation is unavailable in this Windows test environment\")",
+  "entries": [
+    {
+      "order": 0,
+      "phase": "B01 historical final3",
+      "source_thread": "01a09fe7-12e2-7c61-aa3e-fcbc0543de45",
+      "source_item": "exec-57d22ecd-7297-4b56-864e-412d504ff117",
+      "command": "\"<USER_HOME>\\\\.cache\\\\codex-runtimes\\\\codex-primary-runtime\\\\dependencies\\\\native\\\\powershell\\\\pwsh.exe\" -Command \"& '<USER_HOME>\\\\.cache\\\\codex-runtimes\\\\codex-primary-runtime\\\\dependencies\\\\native\\\\powershell\\\\pwsh.exe' -NoLogo -NoProfile -NonInteractive -File '<USER_HOME>\\\\.codex\\\\visualizations\\\\2026\\\\09\\\\14\\\\01a09fe7-12e2-7c61-aa3e-fcbc0543de45\\\\b01-tech-worktree\\\\tools\\\\run_b01_tech.ps1' -ArtifactRoot '<USER_HOME>\\\\.codex\\\\visualizations\\\\2026\\\\09\\\\14\\\\01a09fe7-12e2-7c61-aa3e-fcbc0543de45\\\\b01-tech-evidence-20260914-final3'\"",
+      "cwd": "<USER_HOME>\\.codex\\visualizations\\2026\\09\\14\\01a09fe7-12e2-7c61-aa3e-fcbc0543de45\\b01-tech-worktree",
+      "actual_exit": 0,
+      "result": "B01_TECHNICAL_READY; real executor exit 0; baseline test exit 1; post test exit 0; B01 core tests exit 0",
+      "raw_output": [
+        "run.json",
+        "real-bug-fix.json",
+        "b01-tests.stdout.log",
+        "real-bug-fix/codex.stdout.jsonl"
+      ]
+    },
+    {
+      "order": 1,
+      "phase": "G0 fresh review",
+      "source_thread": "01a0a4f7-6bcd-7160-930d-22c233db3134",
+      "source_item": "exec-4a86bf20-9df6-4769-80a3-de756f6a1879",
+      "command": "\"<USER_HOME>\\\\.cache\\\\codex-runtimes\\\\codex-primary-runtime\\\\dependencies\\\\native\\\\powershell\\\\pwsh.exe\" -Command '$log='\"'<USER_HOME>\\\\.codex\\\\visualizations\\\\2026\\\\09\\\\15\\\\01a0a4f7-6bcd-7160-930d-22c233db3134\\\\g0-b01-targeted-20260915.log'; & 'D:\\\\AI學習教材\\\\PolyNexus\\\\.venv\\\\Scripts\\\\python.exe' -B -m pytest --override-ini addopts= -q --disable-warnings --tb=short --basetemp '<USER_HOME>\\\\.codex\\\\visualizations\\\\2026\\\\09\\\\15\\\\01a0a4f7-6bcd-7160-930d-22c233db3134\\\\g0-pytest-targeted-temp' tests/test_b01_tech.py *> \"'$log; $testExit=$LASTEXITCODE; Get-Content -LiteralPath $log | Select-Object -Last 14; Write-Output \"ACTUAL_EXIT=$testExit\"; exit $testExit'",
+      "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\g0-b01-review-ca85d22\\services\\core",
+      "actual_exit": 0,
+      "result": "3 passed; 0 failed; 0 skipped",
+      "raw_output": "g0-b01-targeted-20260915.log"
+    },
+    {
+      "order": 2,
+      "phase": "G0 fresh review",
+      "source_thread": "01a0a4f7-6bcd-7160-930d-22c233db3134",
+      "source_item": "exec-994c6741-4155-48a2-959e-1f83835a4ab0",
+      "command": "\"<USER_HOME>\\\\.cache\\\\codex-runtimes\\\\codex-primary-runtime\\\\dependencies\\\\native\\\\powershell\\\\pwsh.exe\" -Command '$log='\"'<USER_HOME>\\\\.codex\\\\visualizations\\\\2026\\\\09\\\\15\\\\01a0a4f7-6bcd-7160-930d-22c233db3134\\\\g0-b01-affected-20260915.log'; & 'D:\\\\AI學習教材\\\\PolyNexus\\\\.venv\\\\Scripts\\\\python.exe' -B -m pytest --override-ini addopts= -q --disable-warnings --tb=short --basetemp '<USER_HOME>\\\\.codex\\\\visualizations\\\\2026\\\\09\\\\15\\\\01a0a4f7-6bcd-7160-930d-22c233db3134\\\\g0-pytest-affected-temp' tests/test_b01_tech.py tests/test_d1b_candidate_evidence_human_p0.py tests/test_d1b_runtime_producer.py tests/test_d1a_generation_ownership.py tests/test_cp06_wp28_failure_injection.py tests/test_d2a_external_runtime.py *> \"'$log; $testExit=$LASTEXITCODE; Get-Content -LiteralPath $log | Select-Object -Last 18; Write-Output \"ACTUAL_EXIT=$testExit\"; exit $testExit'",
+      "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\g0-b01-review-ca85d22\\services\\core",
+      "actual_exit": 0,
+      "result": "50 passed; 0 failed; 1 skipped",
+      "raw_output": "g0-b01-affected-20260915.log"
+    },
+    {
+      "order": 3,
+      "phase": "G0 fresh review",
+      "source_thread": "01a0a4f7-6bcd-7160-930d-22c233db3134",
+      "source_item": "exec-35a3019e-55fa-4c9f-9032-d7569a6614d3",
+      "command": "\"<USER_HOME>\\\\.cache\\\\codex-runtimes\\\\codex-primary-runtime\\\\dependencies\\\\native\\\\powershell\\\\pwsh.exe\" -Command '$log='\"'<USER_HOME>\\\\.codex\\\\visualizations\\\\2026\\\\09\\\\15\\\\01a0a4f7-6bcd-7160-930d-22c233db3134\\\\g0-b01-full-core-20260915.log'; & 'D:\\\\AI學習教材\\\\PolyNexus\\\\.venv\\\\Scripts\\\\python.exe' -B -m pytest --override-ini addopts= -q --disable-warnings --tb=short --basetemp '<USER_HOME>\\\\.codex\\\\visualizations\\\\2026\\\\09\\\\15\\\\01a0a4f7-6bcd-7160-930d-22c233db3134\\\\g0-pytest-full-temp' tests *> \"'$log; $testExit=$LASTEXITCODE; Get-Content -LiteralPath $log | Select-Object -Last 20; Write-Output \"ACTUAL_EXIT=$testExit\"; exit $testExit'",
+      "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\g0-b01-review-ca85d22\\services\\core",
+      "actual_exit": 1,
+      "result": "911 passed; 3 failed; 1 skipped",
+      "raw_output": "g0-b01-full-core-20260915.log"
+    },
+    {
+      "order": 4,
+      "phase": "G0 fresh review",
+      "source_thread": "01a0a4f7-6bcd-7160-930d-22c233db3134",
+      "source_item": "exec-8efee8f3-d3a3-4fa1-bb64-b9b1fa48cbd8",
+      "command": "\"<USER_HOME>\\\\.cache\\\\codex-runtimes\\\\codex-primary-runtime\\\\dependencies\\\\native\\\\powershell\\\\pwsh.exe\" -Command '$log='\"'<USER_HOME>\\\\.codex\\\\visualizations\\\\2026\\\\09\\\\15\\\\01a0a4f7-6bcd-7160-930d-22c233db3134\\\\g0-b01-backup-temp-correction-20260915.log'; & 'D:\\\\AI學習教材\\\\PolyNexus\\\\.venv\\\\Scripts\\\\python.exe' -B -m pytest --override-ini addopts= -q --disable-warnings --tb=short --basetemp '<USER_HOME>\\\\AppData\\\\Local\\\\Temp\\\\g0-b01-backup-targeted-20260915' tests/test_wp23_backup_restore_migration.py *> \"'$log; $testExit=$LASTEXITCODE; Get-Content -LiteralPath $log | Select-Object -Last 12; Write-Output \"ACTUAL_EXIT=$testExit\"; exit $testExit'",
+      "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\g0-b01-review-ca85d22\\services\\core",
+      "actual_exit": 0,
+      "result": "4 passed; 0 failed; 0 skipped",
+      "raw_output": "g0-b01-backup-temp-correction-20260915.log"
+    },
+    {
+      "order": 5,
+      "phase": "G0 fresh review",
+      "source_thread": "01a0a4f7-6bcd-7160-930d-22c233db3134",
+      "source_item": "exec-078c7686-1914-4c73-bd17-f1ec6d629704",
+      "command": "\"<USER_HOME>\\\\.cache\\\\codex-runtimes\\\\codex-primary-runtime\\\\dependencies\\\\native\\\\powershell\\\\pwsh.exe\" -Command '$log='\"'<USER_HOME>\\\\.codex\\\\visualizations\\\\2026\\\\09\\\\15\\\\01a0a4f7-6bcd-7160-930d-22c233db3134\\\\g0-b01-full-core-correct-temp-20260915.log'; & 'D:\\\\AI學習教材\\\\PolyNexus\\\\.venv\\\\Scripts\\\\python.exe' -B -m pytest --override-ini addopts= -q --disable-warnings --tb=short --basetemp '<USER_HOME>\\\\AppData\\\\Local\\\\Temp\\\\g0-b01-full-core-correct-20260915' tests *> \"'$log; $testExit=$LASTEXITCODE; Get-Content -LiteralPath $log | Select-Object -Last 18; Write-Output \"ACTUAL_EXIT=$testExit\"; exit $testExit'",
+      "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\g0-b01-review-ca85d22\\services\\core",
+      "actual_exit": 0,
+      "result": "914 passed; 0 failed; 1 skipped",
+      "raw_output": "g0-b01-full-core-correct-temp-20260915.log"
+    },
+    {
+      "order": 6,
+      "phase": "G0 fresh review",
+      "source_thread": "01a0a4f7-6bcd-7160-930d-22c233db3134",
+      "source_item": "exec-64e317cb-9515-4d67-8827-e20dac31ad4d",
+      "command": "\"<USER_HOME>\\\\.cache\\\\codex-runtimes\\\\codex-primary-runtime\\\\dependencies\\\\native\\\\powershell\\\\pwsh.exe\" -Command '$log='\"'<USER_HOME>\\\\.codex\\\\visualizations\\\\2026\\\\09\\\\15\\\\01a0a4f7-6bcd-7160-930d-22c233db3134\\\\g0-b01-npm-ci-20260915.log'; npm ci *> \"'$log; $npmExit=$LASTEXITCODE; Get-Content -LiteralPath $log | Select-Object -Last 14; Write-Output \"ACTUAL_EXIT=$npmExit\"; exit $npmExit'",
+      "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\g0-b01-review-ca85d22\\apps\\web",
+      "actual_exit": -4048,
+      "result": "install failed: EPERM",
+      "raw_output": "g0-b01-npm-ci-20260915.log"
+    },
+    {
+      "order": 7,
+      "phase": "G0 fresh review",
+      "source_thread": "01a0a4f7-6bcd-7160-930d-22c233db3134",
+      "source_item": "exec-c4cdae6d-0637-48c1-8554-a1eb58d23a32",
+      "command": "\"<USER_HOME>\\\\.cache\\\\codex-runtimes\\\\codex-primary-runtime\\\\dependencies\\\\native\\\\powershell\\\\pwsh.exe\" -Command '$log='\"'<USER_HOME>\\\\.codex\\\\visualizations\\\\2026\\\\09\\\\15\\\\01a0a4f7-6bcd-7160-930d-22c233db3134\\\\g0-b01-npm-ci-local-cache-20260915.log'; npm ci --cache '<USER_HOME>\\\\.codex\\\\visualizations\\\\2026\\\\09\\\\15\\\\01a0a4f7-6bcd-7160-930d-22c233db3134\\\\g0-npm-cache' *> \"'$log; $npmExit=$LASTEXITCODE; Get-Content -LiteralPath $log | Select-Object -Last 16; Write-Output \"ACTUAL_EXIT=$npmExit\"; exit $npmExit'",
+      "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\g0-b01-review-ca85d22\\apps\\web",
+      "actual_exit": 1,
+      "result": "install failed: EACCES",
+      "raw_output": "g0-b01-npm-ci-local-cache-20260915.log"
+    },
+    {
+      "order": 8,
+      "phase": "G0 fresh review",
+      "source_thread": "01a0a4f7-6bcd-7160-930d-22c233db3134",
+      "source_item": "exec-302d0efa-fa3b-4b9b-8da0-db90cfd3f2e3",
+      "command": "\"<USER_HOME>\\\\.cache\\\\codex-runtimes\\\\codex-primary-runtime\\\\dependencies\\\\native\\\\powershell\\\\pwsh.exe\" -Command '$log='\"'<USER_HOME>\\\\.codex\\\\visualizations\\\\2026\\\\09\\\\15\\\\01a0a4f7-6bcd-7160-930d-22c233db3134\\\\g0-b01-npm-ci-elevated-20260915.log'; npm ci --cache '<USER_HOME>\\\\.codex\\\\visualizations\\\\2026\\\\09\\\\15\\\\01a0a4f7-6bcd-7160-930d-22c233db3134\\\\g0-npm-cache' *> \"'$log; $npmExit=$LASTEXITCODE; Get-Content -LiteralPath $log | Select-Object -Last 15; Write-Output \"ACTUAL_EXIT=$npmExit\"; exit $npmExit'",
+      "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\g0-b01-review-ca85d22\\apps\\web",
+      "actual_exit": 0,
+      "result": "90 packages; 0 vulnerabilities",
+      "raw_output": "g0-b01-npm-ci-elevated-20260915.log"
+    },
+    {
+      "order": 9,
+      "phase": "G0 fresh review",
+      "source_thread": "01a0a4f7-6bcd-7160-930d-22c233db3134",
+      "source_item": "exec-85d90254-a7e8-4982-850e-8a6ca12cb776",
+      "command": "\"<USER_HOME>\\\\.cache\\\\codex-runtimes\\\\codex-primary-runtime\\\\dependencies\\\\native\\\\powershell\\\\pwsh.exe\" -Command '$log='\"'<USER_HOME>\\\\.codex\\\\visualizations\\\\2026\\\\09\\\\15\\\\01a0a4f7-6bcd-7160-930d-22c233db3134\\\\g0-b01-web-test-20260915.log'; npm test -- --run *> \"'$log; $webExit=$LASTEXITCODE; Get-Content -LiteralPath $log | Select-Object -Last 14; Write-Output \"ACTUAL_EXIT=$webExit\"; exit $webExit'",
+      "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\g0-b01-review-ca85d22\\apps\\web",
+      "actual_exit": 0,
+      "result": "94 passed; 0 failed",
+      "raw_output": "g0-b01-web-test-20260915.log"
+    },
+    {
+      "order": 10,
+      "phase": "G0 fresh review",
+      "source_thread": "01a0a4f7-6bcd-7160-930d-22c233db3134",
+      "source_item": "exec-6400d96f-7186-4fa2-ae7f-1833fe371554",
+      "command": "\"<USER_HOME>\\\\.cache\\\\codex-runtimes\\\\codex-primary-runtime\\\\dependencies\\\\native\\\\powershell\\\\pwsh.exe\" -Command '$log='\"'<USER_HOME>\\\\.codex\\\\visualizations\\\\2026\\\\09\\\\15\\\\01a0a4f7-6bcd-7160-930d-22c233db3134\\\\g0-b01-web-build-20260915.log'; npm run build *> \"'$log; $buildExit=$LASTEXITCODE; Get-Content -LiteralPath $log | Select-Object -Last 13; Write-Output \"ACTUAL_EXIT=$buildExit\"; exit $buildExit'",
+      "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\g0-b01-review-ca85d22\\apps\\web",
+      "actual_exit": 0,
+      "result": "production build completed",
+      "raw_output": "g0-b01-web-build-20260915.log"
+    },
+    {
+      "order": 11,
+      "phase": "G0 fresh review",
+      "source_thread": "01a0a4f7-6bcd-7160-930d-22c233db3134",
+      "source_item": "exec-5289a998-81e7-408f-aee6-9bedc195a69b",
+      "command": "\"<USER_HOME>\\\\.cache\\\\codex-runtimes\\\\codex-primary-runtime\\\\dependencies\\\\native\\\\powershell\\\\pwsh.exe\" -Command '$log='\"'<USER_HOME>\\\\.codex\\\\visualizations\\\\2026\\\\09\\\\15\\\\01a0a4f7-6bcd-7160-930d-22c233db3134\\\\g0-b01-browser-companion-20260915.log'; node --test extensions/browser-companion/tests/test_websurface_drivers.mjs *> \"'$log; $browserExit=$LASTEXITCODE; Get-Content -LiteralPath $log | Select-Object -Last 18; Write-Output \"ACTUAL_EXIT=$browserExit\"; exit $browserExit'",
+      "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\g0-b01-review-ca85d22",
+      "actual_exit": 0,
+      "result": "10 passed; 0 failed; 0 skipped",
+      "raw_output": "g0-b01-browser-companion-20260915.log"
+    },
+    {
+      "order": 12,
+      "phase": "G0 fresh review",
+      "source_thread": "01a0a4f7-6bcd-7160-930d-22c233db3134",
+      "source_item": "exec-55fcf36e-b2b7-4fb9-8758-2e1f2b4d6cfb",
+      "command": "\"<USER_HOME>\\\\.cache\\\\codex-runtimes\\\\codex-primary-runtime\\\\dependencies\\\\native\\\\powershell\\\\pwsh.exe\" -Command '$e='\"'<USER_HOME>\\\\.codex\\\\visualizations\\\\2026\\\\09\\\\14\\\\01a09fe7-12e2-7c61-aa3e-fcbc0543de45\\\\b01-tech-worktree\\\\artifacts\\\\verification\\\\b01-tech-20260914'; \"'$log='\"'<USER_HOME>\\\\.codex\\\\visualizations\\\\2026\\\\09\\\\15\\\\01a0a4f7-6bcd-7160-930d-22c233db3134\\\\g0-b01-reviewer-rerun-20260915.log'; pwsh -NoLogo -NoProfile -NonInteractive -File tools/review_b01_tech.ps1 -EvidenceRoot \"'$e *> $log; $reviewExit=$LASTEXITCODE; Get-Content -LiteralPath $log | Select-Object -Last 13; Write-Output \"ACTUAL_EXIT=$reviewExit\"; exit $reviewExit'",
+      "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\g0-b01-review-ca85d22",
+      "actual_exit": 0,
+      "result": "review predicates PASS",
+      "raw_output": "g0-b01-reviewer-rerun-20260915.log"
+    },
+    {
+      "order": 13,
+      "phase": "G0 fresh review",
+      "source_thread": "01a0a4f7-6bcd-7160-930d-22c233db3134",
+      "source_item": "exec-e92a9d77-0120-4b30-9f65-a4d44188ad3d",
+      "command": "\"<USER_HOME>\\\\.cache\\\\codex-runtimes\\\\codex-primary-runtime\\\\dependencies\\\\native\\\\powershell\\\\pwsh.exe\" -Command '$log='\"'<USER_HOME>\\\\.codex\\\\visualizations\\\\2026\\\\09\\\\15\\\\01a0a4f7-6bcd-7160-930d-22c233db3134\\\\g0-b01-npm-audit-20260915.log'; npm audit --audit-level=moderate --cache '<USER_HOME>\\\\.codex\\\\visualizations\\\\2026\\\\09\\\\15\\\\01a0a4f7-6bcd-7160-930d-22c233db3134\\\\g0-npm-cache' *> \"'$log; $auditExit=$LASTEXITCODE; Get-Content -LiteralPath $log | Select-Object -Last 12; Write-Output \"ACTUAL_EXIT=$auditExit\"; exit $auditExit'",
+      "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\g0-b01-review-ca85d22\\apps\\web",
+      "actual_exit": 0,
+      "result": "0 vulnerabilities",
+      "raw_output": "g0-b01-npm-audit-20260915.log"
+    }
+  ]
+}

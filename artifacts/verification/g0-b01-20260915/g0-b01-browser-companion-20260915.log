@@ -1,0 +1,18 @@
+✔ sanitizes bounded web text and context (1.0391ms)
+✔ redacts POSIX paths and file URIs without corrupting ordinary URLs (0.0978ms)
+✔ driver URL matching is exact and launch is fixed to approved vendor origin (0.5617ms)
+✔ assisted flow fills, pauses for confirmation, and sends only when confirmed (0.3566ms)
+✔ capture normalizes to bounded AI opinion and driver failures use manual fallback (0.2592ms)
+✔ normalization rejects empty output and strips unsafe fields (0.1093ms)
+✔ loopback client is local-only, session-memory, bounded, and no redirect (14.4744ms)
+✔ loopback response over limit fails closed before JSON parsing (0.7464ms)
+✔ service worker exposes only authenticated allowlisted loopback requests (17.6449ms)
+✔ executeInTab rejects missing scripting runtime without raw error (0.2462ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 122.2354

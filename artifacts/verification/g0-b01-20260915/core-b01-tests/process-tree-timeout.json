@@ -1,0 +1,86 @@
+{
+  "all_owned_handles_have_end_observation": true,
+  "all_owned_handles_stopped": true,
+  "case": "B01-PROCESS-TREE-TIMEOUT",
+  "child_exit_evidence": [
+    1,
+    1,
+    1
+  ],
+  "deadline_seconds": 0.25,
+  "flag_used_as_oracle": false,
+  "owned_process_facts": [
+    {
+      "argv": [
+        "D:\\AI學習教材\\PolyNexus\\.venv\\Scripts\\python.exe",
+        "-B",
+        "-c",
+        "import json,subprocess,sys,time;from pathlib import Path;child=subprocess.Popen([sys.executable,'-c',\"import json,subprocess,sys,time;from pathlib import Path;grandchild=subprocess.Popen([sys.executable,'-c','import time; time.sleep(90)']);Path(sys.argv[1]).write_text(json.dumps({'pid':grandchild.pid}),encoding='utf-8');time.sleep(90)\",sys.argv[2]]);Path(sys.argv[1]).write_text(json.dumps({'pid':child.pid}),encoding='utf-8');time.sleep(90)",
+        "<USER_HOME>\\.codex\\visualizations\\2026\\09\\14\\01a09fe7-12e2-7c61-aa3e-fcbc0543de45\\b01-tech-evidence-20260914-final3\\pytest-basetemp\\test_b01_real_process_tree_tim0\\staging_e7f6b936fb770beb4ead273d\\timeout-child.json",
+        "<USER_HOME>\\.codex\\visualizations\\2026\\09\\14\\01a09fe7-12e2-7c61-aa3e-fcbc0543de45\\b01-tech-evidence-20260914-final3\\pytest-basetemp\\test_b01_real_process_tree_tim0\\staging_e7f6b936fb770beb4ead273d\\timeout-grandchild.json"
+      ],
+      "created_filetime": 134338651777958129,
+      "cwd": "<USER_HOME>\\.codex\\visualizations\\2026\\09\\14\\01a09fe7-12e2-7c61-aa3e-fcbc0543de45\\b01-tech-evidence-20260914-final3\\pytest-basetemp\\test_b01_real_process_tree_tim0\\staging_e7f6b936fb770beb4ead273d",
+      "ended_filetime": 134338651781820715,
+      "exit_code": 1,
+      "pid": 21128,
+      "retained_handle": 1060,
+      "signal": "job_terminate",
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stopped": true
+    },
+    {
+      "argv": [
+        "D:\\AI學習教材\\PolyNexus\\.venv\\Scripts\\python.exe",
+        "-B",
+        "-c",
+        "import json,subprocess,sys,time;from pathlib import Path;child=subprocess.Popen([sys.executable,'-c',\"import json,subprocess,sys,time;from pathlib import Path;grandchild=subprocess.Popen([sys.executable,'-c','import time; time.sleep(90)']);Path(sys.argv[1]).write_text(json.dumps({'pid':grandchild.pid}),encoding='utf-8');time.sleep(90)\",sys.argv[2]]);Path(sys.argv[1]).write_text(json.dumps({'pid':child.pid}),encoding='utf-8');time.sleep(90)",
+        "<USER_HOME>\\.codex\\visualizations\\2026\\09\\14\\01a09fe7-12e2-7c61-aa3e-fcbc0543de45\\b01-tech-evidence-20260914-final3\\pytest-basetemp\\test_b01_real_process_tree_tim0\\staging_e7f6b936fb770beb4ead273d\\timeout-child.json",
+        "<USER_HOME>\\.codex\\visualizations\\2026\\09\\14\\01a09fe7-12e2-7c61-aa3e-fcbc0543de45\\b01-tech-evidence-20260914-final3\\pytest-basetemp\\test_b01_real_process_tree_tim0\\staging_e7f6b936fb770beb4ead273d\\timeout-grandchild.json"
+      ],
+      "created_filetime": 134338651778582096,
+      "cwd": "<USER_HOME>\\.codex\\visualizations\\2026\\09\\14\\01a09fe7-12e2-7c61-aa3e-fcbc0543de45\\b01-tech-evidence-20260914-final3\\pytest-basetemp\\test_b01_real_process_tree_tim0\\staging_e7f6b936fb770beb4ead273d",
+      "ended_filetime": 134338651781820128,
+      "exit_code": 1,
+      "pid": 19452,
+      "retained_handle": 604,
+      "signal": "job_terminate",
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stopped": true
+    },
+    {
+      "argv": [
+        "D:\\AI學習教材\\PolyNexus\\.venv\\Scripts\\python.exe",
+        "-B",
+        "-c",
+        "import json,subprocess,sys,time;from pathlib import Path;child=subprocess.Popen([sys.executable,'-c',\"import json,subprocess,sys,time;from pathlib import Path;grandchild=subprocess.Popen([sys.executable,'-c','import time; time.sleep(90)']);Path(sys.argv[1]).write_text(json.dumps({'pid':grandchild.pid}),encoding='utf-8');time.sleep(90)\",sys.argv[2]]);Path(sys.argv[1]).write_text(json.dumps({'pid':child.pid}),encoding='utf-8');time.sleep(90)",
+        "<USER_HOME>\\.codex\\visualizations\\2026\\09\\14\\01a09fe7-12e2-7c61-aa3e-fcbc0543de45\\b01-tech-evidence-20260914-final3\\pytest-basetemp\\test_b01_real_process_tree_tim0\\staging_e7f6b936fb770beb4ead273d\\timeout-child.json",
+        "<USER_HOME>\\.codex\\visualizations\\2026\\09\\14\\01a09fe7-12e2-7c61-aa3e-fcbc0543de45\\b01-tech-evidence-20260914-final3\\pytest-basetemp\\test_b01_real_process_tree_tim0\\staging_e7f6b936fb770beb4ead273d\\timeout-grandchild.json"
+      ],
+      "created_filetime": 134338651779075526,
+      "cwd": "<USER_HOME>\\.codex\\visualizations\\2026\\09\\14\\01a09fe7-12e2-7c61-aa3e-fcbc0543de45\\b01-tech-evidence-20260914-final3\\pytest-basetemp\\test_b01_real_process_tree_tim0\\staging_e7f6b936fb770beb4ead273d",
+      "ended_filetime": 134338651781820331,
+      "exit_code": 1,
+      "pid": 17836,
+      "retained_handle": 1168,
+      "signal": "job_terminate",
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stopped": true
+    }
+  ],
+  "pid_scan_used_as_oracle": false,
+  "run_id": "b01-timeout-run",
+  "runner_exit": "recorded by pytest wrapper",
+  "runtime_state": "TIMED_OUT",
+  "pytest_runner_exit": 0,
+  "pytest_runner_cwd": "<USER_HOME>\\.codex\\visualizations\\2026\\09\\14\\01a09fe7-12e2-7c61-aa3e-fcbc0543de45\\b01-tech-worktree\\services\\core"
+}

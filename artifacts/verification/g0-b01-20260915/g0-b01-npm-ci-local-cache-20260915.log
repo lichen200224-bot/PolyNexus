@@ -1,0 +1,30 @@
+npm warn cleanup Failed to remove some directories [
+npm warn cleanup   [
+npm warn cleanup     '\\\\?\\<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\g0-b01-review-ca85d22\\apps\\web\\node_modules',
+npm warn cleanup     [Error: EPERM: operation not permitted, rmdir '<USER_HOME>\OneDrive\文件\PONYNEXUS\g0-b01-review-ca85d22\apps\web\node_modules\data-urls'] {
+npm warn cleanup       errno: -4048,
+npm warn cleanup       code: 'EPERM',
+npm warn cleanup       syscall: 'rmdir',
+npm warn cleanup       path: '<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\g0-b01-review-ca85d22\\apps\\web\\node_modules\\data-urls'
+npm warn cleanup     }
+npm warn cleanup   ]
+npm warn cleanup ]
+npm error code EACCES
+npm error errno EACCES
+npm error FetchError: request to https://registry.npmjs.org/xmlchars/-/xmlchars-2.2.0.tgz failed, reason: 
+npm error     at ClientRequest.<anonymous> (C:\Program Files\nodejs\node_modules\npm\node_modules\minipass-fetch\lib\index.js:130:14)
+npm error     at ClientRequest.emit (node:events:509:20)
+npm error     at emitErrorEvent (node:_http_client:111:11)
+npm error     at _destroy (node:_http_client:1006:9)
+npm error     at onSocketNT (node:_http_client:1027:5)
+npm error     at process.processTicksAndRejections (node:internal/process/task_queues:91:21) {
+npm error   code: 'EACCES',
+npm error   errno: 'EACCES',
+npm error   type: 'system'
+npm error }
+npm error
+npm error The operation was rejected by your operating system.
+npm error It's possible that the file was already in use (by a text editor or antivirus), or that you lack permissions to access it.
+npm error
+npm error If you believe this might be a permissions issue, please double-check the permissions of the file and its containing directories, or try running the command again as root/Administrator.
+npm error A complete log of this run can be found in: <USER_HOME>\.codex\visualizations\2026\09\15\***\g0-npm-cache\_logs\2026-09-15T12_47_21_363Z-debug-0.log

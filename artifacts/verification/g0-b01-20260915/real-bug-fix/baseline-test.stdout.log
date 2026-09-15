@@ -1,0 +1,14 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________________________ test_answer_is_fixed _____________________________
+
+    def test_answer_is_fixed():
+>       assert answer() == 42
+E       assert 41 == 42
+E        +  where 41 = answer()
+
+test_bug.py:5: AssertionError
+=========================== short test summary info ===========================
+FAILED test_bug.py::test_answer_is_fixed - assert 41 == 42
+1 failed in 0.04s
+

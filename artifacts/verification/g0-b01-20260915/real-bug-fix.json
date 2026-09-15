@@ -1,0 +1,38 @@
+{
+  "case": "B01-REAL-BOUNDED-BUG-FIX",
+  "actual_cwd": "<USER_HOME>\\.codex\\visualizations\\2026\\09\\14\\01a09fe7-12e2-7c61-aa3e-fcbc0543de45\\b01-tech-evidence-20260914-final3\\real-bug-fix\\synthetic-repo",
+  "executor": "<USER_HOME>\\AppData\\Local\\OpenAI\\Codex\\bin\\bffc5354119c8421\\codex.exe",
+  "executor_version": "codex-cli 0.154.0-alpha.6.2",
+  "baseline": {
+    "head": "cc85371f03edfddbe6d7e09de5da51a367925dee",
+    "tree": "c127351da3e60f6e1ac50303b3aa64e1defd3518",
+    "bug_blob": "1083d263a12f8ca0b19827526030ed286669b9df",
+    "bug_sha256": "bb90d2b315ed538549cd708303971dd03d30dd733928b845504fab3a42eeb914",
+    "test_exit": 1
+  },
+  "after": {
+    "bug_blob": "eca386f51bbe9df459d3def8a91f74e99caeab92",
+    "bug_sha256": "aecc013c518523ca22b7e3780f87002f5cae13fabc369f2f59a1faf7058f8c76",
+    "test_exit": 0,
+    "status": "M bug.py",
+    "changed_paths": [
+      "bug.py"
+    ],
+    "diff": "diff --git a/bug.py b/bug.py\nindex 1083d26..eca386f 100644\n--- a/bug.py\n+++ b/bug.py\n@@ -1,2 +1,2 @@\n def answer():\n-    return 41\n+    return 42"
+  },
+  "runner": {
+    "wrapper": "tools/run_b01_tech.ps1",
+    "wrapper_cwd": "<USER_HOME>\\.codex\\visualizations\\2026\\09\\14\\01a09fe7-12e2-7c61-aa3e-fcbc0543de45\\b01-tech-worktree",
+    "wrapper_child_pid": 12704,
+    "child_exit": 0,
+    "inner_command_exit_codes": [
+      0
+    ],
+    "stdout_path": "<USER_HOME>\\.codex\\visualizations\\2026\\09\\14\\01a09fe7-12e2-7c61-aa3e-fcbc0543de45\\b01-tech-evidence-20260914-final3\\real-bug-fix\\codex.stdout.jsonl",
+    "stderr_path": "<USER_HOME>\\.codex\\visualizations\\2026\\09\\14\\01a09fe7-12e2-7c61-aa3e-fcbc0543de45\\b01-tech-evidence-20260914-final3\\real-bug-fix\\codex.stderr.log"
+  },
+  "source_hash_changed": true,
+  "source_closure": true,
+  "no_parent_repo_used": true,
+  "provider_private_session_required": false
+}

@@ -1,0 +1,19 @@
+{
+  "status": "B01_TECHNICAL_READY",
+  "human_uat": "PENDING_FINAL_HUMAN_UAT",
+  "human_acceptance": "NOT_CLAIMED",
+  "source_repo": "<USER_HOME>\\.codex\\visualizations\\2026\\09\\14\\01a09fe7-12e2-7c61-aa3e-fcbc0543de45\\b01-tech-worktree",
+  "source_head": "e9538f328f409e2cb7d6868a8b79cc33ba4bdd87",
+  "source_tree": "b88c555c15def8ad347b0928ec8aa58e681887b3",
+  "real_executor_exit": 0,
+  "baseline_synthetic_test_exit": 1,
+  "post_synthetic_test_exit": 0,
+  "b01_core_tests_exit": 0,
+  "artifact_root": "<USER_HOME>\\.codex\\visualizations\\2026\\09\\14\\01a09fe7-12e2-7c61-aa3e-fcbc0543de45\\b01-tech-evidence-20260914-final3",
+  "generated_evidence": [
+    "<USER_HOME>\\.codex\\visualizations\\2026\\09\\14\\01a09fe7-12e2-7c61-aa3e-fcbc0543de45\\b01-tech-evidence-20260914-final3\\real-bug-fix.json",
+    "<USER_HOME>\\.codex\\visualizations\\2026\\09\\14\\01a09fe7-12e2-7c61-aa3e-fcbc0543de45\\b01-tech-evidence-20260914-final3\\core-b01-tests\\failure-retry-recovery.json",
+    "<USER_HOME>\\.codex\\visualizations\\2026\\09\\14\\01a09fe7-12e2-7c61-aa3e-fcbc0543de45\\b01-tech-evidence-20260914-final3\\core-b01-tests\\process-tree-timeout.json",
+    "<USER_HOME>\\.codex\\visualizations\\2026\\09\\14\\01a09fe7-12e2-7c61-aa3e-fcbc0543de45\\b01-tech-evidence-20260914-final3\\core-b01-tests\\p0-reconstruct.json"
+  ]
+}

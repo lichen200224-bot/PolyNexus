@@ -1,0 +1,46 @@
+........................................................................ [  7%]
+........................................................................ [ 15%]
+.....................................................s.................. [ 23%]
+........................................................................ [ 31%]
+........................................................................ [ 39%]
+........................................................................ [ 47%]
+........................................................................ [ 55%]
+........................................................................ [ 62%]
+........................................................................ [ 70%]
+........................................................................ [ 78%]
+........................................................................ [ 86%]
+........................................................................ [ 94%]
+...................................F.FF............                      [100%]
+================================== FAILURES ===================================
+___________ test_backup_restore_round_trip_preserves_legacy_history ___________
+tests\test_wp23_backup_restore_migration.py:125: in test_backup_restore_round_trip_preserves_legacy_history
+    receipt = create_sqlite_backup(db_path, backup_path)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\polynexus_core\persistence\backup.py:118: in create_sqlite_backup
+    source_path = _validated_path(source, source=True)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\polynexus_core\persistence\backup.py:58: in _validated_path
+    raise BackupRestoreError("backup_not_isolated") from None
+E   polynexus_core.persistence.backup.BackupRestoreError: backup_not_isolated
+_____________________ test_backup_rejects_corrupt_sqlite ______________________
+tests\test_wp23_backup_restore_migration.py:169: in test_backup_rejects_corrupt_sqlite
+    assert error.value.code == "backup_integrity_failed"
+E   AssertionError: assert 'backup_not_isolated' == 'backup_integrity_failed'
+E     
+E     - backup_integrity_failed
+E     + backup_not_isolated
+_____________ test_backup_receipt_does_not_include_database_path ______________
+tests\test_wp23_backup_restore_migration.py:177: in test_backup_receipt_does_not_include_database_path
+    receipt = create_sqlite_backup(db_path, tmp_path / "small.backup")
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\polynexus_core\persistence\backup.py:118: in create_sqlite_backup
+    source_path = _validated_path(source, source=True)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\polynexus_core\persistence\backup.py:58: in _validated_path
+    raise BackupRestoreError("backup_not_isolated") from None
+E   polynexus_core.persistence.backup.BackupRestoreError: backup_not_isolated
+=========================== short test summary info ===========================
+FAILED tests/test_wp23_backup_restore_migration.py::test_backup_restore_round_trip_preserves_legacy_history
+FAILED tests/test_wp23_backup_restore_migration.py::test_backup_rejects_corrupt_sqlite
+FAILED tests/test_wp23_backup_restore_migration.py::test_backup_receipt_does_not_include_database_path
+3 failed, 911 passed, 1 skipped, 214 warnings in 240.31s (0:04:00)
