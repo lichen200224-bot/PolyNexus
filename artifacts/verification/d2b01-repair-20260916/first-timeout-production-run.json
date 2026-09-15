@@ -1,0 +1,167 @@
+{
+  "selected_profile": "opencode.acp.local",
+  "project_id": "project_5f63c5731fa84ec5955a3777ad480d12",
+  "task_id": "task_be19a3f2c7da4a32b3927661ffa46a5f",
+  "context_id": "context_afecfa9e5aa84760aeb2e8832507e535",
+  "generation": {
+    "task_id": "task_be19a3f2c7da4a32b3927661ffa46a5f",
+    "generation_revision": 1,
+    "command_id": "begin",
+    "control_revision": 0
+  },
+  "run_id": "run_eb5ae9be319e403a95dcb8e65c0c8c6a",
+  "initial_outcome": "PREDISPATCH_POLICY_DENIED",
+  "initial_error": "predispatch_policy_denied",
+  "outcome": "TIMED_OUT",
+  "retry_error": "",
+  "binding": {
+    "run_id": "run_eb5ae9be319e403a95dcb8e65c0c8c6a",
+    "profile": "opencode.acp.local",
+    "adapter_id": "builtin.opencode.acp"
+  },
+  "initial_binding": null,
+  "authorization": {
+    "id": "dispatch-auth_0f58010eb43743908b1c04b84c4b5839",
+    "issuer_class": "TEST_ONLY",
+    "policy_digest": "56d745594c2c6421245c86b50a7d26b9f545975b6a9cb5f5bf80bf5a40b73ebb",
+    "state": "CONSUMED",
+    "issued_at": "2026-09-15T21:16:09.225592+00:00",
+    "consumed_at": "2026-09-15T21:16:09.310381+00:00"
+  },
+  "authorization_events": [
+    {
+      "event_kind": "ISSUE",
+      "from_state": null,
+      "to_state": "ISSUED",
+      "occurred_at": "2026-09-15T21:16:09.225592"
+    },
+    {
+      "event_kind": "CONSUME",
+      "from_state": "ISSUED",
+      "to_state": "CONSUMED",
+      "occurred_at": "2026-09-15T21:16:09.310381"
+    }
+  ],
+  "launch_observations_before_effect": [
+    {
+      "run_state": "STARTING",
+      "binding": {
+        "run_id": "run_eb5ae9be319e403a95dcb8e65c0c8c6a",
+        "profile": "opencode.acp.local"
+      },
+      "authorization_state": "CONSUMED",
+      "routing_policy_decisions": [
+        "APPROVAL_REQUIRED"
+      ],
+      "dispatch_evidence_count": 1,
+      "argv": [
+        "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\d2b01-opencode-tool\\node_modules\\opencode-ai\\bin\\opencode.exe",
+        "--pure",
+        "acp"
+      ],
+      "cwd": "<USER_HOME>\\AppData\\Local\\Temp\\d2b01-repair-production-raw-20260916-1\\work-root\\staging_0cc41fecb9ae2b70c189fb5c"
+    }
+  ],
+  "real_acp_process_count": 1,
+  "real_process_facts": [
+    {
+      "pid": 12468,
+      "retained_handle": 536,
+      "created_filetime": 134339805705485646,
+      "ended_filetime": 134339806005677106,
+      "exit_code": 1,
+      "stopped": true,
+      "argv": [
+        "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\d2b01-opencode-tool\\node_modules\\opencode-ai\\bin\\opencode.exe",
+        "--pure",
+        "acp"
+      ],
+      "cwd": "<USER_HOME>\\AppData\\Local\\Temp\\d2b01-repair-production-raw-20260916-1\\work-root\\staging_0cc41fecb9ae2b70c189fb5c",
+      "signal": "job_terminate",
+      "stdout_bytes": 48177,
+      "stderr_bytes": 0,
+      "stdout_sha256": "08d3427d97d82e73ac7467ecfa6ab859b9dd64f9607e2628d162e89dd8390782",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "postcondition_test": {
+    "argv": [
+      "D:\\AI學習教材\\PolyNexus\\.venv\\Scripts\\python.exe",
+      "-B",
+      "-m",
+      "pytest",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "test_bug.py"
+    ],
+    "cwd": "<USER_HOME>\\AppData\\Local\\Temp\\d2b01-repair-production-raw-20260916-1\\work-root\\staging_0cc41fecb9ae2b70c189fb5c",
+    "exit": 1,
+    "stdout": "F                                                                        [100%]\r\n================================== FAILURES ===================================\r\n_________________________________ test_answer _________________________________\r\n\r\n    def test_answer():\r\n>       assert answer() == 42\r\nE       assert 41 == 42\r\nE        +  where 41 = answer()\r\n\r\ntest_bug.py:4: AssertionError\r\n=========================== short test summary info ===========================\r\nFAILED test_bug.py::test_answer - assert 41 == 42\r\n1 failed in 0.04s\r\n",
+    "stderr": ""
+  },
+  "persisted_artifacts": [],
+  "persisted_runtime_evidence": [
+    {
+      "id": "evidence_915da2c3df9747ab8539a939a8c96e2c",
+      "run_id": "run_eb5ae9be319e403a95dcb8e65c0c8c6a",
+      "source": "runtime.routing_policy",
+      "status": "NEED_ACTION",
+      "metadata": {
+        "classification": "PUBLIC",
+        "execution_mode": "STANDARD",
+        "destination_trust": "TRUSTED_EXTERNAL",
+        "tool_trust": "TRUSTED_REGISTERED",
+        "decision": "APPROVAL_REQUIRED",
+        "route": "MANUAL",
+        "reason": "sensitive_or_side_effect_requires_approval",
+        "local_available": "False",
+        "side_effect": "True",
+        "generation_revision": "1"
+      }
+    },
+    {
+      "id": "evidence_a03210535bb04834a41322198ff4ed0d",
+      "run_id": "run_eb5ae9be319e403a95dcb8e65c0c8c6a",
+      "source": "runtime.dispatch_authorization",
+      "status": "OBSERVED",
+      "metadata": {
+        "authorization_id": "dispatch-auth_0f58010eb43743908b1c04b84c4b5839",
+        "issuer_class": "TEST_ONLY",
+        "policy_digest": "56d745594c2c6421245c86b50a7d26b9f545975b6a9cb5f5bf80bf5a40b73ebb",
+        "policy_evidence_id": "evidence_915da2c3df9747ab8539a939a8c96e2c",
+        "issued_at": "2026-09-15T21:16:09.225592+00:00",
+        "consumed_at": "2026-09-15T21:16:09.310381+00:00",
+        "effective_dispatch_outcome": "AUTHORIZED_FOR_EXACT_RUN",
+        "original_policy_decision": "APPROVAL_REQUIRED"
+      }
+    }
+  ],
+  "routing_policy_evidence": [
+    {
+      "id": "evidence_915da2c3df9747ab8539a939a8c96e2c",
+      "run_id": "run_eb5ae9be319e403a95dcb8e65c0c8c6a",
+      "status": "NEED_ACTION",
+      "metadata": {
+        "classification": "PUBLIC",
+        "execution_mode": "STANDARD",
+        "destination_trust": "TRUSTED_EXTERNAL",
+        "tool_trust": "TRUSTED_REGISTERED",
+        "decision": "APPROVAL_REQUIRED",
+        "route": "MANUAL",
+        "reason": "sensitive_or_side_effect_requires_approval",
+        "local_available": "False",
+        "side_effect": "True",
+        "generation_revision": "1"
+      }
+    }
+  ],
+  "all_evidence_sources": [
+    "runtime.routing_policy"
+  ],
+  "source_before_sha256": "a88461f8368a8e884152e5d38bc7a52315f9e311d6c094597c3ad15700bf3911",
+  "original_source_unchanged": true,
+  "baseline_commit": "5c51dd96d5bbee844266213b1855e74cd543dd03",
+  "run_state": "TIMED_OUT",
+  "staging_after_sha256": "a88461f8368a8e884152e5d38bc7a52315f9e311d6c094597c3ad15700bf3911"
+}

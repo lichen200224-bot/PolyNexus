@@ -1,0 +1,112 @@
+{
+  "task_id": "D2B-01-REPAIR-01",
+  "base_sha": "d21fb54f782a3044d43082209394a583af69a24a",
+  "cwd_product": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\enhanced-product-continuation",
+  "cwd_core": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\enhanced-product-continuation\\services\\core",
+  "note": "Rows identify the final publication gates in actual sequence. real-command-records.json and validation-command-records.json preserve completed app command metadata, including intermediate failed invocations. Counts for real diagnostics refer to their independent postcondition pytest; read-back is not a test suite.",
+  "ordering": [
+    {
+      "order": 1,
+      "name": "first_real_product_path_timeout",
+      "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\enhanced-product-continuation",
+      "command": "D:\\AI學習教材\\PolyNexus\\.venv\\Scripts\\python.exe -B tools/run_d2b01_production.py --artifact-root <USER_HOME>\\AppData\\Local\\Temp\\d2b01-repair-production-raw-20260916-1 --executable <USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\d2b01-opencode-tool\\node_modules\\opencode-ai\\bin\\opencode.exe",
+      "actual_exit": 1,
+      "passed": 0,
+      "failed": 1,
+      "skipped": 0,
+      "product_outcome": "TIMED_OUT",
+      "raw_refs": ["real-command-records.json", "first-timeout-production-run.json", "first-timeout-acp.stdout.jsonl", "first-timeout-postcondition.stdout.log"]
+    },
+    {
+      "order": 2,
+      "name": "corrected_real_product_path",
+      "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\enhanced-product-continuation",
+      "command": "D:\\AI學習教材\\PolyNexus\\.venv\\Scripts\\python.exe -B tools/run_d2b01_production.py --artifact-root <USER_HOME>\\AppData\\Local\\Temp\\d2b01-repair-production-raw-20260916-2 --executable <USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\d2b01-opencode-tool\\node_modules\\opencode-ai\\bin\\opencode.exe",
+      "actual_exit": 0,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "product_outcome": "COMPLETED",
+      "raw_refs": ["real-command-records.json", "production-run.json", "production-acp.stdout.jsonl", "production-postcondition.stdout.log"]
+    },
+    {
+      "order": 3,
+      "name": "independent_persisted_readback",
+      "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\enhanced-product-continuation",
+      "command": "<USER_HOME>\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe tools/readback_d2b01_production.py <USER_HOME>\\AppData\\Local\\Temp\\d2b01-repair-production-raw-20260916-2",
+      "actual_exit": 0,
+      "passed": "NOT_APPLICABLE",
+      "failed": "NOT_APPLICABLE",
+      "skipped": "NOT_APPLICABLE",
+      "raw_ref": "production-readback.json"
+    },
+    {
+      "order": 4,
+      "name": "affected_regression",
+      "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\enhanced-product-continuation\\services\\core",
+      "command": "<USER_HOME>\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe -m pytest -o addopts= -q -ra --tb=short --basetemp ../../.tmp-d2b01/pytest tests/test_g16_runtime_selection_policy.py tests/test_g14_runtime_reconciliation.py tests/test_wp14b_runtime_binding.py tests/test_d1a_policy_secret.py tests/test_d1a_generation_ownership.py tests/test_d1b_a_lp.py tests/test_d1b_candidate_evidence_human_p0.py tests/test_d2a_external_runtime.py",
+      "actual_exit": 0,
+      "passed": 160,
+      "failed": 0,
+      "skipped": 1,
+      "raw_ref": "affected.log"
+    },
+    {
+      "order": 5,
+      "name": "migration_and_restore",
+      "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\enhanced-product-continuation\\services\\core",
+      "command": "<USER_HOME>\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe -m pytest -o addopts= -q -ra --tb=short --basetemp ../../.tmp-d2b01/pytest tests/test_d1a_migration_restore.py tests/test_baseline_debt_01_migration.py tests/test_cp06_wp30_clean_install.py tests/test_d1a_project_context.py tests/test_wp23_backup_restore_migration.py tests/test_d2b01_dispatch_authorization.py",
+      "actual_exit": 0,
+      "passed": 48,
+      "failed": 0,
+      "skipped": 0,
+      "raw_ref": "migration.log"
+    },
+    {
+      "order": 6,
+      "name": "d2b01_and_dispatch_targeted",
+      "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\enhanced-product-continuation\\services\\core",
+      "command": "<USER_HOME>\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe -m pytest -o addopts= -q -ra --tb=short --basetemp ../../.tmp-d2b01/pytest tests/test_d2b01_dispatch_authorization.py tests/test_d2b01_opencode_acp.py",
+      "actual_exit": 0,
+      "passed": 49,
+      "failed": 0,
+      "skipped": 0,
+      "raw_ref": "targeted.log"
+    },
+    {
+      "order": 7,
+      "name": "final_full_core",
+      "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\enhanced-product-continuation\\services\\core",
+      "command": "<USER_HOME>\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe -m pytest -o addopts= -q -ra --tb=short --basetemp ../../.tmp-d2b01/pytest tests",
+      "actual_exit": 0,
+      "passed": 963,
+      "failed": 0,
+      "skipped": 1,
+      "raw_ref": "full-core.log"
+    },
+    {
+      "order": 8,
+      "name": "factory_focus",
+      "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\enhanced-product-continuation\\services\\core",
+      "command": "<USER_HOME>\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe -m pytest -o addopts= -vv -k default_registry_factory --tb=short --basetemp ../../.tmp-d2b01/pytest tests/test_d2b01_opencode_acp.py",
+      "actual_exit": 0,
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "raw_ref": "factory.log"
+    },
+    {
+      "order": 9,
+      "name": "active_cancel_focus",
+      "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\enhanced-product-continuation\\services\\core",
+      "command": "<USER_HOME>\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe -m pytest -o addopts= -vv -k active_exchange_cancel --tb=short --basetemp ../../.tmp-d2b01/pytest tests/test_d2b01_opencode_acp.py",
+      "actual_exit": 0,
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "raw_ref": "cancel.log"
+    }
+  ],
+  "skipped_case": "tests/test_d2a_external_runtime.py::test_projected_staging_rejects_nested_reparse_path",
+  "skipped_reason": "symlink creation is unavailable in this Windows test environment"
+}

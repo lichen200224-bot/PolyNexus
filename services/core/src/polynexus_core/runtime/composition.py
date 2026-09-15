@@ -5,6 +5,8 @@ RuntimeRegistry remains the sole profile resolver and this module exposes no
 dynamic install, download, or alternate resolution path.
 """
 from __future__ import annotations
+import os
+from pathlib import Path
 
 from polynexus_core.domain.enums import (
     AuthOwnership,
@@ -34,6 +36,7 @@ from polynexus_core.runtime.registry import (
     RuntimeRegistry,
     build_reference_profile,
 )
+from polynexus_core.storage.content import ContentStore
 
 
 def build_codex_profile() -> RuntimeProfile:
@@ -68,6 +71,16 @@ def build_opencode_acp_profile() -> RuntimeProfile:
         secret_ref_id=None,
         usage_visibility=UsageVisibility.UNAVAILABLE,
     )
+
+
+def _opencode_acp_factory() -> OpenCodeACPRuntimeAdapter:
+    """Bind OpenCode to the same authoritative Core blob root as ExecutionService."""
+
+    configured = os.environ.get("POLYNEXUS_CONTENT_ROOT")
+    if not configured:
+        raise ValueError("core_content_root_required")
+    root = ContentStore(Path(configured)).root
+    return OpenCodeACPRuntimeAdapter(content_root=root)
 
 
 def build_default_registry() -> RuntimeRegistry:
@@ -117,7 +130,7 @@ def build_default_registry() -> RuntimeRegistry:
             health=HealthBoundary.RUNTIME_PROBE,
             conformance_scope=ConformanceScope.UNVERIFIED,
         ),
-        ((build_opencode_acp_profile(), OpenCodeACPRuntimeAdapter),),
+        ((build_opencode_acp_profile(), _opencode_acp_factory),),
     )
     registry.static_module_registry = modules  # type: ignore[attr-defined]
     registry.static_module_bridge = bridge  # type: ignore[attr-defined]

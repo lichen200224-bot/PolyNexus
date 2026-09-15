@@ -7,18 +7,35 @@ import json
 import os
 import subprocess
 import sys
+import threading
 from pathlib import Path
 
 import pytest
 
 from polynexus_core.domain.enums import RunState
+from polynexus_core.extensions.manifest import ModuleError
 from polynexus_core.domain.models import ContextPackage, Task
 from polynexus_core.runtime.acp_transport import ACPTransport
 from polynexus_core.runtime.external_contracts import ExternalContractError
 from polynexus_core.runtime.opencode_acp import OpenCodeACPRuntimeAdapter
 from polynexus_core.runtime.registry import build_default_registry
+from polynexus_core.runtime.supervisor import RunSupervisor
 from polynexus_core.storage.content import ContentStore
 from polynexus_core.workspace.ownership import ControlledJob
+
+
+@pytest.mark.parametrize("seconds", (0, -1, 121, float("nan"), True, "120"))
+def test_supervisor_rejects_unbounded_or_invalid_adapter_deadline(seconds) -> None:
+    adapter = type("DeadlineAdapter", (), {"operation_timeout_seconds": lambda self: seconds})()
+    with pytest.raises(ValueError, match="runtime_operation_timeout_invalid"):
+        RunSupervisor(adapter)
+
+
+def test_supervisor_deadline_is_core_owned_and_bounded() -> None:
+    default = RunSupervisor(object())
+    bounded = RunSupervisor(type("DeadlineAdapter", (), {"operation_timeout_seconds": lambda self: 120})())
+    assert default._operation_timeout_seconds == 30
+    assert bounded._operation_timeout_seconds == 120
 
 
 def _git(cwd: Path, *arguments: str) -> None:
@@ -80,6 +97,8 @@ class _ACPJob:
         elif method == "session/new":
             result = {"sessionId": "sess_1", "configOptions": [] if self.mode == "missing-model" else [{"category": "model", "currentValue": "opencode/paid-model" if self.mode == "fallback" else "opencode/mimo-v2.5-free"}]}
         elif method == "session/prompt":
+            if self.mode == "hold-prompt":
+                return
             if self.mode == "correct":
                 (self.cwd / "bug.py").write_bytes(b"def answer():\n    return 42\n")
             elif self.mode == "other-path":
@@ -155,6 +174,40 @@ def test_real_adapter_registers_without_implicit_fallback() -> None:
     assert registry.resolve("reference.local").adapter_id == "builtin.reference"
     with pytest.raises(Exception):
         registry.resolve("opencode.acp.unknown")
+
+
+def test_default_registry_factory_uses_authoritative_core_root_and_no_fallback(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("POLYNEXUS_CONTENT_ROOT", str(tmp_path / "core-content"))
+    monkeypatch.setenv("POLYNEXUS_OPENCODE_EXECUTABLE", sys.executable)
+    monkeypatch.setenv("POLYNEXUS_RUNTIME_PROFILE_REF", "opencode.acp.local")
+    registry = build_default_registry()
+    profile = registry._resolve_selected_profile()
+    assert profile.runtime_profile_ref == "opencode.acp.local"
+    adapter = registry.create_adapter(profile)
+    assert isinstance(adapter, OpenCodeACPRuntimeAdapter)
+    assert adapter._content_root == (tmp_path / "core-content").resolve()
+    adapter._version_probe = lambda _path: "1.18.31"
+    assert asyncio.run(adapter.readiness()) is True
+    assert registry.resolve("reference.local").adapter_id != profile.adapter_id
+
+
+@pytest.mark.parametrize("value", [None, "relative-core-root"])
+def test_default_registry_factory_missing_or_invalid_core_root_fails_closed(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, value: str | None,
+) -> None:
+    monkeypatch.setenv("POLYNEXUS_OPENCODE_EXECUTABLE", sys.executable)
+    monkeypatch.setenv("POLYNEXUS_RUNTIME_PROFILE_REF", "opencode.acp.local")
+    if value is None:
+        monkeypatch.delenv("POLYNEXUS_CONTENT_ROOT", raising=False)
+    else:
+        monkeypatch.setenv("POLYNEXUS_CONTENT_ROOT", value)
+    registry = build_default_registry()
+    profile = registry._resolve_selected_profile()
+    assert profile.runtime_profile_ref == "opencode.acp.local"
+    with pytest.raises(ModuleError, match="Runtime module factory or capability check failed"):
+        registry.create_adapter(profile)
 
 
 def test_acp_exchange_imports_only_allowlisted_diff_and_core_blob(tmp_path: Path) -> None:
@@ -281,6 +334,63 @@ def test_cleanup_failure_is_reported_and_not_success(tmp_path: Path) -> None:
         ref, _result = await _execute(adapter, _context(source))
         jobs[0].facts = lambda: [{"pid": 1, "stopped": False, "exit_code": 0}]
         assert await adapter.cleanup(ref) is False
+
+    asyncio.run(execute())
+
+
+@pytest.mark.parametrize("target", [RunState.CANCELLED, RunState.TIMED_OUT])
+def test_active_exchange_cancel_targets_exact_run_and_imports_nothing(tmp_path: Path, target: RunState) -> None:
+    source = _source(tmp_path)
+    original_source = (source / "bug.py").read_bytes()
+    jobs = []
+
+    class HoldingJob(_ACPJob):
+        def __init__(self, cwd):
+            super().__init__(cwd, mode="hold-prompt")
+            self.released = threading.Event()
+            self.stop_calls = 0
+        def read_line(self, timeout):
+            if self.lines:
+                return self.lines.pop(0)
+            self.released.wait(timeout)
+            raise TimeoutError("owned prompt was stopped")
+        def close_stdin(self):
+            super().close_stdin()
+            self.released.set()
+        def stop(self, timeout=10):
+            self.stop_calls += 1
+            return super().stop(timeout)
+
+    def factory(_argv, cwd, _environment):
+        job = HoldingJob(cwd)
+        jobs.append(job)
+        return job
+
+    adapter = OpenCodeACPRuntimeAdapter(
+        executable=Path(sys.executable), content_root=tmp_path / "content",
+        job_factory=factory, version_probe=lambda _path: "1.18.31",
+    )
+    adapter.bind_run_identity(run_id="run_cancel_exact", task_id="task_1")
+
+    async def execute():
+        ref = await adapter.create_run(_context(source))
+        await adapter.submit(ref, _task())
+        for _ in range(100):
+            if len(jobs[0].requests) == 3: break
+            await asyncio.sleep(0.01)
+        assert len(jobs[0].requests) == 3
+        assert adapter._get(ref).exchange is not None
+        assert not adapter._get(ref).exchange.done()
+        adapter.set_cleanup_target(ref, target)
+        await adapter.cancel(ref)
+        await asyncio.sleep(0)
+        assert adapter._get(ref).exchange.cancelled()
+        assert (await adapter.status(ref)).state is target
+        assert jobs[0].stop_calls == 1 and jobs[0].stopped()
+        assert await adapter.cleanup(ref) is True
+        assert await adapter.artifacts(ref) == ()
+        assert adapter._get(ref).result_value is None
+        assert (source / "bug.py").read_bytes() == original_source
 
     asyncio.run(execute())
 

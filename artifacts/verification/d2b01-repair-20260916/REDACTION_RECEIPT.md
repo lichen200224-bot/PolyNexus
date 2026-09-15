@@ -1,0 +1,7 @@
+# D2B-01 repair evidence redaction
+
+`PUBLISH.py` reads each original isolated diagnostic/test file as bytes, scans for secret-like values, then deterministically replaces the personal home prefix with `<USER_HOME>` in direct, JSON-escaped and slash-path forms. The retained raw diagnostic roots and original files are outside this Git publication. `real-command-records.json` and `validation-command-records.json` apply the same prefix replacement across direct and nested escaped command/output metadata (1, 2, 4 and 8 backslash variants); their exit codes and output lines come from completed Codex app command records.
+
+Only that personal path prefix is normalized. Run/Task/Generation identities, policy decisions and facts, authorization scope/state/digest, issue/consume event timestamps, binding, process results, source hashes, failure messages, test counts, exits, Artifact hashes, runtime Evidence and acceptance meaning are not edited. The first timed-out production run remains published with exit 1 and its ACP output. The successful retry is a distinct isolated Run, with exit 0 and its own raw ACP output.
+
+`MANIFEST.sha256` hashes every published file except the manifest itself. No API key, token, cookie, credential, private key, Human WebAuthn assertion, passkey material, or secret value is published. The `TEST_ONLY` issuer is a labelled isolated technical principal, not Human UAT or Candidate Human Accept.

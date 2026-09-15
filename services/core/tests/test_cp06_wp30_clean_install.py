@@ -171,7 +171,7 @@ def _assert_ordering_metadata(db_path: Path, run_id: str, event_id: str) -> None
         engine.dispose()
 
 
-@pytest.mark.parametrize("revision, expected", [("0003", "0003"), ("head", "0009")])
+@pytest.mark.parametrize("revision, expected", [("0003", "0003"), ("head", "0010")])
 def test_clean_head_ordering_defaults_and_required_sequence(tmp_path: Path, revision, expected) -> None:
     from sqlalchemy.exc import IntegrityError
 

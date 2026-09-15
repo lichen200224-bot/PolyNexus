@@ -1,0 +1,13 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.14, pytest-9.0.2, pluggy-1.6.0 -- <USER_HOME>\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe
+cachedir: .pytest_cache
+rootdir: <USER_HOME>\OneDrive\���\PONYNEXUS\enhanced-product-continuation\services\core
+configfile: pyproject.toml
+plugins: anyio-4.15.1
+collecting ... collected 32 items / 29 deselected / 3 selected
+
+tests/test_d2b01_opencode_acp.py::test_default_registry_factory_uses_authoritative_core_root_and_no_fallback PASSED [ 33%]
+tests/test_d2b01_opencode_acp.py::test_default_registry_factory_missing_or_invalid_core_root_fails_closed[None] PASSED [ 66%]
+tests/test_d2b01_opencode_acp.py::test_default_registry_factory_missing_or_invalid_core_root_fails_closed[relative-core-root] PASSED [100%]
+
+====================== 3 passed, 29 deselected in 1.18s =======================

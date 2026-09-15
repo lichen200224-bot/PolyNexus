@@ -1,0 +1,95 @@
+{
+  "run": {
+    "id": "run_84ef6f5511284d1f916bf9ea9dfb1c01",
+    "task_id": "task_7e906cf15a2a4feb9c473e0558578729",
+    "generation_revision": 1,
+    "state": "COMPLETED",
+    "result_artifact_ids": "[\"artifact_9bb5d4c294ba4fee914a1d6e5e1d5ca1\"]"
+  },
+  "generation": {
+    "task_id": "task_7e906cf15a2a4feb9c473e0558578729",
+    "revision": 1,
+    "control_revision": 2,
+    "aborted": 0,
+    "closed": 1,
+    "ownership_unknown": 0
+  },
+  "binding": {
+    "run_id": "run_84ef6f5511284d1f916bf9ea9dfb1c01",
+    "runtime_profile_ref": "opencode.acp.local",
+    "adapter_id": "builtin.opencode.acp"
+  },
+  "authorization": {
+    "authorization_id": "dispatch-auth_72b14720aaa34f7cac8c61634077069a",
+    "run_id": "run_84ef6f5511284d1f916bf9ea9dfb1c01",
+    "state": "CONSUMED",
+    "issuer_class": "TEST_ONLY",
+    "policy_digest": "0d691eb5142baef7a9d81945a504ae19f6de7e119fe990a42e0840151ab82f1b",
+    "policy_evidence_id": "evidence_bbb5cfb7709b49ecbbb71bb975bd0558"
+  },
+  "authorization_events": [
+    {
+      "event_kind": "ISSUE",
+      "from_state": null,
+      "to_state": "ISSUED"
+    },
+    {
+      "event_kind": "CONSUME",
+      "from_state": "ISSUED",
+      "to_state": "CONSUMED"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "evidence_311a4d1e6e974955a76d60600ab28c0e",
+      "run_id": "run_84ef6f5511284d1f916bf9ea9dfb1c01",
+      "source": "runtime.opencode.acp",
+      "status": "OBSERVED"
+    },
+    {
+      "id": "evidence_595bf79bc37d48049efbe64decbcfbbf",
+      "run_id": "run_84ef6f5511284d1f916bf9ea9dfb1c01",
+      "source": "runtime.dispatch_authorization",
+      "status": "OBSERVED"
+    },
+    {
+      "id": "evidence_8b9e61d10610426492239188bf99d98b",
+      "run_id": "run_84ef6f5511284d1f916bf9ea9dfb1c01",
+      "source": "runtime-adapter",
+      "status": "PASS"
+    },
+    {
+      "id": "evidence_bbb5cfb7709b49ecbbb71bb975bd0558",
+      "run_id": "run_84ef6f5511284d1f916bf9ea9dfb1c01",
+      "source": "runtime.routing_policy",
+      "status": "NEED_ACTION"
+    },
+    {
+      "id": "evidence_dabac5192b7b4a9b88d91380b6e177ad",
+      "run_id": "run_84ef6f5511284d1f916bf9ea9dfb1c01",
+      "source": "workflow-gate-evaluation",
+      "status": "OBSERVED"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact_9bb5d4c294ba4fee914a1d6e5e1d5ca1",
+      "run_id": "run_84ef6f5511284d1f916bf9ea9dfb1c01",
+      "storage_ref": "core-blob:7749dc5c1111dfc60c7ec37c1133739e3e4f07f6c3202834b61354243f74869b",
+      "sha256": "7749dc5c1111dfc60c7ec37c1133739e3e4f07f6c3202834b61354243f74869b"
+    }
+  ],
+  "selected_source_files": {
+    "bug.py": {
+      "source_sha256": "a88461f8368a8e884152e5d38bc7a52315f9e311d6c094597c3ad15700bf3911",
+      "staging_sha256": "232ebf42bfe8ca6cb387145693368b0708b36fd6d25d10c5949a60afdb9ff473"
+    },
+    "test_bug.py": {
+      "source_sha256": "f8afc94387afa737f65fe8868b9f4e02af64f58b5f0bd9b0505747bfdbe3a576",
+      "staging_sha256": "f8afc94387afa737f65fe8868b9f4e02af64f58b5f0bd9b0505747bfdbe3a576"
+    }
+  },
+  "original_source_unchanged": true,
+  "test_input_unchanged": true,
+  "single_changed_path": true
+}

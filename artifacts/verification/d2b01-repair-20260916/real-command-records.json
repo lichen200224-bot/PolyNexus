@@ -1,0 +1,16 @@
+[
+  {
+    "command": "\"<USER_HOME>\\\\.cache\\\\codex-runtimes\\\\codex-primary-runtime\\\\dependencies\\\\native\\\\powershell\\\\pwsh.exe\" -Command '$root=Join-Path $env:TEMP '\"'d2b01-repair-production-raw-20260916-1'; if(Test-Path \"'$root){ throw '\"'artifact root exists' }; & 'D:\\\\AI學習教材\\\\PolyNexus\\\\.venv\\\\Scripts\\\\python.exe' -B tools/run_d2b01_production.py --artifact-root \"'$root --executable '\"'<USER_HOME>\\\\OneDrive\\\\文件\\\\PONYNEXUS\\\\d2b01-opencode-tool\\\\node_modules\\\\opencode-ai\\\\bin\\\\opencode.exe'; \"'$actual=$LASTEXITCODE; Write-Output \"ACTUAL_EXIT=$actual\"; exit $actual'",
+    "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\enhanced-product-continuation",
+    "exitCode": 1,
+    "durationMs": 33721,
+    "output": "PRODUCTION_PATH_OUTCOME=TIMED_OUT\r\nPRODUCTION_PATH_POLICY=APPROVAL_REQUIRED\r\nPRODUCTION_PATH_BINDING=NONE\r\nPRODUCTION_PATH_AUTHORIZATION=CONSUMED\r\nPRODUCTION_PATH_POSTCONDITION_EXIT=1\r\nACTUAL_EXIT=1\r\n"
+  },
+  {
+    "command": "\"<USER_HOME>\\\\.cache\\\\codex-runtimes\\\\codex-primary-runtime\\\\dependencies\\\\native\\\\powershell\\\\pwsh.exe\" -Command '$root=Join-Path $env:TEMP '\"'d2b01-repair-production-raw-20260916-2'; if(Test-Path \"'$root){ throw '\"'artifact root exists' }; & 'D:\\\\AI學習教材\\\\PolyNexus\\\\.venv\\\\Scripts\\\\python.exe' -B tools/run_d2b01_production.py --artifact-root \"'$root --executable '\"'<USER_HOME>\\\\OneDrive\\\\文件\\\\PONYNEXUS\\\\d2b01-opencode-tool\\\\node_modules\\\\opencode-ai\\\\bin\\\\opencode.exe'; \"'$actual=$LASTEXITCODE; Write-Output \"ACTUAL_EXIT=$actual\"; exit $actual'",
+    "cwd": "<USER_HOME>\\OneDrive\\文件\\PONYNEXUS\\enhanced-product-continuation",
+    "exitCode": 0,
+    "durationMs": 91741,
+    "output": "PRODUCTION_PATH_OUTCOME=COMPLETED\r\nPRODUCTION_PATH_POLICY=APPROVAL_REQUIRED\r\nPRODUCTION_PATH_BINDING=NONE\r\nPRODUCTION_PATH_AUTHORIZATION=CONSUMED\r\nPRODUCTION_PATH_POSTCONDITION_EXIT=0\r\nACTUAL_EXIT=0\r\n"
+  }
+]

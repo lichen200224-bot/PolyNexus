@@ -180,6 +180,11 @@ class OpenCodeACPRuntimeAdapter:
             auth_ownership=AuthOwnership.RUNTIME_MANAGED,
         )
 
+    def operation_timeout_seconds(self) -> float:
+        """Request the Core-owned bounded ACP turn deadline, not provider control."""
+
+        return 120.0
+
     async def create_run(self, context: ContextPackage) -> str:
         if self._run_id is None or self._task_id is None:
             raise ExternalContractError("binding_identity_missing")

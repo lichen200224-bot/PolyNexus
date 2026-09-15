@@ -34,13 +34,13 @@ def test_upgrade_backup_restore_preserves_legacy(tmp_path,monkeypatch):
     receipt=create_sqlite_backup(db,backup)
     assert receipt.integrity=='ok'
     command.upgrade(config(db),'head')
-    assert ScriptDirectory.from_config(config(db)).get_heads()==['0009']
+    assert ScriptDirectory.from_config(config(db)).get_heads()==['0010']
     with sqlite3.connect(db) as conn:
         assert conn.execute('SELECT id,name,classification,archived FROM projects').fetchall()==[('p','legacy','INTERNAL',0)]
         assert conn.execute('SELECT id,context_package_id FROM tasks').fetchall()==[('t','cp')]
         assert conn.execute('SELECT count(*) FROM work_generations').fetchone()==(0,)
         assert conn.execute('PRAGMA foreign_key_check').fetchall()==[]
-    with pytest.raises(RuntimeError,match='not lossless'):
+    with pytest.raises(RuntimeError,match='pre-upgrade database backup|not lossless'):
         command.downgrade(config(db),'0003')
     restore_sqlite_backup(backup,restored)
     # SQLite's backup API may normalize file layout; verify restored bytes
@@ -138,7 +138,7 @@ def test_every_additive_mutation_interrupt_restores_all_legacy_facts(tmp_path,mo
         assert hashlib.sha256(blob.read_bytes()).hexdigest()==digest
         command.upgrade(config(restored),'head')
         assert logical_snapshot(restored,columns)[1]==facts
-        records.append({'step':step,'statement':steps[step].splitlines()[0],'backup_sha256':receipt.sha256,'old_facts_equal':True,'content_sha256':digest,'restored_head':'0009'})
+        records.append({'step':step,'statement':steps[step].splitlines()[0],'backup_sha256':receipt.sha256,'old_facts_equal':True,'content_sha256':digest,'restored_head':'0010'})
     print('D1A_MIGRATION_STEP_FACTS='+json.dumps(records))
 
 

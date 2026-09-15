@@ -207,6 +207,46 @@ class RunBindingSnapshotRow(Base):
     usage_visibility = Column(String(32), nullable=False)
 
 
+class RuntimeDispatchAuthorizationRow(Base):
+    """Independent, exact-Run dispatch authority; scope is DB-immutable."""
+
+    __tablename__ = "runtime_dispatch_authorizations"
+    authorization_id = Column(String(80), primary_key=True)
+    run_id = Column(String(64), ForeignKey("runs.id"), nullable=False)
+    task_id = Column(String(64), ForeignKey("tasks.id"), nullable=False)
+    generation_revision = Column(Integer, nullable=False)
+    runtime_profile_ref = Column(String(64), nullable=False)
+    profile_revision = Column(Integer, nullable=False)
+    adapter_id = Column(String(64), nullable=False)
+    policy_evidence_id = Column(String(64), ForeignKey("evidence.id"), nullable=False)
+    policy_digest = Column(String(64), nullable=False)
+    effective_classification = Column(String(32), nullable=False)
+    execution_mode = Column(String(32), nullable=False)
+    destination_trust = Column(String(32), nullable=False)
+    tool_trust = Column(String(32), nullable=False)
+    side_effect = Column(Boolean, nullable=False)
+    issuer_ref = Column(String(256), nullable=False)
+    issuer_class = Column(String(32), nullable=False)
+    issued_at = Column(DateTime, nullable=False)
+    expires_at = Column(DateTime, nullable=False)
+    state = Column(String(16), nullable=False)
+    consumed_at = Column(DateTime, nullable=True)
+    revoked_at = Column(DateTime, nullable=True)
+
+
+class RuntimeDispatchAuthorizationEventRow(Base):
+    """Append-only issue/consume/revoke audit."""
+
+    __tablename__ = "runtime_dispatch_authorization_events"
+    event_id = Column(String(80), primary_key=True)
+    authorization_id = Column(String(80), ForeignKey("runtime_dispatch_authorizations.authorization_id"), nullable=False)
+    run_id = Column(String(64), ForeignKey("runs.id"), nullable=False)
+    event_kind = Column(String(16), nullable=False)
+    from_state = Column(String(16), nullable=True)
+    to_state = Column(String(16), nullable=False)
+    occurred_at = Column(DateTime, nullable=False)
+
+
 @event.listens_for(RunBindingSnapshotRow, "before_update")
 def _reject_snapshot_row_update(mapper, connection, target) -> None:
     raise RuntimeBindingError(

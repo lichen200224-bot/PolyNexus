@@ -1,0 +1,12 @@
+................................................                         [100%]
+============================== warnings summary ===============================
+..\..\..\..\..\..\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\site-packages\starlette\testclient.py:45
+  <USER_HOME>\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\site-packages\starlette\testclient.py:45: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_baseline_debt_01_migration.py: 20 warnings
+  <USER_HOME>\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\site-packages\alembic\config.py:612: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+48 passed, 21 warnings in 71.61s (0:01:11)

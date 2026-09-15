@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import math
 import weakref
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
@@ -192,6 +193,11 @@ class RunSupervisor:
     ) -> None:
         self._adapter = adapter
         self._workflow_executor = workflow_executor or ReferenceWorkflowExecutor()
+        requested = getattr(adapter, "operation_timeout_seconds", None)
+        seconds = requested() if callable(requested) else _DEFAULT_OPERATION_TIMEOUT_SECONDS
+        if isinstance(seconds, bool) or not isinstance(seconds, (int, float)) or not math.isfinite(seconds) or not 0 < seconds <= 120:
+            raise ValueError("runtime_operation_timeout_invalid")
+        self._operation_timeout_seconds = float(seconds)
 
     def _bind_adapter_identity(self, run: Run, task: Task) -> None:
         """Use a private seam for target provenance without widening the adapter API."""
@@ -235,7 +241,7 @@ class RunSupervisor:
                 return await self._wait_for_operation(
                     operation(), timeout=(
                         _DEFAULT_CLEANUP_TIMEOUT_SECONDS if cleanup
-                        else _DEFAULT_OPERATION_TIMEOUT_SECONDS
+                        else self._operation_timeout_seconds
                     ),
                 )
             except asyncio.TimeoutError:
@@ -298,7 +304,7 @@ class RunSupervisor:
             # would deadlock when create_run/submit is called by the workflow.
             execution = await asyncio.wait_for(
                 self._workflow_executor.execute(request, guarded_adapter),
-                timeout=_DEFAULT_OPERATION_TIMEOUT_SECONDS,
+                timeout=self._operation_timeout_seconds,
             )
         except (asyncio.TimeoutError, _ResourceTimeout, _ResourceBudgetExceeded):
             return None, guarded_adapter.runtime_ref, True

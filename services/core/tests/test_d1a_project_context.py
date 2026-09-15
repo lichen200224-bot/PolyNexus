@@ -34,7 +34,7 @@ def test_archive_reopen_retains_task_and_classification(tmp_path):
         reopened = SqlProjectRepository(session).get(project.id)
         assert reopened.archived and reopened.classification == "CONFIDENTIAL"
         assert SqlTaskRepository(session).get(task.id).project_id == project.id
-        assert session.execute(text("SELECT version_num FROM alembic_version")).scalar_one() == "0009"
+        assert session.execute(text("SELECT version_num FROM alembic_version")).scalar_one() == "0010"
     engine.dispose()
 
 
