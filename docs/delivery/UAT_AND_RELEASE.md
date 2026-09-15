@@ -69,6 +69,8 @@ Human protocol automated tests 只能使用隔離 TEST_ONLY principal。實際 F
 
 Human 不需在 HU-04～HU-06 每次重新批准 provider invocation；那些 runtime executions 應在 AI technical acceptance 階段已完成。Human UAT 的重點是最終產品可理解性、實際身份/decision 與 end-to-end 行為。
 
+HU-08／HU-12 涉及的 PN-078 Assurance Mode/Status 與 PN-038 attributable human override metric，依 [ASSURANCE_CONTRACT.md](ASSURANCE_CONTRACT.md) 核對；Assurance Status、metric 均不得代替 verification PASS 或 Human acceptance。
+
 ## 5. Strategic Runtime acceptance boundary
 
 五 Runtime 都必須進產品 Fleet，但不要求 capability 完全等價。

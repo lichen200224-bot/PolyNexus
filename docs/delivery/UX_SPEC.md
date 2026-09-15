@@ -164,6 +164,6 @@ Final user experience 由 `UAT_AND_RELEASE.md` 的集中 Human UAT 接受；AI r
 
 ## 10. Assurance / metric
 
-PN-078 的 Task mode、read-only Status badge、失效理由及分軸 Candidate view 依 `ASSURANCE_CONTRACT`；Mode/Status 不得與 PASS 或 Human accepted 混成同一 success icon。
+PN-078 的 Task mode、read-only Status badge、失效理由及分軸 Candidate view 依 [ASSURANCE_CONTRACT.md](ASSURANCE_CONTRACT.md)；Mode/Status 不得與 PASS 或 Human accepted 混成同一 success icon。
 
 PN-038 human override 只顯示 attributable disagreement telemetry，無接受或 override 操作；UNKNOWN 不顯示為 0。Control Plane 可以摘要 Assurance/metric，但不能藉摘要改變其 authoritative state。
