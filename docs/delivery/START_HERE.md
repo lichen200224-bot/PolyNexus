@@ -1,49 +1,115 @@
-# 完整初版＋新版擴充：唯一文件與開工入口
+# PolyNexus 加強版收斂：唯一文件與開工入口
 
-Date: 2026-09-13 (Asia/Taipei)
-Task: PREP-FULL-DELIVERY-01
-State: DOCUMENTATION_CANDIDATE / INDEPENDENT_DESIGN_REVIEW_REQUIRED
-Active branch: planning/full-delivery-design-consolidation
-Product implementation: HOLD_PENDING_START_GATES
-Product version: UNCHANGED
+Date: 2026-09-15 (Asia/Taipei)
+Task: `ENHANCED-DELIVERY-REPLAN-01`
+State: `HUMAN_DIRECTION_APPROVED / DOCUMENTATION_CANDIDATE / FRESH_DOC_REVIEW_REQUIRED`
+Active branch: `planning/enhanced-runtime-control-plane`
+Product version: `UNCHANGED`
+Product implementation: `NO_NEW_PRODUCT_WRITES_UNTIL_FRESH_DOC_REVIEW_PASS`
 
-Human已授權ChatGPT補齊前置文件、Git/GitHub發布與文件整併，正式產品開工交Codex；正常開發/UT/SIT/review/fix由AI處理，Human最後檢核。新增要求是各功能開發範圍、限制、子項及依賴必須事先清楚。本文件包實現這個規劃，不縮減Git定稿初版＋確認的新版增量。
+Human 已批准依目前實際產品進度重新收斂後續開發：保留既有 Core/Generation/Runtime/Evidence/Human 架構，加入公司主力 Strategic Runtime Fleet、Multi-Agent Council/Workflow 與 Unified Work Control Plane；Codex 全開發測試，ChatGPT 驗收 exact product candidate，PASS 後可在批准範圍內自動續下一批，Human 正常只在最後集中 UAT / Final Acceptance 介入。
 
-## 閱讀順序與單一來源
+本 docs patch 由 ChatGPT 撰寫，因此不能由同一 Writer 自我宣告 fresh docs PASS。正式產品新寫入先完成 `DESIGN_REVIEW.md` 的 exact remote review，再進 `G0`。
+
+## 1. Current-state reading order
 
 | 目的 | 入口 |
 |---|---|
-| 每個功能做什麼/不能做什麼 | [FEATURE_WORK_PACKAGES](FEATURE_WORK_PACKAGES.md)、[FEATURE_SCOPE_MATRIX](FEATURE_SCOPE_MATRIX.json) |
-| PN來源、完整功能與AC | [REQUIREMENTS](REQUIREMENTS.md)、[PRD](PRD.md)、[TARGET_AND_TEMPLATE_CONTRACTS](TARGET_AND_TEMPLATE_CONTRACTS.md) |
-| 來源身份與接受範圍 | [SOURCE_LOCK](SOURCE_LOCK.json)、[SOURCE_INDEX](SOURCE_INDEX.md) |
-| 全分支處置與衝突 | [BRANCH_DISPOSITION](BRANCH_DISPOSITION.md)、[GIT_RECONCILIATION](GIT_RECONCILIATION.md) |
-| 系統分析/設計 | [SA](SA.md)、[SD](SD.md)、[DATA_AND_API](DATA_AND_API.md) |
-| UX、Runtime、安全 | [UX_SPEC](UX_SPEC.md)、[RUNTIME_AND_MODULES](RUNTIME_AND_MODULES.md)、[SECURITY](SECURITY.md) |
-| 測試/安裝/備份/可攜 | [TEST_PLAN](TEST_PLAN.md)、[OPERATIONS](OPERATIONS.md) |
-| 批次執行及既有成果 | [GOAL_PLAN](GOAL_PLAN.md)、[EXECUTION_CONTRACT](EXECUTION_CONTRACT.md)、[IMPLEMENTATION_LEDGER](IMPLEMENTATION_LEDGER.md) |
-| 本次修復與驗證 | [REPAIR_RECORD](REPAIR_RECORD.md)、[REPAIR_VALIDATION](REPAIR_VALIDATION.json)、[DECISION_AND_GAP_REGISTER](DECISION_AND_GAP_REGISTER.md) |
-| F001／F002逐值契約 | [ASSURANCE_CONTRACT](ASSURANCE_CONTRACT.md)、[ASSURANCE_TRACEABILITY](ASSURANCE_TRACEABILITY.json) |
-| 獨立審查與Codex交接 | [DESIGN_REVIEW](DESIGN_REVIEW.md)、[CODEX_HANDOFF](CODEX_HANDOFF.md) |
-| 最後交Human | [UAT_AND_RELEASE](UAT_AND_RELEASE.md) |
+| **目前真正產品/remote/acceptance狀態** | [CURRENT_PRODUCT_STATE](CURRENT_PRODUCT_STATE.md) |
+| **五 Runtime 加強版契約** | [STRATEGIC_RUNTIME_FLEET](STRATEGIC_RUNTIME_FLEET.md) |
+| 後續批次/順序/人為介入 | [GOAL_PLAN](GOAL_PLAN.md) |
+| AI/Codex/ChatGPT/Human 權限 | [EXECUTION_CONTRACT](EXECUTION_CONTRACT.md) |
+| Fresh docs review | [DESIGN_REVIEW](DESIGN_REVIEW.md) |
+| Codex 正式接手入口 | [CODEX_HANDOFF](CODEX_HANDOFF.md) |
+| Runtime / module details | [RUNTIME_AND_MODULES](RUNTIME_AND_MODULES.md) |
+| Unified Control Plane / UX | [UX_SPEC](UX_SPEC.md) |
+| Final concentrated Human UAT | [UAT_AND_RELEASE](UAT_AND_RELEASE.md) |
+| 原 required 功能/FD/PN | [FEATURE_WORK_PACKAGES](FEATURE_WORK_PACKAGES.md)、[FEATURE_SCOPE_MATRIX](FEATURE_SCOPE_MATRIX.json)、[REQUIREMENTS](REQUIREMENTS.md) |
+| Frozen/source authority | [SOURCE_LOCK](SOURCE_LOCK.json)、[SOURCE_INDEX](SOURCE_INDEX.md) |
 
-22功能包/78 PN/257規劃子項是可追溯分解，不是已完成產品或已通過全部原子source審查。每包包含allowed areas、forbidden、inputs/outputs、deps、正負SIT、UAT，每PN另有細部分解與limits；原frozen義務不因摘要刪除。
+其他 full-delivery/frozen/reference 文件保留來源與歷史證據；其過期 `NEXT_GOAL`、`NOT_STARTED`、`HOLD`、舊 branch routing 不再是 active current-state authority。
 
-## 來源與狀態分離
+## 2. Current product facts to preserve
 
-產品保留SHA為f0c0b986380dc21d103d4e856057cb8ac435a8f9。Track A正式增量與TA-F4接受receipt來自43aa27c8b7a1b950645acc0d41234ec7679b653e，Frozen REV1/Work Packages來自fe2eb2318dc6558afe1aa6c5361756b082c90c74；GOV來源1ea8ce3df9bf6b1fc0899fcafaedeba2f4052af4。選定原件以exact blob保存，不直接覆蓋最新產品tree或舊接受歷史。
+At planning time, canonical remote facts included:
 
-MCF-02候選030890b30160f1063ac2cef1d36705a9ea70bddb仍待獨立review、未接受且未合入產品碼。原G24–G30 bounded100/100不是整個PolyNexus完成。兩個歷史ADR-013以ADR-MOD-013及ADR-ID-013消歧，不改原text/Golden。
+```text
+D1B/current default route:
+  e9538f328f409e2cb7d6868a8b79cc33ba4bdd87
 
-## 發布與開工邊界
+B01 technical candidate:
+  codex/product-b01-tech
+  ca85d22c44062d2856ab037a1ee1556ea26c70cc
 
-前置docs的commit與non-force發布已獲授權；整併為一條文件接續線不等於盲merge全部未審程式。原分支/default與產品source保留。原件內過期NEXT_GOAL/NOT_STARTED/95分是歷史，不是本branch的routing。入口為AGENTS＋docs/37＋本頁。
+old MCF-02 candidate:
+  030890b30160f1063ac2cef1d36705a9ea70bddb
+  REJECTED / NOT_ADOPTED
+```
 
-作者可報結構self-check、actual exits、GitHub API publication；不可自行Independent PASS。正式開工先達設計審查、source closure、實機ownership/clean取得、target/安全/有限資源及有效start receipt。已具Human條件授權者不逐GOAL重問；缺不可委派條件者集中報例外。
+Fresh reviewers/controllers must re-read remote truth; these values are not permission to skip verification.
 
-B01-TECH是內部技術里程碑，不縮小全功能或冒Human接受。必要Human-only UAT在最後集中完成；Agent credentials、fixture principal、Git授權不能替代真正Human決定。
+D1B evidence records bounded technical + isolated Human product acceptance. B01 records technical readiness/fresh engineering review but still `PENDING_FINAL_HUMAN_UAT`. Neither status equals full enhanced-product completion/release.
 
-## 修復與實際驗證範圍
+## 3. What this replan changes
 
-前身1489cd7f的Human轉交獨立審查為NEED_FIX（F001 MAJOR、F002 MINOR、F003 OBSERVATION）；本次是原Writer同範圍修復，不能自判independent closure。PN-078恢復Assurance、PN-038澄清human override遙測。新評估與驗證結果見REPAIR_RECORD/REPAIR_VALIDATION；PREPARATION_VALIDATION.json是前身作者自檢歷史，SOURCE_LOCK原source pins及references不變。
+This replan changes delivery order and completion emphasis, not frozen product identity:
 
-本次planning validator/selftest對已驗byte的文件子集執行；不是完整Git clone，也不是產品測試或獨立審查。Git CLI DNS仍受阻exit128，API發布/readback另記，不能冒CLI push/clean-clone PASS。exact新Candidate/tree/parent以PR publication receipt為準。修復後仍須fresh Reviewer按新SHA完整DR-01–14重審，不只看兩項修正。產品HOLD不變。
+- D2b becomes **Strategic Runtime Fleet**: OpenCode, Gemini CLI, Claude Code, Antigravity on top of existing Codex/reference runtime;
+- D3 completes **Council / role->runtime / structured handoff / workflow/templates** without a new Agent framework;
+- D4 completes **Unified Work Control Plane + Runtime Fleet Doctor** as a thin read-model/UX layer;
+- T1/T2 prove functional cross-runtime Golden scenarios and failure/security truthfulness;
+- Final Human-only work is concentrated into one integrated UAT session.
+
+No new PN or version bump is created. Existing FD responsibility remains authoritative.
+
+## 4. What is explicitly not rebuilt
+
+Do not create parallel authority for:
+
+- Project/Task/WorkGeneration/Run/Candidate;
+- workspace ownership/retry;
+- RuntimeBinding/RunSupervisor;
+- ContextPackage/Artifact/Evidence/Finding;
+- verification/Assurance/Human exact-view decision;
+- Council lifecycle;
+- policy/egress/SecretRef.
+
+Do not reintroduce duplicate `AgentSession`, `AgentMessage`, `AgentHandoff`, `AgentWorkspace` domains simply to copy another multi-agent product shape.
+
+## 5. Current execution routing
+
+After fresh docs review PASS:
+
+```text
+G0 Current/B01 reconciliation
+  -> D2B-01 OpenCode ACP
+  -> D2B-02 Gemini CLI ACP
+  -> D2B-03 Claude Code
+  -> D2B-04 Antigravity
+  -> D2B-05 Runtime Fleet Doctor
+  -> D3 Multi-Agent Council/Workflow
+  -> D4 Unified Work Control Plane
+  -> D4-NEXT only source-required remainder
+  -> T1 Functional Golden SIT
+  -> T2 Failure/Security SIT
+  -> DELIVERY
+  -> FINAL_HUMAN_UAT
+```
+
+Codex product candidates are independently reviewed by ChatGPT. A ChatGPT PASS may authorize the next already-approved dependency-ready unit without another Human response.
+
+## 6. Human boundary
+
+Expected normal remaining Human involvement after this planning approval: **1** concentrated final UAT/acceptance session.
+
+Conditional Human involvement only when actually required:
+
+- official provider login / Windows Hello cannot safely be reused;
+- architecture/frozen/security/scope exception;
+- separate release/merge/deploy/payment/production-data action.
+
+Ordinary bugs, adapter fixes, tests, regressions and same-scope compatibility work remain Codex -> ChatGPT review loops.
+
+## 7. Publication boundary
+
+This branch is documentation/planning only. Do not infer that publishing these documents accepts B01, starts D2b, merges any branch, changes default/protection, releases software or promotes the product version.
